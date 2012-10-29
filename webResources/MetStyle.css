@@ -1,0 +1,109 @@
+body {
+align:center;
+}
+div.collectionHeader {
+    color: black;
+    background:  rgb(204,204,255);
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    margin:auto;
+    width:800px;
+    text-align: center;
+    margin-left:auto;
+    margin-right:auto;
+    margin-top:5px;
+    margin-bottom:5px;
+}
+
+div.termHeader {
+    color: black;
+    background:  rgb(199,199,255);
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    margin:auto;
+    width:800px;
+    text-align: center;
+    margin-left:auto;
+    margin-right:auto;
+    margin-top:5px;
+    margin-bottom:5px;
+    border:2px
+}
+
+div.metaHeader {
+    color: black;
+    background:  rgb(204,204,255);
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    margin-left:auto;
+    margin-right:auto;
+    margin-top:2px;
+    margin-bottom:2px;;
+    width:784px;
+    padding:10px;
+}
+
+div.versionHeader {
+    color: black;
+    background:  rgb(204,204,255);
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    margin-left:auto;
+    margin-right:auto;
+    margin-top:2px;
+    margin-bottom:2px;
+    width:784px;
+    padding:10px;
+}
+
+div.statementsHeader {
+    color: black;
+    background:  rgb(204,204,255);
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    margin-left:auto;
+    margin-right:auto;
+    margin-top:2px;
+    margin-bottom:2px;
+    width:784px;
+    padding:10px;
+}
+
+div.navigationHeader {
+    color: black;
+    background:  rgb(204,204,255);
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    margin-left:auto;
+    margin-right:auto;
+    margin-top:2px;
+    margin-bottom:2px;
+    width:784px;
+    padding:10px;
+
+}
+div.EntityName {
+    font-size: 200%;
+}
+div.uri {
+    font-size: 75%;
+}
+div.comments {
+    font-size: 100%;
+    font-style:italic;
+}
+
+div.formats {
+    font-size: 100%;
+}
+
+div.titles {
+    font-size: 150%;
+    font-style:italic;
+    
+}
+
+
+
+
+

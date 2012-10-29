@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta content="text/html; charset=ISO-8859-1"
+      http-equiv="Content-Type">
+    <title>HOW-TO operate on a terminology model</title>
+  </head>
+  <body>
+    <h1>HOW-TO operate on a terminology model</h1>
+    <p><font color="#000000">The Terminology Manager allows updates of a
+        terminology model via a set of commands controlled by the metOp
+        command line, whose functionalities are described here.<br>
+        Mapping tables to a web representation, and publishing tables
+        are operations performed via the metMap command. For an overview
+        of the platforms and its component refer to the </font><a
+href="file:///Users/andreasplendiani/code/eclipseWorkspace/MetOfficeTermRegistry/Documentation/web/Technical/Terminology_Manager_Platform_Design.html">Terminology
+
+        Manager platform design</a> document.<br>
+    </p>
+    <p>Here are presented a few usage of the metOp utility.<br>
+    </p>
+    <p>Before operating metOp, it is necessary to configure the
+      classpath properly. Example:<br>
+    </p>
+    <pre>export CLASSPATH=$CLASSPATH:/home/test/MetOfficeTermRegistry/distrib/WMOTermReg.jar:/home/test/MetOfficeTermRegistry/libs/*</pre>
+    <h2>Updating a term</h2>
+    <p>A code (or register) can be updated when information is added (or
+      modified) that does not affect its meaning or its commitments as a
+      code. A simple example of update could be the addition of a label
+      in a different language, or correction of a label mispelling.<br>
+      A code (or register) can be updated via the following command:<br>
+    </p>
+    <pre>java uk.gov.metoffice.terminology.commandline.MetOp <br>-m&nbsp; tdb /home/test/DB/MetOffice <br>-o http://metoffice.gov.uk/wmo/ <br>-d "New label introduced" <br>-op addstats <br>-t http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-1/021 <br>-data file:///home/test/MetOfficeTermRegistry/examples/dumbUpdate.ttl<br><br></pre>
+    Explanation:<br>
+    -m&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; indicates the location of
+    the triplestore<br>
+    -o&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; the URI of the "agent"
+    against whom the authorization to perform this operation on the
+    specified code is checked<br>
+    -d &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; a description for this
+    action<br>
+    -op&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; the operation to be performed
+    (internally represented as a URL). addstat issues a monotonous
+    update of the information relative to a code (versioned, if
+    versioning is active for the code).<br>
+    -t&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; the target of the operation<br>
+    -data&nbsp;&nbsp; a file containing the new statements to be added
+    to the code (turtle syntax)<br>
+    <br>
+    <font color="#ff0000">Note: the specific syntax of the above command
+      is currently changing. Explanations will be provided via --help.</font><br>
+    <p></p>
+    <h2>Obsoleting a term</h2>
+    <p>A code can be removed from a register from its next version via a
+      delete command. In the current configuration, the code changes
+      status in a newer version and becomes obsolete. The register, in a
+      newer version, does not include the code anymore (its still
+      include it in versions prior to this operation). The command to
+      obsolete a term in a register is the following:<br>
+    </p>
+    <pre>java uk.gov.metoffice.terminology.commandline.MetOp <br>-m&nbsp; tdb /Users/andreasplendiani/DB/MetOfficeLocal <br>-o http://metoffice.gov.uk/wmo/ <br>-d "Code deleted" <br>-op del <br>-t http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-1/022 <br>-r http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-1<br><br></pre>
+    The parameters have the same meaning of those presented for the
+    update command. With the addition of:<br>
+    -r&nbsp;&nbsp;&nbsp; The register from which the term should be
+    obsoleted.<br>
+    <p>Note that the specification of -r is redundant if a code can
+      reside only in one register, which is the current implementation.<br>
+      <br>
+        <br>
+        <br>
+      <font color="#ff0000">Note: the specific syntax of the above
+        command is currently changing. Explanations will be provided via
+        --help.</font><br>
+    </p>
+    <h2>Adding a new term</h2>
+    <p>A new code can be added to a register as follow:</p>
+    <pre>java uk.gov.metoffice.terminology.commandline.MetOp <br>-m&nbsp; 	tdb /home/test/DB/MetOffice <br>-o 	http://metoffice.gov.uk/wmo/ <br>-d 	"New code added" <br>-op 	add <br>-t 	http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-1/300 <br>-r 	http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-1 <br>-data 	file:///home/test/MetOfficeTermRegistry/examples/demoEntity.ttl<br><br></pre>
+    <p>we focus on the options that have some variations from the above
+      commands:</p>
+    <p>-t The URI of the new code introduced<br>
+      -r The register where to add the code<br>
+      -data A file containing statements proper of the code (inc. its
+      type!)</p>
+    <pre></pre>
+    <p><font color="#ff0000">Note: the specific syntax of the above
+        command is currently changing. Explanations will be provided via
+        --help.</font><br>
+    </p>
+    <h2>Superseding a term</h2>
+    <p>A new code can be introduced that replaces an existing term,
+      basically combining the introduction of a new term and the
+      obsoletion of a term already present.<br>
+    </p>
+    <pre>java uk.gov.metoffice.terminology.commandline.MetOp <br>-m&nbsp; 	tdb /home/test/DB/MetOffice <br>-o 	http://metoffice.gov.uk/wmo/ <br>-d 	"Term superseding" <br>-op 	superseed <br>-t 	http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-1/080 <br>-sup 	http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-1/300 <br>-r 	http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-1<br></pre>
+    <p>Here:<br>
+    </p>
+    <p>-t&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; the term to be obsoleted
+      <br>
+      -sup&nbsp;&nbsp;&nbsp; the superseding term<br>
+      -r&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; the register where the new
+      term is introduced, an the old term was contained.<br>
+    </p>
+    <p> <font color="#ff0000">Note: the specific syntax of the above
+        command is currently changing. Explanations will be provided via
+        --help.</font></p>
+    <p><br>
+    </p>
+    <p><i>All operations results in exceptions if terms and registries
+        specified don't exist, or if the specified actor is not
+        authorized to perform the operation specified.</i><br>
+    </p>
+  </body>
+</html>
