@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<!-- this is fixed, should be imported -->
+<script type=text/javascript>
+		// These are page-element strings
+		
+		// Header elements
+		var versionStr=new Object();
+		versionStr['en']="v.";
+		versionStr['it']="v.";
+		versionStr['zh']="v.";
+		
+		var strDownload=new Object();
+		strDownload['en']="Download this in";
+		strDownload['it']="Scarica il contenuto in";
+		strDownload['']="";
+		
+		var strRead=new Object();
+		strRead['en']="Read this in";
+		strRead['it']="Leggi il contenuto in";
+		strRead['']="";
+		
+		// Meta Information
+		var metaStatusCol=new Object();
+		metaStatusCol['en']="Meta Information on the code";
+		metaStatusCol['it']="Informazioni sul codice";
+		metaStatusCol['zh']="";
+		
+		var metaStatusCol=new Object();
+		metaStatusCol['en']="Status";
+		metaStatusCol['it']="Stato";
+		metaStatusCol['']="";
+		
+		var metaLastUpdateCol=new Object();
+		metaLastUpdateCol['en']="Last update";
+		metaLastUpdateCol['it']="Ultimo aggiornamento";
+		metaLastUpdateCol['']="";
+		
+		var metaOwnerCol=new Object();
+		metaOwnerCol['en']="Owner";
+		metaOwnerCol['it']="Proprietario";
+		metaOwnerCol['']="";
+		
+		var metaVersionCol=new Object();
+		metaVersionCol['en']="Version";
+		metaVersionCol['it']="Versione";
+		metaVersionCol['']="";
+		
+		
+		// Versions table elements
+		var strVersionHistory=new Object();
+		strVersionHistory['en']="Version History";
+		strVersionHistory['it']="Versioni";
+		strVersionHistory['zh']="";
+		
+		var versionColTitle=new Object();
+		versionColTitle['en']="Version";
+		versionColTitle['it']="Numero di versione";
+		versionColTitle['zh']="";
+		
+		var dateColTitle=new Object();
+		dateColTitle['en']="Date";
+		dateColTitle['it']="Data";
+		dateColTitle['zh']="";
+		
+		var actionColTitle=new Object();
+		actionColTitle['en']="Action";
+		actionColTitle['it']="Azione";
+		actionColTitle['zh']="";
+		
+		var actorColTitle=new Object();
+		actorColTitle['en']="From";
+		actorColTitle['it']="Eseguito da";
+		actorColTitle['zh']="";
+		
+		var descColTitle=new Object();
+		descColTitle['en']="Description";
+		descColTitle['it']="Descrizione";
+		descColTitle['zh']="";
+				
+		//Properties
+		var propString=new Object();
+		propString['en']="Register description";
+		propString['it']="Descrizione del registro";
+		propString['zh']="";
+		
+		var propAttributeCol=new Object();
+		propAttributeCol['en']="Attribute";
+		propAttributeCol['it']="Attributo";
+		propAttributeCol['zh']="";
+		
+		var propValueCol=new Object();
+		propValueCol['en']="Value";
+		propValueCol['it']="Valore";
+		propValueCol['zh']="";
+		
+		var propCodeRow=new Object();
+		propCodeRow['en']="Registry code";
+		propCodeRow['it']="Registro inteso come codice";
+		propCodeRow['zh']="";
+		
+		var propConceptRow=new Object();
+		propConceptRow['en']="Registry concept";
+		propConceptRow['it']="Registro inteso come entita'";
+		propConceptRow['zh']="";
+
+		//Navigation
+		var definedInRegStr=new Object();
+		definedInRegStr['en']="Defined in register";
+		definedInRegStr['it']="Definito nel registro";
+		definedInRegStr['zh']="";
+		
+		var subRegStr=new Object();
+		subRegStr['en']="Sub registers";
+		subRegStr['it']="Sottoregistri";
+		subRegStr['zh']="";
+				
+		function switchPageLanguage(lang) {
+			if(strRead[lang]) document.getElementById("strRead").innerHTML=strRead[lang];
+			if(strDownload[lang]) document.getElementById("strDownload").innerHTML=strDownload[lang];
+		
+			if(metaStatusCol[lang]) document.getElementById("metaStatusCol").innerHTML=metaStatusCol[lang];
+			if(metaLastUpdateCol[lang]) document.getElementById("metaLastUpdateCol").innerHTML=metaLastUpdateCol[lang];
+			if(metaOwnerCol[lang]) document.getElementById("metaOwnerCol").innerHTML=metaOwnerCol[lang];
+			if(metaVersionCol[lang]) document.getElementById("metaVersionCol").innerHTML=metaVersionCol[lang];
+			
+			if(strVersionHistory[lang]) document.getElementById("strVersionHistory").innerHTML=strVersionHistory[lang];
+			if(versionColTitle[lang]) document.getElementById("versionColTitle").innerHTML=versionColTitle[lang];
+			if(dateColTitle[lang]) document.getElementById("dateColTitle").innerHTML=dateColTitle[lang];
+			if(actionColTitle[lang]) document.getElementById("actionColTitle").innerHTML=actionColTitle[lang];
+			if(actorColTitle[lang]) document.getElementById("actorColTitle").innerHTML=actorColTitle[lang];
+			if(descColTitle[lang]) document.getElementById("descColTitle").innerHTML=descColTitle[lang];
+			
+			if(propString[lang]) document.getElementById("propString").innerHTML= propString[lang];
+			if(propAttributeCol[lang]) document.getElementById("propAttributeCol").innerHTML= propAttributeCol[lang];
+			if(propValueCol[lang]) document.getElementById("propValueCol").innerHTML= propValueCol[lang];
+			if(propCodeRow[lang]) document.getElementById("propCodeRow").innerHTML= propCodeRow[lang];
+			if(propConceptRow[lang]) document.getElementById("propConceptRow").innerHTML= propConceptRow[lang];
+	
+			if(definedInRegStr[lang]) document.getElementById("definedInRegStr").innerHTML=definedInRegStr[lang];
+			if(subRegStr[lang]) document.getElementById("subRegStr").innerHTML=subRegStr[lang];
+	
+		}
+		
+			
+	</script>
+<script type=text/javascript>
+		//These are code related strings	
+		
+		//Title
+		var titleValue=new Object();
+		titleValue['en']="Table B Cat. 12";
+		titleValue['it']="Tabella B Cat. 12";
+		titleValue['zh']="表B/12";
+		
+		var labelAndType=new Object();
+		labelAndType['en']="Temperatures (and ISO Register)";
+		labelAndType['it']="Temperature (Registro ISO)";
+		labelAndType['zh']="";
+		
+		//Description
+		var descriptionValue=new Object();
+		descriptionValue['en']="A collection of properties representing temperatures in the BUFR standard";
+		descriptionValue['it']="Una lista di proprieta' usate per rappresentare temperature nelle specifiche di BUFR";
+		descriptionValue['zh']="代表在BUFR的標準溫度的屬性集合";
+		
+		//Metadata values
+		var metaStatusValue=new Object();
+		metaStatusValue['en']="Valid";
+		metaStatusValue['it']="Validato";
+		metaStatusValue['zh']="";
+		
+		var metaOwnerValue=new Object();
+		metaOwnerValue['en']="MetOffice";
+		metaOwnerValue['it']="MetOffice";
+		metaOwnerValue['zh']="MetOffice";
+		
+		var metaVersionValue=new Object();
+		metaVersionValue['en']="i0";
+		metaVersionValue['it']="i0";
+		metaVersionValue['zh']="i0";
+		
+		// Versions History
+		var actionValue_i0=new Object();
+		actionValue_i0['en']="Import from Table";
+		actionValue_i0['it']="Importazione da tabella";
+		actionValue_i0['']="";
+		
+		var actorValue_i0=new Object();
+		actorValue_i0['en']="MetOffice";
+		actorValue_i0['it']="MetOffice";
+		actorValue_i0['zh']="MetOffice";
+		
+		var descValue_i0=new Object();
+		descValue_i0['en']="Default semi-automated import";
+		descValue_i0['it']="Importazione semi-automatica di default";
+		descValue_i0['']="";
+		
+		//Code Attribute/Values
+		
+		var propAttr_1=new Object();
+		propAttr_1['en']="Number of bits";
+		propAttr_1['it']="Numero di bits";
+		propAttr_1['zh']="";
+		
+		var propAttr_2=new Object();
+		propAttr_2['en']="See Also";
+		propAttr_2['it']="Vedi anche";
+		propAttr_2['zh']="";
+		
+		var propAttr_3=new Object();
+		propAttr_3['en']="See Also";
+		propAttr_3['it']="Vedi anche";
+		propAttr_3['zh']="";
+		
+		var propValue_1=new Object();
+		propValue_1['en']="8";
+		propValue_1['it']="8";
+		propValue_1['zh']="8";
+		
+		var propValue_2=new Object();
+		propValue_2['en']="SWEET - Temperature";
+		propValue_2['it']="SWEET - temperature";
+		propValue_2['zh']="";
+		
+		var propValue_3=new Object();
+		propValue_3['en']="ISO Temperature Model";
+		propValue_3['it']="Modello delle misure di temperature ISO";
+		propValue_3['']="";
+		
+		//Navigation
+		var upperReg_1=new Object();
+		upperReg_1['en']="Table B";
+		upperReg_1['it']="Tabella B";
+		upperReg_1['zh']="";
+		
+		var subReg_1=new Object();
+		subReg_1['en']="Temperature / air Temperature";
+		subReg_1['it']="Temperatura / temperatura dell'aria";
+		subReg_1['zh']="";
+		
+		var subReg_2=new Object();
+		subReg_2['en']="Air Temperature";
+		subReg_2['it']="Temperatura dell'aria";
+		subReg_2['zh']="";
+		
+		var subReg_3=new Object();
+		subReg_3['en']="Dew - Point Temperature";
+		subReg_3['it']="Punto di condensa";
+		subReg_3['zh']="";
+		
+		function switchCodeLanguage(lang) {
+			if(titleValue[lang]) document.getElementById("strTitlePlusVersion").innerHTML=titleValue[lang]+" - "+versionStr[lang]+" "+metaVersionValue[lang];
+			if(labelAndType[lang]) document.getElementById("labelAndType").innerHTML=labelAndType[lang];
+			if(descriptionValue[lang]) document.getElementById("strDescription").innerHTML=descriptionValue[lang];
+			
+			if(metaStatusValue[lang]) document.getElementById("metaStatusValue").innerHTML=metaStatusValue[lang];
+			if(metaOwnerValue[lang]) document.getElementById("metaOwnerValue").innerHTML=metaOwnerValue[lang];
+			if(metaVersionValue[lang]) document.getElementById("metaVersionValue").innerHTML=metaVersionValue[lang];
+			
+			if(actionValue_i0[lang]) document.getElementById("actionValue_i0").innerHTML=actionValue_i0[lang];
+			if(actorValue_i0[lang]) document.getElementById("actorValue_i0").innerHTML=actorValue_i0[lang];
+			if(descValue_i0[lang]) document.getElementById("descValue_i0").innerHTML=descValue_i0[lang];
+			
+			if(propAttr_1[lang]) document.getElementById("propAttr_1").innerHTML=propAttr_1[lang];
+			if(propAttr_2[lang]) document.getElementById("propAttr_2").innerHTML=propAttr_2[lang];
+			if(propAttr_3[lang]) document.getElementById("propAttr_3").innerHTML=propAttr_3[lang];
+
+			if(propValue_1[lang]) document.getElementById("propValue_1").innerHTML=propValue_1[lang];
+			if(propValue_2[lang]) document.getElementById("propValue_2").innerHTML=propValue_2[lang];
+			if(propValue_3[lang]) document.getElementById("propValue_3").innerHTML=propValue_3[lang];
+			
+			if(upperReg_1[lang]) document.getElementById("upperReg_1").innerHTML= upperReg_1[lang];
+			
+			if(subReg_1[lang]) document.getElementById("subReg_1").innerHTML= subReg_1[lang];
+			
+			if(subReg_2[lang]) document.getElementById("subReg_2").innerHTML= subReg_2[lang];
+			
+			if(subReg_3[lang]) document.getElementById("subReg_3").innerHTML= subReg_3[lang];
+
+
+			
+		}
+		
+		function switchLanguage(lang) {
+			switchCodeLanguage(lang);
+			switchPageLanguage(lang);
+			
+			//alert(descriptionStr[lang]);
+			
+		}
+	</script>
+<title id="strTitlePlusVersion">Table B - v. i0</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width; initial-scale=1.0" />
+<meta name="robots" content="nofollow" />
+<link rel="shortcut icon" href="http://www.metoffice.gov.uk/favicon.ico" />
+<!-- link rel="apple-touch-icon" href="/apple-touch-icon.png" / -->
+<link rel="stylesheet" type="text/css" href="css/normalize.css" />
+<link rel="stylesheet" type="text/css" href="css/default.css" />
+<!--[if lt IE 9]>
+<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+
+<meta name="description" content="" />
+<meta name="author" content="Andrea Splendiani" />
+
+<!-- Replace favicon.ico & apple-touch-icon.png in the root of your domain and delete these references -->
+<style type="text/css"></style>
+</head>
+
+<body>
+<div id="sizer"> 
+	<!-- begin head -->
+	
+	<header> <a id="skip" accesskey="S" href="#moContent">Skip Navigation</a>
+		<div class="moNavTabs">
+			<ul class="fc">
+				<li id="primary0" class="active"><a href="http://www.metoffice.gov.uk">WMO codes</a></li>
+				<li id="primary1"><a href="http://www.metoffice.gov.uk/services">Documentation</a></li>
+			</ul>
+		</div>
+		<div class="logoBar fc"> <a id="topLogo" href="http://www.metoffice.gov.uk/" title="Go to Met Office home page"><img src="img/head-mo-logo.png" alt="Met Office" /></a>
+			<h1>Search</h1>
+			<form action="http://search.metoffice.gov.uk/kb5/metoffice/metoffice/results.page" method="get" id="fsrch">
+				<label for="searchInput">Search</label>
+				<input type="text" name="qt" id="searchInput" value="" maxlength="1000" accesskey="4">
+				<button type="submit" name="button" id="button" class="button" value="Search">Search</button>
+			</form>
+		</div>
+	</header>
+	
+	<!-- end head --> 
+	<!-- begin navbar --> 
+	
+	<!-- end navbar -->
+	<nav id="breadcrumb">
+		<p> <a href="/">Home</a> &gt; <a href="#">Table B</a> &gt; <a>F0X12</a> </p>
+	</nav>
+	<div id="content">
+		<article>
+			<hgroup>
+				<h1>F0X12</h1>
+				<h2 id="labelAndType">Temperatures (An ISO register)</h2>
+			</hgroup>
+			<section id="main">
+				<p id="strDescription">A collection of properties representing temperatures in the BUFR standard</p>
+				<dl>
+					<dt> URI:</dt>
+					<dd><a href="http://127.0.0.1:8888/MetOffice2/global/bufr/b/12">http://127.0.0.1:8888/MetOffice2/global/bufr/b/12</a></dd>
+					<dt id="strDownload">Download this in</dt>
+					<dd><a href="" title="F0X12 RDF">RDF</a></dd>
+					<dd><a href="" title="F0X12 Turtle">Turtle</a></dd>
+				</dl>
+				<table>
+					<caption id="propString">
+					Register description
+					</caption>
+					<tr>
+						<th scope="col"></th>
+						<th scope="col" id="propAttributeCol">Attribute</th>
+						<th scope="col" id="propValueCol">Value</th>
+					</tr>
+					<tr>
+						<th scope="row" id="propCodeRow" rowspan="1">Registry code</th>
+						<td id="propAttr_1">Number of bits</td>
+						<td id="propValue_1">8</td>
+					</tr>
+					<tr>
+						<th scope="row" id="propConceptRow" rowspan="2">Registry concept</th>
+						<td id="propAttr_2">See Also</td>
+						<td id="propValue_2"><a href="">SWEET - Temperatures</a></td>
+					</tr>
+					<tr>
+						<td id="propAttr_3">See Also</td>
+						<td id="propValue_3"><a href="">ISO Temperature model</a></td>
+					</tr>
+				</table>
+				<table>
+					<caption id="metaInformationValue">
+					Meta Information on the code
+					</caption>
+					<tr>
+						<th scope="row" id="metaStatusCol">Status</th>
+						<td id="metaStatusValue">Valid</td>
+					</tr>
+					<tr>
+						<th scope="row" id="metaLastUpdateCol">Last update</th>
+						<td id="metaLastUpdateValue"><time datetime="2011-02-12">2011-02-12</time></td>
+					</tr>
+					<tr>
+						<th scope="row" id="metaOwnerCol">Owner</th>
+						<td id="metaOwnerValue">MetOffice</td>
+					</tr>
+					<tr>
+						<th scope="row" id="metaVersionCol">Version</th>
+						<td><span id="metaVersionValue">v0 (this is the latest version)</span></td>
+					</tr>
+				</table>
+				<table>
+					<caption>
+					<span id="strVersionHistory">Version history</span>
+					</caption>
+					<tr>
+						<th scope="col"><span id="versionColTitle">Version</span></th>
+						<th scope="col"><span id="dateColTitle">Date</span></th>
+						<th scope="col"><span id="actionColTitle">Action</span></th>
+						<th scope="col"><span id="actorColTitle">Actor</span></th>
+						<th scope="col"><span id="descColTitle">Description</span></th>
+					</tr>
+					<tr>
+						<td><a href="http://127.0.0.1:8888/MetOffice2/global/bufr/b/12/i0">i0</a></td>
+						<td><time datetime="2012-07-22T10:10:10Z">2012-07-22T10:10:10Z</time></td>
+						<td id="actionValue_i0">Import from Tables</td>
+						<td id="actorValue_i0">MetOffice</td>
+						<td id="descValue_i0">Default semi-automated import</td>
+					</tr>
+				</table>
+			</section>
+			<section id="second">
+				<h2 id="definedInRegStr">Defined in register</h2>
+				<ul>
+					<li><a href="http://localhost:8888/MetOffice2/global/bufr/b" class="moreb" id="upperReg_1">Table B</a> </li>
+				</ul>
+				<h2 id="subRegStr">Sub registers</h2>
+				<ul>
+					<li><a href="http://localhost:8888/MetOffice2/global/bufr/b/12/001" class="moreb">[FBX12Y12001] <span id="subReg_1">Temperature / air Temperature</span></a></li>
+					<li><a href="http://localhost:8888/MetOffice2/global/bufr/b/12/002" class="moreb">[FBX12Y12002] <span id="subReg_2">Air Temperature</span></a></li>
+					<li><a href="http://localhost:8888/MetOffice2/global/bufr/b/12/003" class="moreb">[FBX12Y1200] <span id="subReg_3">Dew - Point Temperature</span></a></li>
+				</ul>
+			</section>
+		</article>
+		<div id="pageLang">
+			<div id="langSelector"> This page is also available in the following languages:
+				<div id="langContainer"> <a lang="it" rel="alternate" hreflang="it" title="Italian" href="setExample.it.html">Italiano</a> <a lang="zh-CN" rel="alternate" hreflang="zh" title="Chinese" href="setExample.zh.html">中文</a> </div>
+			</div>
+		</div>
+	</div>
+	
+	<!-- begin base -->
+	
+	<footer>
+		<div id="footerlogoBar"><img id="footerLogo" src="img/head-mo-logo.png" alt="Met Office" /> </div>
+		<div id="footerContents">
+			<ul id="footerLeft">
+				<li class="first"><a href="http://www.metoffice.gov.uk/about-us/legal" accesskey="8">Legal</a></li>
+				<li><a href="http://www.metoffice.gov.uk/about-us/legal/privacy-and-cookie">Privacy and cookies</a></li>
+			</ul>
+			<ul id="footerRight">
+				<li class="first"><a href="http://www.metoffice.gov.uk/about-us/legal#licences">© Crown copyright</a></li>
+				<li><a href="http://www.metoffice.gov.uk/">www.metoffice.gov.uk</a></li>
+			</ul>
+		</div>
+	</footer>
+	<!-- end base --> 
+</div>
+<script src="js/common_bottom.min.js" type="text/javascript"></script> 
+<!-- START OF SmartSource Data Collector TAG --> 
+<!-- Copyright (c) 1996-2011 Webtrends Inc.  All rights reserved. --> 
+<!-- Version: 9.4.0 --> 
+<!-- Tag Builder Version: 3.2  --> 
+<!-- Created: 8/1/2011 3:15:41 PM --> 
+<script src="js/webtrends.min.js" type="text/javascript"></script> 
+<!-- Warning: The two script blocks below must remain inline. Moving them to an external --> 
+<!-- JavaScript include file can cause serious problems with cross-domain tracking.      --> 
+<script type="text/javascript">
+//<![CDATA[
+var _tag=new WebTrends();
+_tag.dcsGetId();
+//]]>
+</script> 
+<script type="text/javascript">
+//<![CDATA[
+_tag.dcsCustom=function(){
+// Add custom parameters here.
+//_tag.DCSext.param_name=param_value;
+}
+_tag.dcsCollect();
+//]]>
+</script>
+<noscript>
+<div><img alt="" id="DCSIMG" width="1" height="1" src="http://statse.webtrendslive.com/dcshckprv00000spazrt5ckdq_6d2t/njs.gif?dcsuri=/nojavascript&amp;WT.js=No&amp;WT.tv=9.4.0&amp;dcssip=www.metoffice.gov.uk" /></div>
+</noscript>
+<!-- END OF SmartSource Data Collector TAG -->
+
+</body>
+</html>

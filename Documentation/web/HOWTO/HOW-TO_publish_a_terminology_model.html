@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta content="text/html; charset=ISO-8859-1"
+      http-equiv="Content-Type">
+    <title>HOW-TO publish a terminology model</title>
+  </head>
+  <body>
+    <h1>How To publish a terminology model</h1>
+    <font color="#000000">Before following these instruction, make sure
+      the system is installed. Refer to <a
+href="file:///Users/andreasplendiani/code/eclipseWorkspace/MetOfficeTermRegistry/Documentation/web/HOWTO/HOW-TO_Install.html">HOW-TO
+
+        Install</a> for further details.<br>
+      Publishing a terminology model is possible only once a terminology
+      model has been created. Information on how the terminology
+      publication fits within the overall project is provided in </font><font
+      color="#000000">the </font><a
+href="file:///Users/andreasplendiani/code/eclipseWorkspace/MetOfficeTermRegistry/Documentation/web/Technical/Terminology_Manager_Platform_Design.html">Terminology
+
+
+      Manager platform design</a> document.<br>
+    Publishing a terminology as web resources can be done via the metMap
+    command, as detailed below:<br>
+    <h2>1) Make sure the classpath contains all required libs</h2>
+    <p>Example command:<br>
+    </p>
+    <pre>export CLASSPATH=$CLASSPATH:/home/test/MetOfficeTermRegistry/distrib/WMOTermReg.jar:/home/test/MetOfficeTermRegistry/libs/*</pre>
+    <h2>2) Execute MetMap</h2>
+    Example command:<br>
+    <pre>java uk.gov.metoffice.terminology.commandline.MetMap <br>-d <br>-ow <br>-o web <br>-p file:////home/test/MetOfficeTermRegistry/configurationFiles/metOfficeDeploymentGeneric.ttl <br>-m tdb /home/test/DB/MetOffice <br>-f file:////home/test/MetOfficeTermRegistry/configurationFiles/metOfficeDeploymentGeneric.ttl <br>file:////home/test/MetOfficeTermRegistry/configurationFiles/metOfficeDeploymentServer.ttl <br>file:////home/test/MetOfficeTermRegistry/configurationFiles/genericPropertyAttributes.ttl</pre>
+    <font color="#ff0000">Note: the specific syntax of the above command
+      is currently changing. Explanations will be provided via --help.</font><br>
+    <br>
+    Explanation:<br>
+    -d &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    sets debug on (verbose logging)<br>
+    -ow&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sets
+    overwrite on: the system will overwrite a file if this is already
+    present (it will stop otherwise)<br>
+    -o web &nbsp;&nbsp;&nbsp;&nbsp; species that metMap should produce a
+    web representation of codes as files<br>
+    -p&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; specifies a file whose prefixes are
+    used as prefixes in the relevant RDF serializations (RDF/XML,
+    Turtle)<br>
+    -tdb&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; specifies the location (and
+    type) of the triplestore.<br>
+    -f&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    specifies a set of files with further configurations.&nbsp; All
+    files are read and merged in a unique input processed by the system
+    and how the configuration is cut into files is an arbitrary choice.
+    Details on the configuration possibilities are presented in the <a
+      href="../Technical/Guide_To_Configuration_Files.html">Guide to
+      Configuration Files</a>.<br>
+    <br>
+    <h2>Compact commands</h2>
+    To simplify portability some macro command is provided (in the
+    scripts directory of the distribution).<br>
+    <h3>publishRoot</h3>
+    Example command:<br>
+    <pre>./publishRoot.py</pre>
+    The script relies on a fixed directory structure and executes metMap
+    with "standards" argument sets, and site specific arguments
+    extracted from the file publishenvironment.txt (the format is
+    parameter ONE_SPACE value).<br>
+    <br>
+  </body>
+</html>

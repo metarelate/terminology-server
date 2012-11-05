@@ -1,0 +1,15 @@
+<html>
+<head></head>
+<body>
+This is the core of the Terminology Model and the overall conceptualization id described in the main documentation, that we refer to
+{@link http://reference.metoffice.gov.uk/data/wmo/docs/}.<br/>
+The current implementation is based on a triplestore, and as part of the interfaces, Jena entities are used.
+However, different implementations are possible, easily via other Jena models, or via different persistent layers.<br/>
+Some of the information held by the terminology model is volatile, and it is not persisted across "actions". One example is (in the current implementation) the "local namespace" used to build URIs of entities, which is present in the system only during the terminology model construction phase.<br/>
+Note that all URIs in use in the register are not hard-coded but defined in the MetaLangauge. The system could largely work with URIs not defined there, e.g.: states don't need to be defined in MetaLanguage to be used within the system. However, having them in a single space is useful when uris are used in several points in the code (e.g. states and state transitions maps).<br/>
+Throughout the code, the terms "set", "collection", "register" are to be considered synonyms (as well as "code" and "individual").<br/>
+Versions in the model are essentially bag of statements (that apply to a specific version). Relations between versions is not implicit: links among versions have to be stated explicitly (though this is done by the TerminoligyManager) and multiple versioning threads are possible.<br/>
+Versions are not identified by a URI, although internally (e.g. in the TDB implementation) they are.<br/>
+Everything else in the model (sets, individuals, agents, actions, states...) is identified via a URI.
+</body>
+</html>

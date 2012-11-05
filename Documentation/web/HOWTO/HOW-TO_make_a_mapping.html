@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta content="text/html; charset=ISO-8859-1"
+      http-equiv="Content-Type">
+    <title>HOW-TO make a mapping</title>
+  </head>
+  <body>
+    <h1>How to make a mapping from WMO tables to an RDF terminology
+      model</h1>
+    <font color="#ff0000"></font><font color="#000000">Before following
+      these instruction, make sure the system is installed. Refer to <a
+        href="HOW-TO_Install.html">HOW-TO Install</a> for further
+      details.<br>
+      <br>
+      Generating a mapping from tables is a very flexible process, that
+      can follow different paths and have different arrangements of
+      configuration files (for details of the process refer to the </font><a
+      href="../Technical/Terminology_Manager_Platform_Design.html">Terminology
+
+
+      Manager platform design</a>).<br>
+    In the following, we illustrate the steps needed for a typical
+    example, pointing to relevant configuration files examples.<br>
+    Broadly speaking, a mapping consists of two parts: mapping tables to
+    an RDF representation of tables plus terminology structure, and
+    building a terminology model from this representation. The first
+    part requires the execution of the <a href="http://d2rq.org">D2RQ</a>
+    command, the second part requires the execution of the MetMap
+    command line utility, provided by the TerminologyModel package.<br>
+    In what follows, steps of the first part as indicated via letters
+    (A,B,..), steps in the second part by numbers.<br>
+    Additional steps sequences and configuration options are then
+    discussed.<br>
+    <h2>Mapping process example<br>
+    </h2>
+    <h3><font color="#000000">A) Prepare a database with tables to be
+        mapped</font></h3>
+    <font color="#000000">Tables to be mapped need to be represented in
+      a relational database (supported by D2RQ), in order to be accessed
+      by the D2RQ mapping engine. It is not important how the tables are
+      represented in the database, since a d2rq mapping file specifies
+      as how the database "structure" results in RDF. For instance
+      whether a given datatype is represented as integer or string in
+      RDF is specified in the mapping file, and independent on whether
+      the information is present in an integer or string column
+      (obviously, a string cannot be represented in a integer column to
+      begin with).<br>
+      However, d2rq provides a command to generate a "default mapping"
+      and in doing so it considers the database structure: for a simple
+      table, primary keys are mapped to resources, columns to properties
+      (datatypes of eventually object properties if foreign keys are
+      defined). For datatypes, the column type is taken into account to
+      "type" the corresponding RDF property range.<br>
+      A "default mapping" needs to be heavily edited before it can be
+      processed by the Terminology Manager: a well though relational
+      table representation will minimize the editing required.<br>
+      <br>
+      For WMO tables object of this prototype, a few modifications have
+      been necessary to uniform the data and correct inconsistencies.
+      Such modification have been made either to original tables, or in
+      the database.&nbsp; The current distribution (available on
+      subversion) contains the original WMO tables mapped (CSV format),
+      their processed CSV version and a sql dump of the relational
+      database. </font>All data modification from the original tables
+    to the db represented tables are documented in <a
+      href="../Technical/WMO_Tables_alterarions.html">WMO Tables
+      alterations</a>.<br>
+    <br>
+    <h3>B) Prepare a d2rq mapping file</h3>
+    As previously noted, d2rq provides a "generate-mapping" commands
+    that analyze the relational structure to provide a default mapping.
+    We suggest to use this command and then edit the mapping to
+    incorporate the command and conventions specified in the <a
+      href="../Technical/Terminology_Manager_mapping_consstructs.html">Terminology
+
+
+      Manager mapping constructs</a>. Example mappings for WMO tables
+    are provided in the main distribution (subversion).<br>
+    <br>
+    <h3>C) Execute D2RQ<br>
+    </h3>
+    Example command:<br>
+    <br>
+    <pre>/home/test/d2rqSubsystem/dump-rdf -m /home/test/d2rqWorkArea/BaseDirs.n3 -b http://reference.metoffice.gov.uk/data/wmo/tdcf/ &gt; /home/test/d2rqWorkArea/BaseDirs.ntriples</pre>
+    <br>
+    This instructs D2RQ to dump the content of the database according to
+    the mapping specified via the -m option. <br>
+    The base url of the resulting RDF is provided via the -b option, and
+    the result is saved in the ntriples syntax.<br>
+    Credentials for the database connections (and which tables to map)
+    are provided in the d2rq mapping files.<br>
+    <br>
+    <h3>D) Execute rapper (optional)</h3>
+    If the output of the previous step is in ntriples format, execute
+    the utility rapper to convert the output in rdfxml.<br>
+    Example command:<br>
+    <br>
+    <pre>rapper -i ntriples -o rdfxml-abbrev /home/test/d2rqWorkArea/BaseDirs.ntriples &gt; /home/test/d2rqWorkArea/BaseDirs.rdf
+</pre>
+    (note that suffixes are used by some part of the system to identify
+    the syntax, and their use should be consistent)<br>
+    <br>
+    <h2>1) Make sure the classpath contains all required libs</h2>
+    <p>Example command:<br>
+    </p>
+    <pre>export CLASSPATH=$CLASSPATH:/home/test/MetOfficeTermRegistry/distrib/WMOTermReg.jar:/home/test/MetOfficeTermRegistry/libs/*</pre>
+    <h2>2) Execute MetMap</h2>
+    Example command:<br>
+    <pre>java uk.gov.metoffice.terminology.commandline.MetMap -d -i rdf -auto -go http://metoffice.gov.uk/wmo/ <br>-tdb /Users/andreasplendiani/DB/MetOffice <br>-f file:////home/test/codeconfigurationFiles/metOfficeDeploymentGeneric.ttl <br>file:////home/test/configurationFiles/metOfficeDeploymentGeneric.ttl <br>file:////home/test/configurationFiles/configurationFiles/genericReasoningConf.ttl <br>file:////home/test/configurationFiles/configurationFiles/genericLabels.ttl <br>file:////home/test/configurationFiles/configurationFiles/genericPropertyAttributes.ttl <br>file:///home/test/d2rqWorkArea/BaseDirs.rdf</pre>
+    <font color="#ff0000">Note: the specific synatx of the above command
+      is currently changing. Explanations will be provided via --help.</font><br>
+    <br>
+    Explanation:<br>
+    -d &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; sets debug on (verbose logging)<br>
+    -i &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; rdf the input is an rdf
+    file (remains from an older more complex set of commands, now
+    redundant)<br>
+    -auto &nbsp; sets a few parameters with "default" values, e.g.:
+    current date as the import date, import from tables as action...<br>
+    -go&nbsp;&nbsp;&nbsp; &nbsp; specifies the owner (manager) for all
+    the generated entities ()<br>
+    -tdb&nbsp;&nbsp;&nbsp;&nbsp; specifies the location (and type) of
+    the triplestore.<br>
+    -f&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; specifies a set of
+    files that constitute the input.&nbsp; All files are read and merged
+    in a unique input processed by the system. Therefore how the
+    configuration is cut into files is an arbitrary choice. In this
+    example BaseDirs.rdf is the mapping file generated by the previous
+    process. Other files contain "static" paramers: server
+    configuration, reasoner settings, labels, meta-information on
+    properties, reasoning directives and macros. Refer to <a
+href="file:///Users/andreasplendiani/code/eclipseWorkspace/MetOfficeTermRegistry/Documentation/web/Technical/Terminology_Manager_Platform_Design.html">Terminology
+
+
+      Manager platform design</a> for more detail.<br>
+    <br>
+    <h2>Compact commands</h2>
+    To simplify portability some macro command is provided (in the
+    scripts directory of the distribution).<br>
+    <h3>execD2RQ</h3>
+    Example command:<br>
+    <pre>./execD2RQ.py BaseDirsMap</pre>
+    The script relies on a fixed directory structure and performs the
+    following steps:<br>
+    <ol>
+      <li>concatenate the file BaseDirsMap.n3 (".n3" is appended to the
+        name provided) with a file containing the database connection
+        credential</li>
+      <li>calls D2RQ with the appropriate parameters</li>
+      <li>calls rapper to convert the ntriples output to rdf/xml (note
+        that this could be avoided if D2RQ is called specidying the
+        proper output format. At the time of this writing, this option
+        was not chosen because of a possible bug).</li>
+    </ol>
+    Details on the directories where files are or are to be created, as
+    well as which credentials to use, are provided in a file
+    execd2rqenvironment.txt in the "scripts" directory (the format is
+    parameter ONE_SPACE value).<br>
+    <br>
+    <h3>buildModel</h3>
+    Example command:<br>
+    <pre>./buildModel.py BaseDirs.rdf<br></pre>
+    The script relies on a fixed directory structure and on parameters
+    found in modelbuilderenvironment.txt to generated and execute the
+    MetMap command.<br>
+    <br>
+    <br>
+    <br>
+    <br>
+  </body>
+</html>
