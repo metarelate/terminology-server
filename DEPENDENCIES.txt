@@ -1,14 +1,8 @@
-arq-2.8.5.jar		
 junit-4.5.jar		
 stax-api-1.0.1.jar
 icu4j-3.4.4.jar		
-log4j-1.2.13.jar	
-tdb-0.8.7.jar
 iri-0.8.jar		
 lucene-core-2.3.1.jar	
 wstx-asl-3.2.9.jar
 jena-2.6.4-tests.jar	
-slf4j-api-1.5.8.jar	
-xercesImpl-2.7.1.jar
-jena-2.6.4.jar		
-slf4j-log4j12-1.5.8.jar
+xercesImpl-2.7.1.jar		
