@@ -3,8 +3,8 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>net.metarelate.terminology</groupId>
   <artifactId>terminologySever</artifactId>
-  <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <packaging>war</packaging>
+  <version>0.0.1</version>
   <name>terminologySever</name>
   <url>http://github.com/metarelate/terminology-server</url>
   <dependencies>
@@ -18,6 +18,21 @@
     	<groupId>org.apache.jena</groupId>
     	<artifactId>jena-tdb</artifactId>
     	<version>0.9.3</version>
+    </dependency>
+    <dependency>
+    	<groupId>org.apache.wicket</groupId>
+    	<artifactId>wicket-core</artifactId>
+    	<version>6.3.0</version>
+    </dependency>
+    <dependency>
+    	<groupId>org.eclipse.jetty.aggregate</groupId>
+    	<artifactId>jetty-all-server</artifactId>
+    	<version>7.6.3.v20120416</version>
+    </dependency>
+    <dependency>
+    	<groupId>javax.servlet</groupId>
+    	<artifactId>servlet-api</artifactId>
+    	<version>2.5</version>
     </dependency>
   </dependencies>
 </project>
