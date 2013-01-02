@@ -21,12 +21,9 @@ public final class Footer extends Panel {
 		// Content negotiation
 		// Synchs
 		
-		
-		
 	    add(new Label("year", "" + new GregorianCalendar().get(GregorianCalendar.YEAR)));
 	    add(new Label("version", getApplication().getFrameworkSettings().getVersion()));
 	    add(new Label("url",getRequest().getUrl().toString()));
-	    // Absolute URL needed
 	    
 	    Request rq=getRequest();
 	    WebRequest wrq=(WebRequest)rq;
@@ -34,26 +31,6 @@ public final class Footer extends Panel {
 	    String fullURL=srq.getRequestURL().toString();
 	    String contentType=wrq.getHeader("Accept");
         
-	    /*
-	    if(request instanceof WebRequest){
-        	final WebRequest wr = (WebRequest) request;
-        }
-            
-            // but this is the real thing
-            final HttpServletRequest hsr = wr.getHttpServletRequest();
-            String reqUrl = hsr.getRequestURL().toString();
-            final String queryString = hsr.getQueryString();
-            if(queryString != null){
-                reqUrl += "?" + queryString;
-            }
-            return reqUrl;
-        }
-	    
-	   
-	    HttpServletRequest req = (HttpServletRequest)((WebRequest)RequestCycle.get().getRequest()).getContainerRequest();
-	    String fullURL=RequestUtils.toAbsolutePath(req.getRequestURL().toString(), relativePagePath);
-	    */
-	    
 	    add(new Label("fullurlrequest",fullURL));
 	    add(new Label("fullurlgenerated",RequestCycle.get().getUrlRenderer().renderFullUrl(
 	    		   Url.parse(urlFor(HomePage.class,null).toString()))));

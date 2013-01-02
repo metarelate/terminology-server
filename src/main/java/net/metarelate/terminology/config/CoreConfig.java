@@ -19,13 +19,11 @@
 
 package net.metarelate.terminology.config;
 
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 public class CoreConfig {
 	public static final String INIT_VERSION = "v0";
 	
-	public static String VERSION_NUMBER="0.6.0";
+	public static String VERSION_NUMBER="0.7.0";
 	public static String VERSION_CODENAME="tdb-all";
 	
 	public static String UNDEFINED_LABEL="undefined";
@@ -47,4 +45,8 @@ public class CoreConfig {
 	//public static Resource labelsGraph=ResourceFactory.createResource("http://metoffice.gov.uk/terminology/tools/terminologyManager/labelsGraph");
 	//public static Resource extraGraph=ResourceFactory.createResource("http://metoffice.gov.uk/terminology/tools/terminologyManager/extraGraph");
 
+	public static final String rootDirString=".tserver";
+	public static final String gitDirString="git";
+	public static final String dbDirString="db";
+	public static final String confDirString="conf";
 }

@@ -5,21 +5,24 @@
 		<title>Metarelate Terminology Server</title>
 		<!-- The following are coming from the default configuration-->
 		<link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:regular,bold' rel='stylesheet' type='text/css' />
-		<link rel="stylesheet" href="style.css" type="text/css" media="screen" title="Stylesheet" />
+		<link rel="stylesheet" href="static/style.css" type="text/css" media="screen" title="Stylesheet" />
 	</head>
 	<body>
 		<div id="hd">
 			<div id="logo">
 				<!-- we should have a different logo! -->
-				<img src="logo.png" width="50px" height="50px" alt="Wicket Logo" />
+				<img src="static/logo.png" width="50px" height="50px" alt="Wicket Logo" />
 				<h1>Terminology Server</h1>
+				
 			</div>
 		</div>
 		<div id="bd">
 			<p>
 				Secure connection available <a href="https://localhost:8443">here</a>.
 			</p> 
-			
+			<p>
+				<span wicket:id="body2">What we want to say here</span>
+			</p>
 		</div>
 		<div id="ft">
 			<span wicket:id="ft">Footer Info</span>
