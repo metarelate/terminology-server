@@ -25,6 +25,7 @@
 		</init-param>
 	</filter>
 	
+	
 	<servlet> 
    		<servlet-name>static</servlet-name> 
    		<servlet-class>org.eclipse.jetty.servlet.DefaultServlet</servlet-class> 

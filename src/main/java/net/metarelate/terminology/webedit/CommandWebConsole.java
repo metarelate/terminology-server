@@ -63,7 +63,8 @@ public class CommandWebConsole extends WebApplication
 		}
 		myFactory=new TerminologyFactoryTDBImpl(tdbPath);
 		
-		
+		mountPage("/edit",EditPage.class);
+		//mountPage("/search",SearchPage.class);
 		mountPage("/",HomePage.class);
 	}
 	
