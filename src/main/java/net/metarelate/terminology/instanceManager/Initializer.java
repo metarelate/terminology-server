@@ -25,22 +25,19 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import net.metarelate.terminology.auth.AuthConfig;
 import net.metarelate.terminology.auth.AuthServer;
 import net.metarelate.terminology.auth.AuthServerFactory;
-
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-
 import net.metarelate.terminology.config.CoreConfig;
 import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.exceptions.ConfigurationException;
 import net.metarelate.terminology.utils.SSLogger;
+
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 //TODO Note the use of thisInstance.org as a bougs URL of namespace. Perhaps this could be linked to the instance seed (URL), although not necessary.
 
@@ -83,8 +80,8 @@ public class Initializer {
 		try {
 			InetAddress myAddress=InetAddress.getLocalHost();
 			serverAddress=myAddress.getHostAddress();
-			serverName=myAddress.getCanonicalHostName();
-			defaultUserName=System.clearProperty("user.home");
+			serverName=myAddress.getHostName();
+			defaultUserName=System.clearProperty("user.name");
 		} catch (UnknownHostException e) {
 			serverAddress="Unknown";
 			serverName="Unknown";
@@ -156,7 +153,8 @@ public class Initializer {
 
 	
 	public String getDefaultUserURI() {
-		return serverName+defaultUserName;
+		//TODO this may need to be made machine independent
+		return "http://"+serverName+"/"+defaultUserName;
 	}
 
 	private void createFileAndFillWithString(String dir, String fileName, String content) throws ConfigurationException {

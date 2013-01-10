@@ -28,6 +28,8 @@ import net.metarelate.terminology.exceptions.ConfigurationException;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 public class AuthServerFileBased extends AuthServer {
 	private Model myModel=null;
@@ -41,6 +43,11 @@ public class AuthServerFileBased extends AuthServer {
 			} catch (FileNotFoundException e) {
 				throw new ConfigurationException("Unable to read auth configuration file: "+authFiles[i].getAbsolutePath()+" Note that this file should be written in Turtle syntax");
 			}
+		}
+		StmtIterator stats=myModel.listStatements();
+		while (stats.hasNext()) {
+			Statement stat=stats.nextStatement();
+			System.out.println(">>"+stat.toString());
 		}
 	}
 
