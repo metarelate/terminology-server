@@ -1,6 +1,9 @@
 package net.metarelate.terminology.webedit;
 
 import java.util.GregorianCalendar;
+
+import net.metarelate.terminology.instanceManager.Initializer;
+
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.protocol.http.RequestUtils;
@@ -43,7 +46,7 @@ public final class Footer extends Panel {
 	    catch (UnknownHostException e) {
 	    	add(new Label("localhost","Unable to identify local address"));
 	    }
-	    add(new Label("user",System.getProperty("user.name")));
+	    add(new Label("user",Initializer.defaultUserName));
 	  }
 }
 

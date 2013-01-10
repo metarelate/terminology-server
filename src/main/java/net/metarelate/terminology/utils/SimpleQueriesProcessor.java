@@ -182,5 +182,21 @@ public class SimpleQueriesProcessor {
 		return null;
 	}
 	
+	/**
+	 * Returns a URI from a configuration parameter, and null if no value is found. 
+	 * If more values for a parameter are given, a random one is returned.
+	 * @param configuration : the configuration graph
+	 * @param parameter : the parameter sought
+	 * @return
+	 */
+	public static Resource getOptionalConfigurationParameterSingleResource(Model configuration, Property parameter) {
+		NodeIterator nodeIter=configuration.listObjectsOfProperty(parameter);
+		while (nodeIter.hasNext()) {
+			RDFNode node=nodeIter.nextNode();
+			if(node.isResource()) return node.asResource();
+		}
+		return null;
+	}
+	
 	
 }

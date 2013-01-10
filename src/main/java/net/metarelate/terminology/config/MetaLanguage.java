@@ -43,6 +43,11 @@ public class MetaLanguage {
 	private static Set<Resource> indexRData=null;
 	private static Set<Property> indexPData=null;
 	
+	/**
+	 * Configuration and instance management
+	 */
+	public static final String authConfigURI="http://metarelate.net/config/hasAuthConfigType";
+	public static final Property authConfigProperty=ResourceFactory.createProperty(authConfigURI);
 	
 	/**
 	 * General usage properties

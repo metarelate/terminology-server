@@ -49,4 +49,5 @@ public class CoreConfig {
 	public static final String gitDirString="git";
 	public static final String dbDirString="db";
 	public static final String confDirString="conf";
+	public static final String authDirString = "auth";
 }

@@ -30,6 +30,10 @@ import java.io.Reader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import net.metarelate.terminology.auth.AuthConfig;
+import net.metarelate.terminology.auth.AuthServer;
+import net.metarelate.terminology.auth.AuthServerFactory;
+
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
@@ -55,6 +59,10 @@ public class Initializer {
 	private static String gitDirAbsoluteString=null;
 	private static String dbDirAbsoluteString=null;
 	private static String confDirAbsoluteString=null;
+	private static String authDirAbsoluteString=null;
+	public static String defaultUserName=null;
+	
+	public static AuthServer authServer=null;
 	
 	public Initializer(String[] args) throws ConfigurationException {
 		// Process parameters
@@ -64,7 +72,7 @@ public class Initializer {
 	public Initializer() throws ConfigurationException {
 		construct();
 	}
-	
+	//TODO Inits could be made more modular
 	public void construct() throws ConfigurationException {
 		if(userHomeString==null) userHomeString = System.getProperty( "user.home" );
 		SSLogger.log("User Home: "+ userHomeString);
@@ -76,9 +84,11 @@ public class Initializer {
 			InetAddress myAddress=InetAddress.getLocalHost();
 			serverAddress=myAddress.getHostAddress();
 			serverName=myAddress.getCanonicalHostName();
+			defaultUserName=System.clearProperty("user.home");
 		} catch (UnknownHostException e) {
 			serverAddress="Unknown";
 			serverName="Unknown";
+			defaultUserName="Unknown";
 			e.printStackTrace();
 		}
 		
@@ -105,7 +115,19 @@ public class Initializer {
 			confDirAbsoluteString=confDir.getAbsolutePath();
 		}
 		checkOrCreateDirectory(confDir);
+		
+		File authDir;
+		if(authDirAbsoluteString!=null) authDir=new File(authDirAbsoluteString);
+		else{
+			authDir=new File(rootDirectory.getAbsolutePath(),CoreConfig.authDirString);
+			authDirAbsoluteString=authDir.getAbsolutePath();
+		}
+		checkOrCreateDirectory(authDir);
 		initializeConfFiles();
+		
+		// We need to create AuthManager (eventually taking care of connections).
+		authServer=AuthServerFactory.createServerFromConfig(getConfigurationGraph());
+		
 	}
 	
 
@@ -120,26 +142,42 @@ public class Initializer {
 		
 	}
 	
-	private void initializeConfFiles() throws ConfigurationException {
-		File confDir=new File(confDirAbsoluteString);
+	private void initializeConfFiles() throws ConfigurationException {		
+		String defServerStatements="<http://thisInstance.org> <"+MetaLanguage.tdbPrefixProperty+"> "+"\""+dbDirAbsoluteString+"\"^^<http://www.w3.org/2001/XMLSchema#string> ;\n.";
+		defServerStatements+="<http://thisInstance.org> <"+MetaLanguage.authConfigURI +"> "+"<"+AuthConfig.isConfigFileString+"> ;\n.";
+		createFileAndFillWithString(confDirAbsoluteString,"defaultServerConfig.ttl",defServerStatements);
+		
+		// TODO this is : me what I can on what. Arguably this should start with me can create anything at the top register (empty register?)
+		// However, as a conf option, one could be granted access to everything.
+		String defAuthStatements="<"+getDefaultUserURI()+"> <"+AuthConfig.allURI+"> "+"<"+AuthConfig.allURI+"> ;\n.";
+		createFileAndFillWithString(authDirAbsoluteString,"defaultAuthConfig.ttl",defAuthStatements);
+	}
+	
+
+	
+	public String getDefaultUserURI() {
+		return serverName+defaultUserName;
+	}
+
+	private void createFileAndFillWithString(String dir, String fileName, String content) throws ConfigurationException {
+		File confDir=new File(dir);
 		if(confDir.listFiles().length==0) {
 			//We need at least to specify a default TDB.
-			String defStatement="<http://thisInstance.org> <"+MetaLanguage.tdbPrefixProperty+"> "+"\""+dbDirAbsoluteString+"\"^^<http://www.w3.org/2001/XMLSchema#string> ;\n.";
 
 			try {
-				BufferedWriter defFile=new BufferedWriter(new FileWriter(new File(confDirAbsoluteString,"defaultConf.ttl").getAbsolutePath()));
-				defFile.write(defStatement);
+				BufferedWriter defFile=new BufferedWriter(new FileWriter(new File(dir,fileName).getAbsolutePath()));
+				defFile.write(content);
 				defFile.flush(); // TODO Is this implied by close() ?
 				defFile.close();
 			} catch (IOException e) {
-				throw new ConfigurationException("Unable to initialize configuration file: defaultConf.ttl in "+confDirAbsoluteString);
+				throw new ConfigurationException("Unable to initialize configuration file: "+fileName+" in "+confDirAbsoluteString);
 			}
 			
 		}
 		
 	}
 	
-	
+	// TODO we should cache this!!!
 	/**
 	 * The configuration graph is the union of all graphs in the configuration dir.
 	 * @throws ConfigurationException 
@@ -155,6 +193,11 @@ public class Initializer {
 			}
 		}
 		return configuration;
+	}
+
+	public static File[] getAuthFiles() {
+		File authConfDir=new File(authDirAbsoluteString);
+		return authConfDir.listFiles();
 	}
 
 	

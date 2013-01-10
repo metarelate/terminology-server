@@ -5,6 +5,7 @@ import net.metarelate.terminology.coreModel.TerminologyFactory;
 import net.metarelate.terminology.coreModel.TerminologyFactoryTDBImpl;
 import net.metarelate.terminology.exceptions.ConfigurationException;
 import net.metarelate.terminology.instanceManager.Initializer;
+import net.metarelate.terminology.management.TerminologyManager;
 import net.metarelate.terminology.utils.SSLogger;
 import net.metarelate.terminology.utils.SimpleQueriesProcessor;
 
@@ -20,8 +21,10 @@ import com.hp.hpl.jena.rdf.model.Model;
  */
 public class CommandWebConsole extends WebApplication
 {    	
-	private static Initializer myInitializer=null;
+	public static Initializer myInitializer=null;
 	public static TerminologyFactory myFactory=null;
+	public static TerminologyManager myTerminologyManager=null;
+	
 	/**
 	 * @see org.apache.wicket.Application#getHomePage()
 	 */
@@ -62,6 +65,7 @@ public class CommandWebConsole extends WebApplication
 			System.exit(-1);
 		}
 		myFactory=new TerminologyFactoryTDBImpl(tdbPath);
+		myTerminologyManager=new TerminologyManager(myFactory,myInitializer.authServer);
 		
 		mountPage("/edit",EditPage.class);
 		//mountPage("/search",SearchPage.class);
