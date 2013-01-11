@@ -31,7 +31,7 @@ public class CommandWebConsole extends WebApplication
 	@Override
 	public Class<? extends WebPage> getHomePage()
 	{
-		return HomePage.class;
+		return (Class<? extends WebPage>) HomePage.class;
 	}
 
 	/**

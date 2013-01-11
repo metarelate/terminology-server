@@ -17,6 +17,8 @@
  along with terminology-server. If not, see <http://www.gnu.org/licenses/>.
 */
 
+//TODO Add synch calls throught! (or prblems if the server is killed!!!)
+
 package net.metarelate.terminology.management;
 
 import java.text.DateFormat;
@@ -29,6 +31,7 @@ import net.metarelate.terminology.auth.AuthRegistryManager;
 import net.metarelate.terminology.auth.AuthServer;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.tdb.TDB;
 
 import net.metarelate.terminology.config.CoreConfig;
 import net.metarelate.terminology.config.MetaLanguage;
@@ -94,7 +97,7 @@ public class TerminologyManager {
 		if(description!=null) myEntity.setActionDescription(description,newVersion);
 		myEntity.setActionURI(RegistryPolicyConfig.terminologyAmendedActionURI,newVersion);
 		myEntity.linkVersions(lastVersion,newVersion);
-		
+		myEntity.synch();
 	}
 	
 	public void validate(String entityURI, String actionAuthor, String description, boolean validate) throws AuthException, RegistryManagerException {

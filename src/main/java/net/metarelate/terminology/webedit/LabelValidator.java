@@ -1,7 +1,6 @@
 package net.metarelate.terminology.webedit;
 
 import org.apache.wicket.validation.CompoundValidator;
-import org.apache.wicket.validation.validator.PatternValidator;
 import org.apache.wicket.validation.validator.StringValidator;
 
 public final class LabelValidator extends CompoundValidator<String> {

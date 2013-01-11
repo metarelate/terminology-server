@@ -131,7 +131,7 @@ public class Initializer {
 	
 	
 	
-	private void checkOrCreateDirectory (File dir) throws  ConfigurationException  {
+	private void checkOrCreateDirectory (File dir) throws ConfigurationException  {
 		if(dir.exists()) {
 			if(!dir.isDirectory()) throw new ConfigurationException("Unable to create directory "+dir+" as a file with the same path already exists");
 		}

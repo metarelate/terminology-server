@@ -35,8 +35,8 @@ public final class Footer extends Panel {
 	    String contentType=wrq.getHeader("Accept");
         
 	    add(new Label("fullurlrequest",fullURL));
-	    add(new Label("fullurlgenerated",RequestCycle.get().getUrlRenderer().renderFullUrl(
-	    		   Url.parse(urlFor(HomePage.class,null).toString()))));
+	    //add(new Label("fullurlgenerated",RequestCycle.get().getUrlRenderer().renderFullUrl(
+	    //		   Url.parse(urlFor(HomePage.class,null).toString()))));
 	    add(new Label("contenttype",contentType));
 	    add(new Label("locale",getSession().getLocale().getDisplayName()));
 	    try {
