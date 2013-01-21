@@ -129,6 +129,7 @@ public class SearchPage extends SuperPage {
 		
 	}
 	
+	/*
 	private class TerminologySetDecoupler implements IModel {
 		private String setURI=null;
 		//TODO some type checking would be good...
@@ -146,6 +147,7 @@ public class SearchPage extends SuperPage {
 		public void setObject(Object termSet) {
 			setURI=((TerminologySet)termSet).getURI();
 			
-		}}
-	
+		}
+	}
+	*/
 }
