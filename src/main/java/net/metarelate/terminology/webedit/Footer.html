@@ -1,12 +1,24 @@
+<!-- this is a module -->
+<!-- the footer module shows simple information such as date stamp, user logged in, localhost -->
+<!-- wicket variables:
+		timeStamp:
+		localAddress: it should identify the node seed, in a distributed environment
+		loggedInUser:
+-->
+<!-- css classes 
+		dynamicFooterInfo: e.g. timestamp, user, ...
+		staticFooterinfo: e.g. copyright info, disclaimers,...
+-->
+		 
 <wicket:panel>
-	<hr>
-	General information on this instance:<br/>
-	URL: <span wicket:id="url">http://</span><br/>
-	Full URL (request): <span wicket:id="fullurlrequest">http://</span><br/>
-	Full Content Type: <span wicket:id="contenttype">Nothing yet</span><br/>
-	Year: <span wicket:id="year">2008</span><br/>
-	Wicket version: <wicket:container wicket:id="version">1.5-SNAPSHOT</wicket:container><br/>
-	Locale: <span wicket:id="locale">en</span><br/>
-	Local address: <span wicket:id="localhost">local host</span><br/>
-	User: <span wicket:id="user">user</span><br/>
+<div class="footerPanel">
+	<ul class="dynamicFooterinfo">
+		<li>Timestamp: <span wicket:id="timeStamp">2008</span></li>
+		<li>Local address: <span wicket:id="localAddress">local host</span></li>
+		<li>User: <span wicket:id="loggedInUser">user</span></li>
+	</ul>
+	<ul class="staticFooterinfo">
+		<li>Copyright 2013 XXX</li>
+	</ul>
+</div>
 </wicket:panel>

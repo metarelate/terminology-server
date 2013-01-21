@@ -21,6 +21,10 @@ import com.hp.hpl.jena.rdf.model.Model;
  */
 public class CommandWebConsole extends WebApplication
 {    	
+	public static final int MANAGEMENT_PAGE = 0;
+	public static final int LOCAL_CONFIGURATION_PAGE = 1;
+	public static final int OTHER_PAGE = 2;
+	
 	public static Initializer myInitializer=null;
 	public static TerminologyFactory myFactory=null;
 	public static TerminologyManager myTerminologyManager=null;
@@ -31,7 +35,7 @@ public class CommandWebConsole extends WebApplication
 	@Override
 	public Class<? extends WebPage> getHomePage()
 	{
-		return (Class<? extends WebPage>) HomePage.class;
+		return (Class<? extends WebPage>) SearchPage.class;
 	}
 
 	/**
@@ -68,8 +72,10 @@ public class CommandWebConsole extends WebApplication
 		myTerminologyManager=new TerminologyManager(myFactory,myInitializer.authServer);
 		
 		mountPage("/edit",EditPage.class);
+		mountPage("/config",LocalConfiguration.class);
 		//mountPage("/search",SearchPage.class);
-		mountPage("/",HomePage.class);
+		mountPage("/search",SearchPage.class);
+		mountPage("/view",ViewPage.class);
 	}
 	
 	

@@ -16,8 +16,9 @@
 		The value might be either "development" (reloading when templates change) or 
 		"deployment". If no configuration is found, "development" is the default. -->
 
+
 	<filter>
-		<filter-name>wicket.webedit</filter-name>
+		<filter-name>mainApplication</filter-name>
 		<filter-class>org.apache.wicket.protocol.http.WicketFilter</filter-class>
 		<init-param>
 			<param-name>applicationClassName</param-name>
@@ -25,19 +26,24 @@
 		</init-param>
 	</filter>
 	
-	
-	<servlet> 
-   		<servlet-name>static</servlet-name> 
-   		<servlet-class>org.eclipse.jetty.servlet.DefaultServlet</servlet-class> 
-	</servlet>
-	
-	<servlet-mapping> 
-   		<servlet-name>static</servlet-name> 
-   		<url-pattern>/static/*</url-pattern> 
-	</servlet-mapping>  
+ 
+
 
 	<filter-mapping>
-		<filter-name>wicket.webedit</filter-name>
+		<filter-name>mainApplication</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
+	
+		<!--  we may choose to remove the static server -->
+	<!--
+	<filter> 
+   		<filter-name>default</filter-name> 
+   		<servlet-class>org.eclipse.jetty.servlet.DefaultServlet</servlet-class> 
+	</filter>
+	
+	<filter-mapping> 
+   		<filter-name>default</filter-name> 
+   		<url-pattern>*.css</url-pattern> 
+	</filter-mapping> 
+	-->
 </web-app>

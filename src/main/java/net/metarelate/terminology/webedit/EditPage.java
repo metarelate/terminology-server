@@ -73,6 +73,14 @@ public class EditPage  extends SuperPage {
 		add(new FeedbackPanel("feedback"));
 		
     }
+	@Override
+	String getSubPage() {
+		return "Term edition";
+	}
+	@Override
+	String getCoreMessage() {
+		return "Nothing to say";
+	}
 
 }
 

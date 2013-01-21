@@ -1,0 +1,62 @@
+<!-- this is a page -->
+<!-- extends superpage -->
+
+<!-- wicket variables: 
+	wicketVersion
+	locale
+	localAddress
+	-->
+<!-- css classes:
+	TBD
+	-->
+	
+
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org">
+	<head></head>
+	<body>
+		<wicket:extend>
+			<div id="mainPanel">
+				<article>
+					<div wicket:id="resultPanel">
+						Nothing here yet
+					</div>
+				</article>
+			</div>
+			<div id="sidePanel">
+				<aside>
+					<h2>Text or ID search</h2>
+					<p>
+						<form> 
+							<input type="text" size="20" /><br/>
+							<input type="radio" name="entityType" value="individual"checked />Code<br/>
+							<input type="radio" name="entityType" value="set"/>Register<br/>
+							<input type="submit" value="Search" />
+						</form>
+					</p>
+					<hr>
+					<h2>Register based access</h2>
+					<p>
+						<!-- form>
+							<input wicket:id="openRegButton" type="submit" value="Open registers" />
+						</form -->
+						<div wicket:id="listPanel">
+						<ul>
+							<span wicket:id="registerList">
+								<li>
+								<a href="#" wicket:id="registerBackLink"><span wicket:id="registerBackLabel">...</span></a>&nbsp;
+								<a href="#" wicket:id="registerLink"><span wicket:id="registerLabel">...</span></a>&nbsp;
+								<a href="#" wicket:id="registerDownLink"><span wicket:id="registerDownLabel">...</span></a>
+								</li>
+							</span>
+						</ul>
+						</div>
+					</p>
+	
+				</aside>
+			</div>
+			</wicket:extend>
+		
+		
+	</body>
+</html>

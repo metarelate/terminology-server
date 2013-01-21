@@ -1,32 +1,39 @@
-<!DOCTYPE html>
-<html xmlns:wicket="http://wicket.apache.org">
-	<head>
-		<meta charset="utf-8" />
-		<title>Metarelate Terminology Server</title>
-		<!-- The following are coming from the default configuration-->
-		<link href='http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:regular,bold' rel='stylesheet' type='text/css' />
-		<link rel="stylesheet" href="static/style.css" type="text/css" media="screen" title="Stylesheet" />
+<!doctype html>
+
+<html class="no-js" lang="en" xmlns:wicket="http://wicket.apache.org">
+
+<head id="www-sitename-com" data-template-set="html5-reset">
 	
-		<style>
-			label {
-				background-color: #eee;
-				padding: 4px;
-			}
- 
-			.feedbackPanelERROR {
-				color: red;
-			}
-		</style>
-	</head>
-	<body>
-		<div id="hd">
-			<span wicket:id="hd">Terminology Server: Header Info</span>
+	<!-- CSS: screen, mobile & print are all in the same file -->
+	<link rel="stylesheet" href="_/css/style.css">
+</head>
+
+<body>
+	<div id="wrapper"><!-- not needed? up to you: http://camendesign.com/code/developpeurs_sans_frontieres -->
+		<div id="headerPanel">
+			<header>
+				<div wicket:id="title" class="pageTitlePanel">Page Title</div>
+				<div wicket:id="subTitle" class="pageSubTitlePanel">Page subtitle</div>
+				<nav wicket:id="termNavBar"></nav>
+				<div wicket:id="subPage" class="subPagePanel"></div>
+				<div wicket:id="coreMessage" class="coreMessagePanel"></div>
+			</header>
 		</div>
-		<div id="bd">
-			<wicket:child />
+		<hr>
+	
+		<wicket:child/>
+
+	
+		<hr>
+		
+		<div id=footerPanel>
+			<footer wicket:id="termFooter">
+			</footer>
 		</div>
-		<div id="ft">
-			<span wicket:id="ft">Footer Info</span>
-		</div>
-	</body>
+
+	</div>
+
+
+  
+</body>
 </html>

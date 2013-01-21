@@ -44,4 +44,14 @@ public class HomePage extends SuperPage {
 		// TODO Add your page's components here
 
     }
+
+	@Override
+	String getSubPage() {
+		return "Search";
+	}
+
+	@Override
+	String getCoreMessage() {
+		return "Just searching";
+	}
 }

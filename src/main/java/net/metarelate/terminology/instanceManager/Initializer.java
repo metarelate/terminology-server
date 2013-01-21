@@ -125,6 +125,9 @@ public class Initializer {
 		// We need to create AuthManager (eventually taking care of connections).
 		authServer=AuthServerFactory.createServerFromConfig(getConfigurationGraph());
 		
+		
+		// TODO Perhaps we should look into an initialization sequence
+		// TODO Note also that we should be sure time is in synch globally
 	}
 	
 
@@ -196,6 +199,10 @@ public class Initializer {
 	public static File[] getAuthFiles() {
 		File authConfDir=new File(authDirAbsoluteString);
 		return authConfDir.listFiles();
+	}
+
+	public String getServerName() {
+		return serverName;
 	}
 
 	
