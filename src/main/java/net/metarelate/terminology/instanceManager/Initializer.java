@@ -205,6 +205,15 @@ public class Initializer {
 		return serverName;
 	}
 
+	public boolean isRemote() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public boolean hasRemote() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 	
 	
 	

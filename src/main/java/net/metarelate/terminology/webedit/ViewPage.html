@@ -18,18 +18,22 @@
 		<wicket:extend>
 			<div id="mainPanel">
 				<article>
-					<h1>General information on this instance</h1>
-					<ul>
-						<li>Wicket version: <span wicket:id="wicketVersion">1.5-SNAPSHOT</span></li>
-						<li>Locale: <span wicket:id="locale">en</span></li>
-						<li>Local address: <span wicket:id="localAddress">local host</span></li>
-					</ul>
+					<h1><span wicket:id="subjectType">Register</span> : <span wicket:id="subjectURI">General information on this instance</span></h1>
+					<span wicket:id="subjectTypes">skos:concept...</span>
+					<!-- properties table and version info -->
 				</article>
 			</div>
 			<div id="sidePanel">
 				<aside>
-	
-				Nothing here.
+					<!-- form -->
+				<input wicket:id="editButton" type="submit" value="edit" /><br/>
+				<input wicket:id="newCodeButton" type="submit" value="new code" /><br/>
+				<input wicket:id="newRegisterButton" type="submit" value="new sub register" /><br/>
+				<input wicket:id="obsoleteButton" type="submit" value="obsolete" /><br/>
+				<input wicket:id="supersedButton" type="submit" value="supersed" /><br/>
+				<input wicket:id="pullButton" type="submit" value="pull" /><br/>
+				<input wicket:id="pushButton" type="submit" value="push" /><br/>
+					<!-- /form -->
 	
 				</aside>
 			</div>

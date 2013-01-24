@@ -18,9 +18,26 @@
 		<wicket:extend>
 			<div id="mainPanel">
 				<article>
-					<div wicket:id="resultPanel">
-						Nothing here yet
+					<span wicket:id="resultLabel">See here your results...</span>
+					<div wicket:id="resultRenderer">
+							
+						<table cellspacing="0" class="dataview">
+    					<tr>
+        					<th>Type</th>
+        					<th>ID</th>
+        					<th>Description</th>
+        					<th>URI</th>
+        
+    					</tr>
+    					<tr wicket:id="simpleResults">
+        					<td><span wicket:id="resultType">e.g: register</span></td>
+        					<td><span wicket:id="resultID">e.g: 1002</span> </td>
+        					<td><span wicket:id="resultDescription">e.g: this register contains...</span></td>
+        					<td><a href="#" wicket:id="resultURI"><span wicket:id="resultURILabel">e.g.: http://example.com/register</span></a></td>
+    					</tr>
+					</table>
 					</div>
+					
 				</article>
 			</div>
 			<div id="sidePanel">

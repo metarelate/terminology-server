@@ -6,7 +6,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import net.metarelate.terminology.config.MetaLanguage;
+import net.metarelate.terminology.coreModel.TerminologyIndividual;
 import net.metarelate.terminology.coreModel.TerminologySet;
+import net.metarelate.terminology.utils.SimpleQueriesProcessor;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
@@ -16,9 +19,13 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
+import org.apache.wicket.markup.repeater.Item;
+import org.apache.wicket.markup.repeater.data.DataView;
+import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.tree.AbstractTree;
 import org.apache.wicket.extensions.markup.html.repeater.tree.DefaultNestedTree;
 import org.apache.wicket.extensions.markup.html.repeater.tree.ITreeProvider;
@@ -28,8 +35,10 @@ import org.apache.wicket.extensions.markup.html.repeater.tree.content.Folder;
 import org.apache.wicket.extensions.markup.html.repeater.tree.content.StyledLinkLabel;
 import org.apache.wicket.extensions.markup.html.repeater.tree.theme.HumanTheme;
 import org.apache.wicket.extensions.markup.html.tree.LinkIconPanel;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.MarkupContainer;
+import org.apache.wicket.model.AbstractReadOnlyModel;
 
 import java.lang.String;
 
@@ -41,10 +50,78 @@ public class SearchPage extends SuperPage {
 		super(parameters);
 		
 		// TODO this is the result panel, should get to be something different
-		final Label resultLabel=new Label("resultPanel","Nothing yet");
+		final Label resultLabel=new Label("resultLabel","Nothing yet");
 		resultLabel.setOutputMarkupId(true);
 		add(resultLabel);
 		
+		// TODO results table goes here
+		/**********************/
+		
+		final SearchResultList resultList=new SearchResultList();
+		
+		final MarkupContainer resContainer=new WebMarkupContainer("resultRenderer");
+		final DataView resultView=new DataView<String>("simpleResults", resultList) {
+			private static final long serialVersionUID = 1L;
+
+		            @Override
+		            protected void populateItem(final Item<String> item)
+		            {
+		                String elementURI = item.getModelObject();
+		                if(CommandWebConsole.myFactory.terminologySetExist(elementURI)) {
+		                	item.add(new Label("resultType","Set"));
+		                	// TODO we coould have something more personalized here (Collection, Register..) or use an image...
+		                	String lastVersion=CommandWebConsole.myFactory.getOrCreateTerminologySet(elementURI).getLastVersion();
+		                	String idLabel=SimpleQueriesProcessor.getOptionalLiteralValueAsString(CommandWebConsole.myFactory.getOrCreateTerminologySet(elementURI).getResource(), MetaLanguage.notationProperty, CommandWebConsole.myFactory.getOrCreateTerminologySet(elementURI).getStatements(lastVersion));
+		                	if(idLabel==null) idLabel="undefined";
+		                	item.add(new Label("resultID",idLabel));
+		                	item.add(new Label("resultDescription",CommandWebConsole.myFactory.getOrCreateTerminologySet(elementURI).getLabel(lastVersion)));
+		                	
+		                	BookmarkablePageLink pageLink=new BookmarkablePageLink("resultURI",ViewPage.class);
+		    		    	pageLink.getPageParameters().set("entity", elementURI);
+		    		    	pageLink.add(new Label("resultURILabel",elementURI));
+		                	item.add(pageLink);
+		                }
+		                else if(CommandWebConsole.myFactory.terminologyIndividualExist(elementURI)) {
+		                	item.add(new Label("resultType","Individual"));
+		                	// TODO same note as above
+		                	String lastVersion=CommandWebConsole.myFactory.getOrCreateTerminologyIndividual(elementURI).getLastVersion();
+		                	String idLabel=SimpleQueriesProcessor.getOptionalLiteralValueAsString(CommandWebConsole.myFactory.getOrCreateTerminologyIndividual(elementURI).getResource(), MetaLanguage.notationProperty, CommandWebConsole.myFactory.getOrCreateTerminologyIndividual(elementURI).getStatements(lastVersion));
+		                	if(idLabel==null) idLabel="undefined";
+		                	item.add(new Label("resultID",idLabel));
+		                	item.add(new Label("resultDescription",CommandWebConsole.myFactory.getOrCreateTerminologyIndividual(elementURI).getLabel(lastVersion)));
+		                	BookmarkablePageLink pageLink=new BookmarkablePageLink("resultURI",ViewPage.class);
+		    		    	pageLink.getPageParameters().set("entity", elementURI);
+		    		    	pageLink.add(new Label("resultURILabel",elementURI));
+		                	item.add(pageLink);
+		                }
+		                else {
+		                	item.add(new Label("resultType","?"));
+		                	// TODO same note as above
+		                	item.add(new Label("resultID","Undefined"));
+		                	item.add(new Label("resultDescription","Undefined"));
+		                	item.add(new Label("resultURI",elementURI));
+		                	//TODO to check: this may break Wicket Code as there are no instructions to render a link
+		                }
+		          
+		                /*
+		                item.add(AttributeModifier.replace("class", new AbstractReadOnlyModel()
+		                {
+		                    private static final long serialVersionUID = 1L;
+
+		                    @Override
+		                    public String getObject()
+		                    {
+		                        return (item.getIndex() % 2 == 1) ? "even" : "odd";
+		                    }
+		                }));
+		                */
+		            }
+		        };
+		        resultView.setOutputMarkupId(true);
+		        resContainer.add(resultView);
+		        resContainer.setOutputMarkupId(true);
+		        add(resContainer);
+		/**********************/
 		
 		//TODO here we should add some form logic for search
 		
@@ -61,7 +138,12 @@ public class SearchPage extends SuperPage {
 			
 		};
 		*/
-		final AbstractTree registerTree=new DefaultNestedTree("registerTree",createRegRootModel())  {
+		final AbstractTree<String> registerTree=new DefaultNestedTree<String>("registerTree",createRegRootModel())  {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			protected Component newContentComponent(final String id, final IModel model) {
 				return new Folder(id, this, model) {
@@ -79,8 +161,26 @@ public class SearchPage extends SuperPage {
 				            @Override
 				            protected void onClick(final AjaxRequestTarget target)
 				            {
-				            	resultLabel.setDefaultModelObject(model.getObject().toString());
+				            	String selectedSetURI=model.getObject().toString();
+				            	resultLabel.setDefaultModelObject(selectedSetURI);
 				   		        target.add(resultLabel);
+				   		        String res[]=null;
+				   		        if(CommandWebConsole.myFactory.terminologySetExist(selectedSetURI)) {
+				   		        	//TODO check consistency of defaults (versions)
+				   		        	Set<TerminologyIndividual> childrenSet=CommandWebConsole.myFactory.getOrCreateTerminologySet(selectedSetURI).getIndividuals();
+				   		        	res=new String[childrenSet.size()+1];
+				   		        	res[0]=selectedSetURI;
+				   		        	Iterator<TerminologyIndividual> childrenIter=childrenSet.iterator();
+				   		        	int i=1;
+				   		        	while (childrenIter.hasNext()) {
+				   		        		res[i]=childrenIter.next().getURI();
+				   		        		i++;
+				   		        	}
+				   		        	resultList.changeTo(res);
+				   		        	
+				   		        }
+				   		        
+				   		        target.add(resContainer);
 				                // TODO ok, here we should link to search
 				            	
 				            }
@@ -114,7 +214,7 @@ public class SearchPage extends SuperPage {
 		
 		add(registerTree);
 		
-
+	}
 		
 		
 		
@@ -123,70 +223,8 @@ public class SearchPage extends SuperPage {
 		
 
 		 
-		    
-		/*
-		AjaxLink openRegButton = new AjaxLink("openRegButton") {
-		    public void onClick(final AjaxRequestTarget target) {
-		        resultLabel.setDefaultModelObject("Test");
-		        target.add(resultLabel);
-		    }
-		};
-		add(openRegButton);
-		*/
 		
-		/*
-		TerminologySet[] termRoots=CommandWebConsole.myFactory.getRootCollections();
-		List<String> termRootsURIList=new ArrayList<String>();
-		for(int i=0;i<termRoots.length;i++) {
-			termRootsURIList.add(termRoots[i].getURI());
-		}
-		//TODO presumibly, something doesn't look in the right place
-		final ListView<String> termRootsListView=new RegisterListView("registerList", termRootsURIList);
-		WebMarkupContainer listContainer=new WebMarkupContainer("listPanel");
-		((RegisterListView) termRootsListView).registerView(termRootsListView);
-		((RegisterListView) termRootsListView).registerPanel(listContainer);
-		
-		termRootsListView.setOutputMarkupId(true);
-		listContainer.setOutputMarkupId(true);
-		
-		
-		listContainer.add(termRootsListView);
-		add(listContainer);
-		*/
-		
-		
-	}
-	
-	
-	
 	/*
-	private abstract class TermRegStyledLinkLabel<T> extends StyledLinkLabel<T> {
-		public TermRegStyledLinkLabel(String id,IModel<T> model) {
-			super(id, model);
-			 MarkupContainer link = newLinkComponent("link", model);
-             link.add(STYLE_CLASS);
-             add(link);
-
-             link.add(newLabelComponent("label", model));
-			// TODO Auto-generated constructor stub
-		}
-	}
-	
-	private  class TermRegFolder<T> extends TermRegStyledLinkLabel<T> {
-		public TermRegFolder(String id, IModel<T> model) {
-			super(id, model);
-			
-		}
-
-		@Override
-		protected java.lang.String getStyleClass() {
-			// TODO Auto-generated method stub
-			return null;
-		}
-	
-    };
-    */
-	
 	private class MyDefaultNestedTree extends DefaultNestedTree {
 
 		public MyDefaultNestedTree(String id, ITreeProvider provider) {
@@ -194,7 +232,7 @@ public class SearchPage extends SuperPage {
 		}
 		
 	}
-
+*/
 	private ITreeProvider<String> createRegRootModel() {
 		return new ITreeProvider<String>(){
 
@@ -250,82 +288,42 @@ public class SearchPage extends SuperPage {
 		return "Just searching";
 	}
 	
-	/*
-	private class RegisterListView extends ListView<String> {
-		ListView<String> termRootsListViewlistToUpdate=null;
-		WebMarkupContainer viewPanel=null;
-		public RegisterListView(String id,List<String> list) {
-			super(id,list);
-			
-		}
-		public void registerView(ListView<String> termRootsListView) {
-			termRootsListViewlistToUpdate=termRootsListView;
-		}
-		public void registerPanel(WebMarkupContainer viewPanel) {
-			this.viewPanel=viewPanel;
+	private class SearchResultList implements IDataProvider<String> {
+		String[] results;
+		
+		public SearchResultList(String[] results) {
+			this.results=results;
 		}
 		
-
-		
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		protected void populateItem(final ListItem<String> item) {
-			final TerminologySet thisSet=CommandWebConsole.myFactory.getOrCreateTerminologySet((String)item.getModelObject());
-			BookmarkablePageLink pageUpLink=new BookmarkablePageLink("registerBackLink",EditPage.class);
-	    	pageUpLink.getPageParameters().set("entity", thisSet.getURI());
-	    	pageUpLink.add(new Label("registerBackLabel","<<"));
-	        
-	    	
-	    	BookmarkablePageLink pageLink=new BookmarkablePageLink("registerLink",EditPage.class);
-	    	pageLink.getPageParameters().set("entity", thisSet.getURI());
-	    	pageLink.add(new Label("registerLabel",thisSet.getLabel(thisSet.getLastVersion())));
-	        
-	    	AjaxLink pageDownLink=new AjaxLink("registerDownLink") {
-
-				@Override
-				public void onClick(AjaxRequestTarget target) {
-					Iterator<TerminologySet> newListToBe=thisSet.getCollections().iterator();
-					List<String> newList=new ArrayList<String>();
-					while(newListToBe.hasNext()) newList.add(newListToBe.next().getURI());
-					
-					termRootsListViewlistToUpdate.setDefaultModelObject(newList);
-					target.add(viewPanel);
-				}
-
-	    		
-	    	};
-	    	
-	    	pageDownLink.add(new Label("registerDownLabel",">>"));
-	        
-	    	item.add(pageUpLink);
-	    	item.add(pageLink);
-	    	item.add(pageDownLink);
-	    	//item.add(new Label("label", item.getModelObject().getLabel(item.getModelObject().getLastVersion())));
-			
+		void changeTo(String[] results) {
+			this.results=results;
 		}
 		
-	}
-	*/
-	/*
-	private class TerminologySetDecoupler implements IModel {
-		private String setURI=null;
-		//TODO some type checking would be good...
+		public SearchResultList() {
+			this.results=new String[0];
+		}
+
 		public void detach() {
-			// TODO NOt sure what to do here but most likely we don't need it.
+			// TODO Auto-generated method stub
 			
 		}
 
-		public Object getObject() {
-			// TODO very dangerous, we are going to create things out of nothing is something is wrong
-			return CommandWebConsole.myFactory.getOrCreateTerminologySet(setURI);
-			
+		public Iterator<? extends String> iterator(long offset, long total) {
+			ArrayList<String> res=new ArrayList<String>();
+			for(long i=offset;i<total;i++) {
+				res.add(results[(int) i]); // TODO dangerous. 
+			}
+			return res.iterator();
 		}
 
-		public void setObject(Object termSet) {
-			setURI=((TerminologySet)termSet).getURI();
-			
+		public IModel<String> model(String arg0) {
+			return new Model(arg0);
 		}
+
+		public long size() {
+			return results.length;
+		}
+		
 	}
-	*/
+	
 }
