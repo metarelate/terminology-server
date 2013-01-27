@@ -6,6 +6,7 @@ import net.metarelate.terminology.exceptions.RegistryAccessException;
 
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
+import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 public class ViewPage extends SuperPage {
@@ -33,15 +34,35 @@ public class ViewPage extends SuperPage {
 		
 		add(new Label("subjectTypes","coming soon..."));
 		
-		Button editButton=new Button("editButton");
+		
+		Form<?> form = new Form<Void>("actionForm"); 
+				
+		Button editButton=new Button("editButton") {
+			@Override
+			public void onSubmit() {
+				System.out.println("Action:EDIT");
+				//PageParameters pageParameters = new PageParameters();
+				//pageParameters.add("entity", urlToEdit);
+				//setResponsePage(ViewPage.class, pageParameters);
+			}
+		};
 		if(!CommandWebConsole.myInitializer.myAuthManager.can(CommandWebConsole.myInitializer.getDefaultUserURI(), MetaLanguage.terminologyUpdateAction.getURI(), urlToView))
 			editButton.setEnabled(false);
 		else editButton.setEnabled(true);
 		// TODO auth here
 		
-		add(editButton);
+		form.add(editButton);
 		
-		Button newCodeButton=new Button("newCodeButton");
+		Button newCodeButton=new Button("newCodeButton") {
+			@Override
+			public void onSubmit() {
+				System.out.println("Action:NEWCODE");
+				//PageParameters pageParameters = new PageParameters();
+				//pageParameters.add("entity", urlToEdit);
+				//setResponsePage(ViewPage.class, pageParameters);
+			}
+			
+		};
 		if(isCode) newCodeButton.setEnabled(false);
 		else {
 			// TODO auth here
@@ -49,9 +70,17 @@ public class ViewPage extends SuperPage {
 				newCodeButton.setEnabled(false);
 			else newCodeButton.setEnabled(true);
 		}
-		add(newCodeButton);
+		form.add(newCodeButton);
 		
-		Button newRegisterButton=new Button("newRegisterButton");
+		Button newRegisterButton=new Button("newRegisterButton"){
+			@Override
+			public void onSubmit() {
+				System.out.println("Action:NEWREGISTER");
+				//PageParameters pageParameters = new PageParameters();
+				//pageParameters.add("entity", urlToEdit);
+				//setResponsePage(ViewPage.class, pageParameters);
+			}
+		};
 		if(isCode) newRegisterButton.setEnabled(false);
 		else {
 			// TODO auth here
@@ -59,16 +88,34 @@ public class ViewPage extends SuperPage {
 				newRegisterButton.setEnabled(false);
 			else newRegisterButton.setEnabled(true);
 		}
-		add(newRegisterButton);
+		form.add(newRegisterButton);
 		
-		Button obsoleteButton=new Button("obsoleteButton");
+		
+		Button obsoleteButton=new Button("obsoleteButton") {
+			@Override
+			public void onSubmit() {
+				// TODO ask for confirmation
+				System.out.println("Action:OBSOLETE");
+				setResponsePage(ViewPage.class);
+				//TODO check x error panel report
+			}
+			
+		};
 		// TODO auth here
 		if(!CommandWebConsole.myInitializer.myAuthManager.can(CommandWebConsole.myInitializer.getDefaultUserURI(), MetaLanguage.terminologyDelItemAction.getURI(), urlToView))
 			obsoleteButton.setEnabled(false);
 		else obsoleteButton.setEnabled(true);
-		add(obsoleteButton);
+		form.add(obsoleteButton);
 		
-		Button supersedButton=new Button("supersedButton");
+		Button supersedButton=new Button("supersedButton"){
+			@Override
+			public void onSubmit() {
+				System.out.println("Action:SUPERSED");
+				//PageParameters pageParameters = new PageParameters();
+				//pageParameters.add("entity", urlToEdit);
+				//setResponsePage(ViewPage.class, pageParameters);
+			}
+		};
 		//if(isSet) supersedButton.setEnabled(false);
 		//else {
 			// TODO auth here
@@ -76,23 +123,23 @@ public class ViewPage extends SuperPage {
 				supersedButton.setEnabled(false);
 			else supersedButton.setEnabled(true);
 		//}
-		add(supersedButton);
+		form.add(supersedButton);
 		
 		Button pullButton=new Button("pullButton");
 		if(CommandWebConsole.myInitializer.hasRemote()==false) pullButton.setEnabled(false);
 		else {
 			// TODO auth here
 		}
-		add(pullButton);
+		form.add(pullButton);
 
 		Button pushButton=new Button("pushButton");
 		if(CommandWebConsole.myInitializer.isRemote()==false) pushButton.setEnabled(false);
 		else {
 			// TODO auth here
 		}
-		add(pushButton);
+		form.add(pushButton);
 		
-		
+		add(form);
 	}
 	
 	@Override
