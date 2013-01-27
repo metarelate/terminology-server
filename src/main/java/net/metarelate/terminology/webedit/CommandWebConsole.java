@@ -26,8 +26,6 @@ public class CommandWebConsole extends WebApplication
 	public static final int OTHER_PAGE = 2;
 	
 	public static Initializer myInitializer=null;
-	public static TerminologyFactory myFactory=null;
-	public static TerminologyManager myTerminologyManager=null;
 	
 	/**
 	 * @see org.apache.wicket.Application#getHomePage()
@@ -52,24 +50,7 @@ public class CommandWebConsole extends WebApplication
 			e1.printStackTrace();
 			System.exit(-1);
 		}
-		Model configuration=null;
-		try {
-			configuration = myInitializer.getConfigurationGraph();
-		} catch (ConfigurationException e) {
-			SSLogger.log("Problems in reading configuration files");
-			e.printStackTrace();
-			System.exit(-1);
-		}
-		String tdbPath=SimpleQueriesProcessor.getOptionalConfigurationParameterSingleValue(configuration, MetaLanguage.tdbPrefixProperty);
 		
-		//TODO for the time being only tdb is supported!
-		if(tdbPath==null) {
-			//throw new ConfigurationException("Unable to find a TDB directory");
-			SSLogger.log("Unable to find a TDB directory");
-			System.exit(-1);
-		}
-		myFactory=new TerminologyFactoryTDBImpl(tdbPath);
-		myTerminologyManager=new TerminologyManager(myFactory,myInitializer.authServer);
 		
 		mountPage("/edit",EditPage.class);
 		mountPage("/config",LocalConfiguration.class);

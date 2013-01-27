@@ -19,7 +19,7 @@ public class HomePage extends SuperPage {
 		
 		
 		String rootsString="";
-		TerminologySet[] termRoots=CommandWebConsole.myFactory.getRootCollections(); //TODO presumibly, something doesn't look in the right place
+		TerminologySet[] termRoots=CommandWebConsole.myInitializer.myFactory.getRootCollections(); //TODO presumibly, something doesn't look in the right place
 		List<TerminologySet> termRootsList=Arrays.asList(termRoots);
 		
 		ListView<TerminologySet> termRootsListView = new ListView<TerminologySet>("body2", termRootsList) {

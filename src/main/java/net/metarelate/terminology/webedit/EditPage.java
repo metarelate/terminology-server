@@ -3,7 +3,7 @@ package net.metarelate.terminology.webedit;
 import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.AuthException;
-import net.metarelate.terminology.exceptions.RegistryManagerException;
+import net.metarelate.terminology.exceptions.RegistryAccessException;
 
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
@@ -27,7 +27,7 @@ public class EditPage  extends SuperPage {
 		add(new Label("title",urlToEdit));
 		
 		TerminologySet mySet=null;
-		if(CommandWebConsole.myFactory.terminologySetExist(urlToEdit)) mySet=CommandWebConsole.myFactory.getOrCreateTerminologySet(urlToEdit);
+		if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(urlToEdit)) mySet=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToEdit);
 		System.out.println(">>"+urlToEdit);
 		// TODO if null, exception
 				
@@ -48,12 +48,12 @@ public class EditPage  extends SuperPage {
 				Statement newStatement=ResourceFactory.createStatement(ResourceFactory.createResource(urlToEdit), MetaLanguage.labelProperty, ResourceFactory.createPlainLiteral(labelValue));
 				Model newStats=ModelFactory.createDefaultModel().add(newStatement);
 				try {
-					CommandWebConsole.myTerminologyManager.addToEntityInformation(urlToEdit, newStats, CommandWebConsole.myInitializer.getDefaultUserURI(), "dumb edit");
+					CommandWebConsole.myInitializer.myTerminologyManager.addToEntityInformation(urlToEdit, newStats, CommandWebConsole.myInitializer.getDefaultUserURI(), "dumb edit");
 				} catch (AuthException e) {
 					// TODO Auto-generated catch block
 					getSession().error("Auth error");
 					e.printStackTrace();
-				} catch (RegistryManagerException e) {
+				} catch (RegistryAccessException e) {
 					// TODO Auto-generated catch block
 					getSession().error("Reg error");
 					e.printStackTrace();

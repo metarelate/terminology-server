@@ -29,12 +29,17 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import net.metarelate.terminology.auth.AuthConfig;
+import net.metarelate.terminology.auth.AuthRegistryManager;
 import net.metarelate.terminology.auth.AuthServer;
 import net.metarelate.terminology.auth.AuthServerFactory;
 import net.metarelate.terminology.config.CoreConfig;
 import net.metarelate.terminology.config.MetaLanguage;
+import net.metarelate.terminology.coreModel.TerminologyFactory;
+import net.metarelate.terminology.coreModel.TerminologyFactoryTDBImpl;
 import net.metarelate.terminology.exceptions.ConfigurationException;
+import net.metarelate.terminology.management.TerminologyManager;
 import net.metarelate.terminology.utils.SSLogger;
+import net.metarelate.terminology.utils.SimpleQueriesProcessor;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -59,7 +64,10 @@ public class Initializer {
 	private static String authDirAbsoluteString=null;
 	public static String defaultUserName=null;
 	
-	public static AuthServer authServer=null;
+	private  AuthServer authServer=null;
+	public  AuthRegistryManager myAuthManager=null;
+	public  TerminologyManager myTerminologyManager=null;
+	public  TerminologyFactory myFactory=null;
 	
 	public Initializer(String[] args) throws ConfigurationException {
 		// Process parameters
@@ -69,8 +77,15 @@ public class Initializer {
 	public Initializer() throws ConfigurationException {
 		construct();
 	}
+	
+	public void construct() throws ConfigurationException{
+		prepareConfigurationLayout();
+		prepareDefaultFiles();
+		buildSystemComponents();
+	}
+	
 	//TODO Inits could be made more modular
-	public void construct() throws ConfigurationException {
+	public void prepareConfigurationLayout() throws ConfigurationException {
 		if(userHomeString==null) userHomeString = System.getProperty( "user.home" );
 		SSLogger.log("User Home: "+ userHomeString);
 		System.out.println("User Home: "+ userHomeString);
@@ -120,17 +135,37 @@ public class Initializer {
 			authDirAbsoluteString=authDir.getAbsolutePath();
 		}
 		checkOrCreateDirectory(authDir);
-		initializeConfFiles();
-		
-		// We need to create AuthManager (eventually taking care of connections).
-		authServer=AuthServerFactory.createServerFromConfig(getConfigurationGraph());
-		
-		
-		// TODO Perhaps we should look into an initialization sequence
+
 		// TODO Note also that we should be sure time is in synch globally
 	}
 	
 
+	public void buildSystemComponents() throws ConfigurationException {
+	Model configuration=null;
+		try {
+			configuration = getConfigurationGraph();
+		} catch (ConfigurationException e) {
+			SSLogger.log("Problems in reading configuration files");
+			e.printStackTrace();
+			System.exit(-1);
+		}
+		String tdbPath=SimpleQueriesProcessor.getOptionalConfigurationParameterSingleValue(configuration, MetaLanguage.tdbPrefixProperty);
+	
+		//TODO for the time being only tdb is supported!
+		if(tdbPath==null) {
+			//throw new ConfigurationException("Unable to find a TDB directory");
+			SSLogger.log("Unable to find a TDB directory");
+			System.exit(-1);
+		}
+		
+		myFactory=new TerminologyFactoryTDBImpl(tdbPath);
+		authServer=AuthServerFactory.createServerFromConfig(getConfigurationGraph());
+		myAuthManager=new AuthRegistryManager(authServer,myFactory);
+		myTerminologyManager=new TerminologyManager(myFactory,myAuthManager);
+		
+	}
+
+	
 	
 	
 	
@@ -142,7 +177,7 @@ public class Initializer {
 		
 	}
 	
-	private void initializeConfFiles() throws ConfigurationException {		
+	private void prepareDefaultFiles() throws ConfigurationException {		
 		String defServerStatements="<http://thisInstance.org> <"+MetaLanguage.tdbPrefixProperty+"> "+"\""+dbDirAbsoluteString+"\"^^<http://www.w3.org/2001/XMLSchema#string> ;\n.";
 		defServerStatements+="<http://thisInstance.org> <"+MetaLanguage.authConfigURI +"> "+"<"+AuthConfig.isConfigFileString+"> ;\n.";
 		createFileAndFillWithString(confDirAbsoluteString,"defaultServerConfig.ttl",defServerStatements);

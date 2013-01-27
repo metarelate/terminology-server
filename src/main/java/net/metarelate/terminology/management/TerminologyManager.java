@@ -41,7 +41,7 @@ import net.metarelate.terminology.coreModel.TerminologyIndividual;
 import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.coreModel.Versioner;
 import net.metarelate.terminology.exceptions.AuthException;
-import net.metarelate.terminology.exceptions.RegistryManagerException;
+import net.metarelate.terminology.exceptions.RegistryAccessException;
 import net.metarelate.terminology.utils.SimpleQueriesProcessor;
 
 public class TerminologyManager {
@@ -51,29 +51,29 @@ public class TerminologyManager {
 
 	
 	TerminologyFactory myFactory;
-	AuthServer myAuthServer;
+	AuthRegistryManager myAuthManager;
 	DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-	public TerminologyManager(TerminologyFactory factory,AuthServer authServer) {
+	public TerminologyManager(TerminologyFactory factory,AuthRegistryManager myAuthManager) {
 		myFactory=factory;
-		myAuthServer=authServer;
+		this.myAuthManager=myAuthManager;
 	}
 	
-	public void replaceEntityInformation(String entityURI, Model statsToReplace, String actionAuthor, String description) throws AuthException, RegistryManagerException {
+	public void replaceEntityInformation(String entityURI, Model statsToReplace, String actionAuthor, String description) throws AuthException, RegistryAccessException {
 		amendEntityInformation(entityURI, statsToReplace, actionAuthor, description, MODE_REPLACE);
 	}
-	public void addToEntityInformation(String entityURI, Model statsToReplace, String actionAuthor, String description) throws AuthException, RegistryManagerException {
+	public void addToEntityInformation(String entityURI, Model statsToReplace, String actionAuthor, String description) throws AuthException, RegistryAccessException {
 		amendEntityInformation(entityURI, statsToReplace, actionAuthor, description, MODE_ADD);
 
 	}
-	public void removeFromEntityInformation(String entityURI, Model statsToReplace, String actionAuthor, String description) throws AuthException, RegistryManagerException {
+	public void removeFromEntityInformation(String entityURI, Model statsToReplace, String actionAuthor, String description) throws AuthException, RegistryAccessException {
 		amendEntityInformation(entityURI, statsToReplace, actionAuthor, description, MODE_REMOVE);		
 	}
 	
-	public void amendEntityInformation(String entityURI, Model statsToReplace, String actionAuthor, String description, int mode) throws AuthException, RegistryManagerException {
-		if(!AuthRegistryManager.can(actionAuthor,RegistryPolicyConfig.terminologyAmendedActionURI,entityURI,myAuthServer,myFactory))
+	public void amendEntityInformation(String entityURI, Model statsToReplace, String actionAuthor, String description, int mode) throws AuthException, RegistryAccessException {
+		if(!myAuthManager.can(actionAuthor,RegistryPolicyConfig.terminologyAmendedActionURI,entityURI))
 			throw new AuthException(actionAuthor,RegistryPolicyConfig.terminologyAmendedActionURI,entityURI);
 		TerminologyEntity myEntity=checkEntityExistance(entityURI);
-		if(myEntity==null) throw new RegistryManagerException("Unable to amend "+entityURI+" (entity does not exist)");
+		if(myEntity==null) throw new RegistryAccessException("Unable to amend "+entityURI+" (entity does not exist)");
 		String lastVersion=myEntity.getLastVersion();
 		String preStatus=myEntity.getStateURI(lastVersion);
 		String postStatus=preStatus;
@@ -100,18 +100,18 @@ public class TerminologyManager {
 		myEntity.synch();
 	}
 	
-	public void validate(String entityURI, String actionAuthor, String description, boolean validate) throws AuthException, RegistryManagerException {
+	public void validate(String entityURI, String actionAuthor, String description, boolean validate) throws AuthException, RegistryAccessException {
 		if(validate) {
-			if(!AuthRegistryManager.can(actionAuthor,RegistryPolicyConfig.validateAction,entityURI,myAuthServer,myFactory))
+			if(!myAuthManager.can(actionAuthor,RegistryPolicyConfig.validateAction,entityURI))
 				throw new AuthException(actionAuthor,RegistryPolicyConfig.validateAction,entityURI);
 		}
 		else {
-			if(!AuthRegistryManager.can(actionAuthor,RegistryPolicyConfig.invalidateAction,entityURI,myAuthServer,myFactory))
+			if(!myAuthManager.can(actionAuthor,RegistryPolicyConfig.invalidateAction,entityURI))
 				throw new AuthException(actionAuthor,RegistryPolicyConfig.invalidateAction,entityURI);
 		}
 		
 		TerminologyEntity myEntity=checkEntityExistance(entityURI);
-		if(myEntity==null) throw new RegistryManagerException("Unable to change status to "+entityURI+" (entity does not exist)");
+		if(myEntity==null) throw new RegistryAccessException("Unable to change status to "+entityURI+" (entity does not exist)");
 		String lastVersion=myEntity.getLastVersion();
 		String preStatus=myEntity.getStateURI(lastVersion);
 		System.out.println(">>>PRE: "+preStatus);
@@ -126,8 +126,8 @@ public class TerminologyManager {
 				postStatus=RegistryPolicyConfig.tm.invalidateTransitions.get(preStatus);
 		}
 		
-		if(postStatus==null) throw new RegistryManagerException("Unable to change status to "+entityURI+" (validation resulted didn't yield a state)");
-		if(postStatus.equals(RegistryPolicyConfig.illegalState)) throw new RegistryManagerException("Unable to change status to "+entityURI+" (non viable transition)");
+		if(postStatus==null) throw new RegistryAccessException("Unable to change status to "+entityURI+" (validation resulted didn't yield a state)");
+		if(postStatus.equals(RegistryPolicyConfig.illegalState)) throw new RegistryAccessException("Unable to change status to "+entityURI+" (non viable transition)");
 
 		String newVersion=Versioner.createNextVersion(lastVersion);
 		myEntity.registerVersion(newVersion);
@@ -161,15 +161,15 @@ public class TerminologyManager {
 		
 	}
 	
-	public void addTermToRegister(String codeURI, String registerURI, Model defaultEntityModel,String actionAuthor, String description, boolean isVersioned ) throws AuthException, RegistryManagerException {
+	public void addTermToRegister(String codeURI, String registerURI, Model defaultEntityModel,String actionAuthor, String description, boolean isVersioned ) throws AuthException, RegistryAccessException {
 	//////////////
-		if(!AuthRegistryManager.can(actionAuthor,RegistryPolicyConfig.addItemAction,registerURI,myAuthServer,myFactory))
+		if(!myAuthManager.can(actionAuthor,RegistryPolicyConfig.addItemAction,registerURI))
 				throw new AuthException(actionAuthor,RegistryPolicyConfig.addItemAction,registerURI);
 		TerminologySet myRegister=checkSetExistance(registerURI);
-		if(myRegister==null) throw new RegistryManagerException("Unable to modify "+registerURI+" (register does not exist)");
+		if(myRegister==null) throw new RegistryAccessException("Unable to modify "+registerURI+" (register does not exist)");
 		if(myFactory.terminologyIndividualExist(codeURI)) {
 			// Note this is only for addding! Not for changing obsolete/valid status. In other words, a delete operation
-			throw new RegistryManagerException("Code "+codeURI+" exists. Use \"move\" to change register");
+			throw new RegistryAccessException("Code "+codeURI+" exists. Use \"move\" to change register");
 		}
 			
 		String lastRegisterVersion=myRegister.getLastVersion();
@@ -215,8 +215,13 @@ public class TerminologyManager {
 
 	
 	public void tagRelease(String authorURI, String tag, String description) throws AuthException {
-		if(!AuthRegistryManager.can(authorURI,RegistryPolicyConfig.tagAction,null,myAuthServer,myFactory))
-			throw new AuthException(authorURI,RegistryPolicyConfig.tagAction,null);
+		try {
+			if(!myAuthManager.can(authorURI,RegistryPolicyConfig.tagAction,null))
+				throw new AuthException(authorURI,RegistryPolicyConfig.tagAction,null);
+		} catch (RegistryAccessException e) {
+			// TODO this shouldn't really happen in this case
+			e.printStackTrace();
+		}
 		TerminologySet[] roots=myFactory.getRootCollections();
 		for(int i=0;i<roots.length;i++) myTag(roots[i],tag);
 		//TODO we may want to register infos on tags somewhere.
@@ -263,16 +268,16 @@ public class TerminologyManager {
 	}
 
 	public void delTermFromRegister(String termURI, String regURI,
-			String actionAuthorURI, String description) throws AuthException, RegistryManagerException {
+			String actionAuthorURI, String description) throws AuthException, RegistryAccessException {
 		
-		if(!AuthRegistryManager.can(actionAuthorURI,RegistryPolicyConfig.delItemAction,regURI,myAuthServer,myFactory))
+		if(!myAuthManager.can(actionAuthorURI,RegistryPolicyConfig.delItemAction,regURI))
 			throw new AuthException(actionAuthorURI,RegistryPolicyConfig.delItemAction,regURI);
 	TerminologySet myRegister=checkSetExistance(regURI);
-	if(myRegister==null) throw new RegistryManagerException("Unable to modify "+regURI+" (register does not exist)");
+	if(myRegister==null) throw new RegistryAccessException("Unable to modify "+regURI+" (register does not exist)");
 	TerminologyIndividual myTerm=checkIndividualExistance(termURI);
-	if(myTerm==null) throw new RegistryManagerException("Code "+termURI+" does not exists.");
+	if(myTerm==null) throw new RegistryAccessException("Code "+termURI+" does not exists.");
 	if(!myRegister.getIndividuals(myRegister.getLastVersion()).contains(myTerm))
-		throw new RegistryManagerException("Code "+termURI+" is not contained in the last version of "+regURI);
+		throw new RegistryAccessException("Code "+termURI+" is not contained in the last version of "+regURI);
 	// TODO maybe we should test the containment in the register here.
 	
 	String lastRegisterVersion=myRegister.getLastVersion();
@@ -332,19 +337,19 @@ public class TerminologyManager {
 	
 	public void superseedTermInRegister(String termURI,
 			String superseedingTermURI, String regURI, 
-			String actionAuthorURI, String description) throws AuthException, RegistryManagerException {
+			String actionAuthorURI, String description) throws AuthException, RegistryAccessException {
 		// TODO Auto-generated method stub
 		
-		if(!AuthRegistryManager.can(actionAuthorURI,RegistryPolicyConfig.superseedAction,regURI,myAuthServer,myFactory))
+		if(!myAuthManager.can(actionAuthorURI,RegistryPolicyConfig.superseedAction,regURI))
 			throw new AuthException(actionAuthorURI,RegistryPolicyConfig.superseedAction,regURI);
 	TerminologySet myRegister=checkSetExistance(regURI);
-	if(myRegister==null) throw new RegistryManagerException("Unable to modify "+regURI+" (register does not exist)");
+	if(myRegister==null) throw new RegistryAccessException("Unable to modify "+regURI+" (register does not exist)");
 	
 	TerminologyIndividual myTerm=checkIndividualExistance(termURI);
-	if(myTerm==null) throw new RegistryManagerException("Code "+termURI+" does not exists.");
+	if(myTerm==null) throw new RegistryAccessException("Code "+termURI+" does not exists.");
 	
 	TerminologyIndividual superseedingTerm=checkIndividualExistance(superseedingTermURI);
-	if(superseedingTerm==null) throw new RegistryManagerException("Code "+superseedingTermURI+" does not exist. Add it first.");
+	if(superseedingTerm==null) throw new RegistryAccessException("Code "+superseedingTermURI+" does not exist. Add it first.");
 	
 	
 	
@@ -375,7 +380,7 @@ public class TerminologyManager {
 	if(preSuperseedingTermStatus!=null)
 		if(RegistryPolicyConfig.tm.superseederTransitions.containsKey(preSuperseedingTermStatus))
 			postSuperseedingTermStatus=RegistryPolicyConfig.tm.superseederTransitions.get(preSuperseedingTermStatus);
-	if(postSuperseedingTermStatus.equals(RegistryPolicyConfig.illegalState)) throw new RegistryManagerException(superseedingTermURI+" is not in a viable state for superseeding "+termURI);
+	if(postSuperseedingTermStatus.equals(RegistryPolicyConfig.illegalState)) throw new RegistryAccessException(superseedingTermURI+" is not in a viable state for superseeding "+termURI);
 
 	
 	

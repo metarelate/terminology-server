@@ -67,28 +67,28 @@ public class SearchPage extends SuperPage {
 		            protected void populateItem(final Item<String> item)
 		            {
 		                String elementURI = item.getModelObject();
-		                if(CommandWebConsole.myFactory.terminologySetExist(elementURI)) {
+		                if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(elementURI)) {
 		                	item.add(new Label("resultType","Set"));
 		                	// TODO we coould have something more personalized here (Collection, Register..) or use an image...
-		                	String lastVersion=CommandWebConsole.myFactory.getOrCreateTerminologySet(elementURI).getLastVersion();
-		                	String idLabel=SimpleQueriesProcessor.getOptionalLiteralValueAsString(CommandWebConsole.myFactory.getOrCreateTerminologySet(elementURI).getResource(), MetaLanguage.notationProperty, CommandWebConsole.myFactory.getOrCreateTerminologySet(elementURI).getStatements(lastVersion));
+		                	String lastVersion=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(elementURI).getLastVersion();
+		                	String idLabel=SimpleQueriesProcessor.getOptionalLiteralValueAsString(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(elementURI).getResource(), MetaLanguage.notationProperty, CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(elementURI).getStatements(lastVersion));
 		                	if(idLabel==null) idLabel="undefined";
 		                	item.add(new Label("resultID",idLabel));
-		                	item.add(new Label("resultDescription",CommandWebConsole.myFactory.getOrCreateTerminologySet(elementURI).getLabel(lastVersion)));
+		                	item.add(new Label("resultDescription",CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(elementURI).getLabel(lastVersion)));
 		                	
 		                	BookmarkablePageLink pageLink=new BookmarkablePageLink("resultURI",ViewPage.class);
 		    		    	pageLink.getPageParameters().set("entity", elementURI);
 		    		    	pageLink.add(new Label("resultURILabel",elementURI));
 		                	item.add(pageLink);
 		                }
-		                else if(CommandWebConsole.myFactory.terminologyIndividualExist(elementURI)) {
+		                else if(CommandWebConsole.myInitializer.myFactory.terminologyIndividualExist(elementURI)) {
 		                	item.add(new Label("resultType","Individual"));
 		                	// TODO same note as above
-		                	String lastVersion=CommandWebConsole.myFactory.getOrCreateTerminologyIndividual(elementURI).getLastVersion();
-		                	String idLabel=SimpleQueriesProcessor.getOptionalLiteralValueAsString(CommandWebConsole.myFactory.getOrCreateTerminologyIndividual(elementURI).getResource(), MetaLanguage.notationProperty, CommandWebConsole.myFactory.getOrCreateTerminologyIndividual(elementURI).getStatements(lastVersion));
+		                	String lastVersion=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(elementURI).getLastVersion();
+		                	String idLabel=SimpleQueriesProcessor.getOptionalLiteralValueAsString(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(elementURI).getResource(), MetaLanguage.notationProperty, CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(elementURI).getStatements(lastVersion));
 		                	if(idLabel==null) idLabel="undefined";
 		                	item.add(new Label("resultID",idLabel));
-		                	item.add(new Label("resultDescription",CommandWebConsole.myFactory.getOrCreateTerminologyIndividual(elementURI).getLabel(lastVersion)));
+		                	item.add(new Label("resultDescription",CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(elementURI).getLabel(lastVersion)));
 		                	BookmarkablePageLink pageLink=new BookmarkablePageLink("resultURI",ViewPage.class);
 		    		    	pageLink.getPageParameters().set("entity", elementURI);
 		    		    	pageLink.add(new Label("resultURILabel",elementURI));
@@ -165,9 +165,9 @@ public class SearchPage extends SuperPage {
 				            	resultLabel.setDefaultModelObject(selectedSetURI);
 				   		        target.add(resultLabel);
 				   		        String res[]=null;
-				   		        if(CommandWebConsole.myFactory.terminologySetExist(selectedSetURI)) {
+				   		        if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(selectedSetURI)) {
 				   		        	//TODO check consistency of defaults (versions)
-				   		        	Set<TerminologyIndividual> childrenSet=CommandWebConsole.myFactory.getOrCreateTerminologySet(selectedSetURI).getIndividuals();
+				   		        	Set<TerminologyIndividual> childrenSet=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(selectedSetURI).getIndividuals();
 				   		        	res=new String[childrenSet.size()+1];
 				   		        	res[0]=selectedSetURI;
 				   		        	Iterator<TerminologyIndividual> childrenIter=childrenSet.iterator();
@@ -195,8 +195,8 @@ public class SearchPage extends SuperPage {
 							protected Component newLabelComponent(String id,
 									IModel model) {
 								String myLabel=model.getObject().toString();
-								if(CommandWebConsole.myFactory.terminologySetExist(myLabel))
-									myLabel=CommandWebConsole.myFactory.getOrCreateTerminologySet(myLabel).getLabel(CommandWebConsole.myFactory.getOrCreateTerminologySet(myLabel).getLastVersion());
+								if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(myLabel))
+									myLabel=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(myLabel).getLabel(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(myLabel).getLastVersion());
 									//TODO terrible!!!!! Must be cleaned up a bit
 								return new Label("label",myLabel);
 							}
@@ -243,8 +243,8 @@ public class SearchPage extends SuperPage {
 
 			public Iterator<String> getChildren(String collection) {
 				ArrayList<String> resultList=new ArrayList<String>();
-				if(CommandWebConsole.myFactory.terminologySetExist(collection)) {
-					Set<TerminologySet> children=CommandWebConsole.myFactory.getOrCreateTerminologySet(collection).getCollections();
+				if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(collection)) {
+					Set<TerminologySet> children=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(collection).getCollections();
 					Iterator<TerminologySet> setIter=children.iterator();
 					while(setIter.hasNext()) {
 						resultList.add(setIter.next().getURI())
@@ -254,7 +254,7 @@ public class SearchPage extends SuperPage {
 			}
 
 			public Iterator<String> getRoots() {
-				TerminologySet[] roots=CommandWebConsole.myFactory.getRootCollections();
+				TerminologySet[] roots=CommandWebConsole.myInitializer.myFactory.getRootCollections();
 				ArrayList<String> rootList=new ArrayList<String>();
 				for(int i=0;i<roots.length;i++) {
 					rootList.add(roots[i].getURI());
@@ -263,8 +263,8 @@ public class SearchPage extends SuperPage {
 			}
 
 			public boolean hasChildren(String collection) {
-				if(!CommandWebConsole.myFactory.terminologySetExist(collection)) return false;
-				Set<TerminologySet> children=CommandWebConsole.myFactory.getOrCreateTerminologySet(collection).getCollections();
+				if(!CommandWebConsole.myInitializer.myFactory.terminologySetExist(collection)) return false;
+				Set<TerminologySet> children=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(collection).getCollections();
 				if(children.size()>0) return true;
 				else return false;
 			}

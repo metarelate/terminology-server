@@ -26,7 +26,7 @@ import net.metarelate.terminology.auth.AuthRegistryManager;
 import net.metarelate.terminology.auth.AuthServer;
 import net.metarelate.terminology.auth.StubAuthServer;
 import net.metarelate.terminology.exceptions.AuthException;
-import net.metarelate.terminology.exceptions.RegistryManagerException;
+import net.metarelate.terminology.exceptions.RegistryAccessException;
 import net.metarelate.terminology.management.TerminologyManager;
 import net.metarelate.terminology.utils.SSLogger;
 
@@ -172,8 +172,7 @@ public class MetOp extends CommandLineTool {
 	@Override
 	protected void executeCommand() {
 		// TODO this is only a stub
-		AuthServer authManager=new StubAuthServer();
-		TerminologyManager myManager=new TerminologyManager(myFactory,authManager);
+		TerminologyManager myManager=myInitializer.myTerminologyManager;
 		if(dataContentFile==null) {
 			System.out.println("No data specified");
 			exitWrongUsage("");
@@ -199,7 +198,7 @@ public class MetOp extends CommandLineTool {
 				System.out.println("Auth error");
 				System.out.println(e.getLocalizedMessage());
 				e.printStackTrace();
-			} catch (RegistryManagerException e) {
+			} catch (RegistryAccessException e) {
 				System.out.println("Registry error");
 				System.out.println(e.getLocalizedMessage());
 			}
@@ -220,7 +219,7 @@ public class MetOp extends CommandLineTool {
 				System.out.println("Auth error");
 				System.out.println(e.getLocalizedMessage());
 				e.printStackTrace();
-			} catch (RegistryManagerException e) {
+			} catch (RegistryAccessException e) {
 				System.out.println("Registry error");
 				System.out.println(e.getLocalizedMessage());
 			}
@@ -257,7 +256,7 @@ public class MetOp extends CommandLineTool {
 				System.out.println("Auth error");
 				System.out.println(e.getLocalizedMessage());
 				e.printStackTrace();
-			} catch (RegistryManagerException e) {
+			} catch (RegistryAccessException e) {
 				System.out.println("Registry error");
 				System.out.println(e.getLocalizedMessage());
 			}
@@ -278,7 +277,7 @@ public class MetOp extends CommandLineTool {
 				System.out.println("Auth error");
 				System.out.println(e.getLocalizedMessage());
 				e.printStackTrace();
-			} catch (RegistryManagerException e) {
+			} catch (RegistryAccessException e) {
 				System.out.println("Registry error");
 				System.out.println(e.getLocalizedMessage());
 			}
@@ -295,7 +294,7 @@ public class MetOp extends CommandLineTool {
 				System.out.println("Auth error");
 				System.out.println(e.getLocalizedMessage());
 				e.printStackTrace();
-			} catch (RegistryManagerException e) {
+			} catch (RegistryAccessException e) {
 				System.out.println("Registry error");
 				System.out.println(e.getLocalizedMessage());
 			}
@@ -313,7 +312,7 @@ public class MetOp extends CommandLineTool {
 				System.out.println("Auth error");
 				System.out.println(e.getLocalizedMessage());
 				e.printStackTrace();
-			} catch (RegistryManagerException e) {
+			} catch (RegistryAccessException e) {
 				System.out.println("Registry error");
 				System.out.println(e.getLocalizedMessage());
 			}
