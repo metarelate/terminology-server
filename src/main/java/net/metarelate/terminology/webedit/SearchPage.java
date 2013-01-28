@@ -1,6 +1,7 @@
 package net.metarelate.terminology.webedit;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -11,20 +12,32 @@ import net.metarelate.terminology.utils.SimpleQueriesProcessor;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.MarkupContainer;
+import org.apache.wicket.ajax.AjaxEventBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormValidatingBehavior;
+import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.extensions.markup.html.repeater.tree.AbstractTree;
 import org.apache.wicket.extensions.markup.html.repeater.tree.DefaultNestedTree;
 import org.apache.wicket.extensions.markup.html.repeater.tree.ITreeProvider;
 import org.apache.wicket.extensions.markup.html.repeater.tree.content.Folder;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.Button;
+import org.apache.wicket.markup.html.form.CheckBox;
+import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.FormComponent;
+import org.apache.wicket.markup.html.form.RequiredTextField;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
+import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.data.DataView;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.util.time.Duration;
+import org.apache.wicket.validation.validator.StringValidator;
 
 
 public class SearchPage extends SuperPage {
@@ -33,13 +46,13 @@ public class SearchPage extends SuperPage {
 	public SearchPage(PageParameters parameters) {
 		super(parameters);
 		
-		// TODO this is the result panel, should get to be something different
-		final Label resultLabel=new Label("resultLabel","Nothing yet");
-		resultLabel.setOutputMarkupId(true);
-		add(resultLabel);
+		//final Label resultLabel=new Label("resultLabel","Nothing yet");
+		//resultLabel.setOutputMarkupId(true);
+		//add(resultLabel);
 		
-		// TODO results table goes here
-		/**********************/
+		/*********************************************************************
+		 * Result Table
+		 *********************************************************************/
 		
 		final SearchResultList resultList=new SearchResultList();
 		
@@ -105,23 +118,113 @@ public class SearchPage extends SuperPage {
 		        resContainer.add(resultView);
 		        resContainer.setOutputMarkupId(true);
 		        add(resContainer);
-		/**********************/
 		
-		//TODO here we should add some form logic for search
+		/*********************************************************************
+		* Ajax query form
+	    *********************************************************************/
+		        
+		final FormComponent queryField = new RequiredTextField<String>("queryText", new Model());        
+		queryField.add(new StringValidator(3,null));    
 		
+		final FormComponent regCheckbox=new CheckBox("queryOnReg",new Model(Boolean.FALSE));
+		regCheckbox.setOutputMarkupId(true);
 		
-		// TODO here we have the register tree
-		/*
-		final AbstractTree registerTree=new MyDefaultNestedTree("registerTree",createRegRootModel()) {
+		final FormComponent codeCheckbox=new CheckBox("queryOnCode",new Model(Boolean.TRUE));
+		codeCheckbox.setOutputMarkupId(true);
+		
+		regCheckbox.add(new AjaxEventBehavior("onclick") {
 
 			@Override
-			protected Component newContentComponent(String id, IModel model) {
+			protected void onEvent(AjaxRequestTarget target) {
 				// TODO Auto-generated method stub
-				return new Folder(id,this,model) ;
+				codeCheckbox.setModelObject(Boolean.FALSE);
+				regCheckbox.setModelObject(Boolean.TRUE);
+				target.add(codeCheckbox);
+				target.add(regCheckbox);
+				System.out.println("REG");
+				System.out.println("Code: "+codeCheckbox.getModelObject().toString());
+				System.out.println("Reg: "+regCheckbox.getModelObject().toString());
 			}
 			
-		};
-		*/
+		});
+		
+		
+		codeCheckbox.add(new AjaxEventBehavior("onclick") {
+
+			@Override
+			protected void onEvent(AjaxRequestTarget target) {
+				// TODO Auto-generated method stub
+				regCheckbox.setModelObject(Boolean.FALSE);
+				codeCheckbox.setModelObject(Boolean.TRUE);
+				target.add(regCheckbox);
+				target.add(codeCheckbox);
+				System.out.println("CODE");
+				System.out.println("Code: "+codeCheckbox.getModelObject().toString());
+				System.out.println("Reg: "+regCheckbox.getModelObject().toString());
+			}
+			
+		});
+			
+		
+		
+
+	       
+		
+		Form<?> form = new Form<Void>("queryForm") {        
+			 
+
+	       
+		};        
+		
+		AjaxFormValidatingBehavior.addToAllFormComponents(form, "keydown", Duration.ONE_SECOND);
+
+		form.add(queryField);
+		form.add(regCheckbox);
+		form.add(codeCheckbox);
+		
+		final FeedbackPanel feedback = new FeedbackPanel("feedback");
+	    feedback.setOutputMarkupId(true);
+	    add(feedback);
+		
+		 // add a button that can be used to submit the form via ajax
+        form.add(new AjaxButton("search", form)
+        {
+            @Override
+            protected void onSubmit(AjaxRequestTarget target, Form<?> form)
+            {
+            	String queryString=queryField.getModelObject().toString();
+            	System.out.println("Querying for: "+queryString);
+            	
+            	Collection<TerminologySet> testAnswer=CommandWebConsole.myInitializer.myFactory.getAllSets();
+            	String[] testResults=new String[testAnswer.size()];
+            	Iterator<TerminologySet> answIter=testAnswer.iterator();
+            	int i=0;
+            	while(answIter.hasNext()) {
+            		testResults[i]=answIter.next().getURI();
+            		i++;
+            	}
+            	resultList.changeTo(testResults);
+		        target.add(resContainer);
+                // repaint the feedback panel so that it is hidden
+                target.add(feedback);
+            }
+
+            @Override
+            protected void onError(AjaxRequestTarget target, Form<?> form)
+            {
+                // repaint the feedback panel so errors are shown
+                target.add(feedback);
+            }
+        });
+		
+		add(form);
+		form.setOutputMarkupId(true);
+
+		
+		/*********************************************************************
+		 * Regsiters tree
+		 *********************************************************************/
+		
 		final AbstractTree<String> registerTree=new DefaultNestedTree<String>("registerTree",createRegRootModel())  {
 			/**
 			 * 
@@ -146,8 +249,8 @@ public class SearchPage extends SuperPage {
 				            protected void onClick(final AjaxRequestTarget target)
 				            {
 				            	String selectedSetURI=model.getObject().toString();
-				            	resultLabel.setDefaultModelObject(selectedSetURI);
-				   		        target.add(resultLabel);
+				            	//resultLabel.setDefaultModelObject(selectedSetURI);
+				   		        //target.add(resultLabel);
 				   		        String res[]=null;
 				   		        if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(selectedSetURI)) {
 				   		        	//TODO check consistency of defaults (versions)

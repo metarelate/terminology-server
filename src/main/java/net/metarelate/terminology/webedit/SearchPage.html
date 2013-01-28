@@ -18,7 +18,8 @@
 		<wicket:extend>
 			<div id="mainPanel">
 				<article>
-					<span wicket:id="resultLabel">See here your results...</span>
+					<!-- span wicket:id="resultLabel">See here your results...</span -->
+					<h1>Results</h1>
 					<div wicket:id="resultRenderer">
 							
 						<table cellspacing="0" class="dataview">
@@ -37,18 +38,18 @@
     					</tr>
 					</table>
 					</div>
-					
+					<div wicket:id="feedback"></div>
 				</article>
 			</div>
 			<div id="sidePanel">
 				<aside>
 					<h2>Text or ID search</h2>
 					<p>
-						<form> 
-							<input type="text" size="20" /><br/>
-							<input type="radio" name="entityType" value="individual"checked />Code<br/>
-							<input type="radio" name="entityType" value="set"/>Register<br/>
-							<input type="submit" value="Search" />
+						<form wicket:id="queryForm"> 
+							<input type="text" size="20" wicket:id="queryText" /><br/>
+							<input type="checkbox" name="entityType" value="individual" wicket:id="queryOnCode" checked />Code<br/>
+							<input type="checkbox" name="entityType" value="set" wicket:id="queryOnReg" />Register<br/>
+							<input type="submit" value="Search" wicket:id="search" />
 						</form>
 					</p>
 					<hr>
