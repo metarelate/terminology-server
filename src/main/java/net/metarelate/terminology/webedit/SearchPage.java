@@ -2,10 +2,12 @@ package net.metarelate.terminology.webedit;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
 import net.metarelate.terminology.config.MetaLanguage;
+import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.coreModel.TerminologyIndividual;
 import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.utils.SimpleQueriesProcessor;
@@ -69,7 +71,9 @@ public class SearchPage extends SuperPage {
 		                	// TODO we coould have something more personalized here (Collection, Register..) or use an image...
 		                	String lastVersion=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(elementURI).getLastVersion();
 		                	String idLabel=SimpleQueriesProcessor.getOptionalLiteralValueAsString(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(elementURI).getResource(), MetaLanguage.notationProperty, CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(elementURI).getStatements(lastVersion));
+		                	String lastStatus=SimpleQueriesProcessor.getOptionalLiteralValueAsString(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(elementURI).getResource(), MetaLanguage.hasStatusProperty, CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(elementURI).getStatements(lastVersion));
 		                	if(idLabel==null) idLabel="undefined";
+		                	if(lastStatus==null) lastStatus="undefined";
 		                	item.add(new Label("resultID",idLabel));
 		                	item.add(new Label("resultDescription",CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(elementURI).getLabel(lastVersion)));
 		                	
@@ -77,19 +81,26 @@ public class SearchPage extends SuperPage {
 		    		    	pageLink.getPageParameters().set("entity", elementURI);
 		    		    	pageLink.add(new Label("resultURILabel",elementURI));
 		                	item.add(pageLink);
+		                	item.add(new Label("resultLastVersion",lastVersion));
+		                	item.add(new Label("resultStatus",lastStatus));
 		                }
 		                else if(CommandWebConsole.myInitializer.myFactory.terminologyIndividualExist(elementURI)) {
 		                	item.add(new Label("resultType","Individual"));
 		                	// TODO same note as above
 		                	String lastVersion=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(elementURI).getLastVersion();
 		                	String idLabel=SimpleQueriesProcessor.getOptionalLiteralValueAsString(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(elementURI).getResource(), MetaLanguage.notationProperty, CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(elementURI).getStatements(lastVersion));
+		                	String lastStatus=SimpleQueriesProcessor.getOptionalLiteralValueAsString(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(elementURI).getResource(), MetaLanguage.hasStatusProperty, CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(elementURI).getStatements(lastVersion));
+
 		                	if(idLabel==null) idLabel="undefined";
+		                	if(lastStatus==null) lastStatus="undefined";
 		                	item.add(new Label("resultID",idLabel));
 		                	item.add(new Label("resultDescription",CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(elementURI).getLabel(lastVersion)));
 		                	BookmarkablePageLink pageLink=new BookmarkablePageLink("resultURI",ViewPage.class);
 		    		    	pageLink.getPageParameters().set("entity", elementURI);
 		    		    	pageLink.add(new Label("resultURILabel",elementURI));
 		                	item.add(pageLink);
+		                	item.add(new Label("resultLastVersion",lastVersion));
+		                	item.add(new Label("resultStatus",lastStatus));
 		                }
 		                else {
 		                	item.add(new Label("resultType","?"));
@@ -97,6 +108,11 @@ public class SearchPage extends SuperPage {
 		                	item.add(new Label("resultID","Undefined"));
 		                	item.add(new Label("resultDescription","Undefined"));
 		                	item.add(new Label("resultURI",elementURI));
+		                	item.add(new Label("resultLastVersion","undefined"));
+		                	item.add(new Label("resultStatus","undefined"));
+		                	
+		                	
+		                	
 		                	//TODO to check: this may break Wicket Code as there are no instructions to render a link
 		                }
 		          
@@ -141,9 +157,9 @@ public class SearchPage extends SuperPage {
 				regCheckbox.setModelObject(Boolean.TRUE);
 				target.add(codeCheckbox);
 				target.add(regCheckbox);
-				System.out.println("REG");
-				System.out.println("Code: "+codeCheckbox.getModelObject().toString());
-				System.out.println("Reg: "+regCheckbox.getModelObject().toString());
+				//System.out.println("REG");
+				//System.out.println("Code: "+codeCheckbox.getModelObject().toString());
+				//System.out.println("Reg: "+regCheckbox.getModelObject().toString());
 			}
 			
 		});
@@ -158,9 +174,9 @@ public class SearchPage extends SuperPage {
 				codeCheckbox.setModelObject(Boolean.TRUE);
 				target.add(regCheckbox);
 				target.add(codeCheckbox);
-				System.out.println("CODE");
-				System.out.println("Code: "+codeCheckbox.getModelObject().toString());
-				System.out.println("Reg: "+regCheckbox.getModelObject().toString());
+				//System.out.println("CODE");
+				//System.out.println("Code: "+codeCheckbox.getModelObject().toString());
+				//System.out.println("Reg: "+regCheckbox.getModelObject().toString());
 			}
 			
 		});
@@ -192,18 +208,24 @@ public class SearchPage extends SuperPage {
             @Override
             protected void onSubmit(AjaxRequestTarget target, Form<?> form)
             {
-            	String queryString=queryField.getModelObject().toString();
-            	System.out.println("Querying for: "+queryString);
+            	Set<String> testAnswer=new HashSet<String>();
+            	String textQueryString=queryField.getModelObject().toString();
             	
-            	Collection<TerminologySet> testAnswer=CommandWebConsole.myInitializer.myFactory.getAllSets();
+            	if(((Boolean)codeCheckbox.getModelObject()).booleanValue()) testAnswer.addAll(CommandWebConsole.myInitializer.myFactory.extractIndividualsWithMarchingValue(textQueryString));
+            	if(((Boolean)regCheckbox.getModelObject()).booleanValue()) testAnswer.addAll(CommandWebConsole.myInitializer.myFactory.extractSetsWithMarchingValue(textQueryString));
+            			
+       
+            	
+            	/*
             	String[] testResults=new String[testAnswer.size()];
-            	Iterator<TerminologySet> answIter=testAnswer.iterator();
+            	Iterator<TerminologyEntity> answIter=testAnswer.iterator();
             	int i=0;
             	while(answIter.hasNext()) {
             		testResults[i]=answIter.next().getURI();
             		i++;
             	}
-            	resultList.changeTo(testResults);
+            	*/
+            	resultList.changeTo(testAnswer.toArray(new String[0]));
 		        target.add(resContainer);
                 // repaint the feedback panel so that it is hidden
                 target.add(feedback);
