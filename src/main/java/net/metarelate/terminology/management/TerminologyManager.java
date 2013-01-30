@@ -31,6 +31,10 @@ import net.metarelate.terminology.auth.AuthRegistryManager;
 import net.metarelate.terminology.auth.AuthServer;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.tdb.TDB;
 
 import net.metarelate.terminology.config.CoreConfig;
@@ -82,8 +86,23 @@ public class TerminologyManager {
 				postStatus=RegistryPolicyConfig.tm.updateTransitions.get(preStatus);
 		String newVersion=Versioner.createNextVersion(lastVersion);
 		myEntity.registerVersion(newVersion);
-		if(mode==MODE_REPLACE) 
-			myEntity.replaceStatements(statsToReplace, newVersion);
+		if(mode==MODE_REPLACE) {
+			// myEntity.replaceStatements(statsToReplace, newVersion);
+			// Note: the above was not really making sense!
+			Model oldStatements=ModelFactory.createDefaultModel();
+			oldStatements.add(myEntity.getStatements(lastVersion));
+			//Now we clear the old statements
+			StmtIterator statsToReplaceIterator=statsToReplace.listStatements();
+			while(statsToReplaceIterator.hasNext()) {
+				Statement currentStatToReplace=statsToReplaceIterator.nextStatement();
+				Model diffModel=ModelFactory.createDefaultModel();
+				diffModel.add(oldStatements.listStatements(currentStatToReplace.getSubject(),currentStatToReplace.getPredicate(),(RDFNode)null));
+				oldStatements.remove(diffModel);
+			}
+			oldStatements.add(statsToReplace);
+			myEntity.getStatements(newVersion).add(oldStatements);
+		}
+			
 		if(mode==MODE_ADD) 
 			myEntity.getStatements(newVersion).add(myEntity.getStatements(lastVersion)).add(statsToReplace);
 		if(mode==MODE_REMOVE)

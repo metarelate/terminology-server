@@ -51,7 +51,7 @@ public class EditPage  extends SuperPage {
 				Statement newStatement=ResourceFactory.createStatement(ResourceFactory.createResource(urlToEdit), MetaLanguage.labelProperty, ResourceFactory.createPlainLiteral(labelValue));
 				Model newStats=ModelFactory.createDefaultModel().add(newStatement);
 				try {
-					CommandWebConsole.myInitializer.myTerminologyManager.addToEntityInformation(urlToEdit, newStats, CommandWebConsole.myInitializer.getDefaultUserURI(), "dumb edit");
+					CommandWebConsole.myInitializer.myTerminologyManager.replaceEntityInformation(urlToEdit, newStats, CommandWebConsole.myInitializer.getDefaultUserURI(), "dumb edit");
 				} catch (AuthException e) {
 					// TODO Auto-generated catch block
 					getSession().error("Auth error");
