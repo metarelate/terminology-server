@@ -1,7 +1,6 @@
 package net.metarelate.terminology.webedit;
 
 import net.metarelate.terminology.config.MetaLanguage;
-import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.AuthException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
@@ -20,28 +19,26 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 
-public class EditPage  extends SuperPage {
+public class EditPageOld  extends SuperPage {
 	private static final long serialVersionUID = 1L;
-	public EditPage(final PageParameters parameters) {
+	public EditPageOld(final PageParameters parameters) {
 		super(parameters);
 		final String urlToEdit=parameters.get("entity").toString();
-		add(new Label("urlToEdit",urlToEdit));
+		add(new Label("title",urlToEdit));
 		
-		TerminologyEntity myEntity=null;
-		if(CommandWebConsole.myInitializer.myFactory.terminologyIndividualExist(urlToEdit)) myEntity=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlToEdit);
-		else if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(urlToEdit)) myEntity=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToEdit);
-		else {
-			// TODO nothing was found, which is impossible. But let's add some fall back action here anyway...
-		}
+		TerminologySet mySet=null;
+		if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(urlToEdit)) mySet=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToEdit);
+		System.out.println(">>"+urlToEdit);
+		// TODO if null, exception
 				
 		
-		final TextField<String> entityLabel = new TextField<String>("entityLabel", org.apache.wicket.model.Model.of(myEntity.getLabel(myEntity.getLastVersion())));
+		final TextField<String> entityLabel = new TextField<String>("entityLabel", org.apache.wicket.model.Model.of(mySet.getLabel(mySet.getLastVersion())));
 		//final TextField<String> entityLabel = new TextField<String>("entityLabel", org.apache.wicket.model.Model.of(""));
 
 		entityLabel.setRequired(true);
 		entityLabel.add(new LabelValidator());
 		
-		Form<?> form = new Form<Void>("editForm") {
+		Form<?> form = new Form<Void>("entityForm") {
 
 			@Override
 			protected void onSubmit() {
@@ -65,12 +62,12 @@ public class EditPage  extends SuperPage {
 				
 				PageParameters pageParameters = new PageParameters();
 				pageParameters.add("entity", urlToEdit);
-				setResponsePage(ViewPage.class, pageParameters);
+				setResponsePage(EditPageOld.class, pageParameters);
 
 			}
 
 		};
-		//add(new Label("version",myEntity.getLastVersion()));
+		add(new Label("version",mySet.getLastVersion()));
 		add(form);
 		form.add(entityLabel);
 		add(new FeedbackPanel("feedback"));

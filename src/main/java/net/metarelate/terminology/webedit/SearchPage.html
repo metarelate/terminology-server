@@ -24,23 +24,26 @@
 							
 						<table cellspacing="0" class="dataview">
     					<tr>
-        					<th>Type</th>
-        					<th>ID</th>
-        					<th>Description</th>
-        					<th>URI</th>
-        					<th>Last version</th>
-        					<th>Status</th>
+        					<th class="narrowColumn">Type</th>
+        					<th class="narrowColumn">ID</th>
+        					<th class="wideColumn">Description</th>
+        					<th class="narrowColumn">Last vers.</th>
+        					<th class="narrowColumn">Status</th>
+        					<th class="uriColumn">URI</th>
+        					
+        					
         					<!-- th>New comments</th>
         					<th>Pull requests</th -->
         
     					</tr>
     					<tr wicket:id="simpleResults">
-        					<td><span wicket:id="resultType">e.g: register</span></td>
-        					<td><span wicket:id="resultID">e.g: 1002</span> </td>
-        					<td><span wicket:id="resultDescription">e.g: this register contains...</span></td>
-        					<td><a href="#" wicket:id="resultURI"><span wicket:id="resultURILabel">e.g.: http://example.com/register</span></a></td>
-    						<td><span wicket:id="resultLastVersion">e.g: v3</span></td>
-    						<td><span wicket:id="resultStatus">e.g: valid</span></td>
+        					<td class="narrowColumn"><span wicket:id="resultType">e.g: register</span></td>
+        					<td class="narrowColumn"><span wicket:id="resultID">e.g: 1002</span> </td>
+        					<td class="wideColumn"><span wicket:id="resultDescription">e.g: this register contains...</span></td>
+    						<td class="narrowColumn"><span wicket:id="resultLastVersion">e.g: v3</span></td>
+    						<td class="narrowColumn"><span wicket:id="resultStatus">e.g: valid</span></td>
+    						<td class="uriColumn"><a href="#" wicket:id="resultURI"><span wicket:id="resultURILabel">e.g.: http://example.com/register</span></a></td>
+    						
     						<!-- td></td>
     						<td></td-->
     					</tr>

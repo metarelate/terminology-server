@@ -41,9 +41,9 @@ public class ViewPage extends SuperPage {
 			@Override
 			public void onSubmit() {
 				System.out.println("Action:EDIT");
-				//PageParameters pageParameters = new PageParameters();
-				//pageParameters.add("entity", urlToEdit);
-				//setResponsePage(ViewPage.class, pageParameters);
+				PageParameters pageParameters = new PageParameters();
+				pageParameters.add("entity", urlToView);
+				setResponsePage(EditPage.class, pageParameters);
 			}
 		};
 		if(!CommandWebConsole.myInitializer.myAuthManager.can(CommandWebConsole.myInitializer.getDefaultUserURI(), MetaLanguage.terminologyUpdateAction.getURI(), urlToView))
