@@ -2,17 +2,13 @@ package net.metarelate.terminology.webedit;
 
 import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
-import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.AuthException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
 
-import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.basic.MultiLineLabel;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
-
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -20,10 +16,19 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 
-public class EditPage  extends SuperPage {
-	private static final long serialVersionUID = 1L;
-	public EditPage(final PageParameters parameters) {
+/**
+ * Common behaviour to edit and new operations. These two actions are largely
+ * equivalent, except for the definition of new URIs.
+ * @author andreasplendiani
+ *
+ */
+public class AbstractEditPage  extends SuperPage {
+	private static final long serialVersionUID = 10L;
+	
+	public AbstractEditPage(final PageParameters parameters) {
 		super(parameters);
+		
+		// urlToEdit cannot be final as is defined by subclasses...
 		final String urlToEdit=parameters.get("entity").toString();
 		add(new Label("urlToEdit",urlToEdit));
 		

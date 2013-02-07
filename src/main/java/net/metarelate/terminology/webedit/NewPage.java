@@ -20,9 +20,9 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 
-public class EditPage  extends SuperPage {
+public class NewPage  extends SuperPage {
 	private static final long serialVersionUID = 1L;
-	public EditPage(final PageParameters parameters) {
+	public NewPage(final PageParameters parameters) {
 		super(parameters);
 		final String urlToEdit=parameters.get("entity").toString();
 		add(new Label("urlToEdit",urlToEdit));

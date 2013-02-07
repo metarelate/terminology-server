@@ -68,6 +68,7 @@ public class Initializer {
 	public  AuthRegistryManager myAuthManager=null;
 	public  TerminologyManager myTerminologyManager=null;
 	public  TerminologyFactory myFactory=null;
+	public boolean debugMode=true;	// TODO this shold come from the configuration file
 	
 	public Initializer(String[] args) throws ConfigurationException {
 		// Process parameters

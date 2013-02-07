@@ -45,7 +45,10 @@ import net.metarelate.terminology.coreModel.TerminologyIndividual;
 import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.coreModel.Versioner;
 import net.metarelate.terminology.exceptions.AuthException;
+import net.metarelate.terminology.exceptions.ImpossibleOperationException;
+import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
+import net.metarelate.terminology.exceptions.UnknownURIException;
 import net.metarelate.terminology.utils.SimpleQueriesProcessor;
 
 public class TerminologyManager {
@@ -285,7 +288,44 @@ public class TerminologyManager {
 		
 		
 	}
-
+	
+	public void delTerm(String urlToDelete, String actionAuthorURI,
+			String description) throws ModelException, RegistryAccessException, ImpossibleOperationException {
+		if(myFactory.terminologySetExist(urlToDelete)) {
+			//This is a set, we can obsolete it only if in its last version it has not valid individuals
+			TerminologySet setToDelete=myFactory.getOrCreateTerminologySet(urlToDelete);
+			String lastVersion=setToDelete.getLastVersion();
+			Set<TerminologyIndividual> childrendIndividuals=setToDelete.getIndividuals(lastVersion);
+			Set<TerminologySet> setsIndividuals=setToDelete.getCollections(lastVersion);
+			if(!(childrendIndividuals.size()==0 && setsIndividuals.size()==0)){
+				throw new ImpossibleOperationException("Impossible to obsolete non empty register: "+urlToDelete+" (this is a built in constraint)");
+			}
+			propagateDeleteOverContainers(setToDelete,actionAuthorURI,description);
+		}
+		else if(myFactory.terminologyIndividualExist(urlToDelete)) {
+			TerminologyIndividual individualToDelete=myFactory.getOrCreateTerminologyIndividual(urlToDelete);
+			propagateDeleteOverContainers(individualToDelete,actionAuthorURI,description);
+		}
+		else {
+			throw new UnknownURIException(urlToDelete);
+		}
+		
+	}
+	
+	
+	private void propagateDeleteOverContainers(TerminologyEntity entityToDelete, String actionAuthorURI, String description) throws AuthException, RegistryAccessException, ModelException {
+		Set<TerminologySet> containers=entityToDelete.getContainers(entityToDelete.getLastVersion());
+		//Note: there should only be one container for the time being...
+		if(containers.size()>1) throw new ModelException("More than one container defined for "+entityToDelete);
+		Iterator<TerminologySet> containersIter=containers.iterator();
+		while(containersIter.hasNext()) {
+			TerminologySet container=containersIter.next();
+			delTermFromRegister(entityToDelete.getURI(), container.getURI(),
+					actionAuthorURI, description);
+		}
+	}
+	//TODO generalize to set
+	//TODO overall TerminologyManager is due a big overhaul!!!
 	public void delTermFromRegister(String termURI, String regURI,
 			String actionAuthorURI, String description) throws AuthException, RegistryAccessException {
 		
@@ -449,6 +489,8 @@ public class TerminologyManager {
 	
 	
 	}
+
+
 
 
 	

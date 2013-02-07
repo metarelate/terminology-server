@@ -391,7 +391,7 @@ public class SearchPage extends SuperPage {
 	}
 
 	@Override
-	String getCoreMessage() {
+	String getPageStateMessage() {
 		return "Just searching";
 	}
 	
