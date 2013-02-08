@@ -388,6 +388,9 @@ public class TerminologyManager {
 
 	myRegister.unregisterContainedIndividual(myTerm, newRegisterVersion, newTermVersion);
 	
+	myTerm.synch();
+	myRegister.synch();
+	
 		//////
 		
 	}

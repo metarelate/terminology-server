@@ -4,7 +4,9 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
@@ -14,7 +16,7 @@ public class ObsoleteConfirmPanel extends Panel
 	Label textLabel=null;
 	AjaxLink confirmButton=null;
 	AjaxLink abandonButton=null;
-	public boolean resultValue=false;
+	TextArea<String> description=null;
 	
 	
     /**
@@ -33,7 +35,6 @@ public class ObsoleteConfirmPanel extends Panel
 			@Override
 			public void onClick(AjaxRequestTarget target) {
 				System.out.println("onClick");
-				resultValue=true;
 				target.add(viewPage.feedbackPanel);
 				System.out.println("beforeClose");
 				viewPage.obsoleteConfirmPanelWindow.close(target); 
@@ -51,7 +52,6 @@ public class ObsoleteConfirmPanel extends Panel
 
 			@Override
 			public void onClick(AjaxRequestTarget target) {
-				resultValue=false;
 				target.add(viewPage.feedbackPanel);
 				viewPage.abandonCommand();
 				viewPage.obsoleteConfirmPanelWindow.close(target);
@@ -62,13 +62,19 @@ public class ObsoleteConfirmPanel extends Panel
         	
         };
         add(abandonButton);
+        
+        description = new TextArea<String>("description",Model.of(""));		
+        add(description);
+        
+      
     }
     
-    public boolean getValueOnce() {
-    	boolean toReturn=resultValue;
-    	resultValue=false;
-    	return toReturn;
+    public String getDescription() {
+    	String result=description.getModelObject().toString();
+    	if(result==null) result ="";
+    	return result;
     }
+   
     
 
 }

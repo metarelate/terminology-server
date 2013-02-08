@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import net.metarelate.terminology.config.MetaLanguage;
+import net.metarelate.terminology.coreModel.LabelManager;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.coreModel.TerminologyIndividual;
 import net.metarelate.terminology.coreModel.TerminologySet;
@@ -69,7 +70,12 @@ public class SearchPage extends SuperPage {
 		                	// TODO we coould have something more personalized here (Collection, Register..) or use an image...
 		                	String lastVersion=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(elementURI).getLastVersion();
 		                	String idLabel=SimpleQueriesProcessor.getOptionalLiteralValueAsString(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(elementURI).getResource(), MetaLanguage.notationProperty, CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(elementURI).getStatements(lastVersion));
-		                	String lastStatus=SimpleQueriesProcessor.getOptionalLiteralValueAsString(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(elementURI).getResource(), MetaLanguage.hasStatusProperty, CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(elementURI).getStatements(lastVersion));
+		                	
+		                	
+		                	String lastStatusURI=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(elementURI)
+		                	.getGenericVersionSpecificURIObject(MetaLanguage.hasStatusProperty,lastVersion);
+		                	
+		                	String lastStatus=CommandWebConsole.myInitializer.myFactory.getLabelManager().getLabelForURI(lastStatusURI, LabelManager.URI_IF_NULL);
 		                	if(idLabel==null) idLabel="undefined";
 		                	if(lastStatus==null) lastStatus="undefined";
 		                	item.add(new Label("resultID",idLabel));
@@ -87,7 +93,12 @@ public class SearchPage extends SuperPage {
 		                	// TODO same note as above
 		                	String lastVersion=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(elementURI).getLastVersion();
 		                	String idLabel=SimpleQueriesProcessor.getOptionalLiteralValueAsString(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(elementURI).getResource(), MetaLanguage.notationProperty, CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(elementURI).getStatements(lastVersion));
-		                	String lastStatus=SimpleQueriesProcessor.getOptionalLiteralValueAsString(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(elementURI).getResource(), MetaLanguage.hasStatusProperty, CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(elementURI).getStatements(lastVersion));
+		                	
+		                	String lastStatusURI=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(elementURI)
+				                	.getGenericVersionSpecificURIObject(MetaLanguage.hasStatusProperty,lastVersion);
+				                	
+				            String lastStatus=CommandWebConsole.myInitializer.myFactory.getLabelManager().getLabelForURI(lastStatusURI, LabelManager.URI_IF_NULL);
+		                	
 
 		                	if(idLabel==null) idLabel="undefined";
 		                	if(lastStatus==null) lastStatus="undefined";

@@ -195,51 +195,11 @@ public class ViewPage extends SuperPage {
 		 ********************************************************************/
 		AjaxButton obsoleteButton=new AjaxButton("obsoleteButton") {
 			private static final long serialVersionUID = 7284165411845513293L;
-
 			@Override
 			public void onSubmit(AjaxRequestTarget target, Form<?> form) {
 				target.add(feedbackPanel);	// TODO clarify the role of target
-				System.out.println("onSubmit-ShowPanel");
-				obsoleteConfirmPanelWindow.show(target);
-				System.out.println("onSubmit-PostShowPanel");
-				/*
-				System.out.println(1);
-				if(obsoleteConfirmPanelContent.getValueOnce()==false) {
-					System.out.println(2);
-					getSession().warn("Obsolete action abandoned");	// TODO multilingual support
-				}
-				else {
-					
-					System.out.println(3);
-					String description="No description available now"; // TODO add support to get description
-					try {
-						CommandWebConsole.myInitializer.myTerminologyManager.delTerm(
-								urlToAction, 
-								CommandWebConsole.myInitializer.getDefaultUserURI() , 
-								description);
-					} catch (ModelException e) {
-						getSession().error("Impossible to obsolete: "+urlToAction+" because of internal inconsistencies in the terminology model");
-						if(CommandWebConsole.myInitializer.debugMode) getSession().error(e.getMessage());
-						e.printStackTrace(); // TODO route to logger
-					} catch (RegistryAccessException e) {
-						getSession().error("Impossible to obsolete: "+urlToAction+" (access denied)");
-						if(CommandWebConsole.myInitializer.debugMode) getSession().error(e.getMessage());
-						e.printStackTrace(); // TODO route to logger
-					} catch (ImpossibleOperationException e) {
-						getSession().error("Impossible to obsolete: "+urlToAction+" (operation not possible)");
-						if(CommandWebConsole.myInitializer.debugMode) getSession().error(e.getMessage());
-						e.printStackTrace(); // TODO route to logger
-					}
-					
-					PageParameters pageParameters = new PageParameters();
-					pageParameters.add("entity", urlToAction);
-					setResponsePage(ViewPage.class,pageParameters);
-					
-				}*/
-				
-				
+				obsoleteConfirmPanelWindow.show(target);	
 			}
-			
 		};
 		
 		if(!CommandWebConsole.myInitializer.myAuthManager.can(CommandWebConsole.myInitializer.getDefaultUserURI(), MetaLanguage.terminologyDelItemAction.getURI(), urlToAction))
@@ -322,11 +282,13 @@ public class ViewPage extends SuperPage {
 	String getPageStateMessage() {
 		return pageStateMessage;
 	}
-
+	/********************************************************************
+	 * OBSOLETE Action (this is where the obsolete action is issued)
+	 ********************************************************************/
 	public void proceedObsolete(AjaxRequestTarget target) {
 		// TODO Auto-generated method stub
 		System.out.println("proceedObsolete");
-		String description="No description available now"; // TODO add support to get description
+		String description=obsoleteConfirmPanelContent.getDescription(); // TODO add support to get description
 		try {
 			CommandWebConsole.myInitializer.myTerminologyManager.delTerm(
 					urlToAction, 
