@@ -1,7 +1,12 @@
 package net.metarelate.terminology.webedit;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
+import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.ImpossibleOperationException;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
@@ -12,6 +17,9 @@ import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
+import org.apache.wicket.markup.html.list.ListItem;
+import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -118,7 +126,18 @@ public class ViewPage extends SuperPage {
 	    /******************************************************************
 	     * CONSTRUCTION OF VIEW DISPLAY: ENTITY DETAILS and HISTORY 
 	     ******************************************************************/
+		String lastVersion=TerminologyEntityWrapper.getObject().getLastVersion();
+		String[] versions=TerminologyEntityWrapper.getObject().getVersionsChainFor(lastVersion);
+		List<String> versionsList=Arrays.asList(versions);
 		
+		ListView<String> entityVersionsDetailsView = new ListView<String>("versionList", versionsList) {
+		    protected void populateItem(ListItem<String> item) {
+		    	Label versionLabel=new Label("versionNumber",item.getModelObject());
+		    	item.add(versionLabel);
+		    	
+		    }
+		};
+		add(entityVersionsDetailsView);
 		// TODO Here we should list, for each versions, all details... most recent to oldest
 		
 		

@@ -250,6 +250,13 @@ public interface TerminologyEntity {
 	public abstract String[] getVersions();
 	
 	/**
+	 * Returns an array containing version and all its preceding versions
+	 * (inverse chronological order)
+	 * @return
+	 */
+	public abstract String[] getVersionsChainFor(String version);
+	
+	/**
 	 * Return an URI representation of the entity for a given version.
 	 * @param version
 	 * @return

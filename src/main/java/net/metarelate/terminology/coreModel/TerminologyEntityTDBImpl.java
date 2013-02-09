@@ -19,6 +19,7 @@
 	
 package net.metarelate.terminology.coreModel;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -475,6 +476,17 @@ public class TerminologyEntityTDBImpl implements TerminologyEntity{
 		TDB.sync(globalGraph);
 		// TODO calls to synch should be double checked (arguably, it's a TerminologyManager issue)
 		
+	}
+
+	public String[] getVersionsChainFor(String version) {
+		ArrayList<String> versions=new ArrayList<String>();
+		String currentVersion=getLastVersion();
+		versions.add(currentVersion);
+		while(getPreviousVersion(currentVersion)!=null) {
+			currentVersion=getPreviousVersion(currentVersion);
+			versions.add(currentVersion);
+		}
+		return versions.toArray(new String[0]);
 	}
 	
 }
