@@ -50,4 +50,10 @@ public class CoreConfig {
 	public static final String dbDirString="db";
 	public static final String confDirString="conf";
 	public static final String authDirString = "auth";
+
+	public static final String seedFileString = "instanceSeed.ttl";
+	
+	public static final String hasInstanceIdentifierURI="http://metarelate.net/configuration/hasInstanceIdentifier";
+	public static final String selfURI="http://thisInstance.org";
+	
 }

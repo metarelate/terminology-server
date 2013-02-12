@@ -1,5 +1,5 @@
 /* 
- (C) British Crown Copyright 2011 - 2012, Met Office
+ (C) British Crown Copyright 2011 - 2013, Met Office
 
  This file is part of terminology-server.
 
@@ -27,6 +27,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.UUID;
 
 import net.metarelate.terminology.auth.AuthConfig;
 import net.metarelate.terminology.auth.AuthRegistryManager;
@@ -37,12 +38,14 @@ import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.coreModel.TerminologyFactory;
 import net.metarelate.terminology.coreModel.TerminologyFactoryTDBImpl;
 import net.metarelate.terminology.exceptions.ConfigurationException;
+import net.metarelate.terminology.exceptions.NonConformantRDFException;
 import net.metarelate.terminology.management.TerminologyManager;
 import net.metarelate.terminology.utils.SSLogger;
 import net.metarelate.terminology.utils.SimpleQueriesProcessor;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 //TODO Note the use of thisInstance.org as a bougs URL of namespace. Perhaps this could be linked to the instance seed (URL), although not necessary.
 
@@ -62,6 +65,7 @@ public class Initializer {
 	private static String dbDirAbsoluteString=null;
 	private static String confDirAbsoluteString=null;
 	private static String authDirAbsoluteString=null;
+	private static String seedFileAbsoluteString=null;
 	public static String defaultUserName=null;
 	
 	private  AuthServer authServer=null;
@@ -136,6 +140,14 @@ public class Initializer {
 			authDirAbsoluteString=authDir.getAbsolutePath();
 		}
 		checkOrCreateDirectory(authDir);
+		
+		File seedFile;
+		if(seedFileAbsoluteString!=null) seedFile=new File(seedFileAbsoluteString);
+		else{
+			seedFile=new File(rootDirectory.getAbsolutePath(),CoreConfig.seedFileString);
+			seedFileAbsoluteString=seedFile.getAbsolutePath();
+		}
+		checkOrCreateSeedFile();
 
 		// TODO Note also that we should be sure time is in synch globally
 	}
@@ -167,7 +179,31 @@ public class Initializer {
 	}
 
 	
-	
+	private void checkOrCreateSeedFile() throws ConfigurationException {
+		File seedFile=new File(seedFileAbsoluteString);
+		if(!seedFile.exists()) {
+			instanceIdentifier=UUID.randomUUID().toString();
+			String idStatement="<http://thisInstance.org> <"+CoreConfig.hasInstanceIdentifierURI+"> "+"\""+instanceIdentifier+"\";\n.";
+			writeInFile(seedFile,idStatement);
+		}
+		else {
+			Model seedModel=ModelFactory.createDefaultModel();
+			try {
+				seedModel.read(new FileInputStream(seedFileAbsoluteString),"http://thisInstance.org/configuration/","Turtle");
+			} catch (FileNotFoundException e1) {
+				e1.printStackTrace();
+				throw new ConfigurationException("Configuration file not found: "+seedFileAbsoluteString);
+			}
+			try {
+				instanceIdentifier=SimpleQueriesProcessor.getSingleMandatoryLiteral(ResourceFactory.createResource("http://thisInstance.org"), ResourceFactory.createProperty(CoreConfig.hasInstanceIdentifierURI), seedModel).getValue().toString();
+			} catch (NonConformantRDFException e) {
+				e.printStackTrace();
+				throw new ConfigurationException("Unable to read instance id from configuration file");
+			}
+			
+		}
+		
+	}
 	
 	
 	private void checkOrCreateDirectory (File dir) throws ConfigurationException  {
@@ -193,7 +229,7 @@ public class Initializer {
 	
 	public String getDefaultUserURI() {
 		//TODO this may need to be made machine independent
-		return "http://"+serverName+"/"+defaultUserName;
+		return "http://"+instanceIdentifier+"/"+defaultUserName;
 	}
 
 	private void createFileAndFillWithString(String dir, String fileName, String content) throws ConfigurationException {
@@ -211,6 +247,22 @@ public class Initializer {
 			}
 			
 		}
+		
+	}
+	
+	private void writeInFile(File file, String content) throws ConfigurationException  {
+		BufferedWriter defFile;
+		try {
+			defFile = new BufferedWriter(new FileWriter(file));
+			defFile.write(content);
+			defFile.flush(); // TODO Is this implied by close() ?
+			defFile.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new ConfigurationException("Unable to write to : "+file.getAbsolutePath());
+			
+		}
+		
 		
 	}
 	
