@@ -26,9 +26,13 @@ public abstract class SuperPage extends WebPage {
 		add(new Label("subTitle",getPageSubTitle()));
 		add(new NavigationBar("termNavBar",CommandWebConsole.LOCAL_CONFIGURATION_PAGE));
 		add(new Label("subPage",getSubPage()));
-		add(new Label("coreMessage",getPageStateMessage()));
+		
 		add(new Footer("termFooter"));
 	
 
     }
+	public final void postConstructionFinalize() {
+		add(new Label("coreMessage",getPageStateMessage()));
+	}
+	
 }

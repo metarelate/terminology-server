@@ -43,10 +43,17 @@ import org.apache.wicket.validation.validator.StringValidator;
 
 public class SearchPage extends SuperPage {
 	private static final long serialVersionUID = 1L;
-
+	boolean hasSuperseder=false;
+	String urlToSupersed=null;
+	String pageStateMessageString="Just searching";
 	public SearchPage(PageParameters parameters) {
 		super(parameters);
-		
+		urlToSupersed=parameters.get("superseding").toString();
+		if(urlToSupersed!=null) {
+			hasSuperseder=true;
+			pageStateMessageString="Search for a term to supersed: "+urlToSupersed;
+		}
+		postConstructionFinalize();
 		//final Label resultLabel=new Label("resultLabel","Nothing yet");
 		//resultLabel.setOutputMarkupId(true);
 		//add(resultLabel);
@@ -80,10 +87,17 @@ public class SearchPage extends SuperPage {
 		                	if(lastStatus==null) lastStatus="undefined";
 		                	item.add(new Label("resultID",idLabel));
 		                	item.add(new Label("resultDescription",CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(elementURI).getLabel(lastVersion)));
-		                	
 		                	BookmarkablePageLink pageLink=new BookmarkablePageLink("resultURI",ViewPage.class);
-		    		    	pageLink.getPageParameters().set("entity", elementURI);
-		    		    	pageLink.add(new Label("resultURILabel",elementURI));
+		                	if(hasSuperseder) {
+		                		pageLink.getPageParameters().set("entity", urlToSupersed);
+		                		pageLink.getPageParameters().set("superseder", elementURI);
+		        				
+		                	}
+		                	else {
+		                		pageLink.getPageParameters().set("entity", elementURI);
+			    		    	
+		                	}
+		                	pageLink.add(new Label("resultURILabel",elementURI));
 		                	item.add(pageLink);
 		                	item.add(new Label("resultLastVersion",lastVersion));
 		                	item.add(new Label("resultStatus",lastStatus));
@@ -125,18 +139,7 @@ public class SearchPage extends SuperPage {
 		                	//TODO to check: this may break Wicket Code as there are no instructions to render a link
 		                }
 		          
-		                /*
-		                item.add(AttributeModifier.replace("class", new AbstractReadOnlyModel()
-		                {
-		                    private static final long serialVersionUID = 1L;
-
-		                    @Override
-		                    public String getObject()
-		                    {
-		                        return (item.getIndex() % 2 == 1) ? "even" : "odd";
-		                    }
-		                }));
-		                */
+		              
 		            }
 		        };
 		        resultView.setOutputMarkupId(true);
@@ -342,15 +345,7 @@ public class SearchPage extends SuperPage {
 
 		 
 		
-	/*
-	private class MyDefaultNestedTree extends DefaultNestedTree {
-
-		public MyDefaultNestedTree(String id, ITreeProvider provider) {
-			super(id, provider);
-		}
-		
-	}
-*/
+	
 	private ITreeProvider<String> createRegRootModel() {
 		return new ITreeProvider<String>(){
 
@@ -403,7 +398,7 @@ public class SearchPage extends SuperPage {
 
 	@Override
 	String getPageStateMessage() {
-		return "Just searching";
+		return pageStateMessageString;
 	}
 	
 	private class SearchResultList implements IDataProvider<String> {

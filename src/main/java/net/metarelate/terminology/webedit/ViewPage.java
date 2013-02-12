@@ -53,6 +53,11 @@ public class ViewPage extends SuperPage {
 	
 	ModalWindow obsoleteConfirmPanelWindow=null;
 	ObsoleteConfirmPanel obsoleteConfirmPanelContent=null;
+	
+	ModalWindow supersedPanelWindow=null;
+    SupersedPanel1 supersedPanelContent1=null;
+    SupersedPanel2 supersedPanelContent2=null;
+   	
 	FeedbackPanel feedbackPanel=null;
 	
 	LoadableDetachableModel<TerminologyEntity> TerminologyEntityWrapper=new LoadableDetachableModel<TerminologyEntity>() {
@@ -73,7 +78,8 @@ public class ViewPage extends SuperPage {
 			hasSuperseder=true;
 			pageStateMessage="You can now supersed this term with: "+urlSuperseder;
 		}
-	
+		postConstructionFinalize();
+		
 		if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(urlToAction)) {
 			TerminologyEntityWrapper=new LoadableDetachableModel<TerminologyEntity>() {
 				//TerminologyEntity entity=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToAction);
@@ -118,12 +124,22 @@ public class ViewPage extends SuperPage {
 	    obsoleteConfirmPanelWindow.setHeightUnit("pixel"); //TODO to verify
 	    add(obsoleteConfirmPanelWindow);
 	    
-		final ModalWindow supersedPanelWindow=new ModalWindow("supersedPanel");
-	    final SupersedPanel supersedPanelContent=new SupersedPanel(supersedPanelWindow.getContentId(),supersedPanelWindow);
-	    supersedPanelWindow.setContent(supersedPanelContent);
-	    supersedPanelWindow.setInitialHeight(200);
-	    supersedPanelWindow.setInitialWidth(400);
-	    supersedPanelWindow.setHeightUnit("pixel"); //TODO to verify
+	    if(!hasSuperseder) {
+	    	supersedPanelWindow=new ModalWindow("supersedPanel");
+	    	supersedPanelContent1=new SupersedPanel1(supersedPanelWindow.getContentId(),this);
+	    	supersedPanelWindow.setContent(supersedPanelContent1);
+	    	supersedPanelWindow.setInitialHeight(200);
+	    	supersedPanelWindow.setInitialWidth(400);
+	    	supersedPanelWindow.setHeightUnit("pixel"); //TODO to verify
+	    }
+	    else {
+	    	supersedPanelWindow=new ModalWindow("supersedPanel");
+	    	supersedPanelContent2=new SupersedPanel2(supersedPanelWindow.getContentId(),this,urlToAction);
+	    	supersedPanelWindow.setContent(supersedPanelContent2);
+	    	supersedPanelWindow.setInitialHeight(200);
+	    	supersedPanelWindow.setInitialWidth(400);
+	    	supersedPanelWindow.setHeightUnit("pixel"); //TODO to verify
+	    }
 	    add(supersedPanelWindow);
 	       
 	      
@@ -300,51 +316,32 @@ public class ViewPage extends SuperPage {
 		 * SUPERSED Action
 		 * If no superseding term is selected, we redirect to a search or
 		 * add page (with proper settings).
-		 * If a superseding term is selected, we just proceed with the action.
-		 * Clues are provided to inform the user that a superseding term
-		 * is selected.
+		 * If a superseding term is selected, we ask for description and 
+		 * proceed/abandon
 		 ********************************************************************/
 		AjaxButton supersedButton=new AjaxButton("supersedButton"){
+			private static final long serialVersionUID = 2663696796017307696L;
 			@Override
 			public void onSubmit(AjaxRequestTarget target,Form form) {
 				System.out.println("Action:SUPERSED");
 				target.add(feedbackPanel);	// TODO clarify the role of target
-				
-				if(!hasSuperseder) {
-					supersedPanelWindow.show(target);
-					if(supersedPanelContent.getValueOnce()==false) {
-						System.out.println("Do search");
-						// We send to search, but we must know what to do next
-						PageParameters pageParameters = new PageParameters();
-						pageParameters.add("superseding", urlToAction);
-						setResponsePage(SearchPage.class,pageParameters);
-					}
-					else {
-						System.out.println("Do new");
-						//Set<TerminologyEntity> cotainers=entity.getContainers(entity.getLastVersion());
-						PageParameters pageParameters = new PageParameters();
-						pageParameters.add("superseding", urlToAction);
-						//pageParameters.add("container", );
-						setResponsePage(NewPage.class,pageParameters);
-						// We send to add, but must know what to do next
-					}
-				}
-				else {
-					// TODO issue the supersed operation
-				}
+				supersedPanelWindow.show(target);
 			}
 			
 		
 		};
-		//if(isSet) supersedButton.setEnabled(false);
-		//else {
-			// TODO auth here
-			if(!CommandWebConsole.myInitializer.myAuthManager.can(CommandWebConsole.myInitializer.getDefaultUserURI(), MetaLanguage.terminologySupersedAction.getURI(), urlToAction))
-				supersedButton.setEnabled(false);
-			else supersedButton.setEnabled(true);
-		//}
+		
+		if(!CommandWebConsole.myInitializer.myAuthManager.can(CommandWebConsole.myInitializer.getDefaultUserURI(), MetaLanguage.terminologySupersedAction.getURI(), urlToAction))
+			supersedButton.setEnabled(false);
+		else supersedButton.setEnabled(true);
+		
 		form.add(supersedButton);
 		
+		
+		/********************************************************************
+		 * PULL Action
+		 * Still to be implemented!
+		 ********************************************************************/
 		Button pullButton=new Button("pullButton");
 		if(CommandWebConsole.myInitializer.hasRemote()==false) pullButton.setEnabled(false);
 		else {
@@ -406,5 +403,45 @@ public class ViewPage extends SuperPage {
 		getSession().warn("Operation abandoned");
 		
 	}
+	
+	/********************************************************************
+	 * SUPERSED Action (this is where the supersed action is issued)
+	 ********************************************************************/
+	public void supersedRouteToSearch(AjaxRequestTarget target) {
+		PageParameters pageParameters = new PageParameters();
+		pageParameters.add("superseding", urlToAction);
+		setResponsePage(SearchPage.class,pageParameters);
+	}
+	public void supersedRouteToAdd(AjaxRequestTarget target) {
+		PageParameters pageParameters = new PageParameters();
+		pageParameters.add("superseding", urlToAction);
+		setResponsePage(NewPage.class,pageParameters);
+	}
+	
+	public void proceedSupersed(AjaxRequestTarget target) {
+		System.out.println("ACTION: supersed");
+		/*
+		if(!hasSuperseder) {
+			supersedPanelWindow.show(target);
+			if(supersedPanelContent2.getValueOnce()==false) {
+				System.out.println("Do search");
+				// We send to search, but we must know what to do next
+				PageParameters pageParameters = new PageParameters();
+				pageParameters.add("superseding", urlToAction);
+				setResponsePage(SearchPage.class,pageParameters);
+			}
+			else {
+				System.out.println("Do new");
+				//Set<TerminologyEntity> cotainers=entity.getContainers(entity.getLastVersion());
+				PageParameters pageParameters = new PageParameters();
+				pageParameters.add("superseding", urlToAction);
+				//pageParameters.add("container", );
+				setResponsePage(NewPage.class,pageParameters);
+				// We send to add, but must know what to do next
+			}
+		}
+		*/
+	}
+	
 
 }
