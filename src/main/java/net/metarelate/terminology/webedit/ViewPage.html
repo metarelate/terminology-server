@@ -26,7 +26,19 @@
 					
 					
 					<div wicket:id="versionList">
-						Version: <span wicket:id="versionNumber">version</span><br/>
+						<div wicket:id="versionContainer">
+							<p>
+							<strong>Version: <span wicket:id="versionNumber">version</span></strong><br/>
+							Date: <span wicket:id="versionDate">date</span><br/>
+							Action: <span wicket:id="versionAction">date</span><br/>
+							By: <span wicket:id="versionAuthor">date</span><br/>
+							Description: <span wicket:id="versionDescription">date</span><br/>
+							<table wicket:id="statsContainer">
+								<tr><td><span wicket:id="property">prop</span></td><td><span wicket:id="value">value</span></td></tr>
+							</table>
+							<br/>
+							</p>
+						</div>
 					</div>
 					
 					<!-- properties table and version info -->

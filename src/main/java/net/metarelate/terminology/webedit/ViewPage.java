@@ -2,18 +2,28 @@ package net.metarelate.terminology.webedit;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import net.metarelate.terminology.config.MetaLanguage;
+import net.metarelate.terminology.coreModel.LabelManager;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.ImpossibleOperationException;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
+import net.metarelate.terminology.publisher.WebRendererStrings;
+import net.metarelate.terminology.utils.CodeComparator;
+import net.metarelate.terminology.utils.StatementsOrganizer;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
@@ -23,6 +33,11 @@ import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 public class ViewPage extends SuperPage {
 	// TODO when is this used in Wicket ?
@@ -132,9 +147,64 @@ public class ViewPage extends SuperPage {
 		
 		ListView<String> entityVersionsDetailsView = new ListView<String>("versionList", versionsList) {
 		    protected void populateItem(ListItem<String> item) {
-		    	Label versionLabel=new Label("versionNumber",item.getModelObject());
-		    	item.add(versionLabel);
+		    	WebMarkupContainer versionContainer=new WebMarkupContainer("versionContainer");
+		    	String currentVersion=item.getModelObject();
+		    	Label versionLabel=new Label("versionNumber",currentVersion);
+		    	Label versionDate=new Label("versionDate",TerminologyEntityWrapper.getObject().getActionDate(currentVersion)); 
+		    	Label versionAction=new Label(
+		    			"versionAction",
+		    			CommandWebConsole.myInitializer.myFactory.getLabelManager().getLabelForURI(
+		    					TerminologyEntityWrapper.getObject().getActionURI(currentVersion),
+		    					LabelManager.URI_IF_NULL)
+		    			);
+		    	Label versionAuthor=new Label(
+		    			"versionAuthor",
+		    			CommandWebConsole.myInitializer.myFactory.getLabelManager().getLabelForURI(
+		    			TerminologyEntityWrapper.getObject().getActionAuthorURI(currentVersion),
+		    			LabelManager.URI_IF_NULL)
+		    			);
+		    	Label versionDescription=new Label("versionDescription",TerminologyEntityWrapper.getObject().getActionDescription(currentVersion));
+		    	versionContainer.add(versionLabel);
+		    	versionContainer.add(versionDate);
+		    	versionContainer.add(versionAction);
+		    	versionContainer.add(versionAuthor);
+		    	versionContainer.add(versionDescription);
 		    	
+		    	
+		    	StatementsOrganizer statsOrg=new StatementsOrganizer(CommandWebConsole.myInitializer);
+		    	ArrayList<Statement> statements=statsOrg.orderStatements(statsOrg.filterModelForWeb(TerminologyEntityWrapper.getObject().getStatements(currentVersion)));
+		    	System.out.println("Pre size: "+TerminologyEntityWrapper.getObject().getStatements(currentVersion).size());
+		    	System.out.println("After filter: "+statsOrg.filterModelForWeb(TerminologyEntityWrapper.getObject().getStatements(currentVersion)).size());
+
+		    	System.out.println("List size: "+statements.size());
+		    	ListView<Statement> statementsView = new ListView<Statement>("statsContainer", statements) {
+				    protected void populateItem(ListItem<Statement> innerItem) {
+				    	Label propLabel=new Label(
+				    			"property",
+				    			CommandWebConsole.myInitializer.myFactory.getLabelManager().getLabelForURI(
+						    			innerItem.getModelObject().getPredicate().getURI(),
+						    			LabelManager.URI_IF_NULL)	
+				    			);
+				    	Label valueLabel=null;
+				    	if(innerItem.getModelObject().getObject().isResource()) {
+				    		valueLabel=new Label("value",
+				    				CommandWebConsole.myInitializer.myFactory.getLabelManager().getLabelForURI(
+							    			innerItem.getModelObject().getObject().asResource().getURI(),
+							    			LabelManager.URI_IF_NULL)
+				    				);
+				    	}
+				    	else if(innerItem.getModelObject().getObject().isLiteral()) {
+				    		valueLabel=new Label("value",innerItem.getModelObject().getObject().asLiteral().getValue().toString());
+				    	}
+				    	else {
+				    		valueLabel=new Label("value",innerItem.getModelObject().getObject().toString());
+				    	}
+				    	innerItem.add(propLabel);
+				    	innerItem.add(valueLabel);
+				    }
+		    	};
+		    	versionContainer.add(statementsView);
+		    	item.add(versionContainer);
 		    }
 		};
 		add(entityVersionsDetailsView);

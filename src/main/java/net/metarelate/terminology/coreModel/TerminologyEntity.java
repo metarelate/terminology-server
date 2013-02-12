@@ -390,6 +390,7 @@ public interface TerminologyEntity {
 	String getGenericEndurantStringValueObject(Property property);
 	String getGenericEndurantURIObject(Property property);
 
-	public abstract void synch();	
+	public abstract void synch();
+
 	
 }
