@@ -395,6 +395,38 @@ public class TerminologyManager {
 		
 	}
 	
+	//////////////
+	public void superseedTerm(String urlToAction, String urlSuperseder,
+			String actionAuthorURI, String description) throws ImpossibleOperationException, RegistryAccessException, ModelException {
+		if(myFactory.terminologySetExist(urlToAction)) {
+			throw new ImpossibleOperationException("Impossible to supersed a register: "+urlToAction+" (this is a built in constraint)");
+		}
+		if(myFactory.terminologySetExist(urlSuperseder)) {
+			throw new ImpossibleOperationException("Impossible to supersed with a register: "+urlSuperseder+" (this is a built in constraint)");
+		}
+		if(!myFactory.terminologyIndividualExist(urlToAction)) {
+			throw new UnknownURIException(urlToAction);
+		}
+		if(!myFactory.terminologyIndividualExist(urlSuperseder)) {
+			throw new UnknownURIException(urlSuperseder);
+		}
+		propagateSupersedOverContainers(urlToAction,urlSuperseder,actionAuthorURI,description);
+		
+	}
+	
+	private void propagateSupersedOverContainers(String urlToSupersed, String supersedingURL, String actionAuthorURI, String description) throws AuthException, RegistryAccessException, ModelException {
+		TerminologyIndividual termToSupersed=myFactory.getOrCreateTerminologyIndividual(urlToSupersed);
+		Set<TerminologySet> containers=termToSupersed.getContainers(termToSupersed.getLastVersion());
+		//Note: there should only be one container for the time being...
+		if(containers.size()>1) throw new ModelException("More than one container defined for "+termToSupersed);
+		Iterator<TerminologySet> containersIter=containers.iterator();
+		while(containersIter.hasNext()) {
+			TerminologySet container=containersIter.next();
+			superseedTermInRegister(urlToSupersed, supersedingURL,container.getURI(),
+					actionAuthorURI, description);
+		}
+	}
+
 	
 	
 	public void superseedTermInRegister(String termURI,
@@ -454,7 +486,8 @@ public class TerminologyManager {
 	if(postRegisterStatus!=null) myRegister.setStateURI(postRegisterStatus, newRegisterVersion);
 	myRegister.setActionDate(dateFormat.format(date),newRegisterVersion);
 	myRegister.setActionAuthorURI(actionAuthorURI, newRegisterVersion);
-	if(description!=null) myRegister.setActionDescription("Deleted term: "+myTerm.getURI(),newRegisterVersion);
+	if(description==null) myRegister.setActionDescription(description+" (deleted term: "+myTerm.getURI()+")",newRegisterVersion);
+	else myRegister.setActionDescription("Deleted term: "+myTerm.getURI(),newRegisterVersion);
 	myRegister.setActionURI(RegistryPolicyConfig.delItemAction ,newRegisterVersion);
 	myRegister.linkVersions(lastRegisterVersion,newRegisterVersion);
 	
@@ -465,7 +498,8 @@ public class TerminologyManager {
 	myTerm.setOwnerURI(actionAuthorURI);
 	myTerm.setActionURI(RegistryPolicyConfig.superseedAction ,newTermVersion);
 	myTerm.setActionAuthorURI(actionAuthorURI,newTermVersion);
-	myTerm.setActionDescription("Term was removed from registry and superseeded by "+superseedingTermURI,newTermVersion);
+	if(description==null) myTerm.setActionDescription("Term was removed from registry and superseeded by "+superseedingTermURI,newTermVersion);
+	else myTerm.setActionDescription(description+ " (term was removed from registry and superseeded by "+superseedingTermURI+")",newTermVersion);
 	myTerm.addStatements(myTerm.getStatements(lastTermVersion),newTermVersion);
 	myTerm.getStatements(newTermVersion).add(myTerm.getResource(),MetaLanguage.superseededBy,superseedingTerm.getResource());
 	myTerm.setActionDate(dateFormat.format(date),newTermVersion);
@@ -476,7 +510,8 @@ public class TerminologyManager {
 	superseedingTerm.setStateURI(postTermStatus,newSuperseedingVersion);
 	superseedingTerm.setActionURI(RegistryPolicyConfig.superseedAction ,newSuperseedingVersion);
 	superseedingTerm.setActionAuthorURI(actionAuthorURI,newSuperseedingVersion);
-	superseedingTerm.setActionDescription("Term superseeded "+termURI,newSuperseedingVersion);
+	if(description!=null) superseedingTerm.setActionDescription("Term superseeded "+termURI,newSuperseedingVersion);
+	else superseedingTerm.setActionDescription(description+" (term superseeded "+termURI+")",newSuperseedingVersion);
 	superseedingTerm.addStatements(superseedingTerm.getStatements(lastSuperseedingsTermVersion),newSuperseedingVersion);
 	superseedingTerm.getStatements(newSuperseedingVersion).add(superseedingTerm.getResource(),MetaLanguage.superseeds,myTerm.getResource());
 	superseedingTerm.setActionDate(dateFormat.format(date),newSuperseedingVersion);
@@ -487,11 +522,15 @@ public class TerminologyManager {
 	myRegister.unregisterContainedIndividual(myTerm, newRegisterVersion, newTermVersion);
 	
 		//////	
-	
+	myRegister.synch();
+	myTerm.synch();
+	superseedingTerm.synch();
 	
 	
 	
 	}
+
+
 
 
 

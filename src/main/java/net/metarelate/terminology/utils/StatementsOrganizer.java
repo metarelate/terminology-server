@@ -1,5 +1,6 @@
 package net.metarelate.terminology.utils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -16,10 +17,10 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 public class StatementsOrganizer {
-	Initializer myInitializer=null;
-	public StatementsOrganizer(Initializer initializer) {
-		myInitializer=initializer;
-	}
+	//Initializer myInitializer=null;
+	//public StatementsOrganizer(Initializer initializer) {
+	//	myInitializer=initializer;
+	//}
 	
 	public static Model filterModelForWeb(Model statements) {
 		return MetaLanguage.filterForWeb(statements);
@@ -30,7 +31,7 @@ public class StatementsOrganizer {
 	}
 	
 	
-	public ArrayList<Statement> orderStatements(Model statementsModel) {
+	public static ArrayList<Statement> orderStatements(Model statementsModel,Initializer myInitializer) {
 		Set<Property> codeSet=new HashSet<Property>();
 		Set<Property> conceptSet=new HashSet<Property>();
 		Set<Property> otherSet=new HashSet<Property>();
@@ -54,7 +55,7 @@ public class StatementsOrganizer {
 		return orderedStatementsList;
 	}
 
-	private ArrayList<Statement> subOrder(Set<Property> propertySet, Model statements,
+	private static ArrayList<Statement> subOrder(Set<Property> propertySet, Model statements,
 			ArrayList<Statement> orderedStatementsList) {
 			TreeMap<String,TreeMap<String,Statement>> orderedStatements=new TreeMap<String,TreeMap<String,Statement>>();
 			Iterator<Property> propIter=propertySet.iterator();

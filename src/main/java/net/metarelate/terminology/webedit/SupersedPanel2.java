@@ -8,10 +8,9 @@ import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.ResourceModel;
-import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 
-public class ObsoleteConfirmPanel extends Panel
+public class SupersedPanel2 extends Panel
 {
 	Label textLabel=null;
 	AjaxLink confirmButton=null;
@@ -24,22 +23,19 @@ public class ObsoleteConfirmPanel extends Panel
      * @param message
      * @param container
      */
-    public ObsoleteConfirmPanel(String id, final ViewPage viewPage, final String urlToAction)
+    public SupersedPanel2(String id, final ViewPage viewPage, final String urlToAction)
     {
         super(id);
-        String message="Do you really want to obsolete this term ?";	
+        String message="Do you really want to supersed this item ?";	
         textLabel=new Label("text",message);
         add(textLabel);
         confirmButton=new AjaxLink("proceedButton",new ResourceModel("Proceed")) {
 
 			@Override
 			public void onClick(AjaxRequestTarget target) {
-				System.out.println("onClick");
 				target.add(viewPage.feedbackPanel);
-				System.out.println("beforeClose");
 				viewPage.obsoleteConfirmPanelWindow.close(target); 
-				System.out.println("postClose-beforeObsolete");
-				viewPage.proceedObsolete(target);
+				viewPage.proceedSupersed(target);
 				//PageParameters pageParameters = new PageParameters();
 				//pageParameters.add("entity", urlToAction);
 				//setResponsePage(ViewPage.class,pageParameters);
@@ -54,7 +50,7 @@ public class ObsoleteConfirmPanel extends Panel
 			public void onClick(AjaxRequestTarget target) {
 				target.add(viewPage.feedbackPanel);
 				viewPage.abandonCommand();
-				viewPage.obsoleteConfirmPanelWindow.close(target);
+				viewPage.supersedPanelWindow.close(target);
 				
 				// TODO Auto-generated method stub
 				

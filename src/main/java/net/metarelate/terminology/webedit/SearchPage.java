@@ -89,11 +89,13 @@ public class SearchPage extends SuperPage {
 		                	item.add(new Label("resultDescription",CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(elementURI).getLabel(lastVersion)));
 		                	BookmarkablePageLink pageLink=new BookmarkablePageLink("resultURI",ViewPage.class);
 		                	if(hasSuperseder) {
+		                		System.out.println("has: "+elementURI);
 		                		pageLink.getPageParameters().set("entity", urlToSupersed);
 		                		pageLink.getPageParameters().set("superseder", elementURI);
 		        				
 		                	}
 		                	else {
+		                		System.out.println("has NOT ");
 		                		pageLink.getPageParameters().set("entity", elementURI);
 			    		    	
 		                	}
@@ -119,7 +121,17 @@ public class SearchPage extends SuperPage {
 		                	item.add(new Label("resultID",idLabel));
 		                	item.add(new Label("resultDescription",CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(elementURI).getLabel(lastVersion)));
 		                	BookmarkablePageLink pageLink=new BookmarkablePageLink("resultURI",ViewPage.class);
-		    		    	pageLink.getPageParameters().set("entity", elementURI);
+		                	if(hasSuperseder) {
+		                		System.out.println("has: "+elementURI);
+		                		pageLink.getPageParameters().set("entity", urlToSupersed);
+		                		pageLink.getPageParameters().set("superseder", elementURI);
+		        				
+		                	}
+		                	else {
+		                		System.out.println("has NOT ");
+		                		pageLink.getPageParameters().set("entity", elementURI);
+			    		    	
+		                	}
 		    		    	pageLink.add(new Label("resultURILabel",elementURI));
 		                	item.add(pageLink);
 		                	item.add(new Label("resultLastVersion",lastVersion));

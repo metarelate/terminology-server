@@ -2,22 +2,14 @@ package net.metarelate.terminology.webedit;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.coreModel.LabelManager;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
-import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.ImpossibleOperationException;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
-import net.metarelate.terminology.publisher.WebRendererStrings;
-import net.metarelate.terminology.utils.CodeComparator;
 import net.metarelate.terminology.utils.StatementsOrganizer;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -27,17 +19,13 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 public class ViewPage extends SuperPage {
 	// TODO when is this used in Wicket ?
@@ -187,14 +175,23 @@ public class ViewPage extends SuperPage {
 		    	versionContainer.add(versionDescription);
 		    	
 		    	
-		    	StatementsOrganizer statsOrg=new StatementsOrganizer(CommandWebConsole.myInitializer);
+		    	//StatementsOrganizer statsOrg=new StatementsOrganizer(CommandWebConsole.myInitializer);
+		    	
+		    	LoadableDetachableModel<ArrayList<Statement>> statementsListWrapper=new StatementsListWrapper(currentVersion);
+		    	
+		    	/*
 		    	ArrayList<Statement> statements=statsOrg.orderStatements(statsOrg.filterModelForWeb(TerminologyEntityWrapper.getObject().getStatements(currentVersion)));
 		    	System.out.println("Pre size: "+TerminologyEntityWrapper.getObject().getStatements(currentVersion).size());
 		    	System.out.println("After filter: "+statsOrg.filterModelForWeb(TerminologyEntityWrapper.getObject().getStatements(currentVersion)).size());
 
 		    	System.out.println("List size: "+statements.size());
-		    	ListView<Statement> statementsView = new ListView<Statement>("statsContainer", statements) {
-				    protected void populateItem(ListItem<Statement> innerItem) {
+		    	*/
+		    	
+		    	
+		    	ListView<Statement> statementsView = new ListView<Statement>("statsContainer", statementsListWrapper) {
+					private static final long serialVersionUID = 7349972737999142555L;
+
+					protected void populateItem(ListItem<Statement> innerItem) {
 				    	Label propLabel=new Label(
 				    			"property",
 				    			CommandWebConsole.myInitializer.myFactory.getLabelManager().getLabelForURI(
@@ -420,6 +417,29 @@ public class ViewPage extends SuperPage {
 	
 	public void proceedSupersed(AjaxRequestTarget target) {
 		System.out.println("ACTION: supersed");
+		String description=supersedPanelContent2.getDescription(); // TODO add support to get description
+		try {
+			CommandWebConsole.myInitializer.myTerminologyManager.superseedTerm(urlToAction, 
+					urlSuperseder,
+					CommandWebConsole.myInitializer.getDefaultUserURI(), 
+					description);
+		} catch (ModelException e) {
+			getSession().error("Impossible to supersed: "+urlToAction+" with "+urlSuperseder+" because of internal inconsistencies in the terminology model");
+			if(CommandWebConsole.myInitializer.debugMode) getSession().error(e.getMessage());
+			e.printStackTrace(); // TODO route to logger
+		} catch (RegistryAccessException e) {
+			getSession().error("Impossible to supersed: "+urlToAction+" with "+urlSuperseder+" (access denied)");
+			if(CommandWebConsole.myInitializer.debugMode) getSession().error(e.getMessage());
+			e.printStackTrace(); // TODO route to logger
+		} catch (ImpossibleOperationException e) {
+			getSession().error("Impossible to supersed: "+urlToAction+" with "+urlSuperseder+" (operation not possible)");
+			if(CommandWebConsole.myInitializer.debugMode) getSession().error(e.getMessage());
+			e.printStackTrace(); // TODO route to logger
+		}
+		
+		PageParameters pageParameters = new PageParameters();
+		pageParameters.add("entity", urlToAction);
+		setResponsePage(ViewPage.class,pageParameters);
 		/*
 		if(!hasSuperseder) {
 			supersedPanelWindow.show(target);
@@ -443,5 +463,26 @@ public class ViewPage extends SuperPage {
 		*/
 	}
 	
+	private class StatementsListWrapper extends LoadableDetachableModel<ArrayList<Statement>>{
+		private static final long serialVersionUID = 1L;
+		private String currentVersion=null;
+		
+		
+		
+
+		public StatementsListWrapper(String currentVersion) {
+			super();
+			this.currentVersion = currentVersion;
+			
+		}
+
+
+
+		@Override
+		protected ArrayList<Statement> load() {
+			return StatementsOrganizer.orderStatements(StatementsOrganizer.filterModelForWeb(TerminologyEntityWrapper.getObject().getStatements(currentVersion)), CommandWebConsole.myInitializer);
+		}
+		
+	};
 
 }
