@@ -1,12 +1,14 @@
 package net.metarelate.terminology.webedit;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
@@ -16,7 +18,7 @@ public class ObsoleteConfirmPanel extends Panel
 	Label textLabel=null;
 	AjaxLink confirmButton=null;
 	AjaxLink abandonButton=null;
-	TextArea<String> description=null;
+	AjaxyTextArea description=null;
 	
 	
     /**
@@ -34,11 +36,8 @@ public class ObsoleteConfirmPanel extends Panel
 
 			@Override
 			public void onClick(AjaxRequestTarget target) {
-				System.out.println("onClick");
 				target.add(viewPage.feedbackPanel);
-				System.out.println("beforeClose");
 				viewPage.obsoleteConfirmPanelWindow.close(target); 
-				System.out.println("postClose-beforeObsolete");
 				viewPage.proceedObsolete(target);
 				//PageParameters pageParameters = new PageParameters();
 				//pageParameters.add("entity", urlToAction);
@@ -63,16 +62,19 @@ public class ObsoleteConfirmPanel extends Panel
         };
         add(abandonButton);
         
-        description = new TextArea<String>("description",Model.of(""));		
+        
+        
+        
+        
+        description = new AjaxyTextArea("description");		
         add(description);
         
       
     }
     
     public String getDescription() {
-    	String result=description.getModelObject().toString();
+    	String result=description.getText();
     	System.out.println("Result: "+result);
-    	if(result==null) result ="";
     	return result;
     }
    

@@ -368,7 +368,8 @@ public class TerminologyManager {
 	//DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 	myRegister.setActionDate(dateFormat.format(date),newRegisterVersion);
 	myRegister.setActionAuthorURI(actionAuthorURI, newRegisterVersion);
-	if(description!=null) myRegister.setActionDescription("Deleted term: "+myTerm.getURI(),newRegisterVersion);
+	if(description!=null) myRegister.setActionDescription(description+"(deleted term: "+myTerm.getURI()+")",newRegisterVersion);
+	else myRegister.setActionDescription("Deleted term: "+myTerm.getURI(),newRegisterVersion);
 	myRegister.setActionURI(RegistryPolicyConfig.delItemAction ,newRegisterVersion);
 	myRegister.linkVersions(lastRegisterVersion,newRegisterVersion);
 	

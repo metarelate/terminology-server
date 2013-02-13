@@ -15,7 +15,7 @@ public class SupersedPanel2 extends Panel
 	Label textLabel=null;
 	AjaxLink confirmButton=null;
 	AjaxLink abandonButton=null;
-	TextArea<String> description=null;
+	AjaxyTextArea description=null;
 	
 	
     /**
@@ -59,16 +59,15 @@ public class SupersedPanel2 extends Panel
         };
         add(abandonButton);
         
-        description = new TextArea<String>("description",Model.of(""));		
+        description = new AjaxyTextArea("description");		
         add(description);
         
       
     }
     
     public String getDescription() {
-    	String result=description.getModelObject().toString();
+    	String result=description.getText();
     	System.out.println("Result: "+result);
-    	if(result==null) result ="";
     	return result;
     }
    
