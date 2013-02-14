@@ -271,7 +271,7 @@ public class SearchPage extends SuperPage {
 		 * Regsiters tree
 		 *********************************************************************/
 		
-		final AbstractTree<String> registerTree=new DefaultNestedTree<String>("registerTree",createRegRootModel())  {
+		AbstractTree<String> registerTree=new DefaultNestedTree<String>("registerTree",createRegRootModel())  {
 			/**
 			 * 
 			 */

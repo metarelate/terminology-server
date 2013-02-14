@@ -25,7 +25,7 @@ import com.hp.hpl.jena.rdf.model.Statement;
  */
 public abstract class AbstractEditPage  extends SuperPage {
 	private static final long serialVersionUID = 10L;
-	protected String uriOfEntity=null;
+	//protected String uriOfEntity=null;
 	protected String uriToSupersed=null;
 	protected boolean isNew=false;
 	protected boolean isEdit=false;
@@ -40,8 +40,9 @@ public abstract class AbstractEditPage  extends SuperPage {
 		super(parameters);
     }
 	
+	protected abstract String getURIOfEntity();
 	
-	protected abstract TerminologyEntity buildEntity();
+	protected abstract void buildEntity(Model statementsCollected,String description) throws WebSystemException;
 	
 	protected void buildForm() throws WebSystemException {
 		
@@ -53,26 +54,31 @@ public abstract class AbstractEditPage  extends SuperPage {
 		final TextField<String> entityLabel = new TextField<String>("entityLabel", labelModel);
 		
 		entityLabel.setRequired(true);
-		entityLabel.add(new LabelValidator());
+		entityLabel.add(new LabelValidator()); //TODO here is where we extend validation
 		
 		Form<?> form = new Form<Void>("editForm") {
 
 			@Override
 			protected void onSubmit() {
-				//This is called only if valid!
-				if(isNew) {
-					//check thet URI is present or complain
-					// create entity
-				}
-				// Proceed with action
-				if(uriOfEntity==null) {
-					//throw exception
-					//this should never happen
-				}
+				//NOTE: this method is executed only upon successful validation. We rely on this!
+				System.out.println("Page is valid");
 				String labelValue = entityLabel.getModel().getObject();
 				if(labelValue==null) labelValue=""; // TODO check that things work here
-				Statement newStatement=ResourceFactory.createStatement(ResourceFactory.createResource(uriOfEntity), MetaLanguage.labelProperty, ResourceFactory.createPlainLiteral(labelValue));
+				Statement newStatement=ResourceFactory.createStatement(ResourceFactory.createResource(getURIOfEntity()), MetaLanguage.labelProperty, ResourceFactory.createPlainLiteral(labelValue));
 				Model newStats=ModelFactory.createDefaultModel().add(newStatement);
+				System.out.println("Model collected: "+newStats.size()+" statements");
+				
+				try {
+					buildEntity(newStats,"bogud description");
+				} catch (WebSystemException e) {
+					getSession().error("Impossible to initialize entity");
+					return;
+					// TODO do nothing and return
+					//PageParameters pageParameters = new PageParameters();
+					//pageParameters.add("entity", getURIOfEntity());
+					//setResponsePage(ViewPage.class, pageParameters);
+					//e.printStackTrace();
+				} // TODO implement real one
 				
 				/**
 				 * What should happen here.
@@ -101,15 +107,18 @@ public abstract class AbstractEditPage  extends SuperPage {
 				*/
 				if(isSuperseding) {
 					//route to to viewPage (target=superseding)
+					System.out.println("Superseding");
+					System.out.println("e: "+getURIOfEntity());
+					System.out.println("s: "+uriToSupersed);
 					PageParameters pageParameters = new PageParameters();
-					pageParameters.add("entity", uriToSupersed);
-					pageParameters.add("superseding",uriOfEntity);
+					pageParameters.add("entity", getURIOfEntity());
+					pageParameters.add("superseding",uriToSupersed);
 					setResponsePage(ViewPage.class, pageParameters);
 				}
 				else {
 					//route to viewPage (target=urlOfEntity)
 					PageParameters pageParameters = new PageParameters();
-					pageParameters.add("entity", uriOfEntity);
+					pageParameters.add("entity", getURIOfEntity());
 					setResponsePage(ViewPage.class, pageParameters);
 				}
 				

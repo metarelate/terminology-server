@@ -76,6 +76,62 @@ public class TerminologyManager {
 		amendEntityInformation(entityURI, statsToReplace, actionAuthor, description, MODE_REMOVE);		
 	}
 	
+	//TODO we start refactoring from this!
+	public void addTermToRegister(String codeURI, String registerURI, Model defaultEntityModel,String actionAuthor, String description, boolean isVersioned ) throws AuthException, RegistryAccessException {
+		//////////////
+			if(!myAuthManager.can(actionAuthor,RegistryPolicyConfig.addItemAction,registerURI))
+					throw new AuthException(actionAuthor,RegistryPolicyConfig.addItemAction,registerURI);
+			TerminologySet myRegister=checkSetExistance(registerURI);
+			if(myRegister==null) throw new RegistryAccessException("Unable to modify "+registerURI+" (register does not exist)");
+			if(myFactory.terminologyIndividualExist(codeURI)) {
+				// Note this is only for addding! Not for changing obsolete/valid status. In other words, a delete operation
+				throw new RegistryAccessException("Code "+codeURI+" exists. Use \"move\" to change register");
+			}
+				
+			String lastRegisterVersion=myRegister.getLastVersion();
+			String preRegisterStatus=myRegister.getStateURI(lastRegisterVersion);
+			String postRegisterStatus=preRegisterStatus;
+			if(preRegisterStatus!=null)
+				if(RegistryPolicyConfig.tm.addTransitions.containsKey(preRegisterStatus))
+					postRegisterStatus=RegistryPolicyConfig.tm.addTransitions.get(preRegisterStatus);
+			String newRegisterVersion=Versioner.createNextVersion(lastRegisterVersion);
+				
+			//Now we create the entity
+			TerminologyIndividual newTerm=myFactory.getOrCreateTerminologyIndividual(codeURI);
+			newTerm.setDefaultVersion(newTerm.getLastVersion());
+			if(isVersioned) newTerm.setIsVersioned(true);	
+			newTerm.setStateURI(RegistryPolicyConfig.DEFAULT_CREATION_STATE,newTerm.getDefaultVersion());
+			newTerm.setOwnerURI(actionAuthor);
+			newTerm.setActionURI(RegistryPolicyConfig.addItemAction ,newTerm.getDefaultVersion());
+			newTerm.setActionAuthorURI(actionAuthor,newTerm.getDefaultVersion());
+			newTerm.setActionDescription("New term added to registry",newTerm.getDefaultVersion());
+			newTerm.addStatements(defaultEntityModel,newTerm.getDefaultVersion());
+			DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+			Date date = new Date();
+			newTerm.setActionDate(dateFormat.format(date),newTerm.getDefaultVersion());
+			
+			myRegister.registerVersion(newRegisterVersion);
+			myRegister.getStatements(newRegisterVersion).add((myRegister.getStatements(lastRegisterVersion)));
+				
+			myRegister.registerContainedIndividual(newTerm, newRegisterVersion, newTerm.getDefaultVersion());
+				
+			if(postRegisterStatus!=null) myRegister.setStateURI(postRegisterStatus, newRegisterVersion);
+			//DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+			myRegister.setActionDate(dateFormat.format(date),newRegisterVersion);
+			myRegister.setActionAuthorURI(actionAuthor, newRegisterVersion);
+			if(description!=null) myRegister.setActionDescription("Added term: "+newTerm.getURI(),newRegisterVersion);
+			myRegister.setActionURI(RegistryPolicyConfig.addItemAction ,newRegisterVersion);
+			myRegister.linkVersions(lastRegisterVersion,newRegisterVersion);
+			
+			newTerm.synch();
+			myRegister.synch();
+				
+		}
+	
+	public void addSubRegister() {
+		
+	}
+	
 	public void amendEntityInformation(String entityURI, Model statsToReplace, String actionAuthor, String description, int mode) throws AuthException, RegistryAccessException {
 		if(!myAuthManager.can(actionAuthor,RegistryPolicyConfig.terminologyAmendedActionURI,entityURI))
 			throw new AuthException(actionAuthor,RegistryPolicyConfig.terminologyAmendedActionURI,entityURI);
@@ -174,62 +230,15 @@ public class TerminologyManager {
 	
 
 	
-	public void addSubRegister() {
-		
-	}
+
 	
 	
 	public void removeSubRegister() {
 		
 	}
 	
-	public void addTermToRegister(String codeURI, String registerURI, Model defaultEntityModel,String actionAuthor, String description, boolean isVersioned ) throws AuthException, RegistryAccessException {
-	//////////////
-		if(!myAuthManager.can(actionAuthor,RegistryPolicyConfig.addItemAction,registerURI))
-				throw new AuthException(actionAuthor,RegistryPolicyConfig.addItemAction,registerURI);
-		TerminologySet myRegister=checkSetExistance(registerURI);
-		if(myRegister==null) throw new RegistryAccessException("Unable to modify "+registerURI+" (register does not exist)");
-		if(myFactory.terminologyIndividualExist(codeURI)) {
-			// Note this is only for addding! Not for changing obsolete/valid status. In other words, a delete operation
-			throw new RegistryAccessException("Code "+codeURI+" exists. Use \"move\" to change register");
-		}
-			
-		String lastRegisterVersion=myRegister.getLastVersion();
-		String preRegisterStatus=myRegister.getStateURI(lastRegisterVersion);
-		String postRegisterStatus=preRegisterStatus;
-		if(preRegisterStatus!=null)
-			if(RegistryPolicyConfig.tm.addTransitions.containsKey(preRegisterStatus))
-				postRegisterStatus=RegistryPolicyConfig.tm.addTransitions.get(preRegisterStatus);
-		String newRegisterVersion=Versioner.createNextVersion(lastRegisterVersion);
-			
-		//Now we create the entity
-		TerminologyIndividual newTerm=myFactory.getOrCreateTerminologyIndividual(codeURI);
-		newTerm.setDefaultVersion(newTerm.getLastVersion());
-		if(isVersioned) newTerm.setIsVersioned(true);	
-		newTerm.setStateURI(RegistryPolicyConfig.DEFAULT_CREATION_STATE,newTerm.getDefaultVersion());
-		newTerm.setOwnerURI(actionAuthor);
-		newTerm.setActionURI(RegistryPolicyConfig.addItemAction ,newTerm.getDefaultVersion());
-		newTerm.setActionAuthorURI(actionAuthor,newTerm.getDefaultVersion());
-		newTerm.setActionDescription("New term added to registry",newTerm.getDefaultVersion());
-		newTerm.addStatements(defaultEntityModel,newTerm.getDefaultVersion());
-		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-		Date date = new Date();
-		newTerm.setActionDate(dateFormat.format(date),newTerm.getDefaultVersion());
-		
-		myRegister.registerVersion(newRegisterVersion);
-		myRegister.getStatements(newRegisterVersion).add((myRegister.getStatements(lastRegisterVersion)));
-			
-		myRegister.registerContainedIndividual(newTerm, newRegisterVersion, newTerm.getDefaultVersion());
-			
-		if(postRegisterStatus!=null) myRegister.setStateURI(postRegisterStatus, newRegisterVersion);
-		//DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-		myRegister.setActionDate(dateFormat.format(date),newRegisterVersion);
-		myRegister.setActionAuthorURI(actionAuthor, newRegisterVersion);
-		if(description!=null) myRegister.setActionDescription("Added term: "+newTerm.getURI(),newRegisterVersion);
-		myRegister.setActionURI(RegistryPolicyConfig.addItemAction ,newRegisterVersion);
-		myRegister.linkVersions(lastRegisterVersion,newRegisterVersion);
-			
-	}
+	
+	
 		
 		
 	

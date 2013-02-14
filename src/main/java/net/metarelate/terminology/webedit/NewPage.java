@@ -33,7 +33,7 @@ public class NewPage  extends AbstractEditPage {
 	Label uriStatus=null;
 	public NewPage(final PageParameters parameters) throws WebSystemException {
 		super(parameters);
-		uriOfEntity=parameters.get("entity").toString();
+		//uriOfEntity=parameters.get("entity").toString();
 		uriToSupersed=parameters.get("superseding").toString();
 		type=parameters.get("type").toString();
 		uriOfContainer=parameters.get("container").toString();
@@ -89,17 +89,34 @@ public class NewPage  extends AbstractEditPage {
     }
 	
 	@Override
-	protected TerminologyEntity buildEntity() {
+	protected void buildEntity(Model statementsCollected,String description) throws WebSystemException {
 		String uri=uriField.getText();
 		if(!validateURI(uri)) {
-			getSession().error(uri+" is not a valid uri");
-			return null;
+			getSession().error(uri+" is not a valid uri"); //TODO to move up to Abstract
+			throw new WebSystemException("cannot build entity with invalid uri");
 		}
-	
-		
-		// We keep indiviudal as a default, that is anyway the only valid option
-		if(type=="Set") return CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(uri);
-		else return CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(uri);
+		if(isSet) {
+			//TODO fill
+		}
+		else {
+			try {
+				CommandWebConsole.myInitializer.myTerminologyManager.addTermToRegister(
+					getURIOfEntity(), 
+					uriOfContainer, 
+					statementsCollected,
+					CommandWebConsole.myInitializer.getDefaultUserURI(), 
+					description, 
+					true);
+			} catch (AuthException e) {
+				// TODO Auto-generated catch block
+				getSession().error("Auth error");
+				e.printStackTrace();
+			} catch (RegistryAccessException e) {
+				// TODO Auto-generated catch block
+				getSession().error("Reg error");
+				e.printStackTrace();
+			}
+		}
 
 	}
 	
@@ -132,7 +149,8 @@ public class NewPage  extends AbstractEditPage {
 	String getPageStateMessage() {
 		return pageMessage;
 	}
-
+	
+	//TODO maybe we want a text field here
 	public class AjaxyTextArea extends TextArea {
 		private static final long serialVersionUID = 1L;
 		private String text; 
@@ -151,6 +169,16 @@ public class NewPage  extends AbstractEditPage {
 		public String getText(){ return text; } 
 
 		public void setText(String text) { this.text = text; } 
+	}
+
+	@Override
+	protected String getURIOfEntity() {
+		String result=uriField.getText();
+		System.out.println("URI of entity: "+result);
+		//if(result!=null)
+		//	if(validateURI(result)) return result;
+		return result;
+		
 	} 
 	
 }
