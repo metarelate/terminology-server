@@ -276,12 +276,13 @@ public class SearchPage extends SuperPage {
 			 * 
 			 */
 			private static final long serialVersionUID = 1L;
+			
 
 			@Override
 			protected Component newContentComponent(final String id, final IModel model) {
 				return new Folder(id, this, model) {
 					private static final long serialVersionUID = 1L;
-
+							
 				            /**
 				             * Always clickable.
 				             */
@@ -300,7 +301,7 @@ public class SearchPage extends SuperPage {
 				   		        String res[]=null;
 				   		        if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(selectedSetURI)) {
 				   		        	//TODO check consistency of defaults (versions)
-				   		        	Set<TerminologyIndividual> childrenSet=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(selectedSetURI).getIndividuals();
+				   		        	Set<TerminologyIndividual> childrenSet=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(selectedSetURI).getIndividuals(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(selectedSetURI).getLastVersion());
 				   		        	res=new String[childrenSet.size()+1];
 				   		        	res[0]=selectedSetURI;
 				   		        	Iterator<TerminologyIndividual> childrenIter=childrenSet.iterator();
@@ -343,7 +344,7 @@ public class SearchPage extends SuperPage {
 			}
 		};
 		
-		
+		//System.out.println("Building tree, maybe");
 		
 		add(registerTree);
 		
@@ -368,8 +369,9 @@ public class SearchPage extends SuperPage {
 
 			public Iterator<String> getChildren(String collection) {
 				ArrayList<String> resultList=new ArrayList<String>();
+				//System.out.println("Collectoon: "+collection+"version: "+CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(collection).getLastVersion());
 				if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(collection)) {
-					Set<TerminologySet> children=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(collection).getCollections();
+					Set<TerminologySet> children=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(collection).getCollections(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(collection).getLastVersion());
 					Iterator<TerminologySet> setIter=children.iterator();
 					while(setIter.hasNext()) {
 						resultList.add(setIter.next().getURI())
@@ -389,7 +391,7 @@ public class SearchPage extends SuperPage {
 
 			public boolean hasChildren(String collection) {
 				if(!CommandWebConsole.myInitializer.myFactory.terminologySetExist(collection)) return false;
-				Set<TerminologySet> children=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(collection).getCollections();
+				Set<TerminologySet> children=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(collection).getCollections(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(collection).getLastVersion());
 				if(children.size()>0) return true;
 				else return false;
 			}

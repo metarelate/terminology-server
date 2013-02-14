@@ -111,8 +111,8 @@ public abstract class AbstractEditPage  extends SuperPage {
 					System.out.println("e: "+getURIOfEntity());
 					System.out.println("s: "+uriToSupersed);
 					PageParameters pageParameters = new PageParameters();
-					pageParameters.add("entity", getURIOfEntity());
-					pageParameters.add("superseding",uriToSupersed);
+					pageParameters.add("entity", uriToSupersed);
+					pageParameters.add("superseder",getURIOfEntity());
 					setResponsePage(ViewPage.class, pageParameters);
 				}
 				else {
