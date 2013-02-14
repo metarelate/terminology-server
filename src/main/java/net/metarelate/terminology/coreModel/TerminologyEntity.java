@@ -25,6 +25,8 @@ import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 public interface TerminologyEntity {
+	final int INDIVIDUAL_TYPE = 1;
+	final int SET_TYPE=2;
 	/**
 	 * Returns the URI representing the entity
 	 * @return the URI string (not null and not by design)

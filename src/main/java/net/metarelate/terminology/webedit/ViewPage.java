@@ -253,10 +253,22 @@ public class ViewPage extends SuperPage {
 		
 		
 		
+	    /******************************************************************
+	     * NEW CODE ACTION   
+	     ******************************************************************/
 		Button newCodeButton=new Button("newCodeButton") {
 			@Override
 			public void onSubmit() {
 				System.out.println("Action:NEWCODE");
+				/////
+				PageParameters pageParameters = new PageParameters();
+				pageParameters.add("type","Individual");
+				
+				// TODO there must be one, and we take one just at random... if more than one is present, this bit of code is inconsistent (as the rest of the interface)
+				//String container=TerminologyEntityWrapper.getObject().getContainers(TerminologyEntityWrapper.getObject().getLastVersion()).iterator().next().getURI();
+				pageParameters.add("container", urlToAction);
+				setResponsePage(NewPage.class,pageParameters);
+				////
 				//PageParameters pageParameters = new PageParameters();
 				//pageParameters.add("entity", urlToEdit);
 				//setResponsePage(ViewPage.class, pageParameters);
@@ -272,13 +284,20 @@ public class ViewPage extends SuperPage {
 		}
 		form.add(newCodeButton);
 		
+	    /******************************************************************
+	     * NEW REGISTER ACTION   
+	     ******************************************************************/
 		Button newRegisterButton=new Button("newRegisterButton"){
 			@Override
 			public void onSubmit() {
 				System.out.println("Action:NEWREGISTER");
-				//PageParameters pageParameters = new PageParameters();
-				//pageParameters.add("entity", urlToEdit);
-				//setResponsePage(ViewPage.class, pageParameters);
+				PageParameters pageParameters = new PageParameters();
+				pageParameters.add("type","Set");
+				
+				// TODO there must be one, and we take one just at random... if more than one is present, this bit of code is inconsistent (as the rest of the interface)
+				//String container=TerminologyEntityWrapper.getObject().getContainers(TerminologyEntityWrapper.getObject().getLastVersion()).iterator().next().getURI();
+				pageParameters.add("container", urlToAction);
+				setResponsePage(NewPage.class,pageParameters);
 			}
 		};
 		if(isCode) newRegisterButton.setEnabled(false);

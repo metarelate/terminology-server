@@ -69,7 +69,7 @@ public abstract class AbstractEditPage  extends SuperPage {
 				System.out.println("Model collected: "+newStats.size()+" statements");
 				
 				try {
-					buildEntity(newStats,"bogud description");
+					buildEntity(newStats,"bogus description");
 				} catch (WebSystemException e) {
 					getSession().error("Impossible to initialize entity");
 					return;

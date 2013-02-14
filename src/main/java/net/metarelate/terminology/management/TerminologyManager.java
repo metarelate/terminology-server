@@ -76,8 +76,15 @@ public class TerminologyManager {
 		amendEntityInformation(entityURI, statsToReplace, actionAuthor, description, MODE_REMOVE);		
 	}
 	
-	//TODO we start refactoring from this!
 	public void addTermToRegister(String codeURI, String registerURI, Model defaultEntityModel,String actionAuthor, String description, boolean isVersioned ) throws AuthException, RegistryAccessException {
+		addEntityToRegister( codeURI,  registerURI,  defaultEntityModel, actionAuthor,  description,  isVersioned, TerminologyEntity.INDIVIDUAL_TYPE);
+	}
+	public void addSubRegister(String codeURI, String registerURI, Model defaultEntityModel,String actionAuthor, String description, boolean isVersioned ) throws AuthException, RegistryAccessException {
+		addEntityToRegister( codeURI,  registerURI,  defaultEntityModel, actionAuthor,  description,  isVersioned, TerminologyEntity.SET_TYPE);
+
+	}
+			//TODO we start refactoring from this!
+	private void addEntityToRegister(String codeURI, String registerURI, Model defaultEntityModel,String actionAuthor, String description, boolean isVersioned, int entityType ) throws AuthException, RegistryAccessException {
 		//////////////
 			if(!myAuthManager.can(actionAuthor,RegistryPolicyConfig.addItemAction,registerURI))
 					throw new AuthException(actionAuthor,RegistryPolicyConfig.addItemAction,registerURI);
@@ -97,7 +104,12 @@ public class TerminologyManager {
 			String newRegisterVersion=Versioner.createNextVersion(lastRegisterVersion);
 				
 			//Now we create the entity
-			TerminologyIndividual newTerm=myFactory.getOrCreateTerminologyIndividual(codeURI);
+			TerminologyEntity newTerm=null;
+			//TODO dirty use of a type system!!!! should be a bit re-designed (e.g.: use entity more!)
+			if(entityType==TerminologyEntity.INDIVIDUAL_TYPE) newTerm=myFactory.getOrCreateTerminologyIndividual(codeURI);
+			else if(entityType==TerminologyEntity.SET_TYPE) newTerm=myFactory.getOrCreateTerminologySet(codeURI);
+			else System.out.println("This is a private method, should never be invoked like that!");
+			
 			newTerm.setDefaultVersion(newTerm.getLastVersion());
 			if(isVersioned) newTerm.setIsVersioned(true);	
 			newTerm.setStateURI(RegistryPolicyConfig.DEFAULT_CREATION_STATE,newTerm.getDefaultVersion());
@@ -112,9 +124,13 @@ public class TerminologyManager {
 			
 			myRegister.registerVersion(newRegisterVersion);
 			myRegister.getStatements(newRegisterVersion).add((myRegister.getStatements(lastRegisterVersion)));
-				
-			myRegister.registerContainedIndividual(newTerm, newRegisterVersion, newTerm.getDefaultVersion());
-				
+			
+			//TODO dirty use of a type system!!!! should be a bit re-designed (e.g.: use entity more!)
+			if(entityType==TerminologyEntity.INDIVIDUAL_TYPE)
+				myRegister.registerContainedIndividual((TerminologyIndividual)newTerm, newRegisterVersion, newTerm.getDefaultVersion());
+			else if(entityType==TerminologyEntity.SET_TYPE)
+				myRegister.registerContainedCollection((TerminologySet)newTerm, newRegisterVersion, newTerm.getDefaultVersion());	
+			else System.out.println("This is a private method, should never be invoked like that!");
 			if(postRegisterStatus!=null) myRegister.setStateURI(postRegisterStatus, newRegisterVersion);
 			//DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 			myRegister.setActionDate(dateFormat.format(date),newRegisterVersion);
@@ -128,9 +144,7 @@ public class TerminologyManager {
 				
 		}
 	
-	public void addSubRegister() {
-		
-	}
+	
 	
 	public void amendEntityInformation(String entityURI, Model statsToReplace, String actionAuthor, String description, int mode) throws AuthException, RegistryAccessException {
 		if(!myAuthManager.can(actionAuthor,RegistryPolicyConfig.terminologyAmendedActionURI,entityURI))
@@ -337,15 +351,28 @@ public class TerminologyManager {
 	//TODO overall TerminologyManager is due a big overhaul!!!
 	public void delTermFromRegister(String termURI, String regURI,
 			String actionAuthorURI, String description) throws AuthException, RegistryAccessException {
-		
+			
 		if(!myAuthManager.can(actionAuthorURI,RegistryPolicyConfig.delItemAction,regURI))
 			throw new AuthException(actionAuthorURI,RegistryPolicyConfig.delItemAction,regURI);
 	TerminologySet myRegister=checkSetExistance(regURI);
 	if(myRegister==null) throw new RegistryAccessException("Unable to modify "+regURI+" (register does not exist)");
-	TerminologyIndividual myTerm=checkIndividualExistance(termURI);
+	
+	TerminologyEntity myTerm=null;
+	if(myFactory.terminologyIndividualExist(termURI)) {
+		myTerm=myFactory.getOrCreateTerminologyIndividual(termURI);
+		if(myTerm==null) throw new RegistryAccessException("Code "+termURI+" does not exists.");
+		if(!myRegister.getIndividuals(myRegister.getLastVersion()).contains(myTerm))
+			throw new RegistryAccessException("Code "+termURI+" is not contained in the last version of "+regURI);
+	}
+	if(myFactory.terminologySetExist(termURI)) {
+		myTerm=myFactory.getOrCreateTerminologySet(termURI);
+		if(myTerm==null) throw new RegistryAccessException("Code "+termURI+" does not exists.");
+		if(!myRegister.getCollections(myRegister.getLastVersion()).contains(myTerm))
+			throw new RegistryAccessException("Register "+termURI+" is not contained in the last version of "+regURI);
+	}
+	
 	if(myTerm==null) throw new RegistryAccessException("Code "+termURI+" does not exists.");
-	if(!myRegister.getIndividuals(myRegister.getLastVersion()).contains(myTerm))
-		throw new RegistryAccessException("Code "+termURI+" is not contained in the last version of "+regURI);
+	
 	// TODO maybe we should test the containment in the register here.
 	
 	String lastRegisterVersion=myRegister.getLastVersion();
@@ -395,8 +422,8 @@ public class TerminologyManager {
 	myTerm.setActionDate(dateFormat.format(date),newTermVersion);
 	myTerm.setStateURI(postTermStatus,newTermVersion); // Note this overwrites old statements!
 	myTerm.linkVersions(lastTermVersion,newTermVersion);
-
-	myRegister.unregisterContainedIndividual(myTerm, newRegisterVersion, newTermVersion);
+	
+	myRegister.unregisterContainedEntity(myTerm, newRegisterVersion, newTermVersion);
 	
 	myTerm.synch();
 	myRegister.synch();
@@ -529,7 +556,7 @@ public class TerminologyManager {
 	
 	
 	
-	myRegister.unregisterContainedIndividual(myTerm, newRegisterVersion, newTermVersion);
+	myRegister.unregisterContainedEntity(myTerm, newRegisterVersion, newTermVersion);
 	
 		//////	
 	myRegister.synch();

@@ -280,7 +280,7 @@ public class PragmaComputeExpandDashAndSuppress extends PragmaProcessor {
 		Iterator<TerminologyIndividual> toRemoveIter=termsToRemove.iterator();
 		while(toRemoveIter.hasNext()) {
 			TerminologyIndividual toRemove=toRemoveIter.next();
-			terminologySet.unregisterContainedIndividual(toRemove);
+			terminologySet.unregisterContainedEntity(toRemove);
 			// TODO Remove the triples! Not only the reference...
 		}
 		SSLogger.log("Individuals count (after pruning) :"+terminologySet.getIndividuals().size(),SSLogger.DEBUG);

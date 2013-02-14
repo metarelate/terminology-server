@@ -59,14 +59,14 @@ public interface TerminologySet extends TerminologyEntity{
 	 * Remove the individual (code) to set of individuals known for the default version.
 	 * @param toRemove the individual to remove
 	 */
-	public void unregisterContainedIndividual(TerminologyIndividual toRemove) ;
+	public void unregisterContainedEntity(TerminologyEntity toRemove) ;
 		
 	/**
 	 * Remove the individual (code) to set of individuals known for the given version.
 	 * @param toRemove the individual to remove
 	 * @param myVersion
 	 */
-	public void unregisterContainedIndividual(TerminologyIndividual myIndividual, String myVersion, String containedVersion);
+	public void unregisterContainedEntity(TerminologyEntity myIndividual, String myVersion, String containedVersion);
 	
 	/**
 	 * Get all individuals contained in this collection in the default version

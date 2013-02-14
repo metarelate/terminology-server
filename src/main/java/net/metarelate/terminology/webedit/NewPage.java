@@ -95,11 +95,18 @@ public class NewPage  extends AbstractEditPage {
 			getSession().error(uri+" is not a valid uri"); //TODO to move up to Abstract
 			throw new WebSystemException("cannot build entity with invalid uri");
 		}
-		if(isSet) {
-			//TODO fill
-		}
-		else {
-			try {
+		try {
+			if(isSet) {
+				CommandWebConsole.myInitializer.myTerminologyManager.addSubRegister(
+						getURIOfEntity(), 
+						uriOfContainer, 
+						statementsCollected,
+						CommandWebConsole.myInitializer.getDefaultUserURI(), 
+						description, 
+						true);
+			}
+			else {
+			
 				CommandWebConsole.myInitializer.myTerminologyManager.addTermToRegister(
 					getURIOfEntity(), 
 					uriOfContainer, 
@@ -107,16 +114,17 @@ public class NewPage  extends AbstractEditPage {
 					CommandWebConsole.myInitializer.getDefaultUserURI(), 
 					description, 
 					true);
-			} catch (AuthException e) {
+			}
+		} catch (AuthException e) {
 				// TODO Auto-generated catch block
 				getSession().error("Auth error");
 				e.printStackTrace();
-			} catch (RegistryAccessException e) {
+		} catch (RegistryAccessException e) {
 				// TODO Auto-generated catch block
 				getSession().error("Reg error");
 				e.printStackTrace();
-			}
 		}
+		
 
 	}
 	
