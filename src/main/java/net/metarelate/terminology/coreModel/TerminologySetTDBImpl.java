@@ -89,10 +89,10 @@ public class TerminologySetTDBImpl extends
 
 	
 	public void unregisterContainedIndividual(
-			TerminologyIndividual myIndividual, String myVersion,
+			TerminologyIndividual myIndividual, String containerVersion,
 			String containedVersion) {
 		// TODO fix here! (unclear what this comment was referring to!)
-		Model containerModel=getStatements(myVersion);
+		Model containerModel=getStatements(containerVersion);
 		Model containedModel=myIndividual.getStatements(containedVersion);
 		
 		containerModel.remove(myRes,TDBModelsCoreConfig.hasRegisterItem,myIndividual.getResource());

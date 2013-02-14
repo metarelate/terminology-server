@@ -3,10 +3,12 @@ package net.metarelate.terminology.webedit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.coreModel.LabelManager;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
+import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.ImpossibleOperationException;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
@@ -411,6 +413,15 @@ public class ViewPage extends SuperPage {
 	}
 	public void supersedRouteToAdd(AjaxRequestTarget target) {
 		PageParameters pageParameters = new PageParameters();
+		if(isSet) {
+			pageParameters.add("type","Set");
+		}
+		if(isCode) {
+			pageParameters.add("type","Individual");
+		}
+		// TODO there must be one, and we take one just at random... if more than one is present, this bit of code is inconsistent (as the rest of the interface)
+		String container=TerminologyEntityWrapper.getObject().getContainers(TerminologyEntityWrapper.getObject().getLastVersion()).iterator().next().getURI();
+		pageParameters.add("container", container);
 		pageParameters.add("superseding", urlToAction);
 		setResponsePage(NewPage.class,pageParameters);
 	}

@@ -5,13 +5,18 @@ import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.AuthException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
+import net.metarelate.terminology.exceptions.WebSystemException;
 
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.basic.MultiLineLabel;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
+import org.apache.wicket.model.PropertyModel;
 
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
@@ -20,71 +25,134 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 
-public class NewPage  extends SuperPage {
+public class NewPage  extends AbstractEditPage {
 	private static final long serialVersionUID = 1L;
-	public NewPage(final PageParameters parameters) {
+	private String uriOfContainer=null;
+	private String type=null;
+	AjaxyTextArea uriField=null;
+	Label uriStatus=null;
+	public NewPage(final PageParameters parameters) throws WebSystemException {
 		super(parameters);
-		final String urlToEdit=parameters.get("entity").toString();
-		add(new Label("urlToEdit",urlToEdit));
-		
-		TerminologyEntity myEntity=null;
-		if(CommandWebConsole.myInitializer.myFactory.terminologyIndividualExist(urlToEdit)) myEntity=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlToEdit);
-		else if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(urlToEdit)) myEntity=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToEdit);
-		else {
-			// TODO nothing was found, which is impossible. But let's add some fall back action here anyway...
+		uriOfEntity=parameters.get("entity").toString();
+		uriToSupersed=parameters.get("superseding").toString();
+		type=parameters.get("type").toString();
+		uriOfContainer=parameters.get("container").toString();
+		if(uriToSupersed!=null) {
+			isSuperseding=true;
+			pageMessage="Adding a new entity to supersed "+uriToSupersed;
 		}
-				
+		else {
+			pageMessage="Nothing to say";
+		}
+		isNew=true;
+		if(type.equals("Set")) isSet=true;
+		else if(type.equals("Individual")) isIndividual=true;
+		else {
+			//TODO here we have a fatal error condition
+		}
+		if(uriOfContainer==null) {
+			//TODO here we have another fatal condition
+		}
 		
-		final TextField<String> entityLabel = new TextField<String>("entityLabel", org.apache.wicket.model.Model.of(myEntity.getLabel(myEntity.getLastVersion())));
-		//final TextField<String> entityLabel = new TextField<String>("entityLabel", org.apache.wicket.model.Model.of(""));
-
-		entityLabel.setRequired(true);
-		entityLabel.add(new LabelValidator());
+		uriField=new AjaxyTextArea("uriField");
+		uriField.setText(uriOfContainer+"/");
+		uriField.add(new AjaxFormComponentUpdatingBehavior("onkeyup"){
+	            protected void onUpdate(AjaxRequestTarget target) { 
+	                target.add(uriStatus);
+	                target.add(feedbackPanel);
+	                if(!validateURI(uriField.getText())) {
+	                	//getSession().error("Invalid URI or code already defined");
+	                	uriStatus.setDefaultModelObject("Not valid");
+	                	System.out.println("URI not valid");
+	                }
+	                else {
+	                	uriStatus.setDefaultModelObject("Valid");
+	                	System.out.println("URI is valid");
+	                }
+	            } 
+	        }); 
 		
-		Form<?> form = new Form<Void>("editForm") {
-
-			@Override
-			protected void onSubmit() {
-				//This is called only if valid!
+		add(uriField);
+		//here we should add a validation behaviour.
+		uriStatus=new Label("uriStatus","Not valid");
+		uriStatus.setOutputMarkupId(true);
+		add(uriStatus);
+		
+	
 				
-				final String labelValue = entityLabel.getModelObject();
-				Statement newStatement=ResourceFactory.createStatement(ResourceFactory.createResource(urlToEdit), MetaLanguage.labelProperty, ResourceFactory.createPlainLiteral(labelValue));
-				Model newStats=ModelFactory.createDefaultModel().add(newStatement);
-				try {
-					CommandWebConsole.myInitializer.myTerminologyManager.replaceEntityInformation(urlToEdit, newStats, CommandWebConsole.myInitializer.getDefaultUserURI(), "dumb edit");
-				} catch (AuthException e) {
-					// TODO Auto-generated catch block
-					getSession().error("Auth error");
-					e.printStackTrace();
-				} catch (RegistryAccessException e) {
-					// TODO Auto-generated catch block
-					getSession().error("Reg error");
-					e.printStackTrace();
-				}
-				// update label with labelValue
-				
-				PageParameters pageParameters = new PageParameters();
-				pageParameters.add("entity", urlToEdit);
-				setResponsePage(ViewPage.class, pageParameters);
-
-			}
-
-		};
+		buildForm();
+		postConstructionFinalize();
+		
 		//add(new Label("version",myEntity.getLastVersion()));
-		add(form);
-		form.add(entityLabel);
-		add(new FeedbackPanel("feedback"));
+
 		
     }
+	
+	@Override
+	protected TerminologyEntity buildEntity() {
+		String uri=uriField.getText();
+		if(!validateURI(uri)) {
+			getSession().error(uri+" is not a valid uri");
+			return null;
+		}
+	
+		
+		// We keep indiviudal as a default, that is anyway the only valid option
+		if(type=="Set") return CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(uri);
+		else return CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(uri);
+
+	}
+	
+	private boolean validateURI(String uri) {
+		if(uri.length()<8) {
+			return false;
+		}
+		if(CommandWebConsole.myInitializer.myFactory.terminologyIndividualExist(uri)) {
+			return false;
+		}
+		if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(uri)) {
+			return false;
+		}
+		if(uri.endsWith("/")) {
+			if(CommandWebConsole.myInitializer.myFactory.terminologyIndividualExist(uri.substring(0,uri.length()-1))) {
+				return false;
+			}
+			if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(uri.substring(0,uri.length()-1))) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	@Override
 	String getSubPage() {
-		return "Term edition";
+		return "New Term";
 	}
 	@Override
 	String getPageStateMessage() {
-		return "Nothing to say";
+		return pageMessage;
 	}
 
+	public class AjaxyTextArea extends TextArea {
+		private static final long serialVersionUID = 1L;
+		private String text; 
+		
+		public AjaxyTextArea(String id) { 
+		        super(id); 
+		        setModel(new PropertyModel(this, "text")); 
+		        add(new AjaxFormComponentUpdatingBehavior("onchange"){ 
+
+		            protected void onUpdate(AjaxRequestTarget target) { 
+		                System.out.println("text: " + text); 
+		            } 
+		        }); 
+		    } 
+
+		public String getText(){ return text; } 
+
+		public void setText(String text) { this.text = text; } 
+	} 
+	
 }
 
 

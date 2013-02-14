@@ -4,6 +4,7 @@ import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.exceptions.AuthException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
+import net.metarelate.terminology.exceptions.WebSystemException;
 
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
@@ -22,27 +23,35 @@ import com.hp.hpl.jena.rdf.model.Statement;
  * @author andreasplendiani
  *
  */
-public class AbstractEditPage  extends SuperPage {
+public abstract class AbstractEditPage  extends SuperPage {
 	private static final long serialVersionUID = 10L;
+	protected String uriOfEntity=null;
+	protected String uriToSupersed=null;
+	protected boolean isNew=false;
+	protected boolean isEdit=false;
+	protected boolean isSet=false;
+	protected boolean isIndividual=false;
+	protected boolean isSuperseding=false;
+	protected TerminologyEntity myEntity=null;
+	protected String pageMessage="";
+	protected FeedbackPanel feedbackPanel=null;
 	
 	public AbstractEditPage(final PageParameters parameters) {
 		super(parameters);
+    }
+	
+	
+	protected abstract TerminologyEntity buildEntity();
+	
+	protected void buildForm() throws WebSystemException {
 		
-		// urlToEdit cannot be final as is defined by subclasses...
-		final String urlToEdit=parameters.get("entity").toString();
-		add(new Label("urlToEdit",urlToEdit));
+		// TODO what below should be generalized to all statements present (or required for a new term/set).
+		org.apache.wicket.model.Model<String> labelModel=null;
+		if(isEdit) labelModel=org.apache.wicket.model.Model.of(myEntity.getLabel(myEntity.getLastVersion()));
+		else if(isNew) labelModel=new org.apache.wicket.model.Model<String>();
+		else throw new WebSystemException("Neither edit or new action for edit form");
+		final TextField<String> entityLabel = new TextField<String>("entityLabel", labelModel);
 		
-		TerminologyEntity myEntity=null;
-		if(CommandWebConsole.myInitializer.myFactory.terminologyIndividualExist(urlToEdit)) myEntity=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlToEdit);
-		else if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(urlToEdit)) myEntity=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToEdit);
-		else {
-			// TODO nothing was found, which is impossible. But let's add some fall back action here anyway...
-		}
-				
-		
-		final TextField<String> entityLabel = new TextField<String>("entityLabel", org.apache.wicket.model.Model.of(myEntity.getLabel(myEntity.getLastVersion())));
-		//final TextField<String> entityLabel = new TextField<String>("entityLabel", org.apache.wicket.model.Model.of(""));
-
 		entityLabel.setRequired(true);
 		entityLabel.add(new LabelValidator());
 		
@@ -51,12 +60,35 @@ public class AbstractEditPage  extends SuperPage {
 			@Override
 			protected void onSubmit() {
 				//This is called only if valid!
-				
-				final String labelValue = entityLabel.getModelObject();
-				Statement newStatement=ResourceFactory.createStatement(ResourceFactory.createResource(urlToEdit), MetaLanguage.labelProperty, ResourceFactory.createPlainLiteral(labelValue));
+				if(isNew) {
+					//check thet URI is present or complain
+					// create entity
+				}
+				// Proceed with action
+				if(uriOfEntity==null) {
+					//throw exception
+					//this should never happen
+				}
+				String labelValue = entityLabel.getModel().getObject();
+				if(labelValue==null) labelValue=""; // TODO check that things work here
+				Statement newStatement=ResourceFactory.createStatement(ResourceFactory.createResource(uriOfEntity), MetaLanguage.labelProperty, ResourceFactory.createPlainLiteral(labelValue));
 				Model newStats=ModelFactory.createDefaultModel().add(newStatement);
+				
+				/**
+				 * What should happen here.
+				 * 1) check validation
+				 * 2) prepare metadata
+				 * 3) if this is a New Page:
+				 *  	a) create the entity			(Possibly in TerminologyWebConstructor and should move to TerminologyManager)
+				 *      b) register entity in container (Possibly in TerminologyWebConstructor and should move to TerminologyManager)
+				 * 		c) regsiter values				(Possibly in TerminologyWebConstructor and should move to TerminologyManager)
+				 * 4) if this is an Edit page: issue update
+				 */
+				
+				/*
 				try {
-					CommandWebConsole.myInitializer.myTerminologyManager.replaceEntityInformation(urlToEdit, newStats, CommandWebConsole.myInitializer.getDefaultUserURI(), "dumb edit");
+					//Do nothing now, but we should get all statements and replace the model
+					CommandWebConsole.myInitializer.myTerminologyManager.replaceEntityInformation(uriOfEntity, newStats, CommandWebConsole.myInitializer.getDefaultUserURI(), "dumb edit");
 				} catch (AuthException e) {
 					// TODO Auto-generated catch block
 					getSession().error("Auth error");
@@ -66,11 +98,25 @@ public class AbstractEditPage  extends SuperPage {
 					getSession().error("Reg error");
 					e.printStackTrace();
 				}
+				*/
+				if(isSuperseding) {
+					//route to to viewPage (target=superseding)
+					PageParameters pageParameters = new PageParameters();
+					pageParameters.add("entity", uriToSupersed);
+					pageParameters.add("superseding",uriOfEntity);
+					setResponsePage(ViewPage.class, pageParameters);
+				}
+				else {
+					//route to viewPage (target=urlOfEntity)
+					PageParameters pageParameters = new PageParameters();
+					pageParameters.add("entity", uriOfEntity);
+					setResponsePage(ViewPage.class, pageParameters);
+				}
+				
+				
 				// update label with labelValue
 				
-				PageParameters pageParameters = new PageParameters();
-				pageParameters.add("entity", urlToEdit);
-				setResponsePage(ViewPage.class, pageParameters);
+				
 
 			}
 
@@ -78,17 +124,11 @@ public class AbstractEditPage  extends SuperPage {
 		//add(new Label("version",myEntity.getLastVersion()));
 		add(form);
 		form.add(entityLabel);
-		add(new FeedbackPanel("feedback"));
-		
-    }
-	@Override
-	String getSubPage() {
-		return "Term edition";
+		feedbackPanel=new FeedbackPanel("feedback");
+		feedbackPanel.setOutputMarkupId(true);
+		add(feedbackPanel);
 	}
-	@Override
-	String getPageStateMessage() {
-		return "Nothing to say";
-	}
+	
 
 }
 
