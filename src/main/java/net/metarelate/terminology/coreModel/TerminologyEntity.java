@@ -381,6 +381,8 @@ public interface TerminologyEntity {
 	String getGenericVersionSpecificStringValueObject(Property property, String version);
 	String getGenericVersionSpecificURIObject(Property property, String version);
 	String getGenericEndurantStringValueObject(Property property);
-	String getGenericEndurantURIObject(Property property);	
+	String getGenericEndurantURIObject(Property property);
+
+	public abstract void synch();	
 	
 }

@@ -18,18 +18,13 @@
 */
 
 package net.metarelate.terminology.exceptions;
-/**
- * Registry Manager Exception
- *
- * Thrown when an unauthorized operation is requested.
- * 
- * @author andreasplendiani
- *
- */
-public class RegistryManagerException extends Exception {
 
-	public RegistryManagerException(String message) {
+public class ConfigurationException extends Exception {
+
+	
+	public ConfigurationException(String message) {
 		super(message);
+
 	}
 
 }

@@ -17,18 +17,19 @@
  along with terminology-server. If not, see <http://www.gnu.org/licenses/>.
 */
 
-package net.metarelate.terminology.terminology.auth;
+package net.metarelate.terminology.exceptions;
 /**
- * A collection of static configuration fields
+ * Registry Manager Exception
+ *
+ * Thrown when an unauthorized operation is requested.
+ * 
  * @author andreasplendiani
  *
  */
-class AuthConfig {
-	/**
-	 * Represents "all" entries. 
-	 * This is used to specify general authorizations: e.g.: agent-action-all.
-	 * 
-	 */
-	static final String allURI="http://metoffice.gov.uk/terminology/auth/all";
+public class RegistryAccessException extends Exception {
+
+	public RegistryAccessException(String message) {
+		super(message);
+	}
 
 }

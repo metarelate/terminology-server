@@ -21,12 +21,21 @@ package net.metarelate.terminology.coreModel;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Set;
 
 import net.metarelate.terminology.config.CoreConfig;
+import net.metarelate.terminology.config.MetaLanguage;
 
 import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -182,5 +191,37 @@ public class TerminologyFactoryTDBImpl implements TerminologyFactory {
 	}
 	public BackgroundKnowledgeManager getBackgroundKnowledgeManager() {
 		return myBackgroundKnowledgeManager;
+	}
+
+	public Set<String> extractIndividualsWithMarchingValue(
+			String textQueryString) {
+		return extractTypedResourcesMatchingLiteratConstraint(MetaLanguage.terminologyIndividualType.getURI(),textQueryString);
+	}
+
+	public Set<String> extractSetsWithMarchingValue(String textQueryString) {
+		return extractTypedResourcesMatchingLiteratConstraint(MetaLanguage.terminologySetType.getURI(),textQueryString);
+	}
+	
+	private Set<String> extractTypedResourcesMatchingLiteratConstraint(String type, String constraint){
+		
+    	String queryString="select distinct ?s where {\n"+ 
+    			"graph <"+TDBModelsCoreConfig.globalModel+">{ ?s a <"+type+">}\n"+
+    			"graph ?g {?s ?p ?l .\n"+ 
+    			"filter regex(?l,\""+constraint+"\")}\n"+
+    			"}";
+    	System.out.println("Query:");
+    	System.out.println(queryString);
+    	QueryExecution queryExec=QueryExecutionFactory.create(queryString,myDataset);
+    	ResultSet results = queryExec.execSelect();
+    	Set<String> uriResult=new HashSet<String>();
+    	while(results.hasNext()) {
+    		QuerySolution currentRes=results.next();
+    		if(currentRes.get("?s").isURIResource()) {
+    			uriResult.add(((Resource)currentRes.get("?s")).getURI());
+    		}
+    	}
+    	return uriResult;
+    	
+    			
 	}
 }

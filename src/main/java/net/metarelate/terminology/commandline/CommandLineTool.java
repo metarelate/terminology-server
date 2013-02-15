@@ -21,6 +21,8 @@ package net.metarelate.terminology.commandline;
 
 import net.metarelate.terminology.coreModel.TerminologyFactory;
 import net.metarelate.terminology.coreModel.TerminologyFactoryTDBImpl;
+import net.metarelate.terminology.exceptions.ConfigurationException;
+import net.metarelate.terminology.instanceManager.Initializer;
 import net.metarelate.terminology.utils.SSLogger;
 /**
  * An abstract class that provides some basic structure to a command line program.
@@ -46,6 +48,8 @@ public abstract class CommandLineTool {
 	protected abstract void parseLocal(String[] args);
 	protected abstract void executeCommand();
 	
+	public Initializer myInitializer=null;
+	
 	/**
 	 * See discussion in the class description {@link CommandLineTool}
 	 * @param args
@@ -54,6 +58,12 @@ public abstract class CommandLineTool {
 		printStartMessage();
 		parseGlobal(args);
 		parseLocal(args);
+		try {
+			startupSystem();
+		} catch (ConfigurationException e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
 		executeCommand();
 	}
 	
@@ -61,6 +71,11 @@ public abstract class CommandLineTool {
 	// Parsing arguments is done in two stages: first options are found (and immediately executed when they don't take arguments)
 	// Then all found options are evaluated for further arguments.
 	
+	private void startupSystem() throws ConfigurationException {
+		// TODO things should change here in order to pass/override settings specified in the command line
+		myInitializer=new Initializer();
+		
+	}
 	protected void parseGlobal(String[] args) {
 		//Parameters identification
 		for(int i=0;i<args.length;i++) {

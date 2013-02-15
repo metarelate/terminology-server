@@ -20,6 +20,7 @@
 package net.metarelate.terminology.coreModel;
 
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * Factory responsible for the creation of terminology objects (individuals and sets).
@@ -122,7 +123,11 @@ public interface TerminologyFactory {
 	 * @return
 	 */
 	public BackgroundKnowledgeManager getBackgroundKnowledgeManager() ;
-	
+
+	public abstract Set<String> extractIndividualsWithMarchingValue(
+			String textQueryString);
+	public abstract Set<String> extractSetsWithMarchingValue(
+			String textQueryString);
 	
 	
 }

@@ -35,6 +35,7 @@ import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.tdb.TDB;
 
 public class TerminologyEntityTDBImpl implements TerminologyEntity{
 	protected TerminologyFactory myFactory=null;	//The factory responsible for the construction of this entity
@@ -467,6 +468,13 @@ public class TerminologyEntityTDBImpl implements TerminologyEntity{
 			if(myRes.isURIResource()) result=myRes.asResource().getURI();
 		}
 		return result;
+	}
+
+	public void synch() {
+		TDB.sync(myDataset);
+		TDB.sync(globalGraph);
+		// TODO calls to synch should be double checked (arguably, it's a TerminologyManager issue)
+		
 	}
 	
 }
