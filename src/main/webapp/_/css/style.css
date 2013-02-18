@@ -257,6 +257,15 @@ table.dataview tr th.wicket_orderNone {
 table.dataview tr th a { font-weight: normal; }
 table.dataview #message { padding-left: 3px; }
 table.dataview caption { padding-bottom: 2px; }
+
+
+.propertyTable {
+	
+	padding-right: 5px;
+	font-style: italic;
+	overflow: hidden;
+	width: 780px;
+}
 /************************************/
 /* Wrapper Styles                   */
 /************************************/

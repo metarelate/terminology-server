@@ -56,7 +56,7 @@ public abstract class WebRendererItem {
 	protected static final int STYLE_TERM_SKOS_CONCEPT=5;
 	protected int type=0;
 	protected String itemUrl=null;
-	protected Model labelsModel=null;
+	//protected Model labelsModel=null;
 	protected TerminologyEntity entity=null;
 	protected LabelManager myLabelManager=null;
 	protected Hashtable<String, String> uri2UrlMap=new Hashtable<String,String>();

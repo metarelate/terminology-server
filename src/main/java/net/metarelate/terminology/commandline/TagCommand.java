@@ -9,10 +9,12 @@ public class TagCommand extends TsCommand {
 		// TODO Auto-generated constructor stub
 	}
 
-	@Override
-	public void execute() {
-		// TODO Auto-generated method stub
 
+
+	@Override
+	public void localExecute() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -264,7 +264,7 @@ public class MetMap extends CommandLineTool {
 						SSLogger.log("Generating web layout for: "+roots[i].getURI());
 						WebWriter myWriter=new WebWriter(roots[i],myConfigModel,writeOverwrite);
 						myWriter.setPrefixMap(prefixMap);		// TODO verify consistency with publisher/builder/factory
-						myWriter.setLabelModel(labelsModel);	// TODO verify consistency with publisher/builder/factory
+						//myWriter.setLabelModel(labelsModel);	// TODO verify consistency with publisher/builder/factory
 						myWriter.write();
 						
 					} catch (Exception e) {
@@ -283,7 +283,7 @@ public class MetMap extends CommandLineTool {
 							SSLogger.log("Generating web layout for: "+roots[i].getURI());
 							WebWriter myWriter=new WebWriter(roots[i],myConfigModel,writeOverwrite);
 							myWriter.setPrefixMap(prefixMap);		// TODO verify consistency with publisher/builder/factory
-							myWriter.setLabelModel(labelsModel);	// TODO verify consistency with publisher/builder/factory
+							//myWriter.setLabelModel(labelsModel);	// TODO verify consistency with publisher/builder/factory
 							myWriter.write(rootPath,rootURL);
 						} catch (Exception e) {
 							e.printStackTrace();

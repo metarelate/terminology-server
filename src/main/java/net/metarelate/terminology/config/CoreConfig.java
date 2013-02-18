@@ -34,6 +34,8 @@ public class CoreConfig {
 
 	public static String DEFAULT_FROM_RDF_DESCRIPTION="imported from table";
 
+	
+
 	public static final String DEAFULT_FROM_RDF_IMPORT_ACTION = "http://metoffice.gov.uk/action/importFromTables";
 
 	public static final String DEFAULT_IMPORT_STATUS = MetaLanguage.statusOutOfRegistry.getURI();
@@ -52,6 +54,9 @@ public class CoreConfig {
 	public static final String authDirString = "auth";
 
 	public static final String seedFileString = "instanceSeed.ttl";
+	public static String prefixFileString="prefixFile.ttl";
+
+	public static String baseDiskDir="web";
 	
 	public static final String hasInstanceIdentifierURI="http://metarelate.net/configuration/hasInstanceIdentifier";
 	public static final String selfURI="http://thisInstance.org";

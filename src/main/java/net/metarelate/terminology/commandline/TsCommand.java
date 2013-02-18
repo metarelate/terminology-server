@@ -36,7 +36,11 @@ public abstract class TsCommand {
 
 	
 	
-	public abstract void execute();
+	public void execute() {
+		localExecute();
+		myInitializer.myFactory.synch();
+	}
+	public abstract void localExecute();
 	
 	protected Model readIntoModel(ArrayList<String> files) {
 		Model inputModel=ModelFactory.createDefaultModel();

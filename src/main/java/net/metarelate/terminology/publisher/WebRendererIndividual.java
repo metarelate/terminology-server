@@ -36,12 +36,11 @@ import com.hp.hpl.jena.rdf.model.Model;
 
 public class WebRendererIndividual extends WebRendererItem {
 	TerminologyIndividual myTerm;
-	public WebRendererIndividual(TerminologyIndividual term, String url,
-			Model labelRepository) {
+	public WebRendererIndividual(TerminologyIndividual term, String url) {
 		super(term);
 		myTerm=term;
 		itemUrl=url;
-		labelsModel=labelRepository;
+		//labelsModel=labelRepository;
 		
 		determineType(term.getLastVersion());
 		SSLogger.log("created renderer for indivudual "+term.getURI()+" style :"+type);

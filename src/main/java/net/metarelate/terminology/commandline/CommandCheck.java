@@ -10,7 +10,7 @@ public class CommandCheck extends TsCommand {
 	}
 
 	@Override
-	public void execute() {
+	public void localExecute() {
 		// TODO Auto-generated method stub
 
 	}

@@ -33,7 +33,7 @@ public class CommandIngest extends TsCommand {
 	}
 	
 	@Override
-	public void execute() {
+	public void localExecute() {
 		
 		System.out.println("Starting execution");
 		System.out.print("Debug mode is: ");

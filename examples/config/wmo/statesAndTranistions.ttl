@@ -1,0 +1,32 @@
+@prefix metaMap: 	<http://reference.metoffice.gov.uk/data/wmo/meta/mapping#> .
+@prefix metModel:	<http://reference.metoffice.gov.uk/data/wmo/meta/model#> .
+@prefix metExtra:	<http://reference.metoffice.gov.uk/data/wmo/def/met#> .
+@prefix iso19135: 	<http://reference.metoffice.gov.uk/data/wmo/def/iso19135#> .
+@prefix wmo: 		<http://reference.metoffice.gov.uk/data/wmo/def/wmo#> .
+@prefix map:		<http://reference.metoffice.gov.uk/data/wmo/mapping/generic1#> .
+
+@prefix rdfs:   	<http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdf:    	<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:    	<http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: 		<http://www.w3.org/2004/02/skos/core#> .
+
+
+#The following namespaces are defined to ease the portability of this file.
+@prefix siteBase: 	<http://127.0.0.1:8888/MetOffice3/global/> .
+@prefix common:		<http://127.0.0.1:8888/MetOffice3/global/common/> .
+@prefix schemes:	<http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes/> .
+@prefix bufr:		<http://reference.metoffice.gov.uk/data/wmo/tdcf/bufr/> .
+@prefix crex:		<http://reference.metoffice.gov.uk/data/wmo/tdcf/crex/> .
+@prefix grib:		<http://reference.metoffice.gov.uk/data/wmo/tdcf/grib/> .
+@prefix bufrcrex:	<http://reference.metoffice.gov.uk/data/wmo/tdcf/bufrcrex/> .
+# TODO
+# do we still need the two following definitions ?
+@prefix bufrb: 		<http://reference.metoffice.gov.uk/data/wmo/tdcf/bufr/b/> .
+@prefix crexb: 		<http://reference.metoffice.gov.uk/data/wmo/tdcf/crex/b/> .
+
+
+
+[] a metaMap:publisherSpecs;
+	metaMap:diskPrefix	"/vaw/www/html/data/wmo/tdcf";
+	metaMap:baseURL		"http://reference.metoffice.gov.uk/data/wmo/tdcf";
+	.

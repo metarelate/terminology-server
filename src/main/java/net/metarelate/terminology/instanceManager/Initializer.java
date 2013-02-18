@@ -27,6 +27,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Map;
 import java.util.UUID;
 
 import net.metarelate.terminology.auth.AuthConfig;
@@ -66,6 +67,7 @@ public class Initializer {
 	private static String confDirAbsoluteString=null;
 	private static String authDirAbsoluteString=null;
 	private static String seedFileAbsoluteString=null;
+	private static String prefixFileAbsoluteString=null;
 	public static String defaultUserName=null;
 	
 	private  AuthServer authServer=null;
@@ -75,6 +77,8 @@ public class Initializer {
 	public boolean debugMode=true;	// TODO this shold come from the configuration file
 	
 	protected String rootDirString=CoreConfig.rootDirString;
+	
+	private Map<String,String> nsPrefixMap=null;
 	
 	public Initializer(String confDir) throws ConfigurationException {
 		rootDirString=confDir;
@@ -150,10 +154,20 @@ public class Initializer {
 			seedFileAbsoluteString=seedFile.getAbsolutePath();
 		}
 		checkOrCreateSeedFile();
+		
+		File prefixFile;
+		if(prefixFileAbsoluteString!=null) prefixFile=new File(prefixFileAbsoluteString);
+		else{
+			prefixFile=new File(rootDirectory.getAbsolutePath(),CoreConfig.prefixFileString);
+			prefixFileAbsoluteString=prefixFile.getAbsolutePath();
+		}
+		checkOrCreatePrefixFile();
 
 		// TODO Note also that we should be sure time is in synch globally
 	}
 	
+
+
 
 	public void buildSystemComponents() throws ConfigurationException {
 	Model configuration=null;
@@ -207,6 +221,33 @@ public class Initializer {
 		
 	}
 	
+	private void checkOrCreatePrefixFile() throws ConfigurationException {
+		// TODO Auto-generated method stub
+		File prefixFile=new File(prefixFileAbsoluteString);
+		if(!prefixFile.exists()) {
+			String defaultContent=
+					"@prefix rdfs:   	<http://www.w3.org/2000/01/rdf-schema#> .\n"+
+					"@prefix rdf:    	<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n"+
+					"@prefix xsd:    	<http://www.w3.org/2001/XMLSchema#> .\n"+
+					"@prefix skos: 		<http://www.w3.org/2004/02/skos/core#> .\n"+
+					"[] a <http://bog.us/bougs> ;\n" +
+					".";
+			writeInFile(prefixFile,defaultContent);
+		}
+		else {
+			Model prefixModel=ModelFactory.createDefaultModel();
+			try {
+				prefixModel.read(new FileInputStream(prefixFileAbsoluteString),"http://thisInstance.org/configuration/","Turtle");
+				nsPrefixMap=prefixModel.getNsPrefixMap();
+			} catch (FileNotFoundException e1) {
+				e1.printStackTrace();
+				throw new ConfigurationException("Prefixes file not found: "+seedFileAbsoluteString);
+			}
+			
+		}
+		
+	}
+	
 	
 	private void checkOrCreateDirectory (File dir) throws ConfigurationException  {
 		if(dir.exists()) {
@@ -217,13 +258,19 @@ public class Initializer {
 	}
 	
 	private void prepareDefaultFiles() throws ConfigurationException {		
-		String defServerStatements="<http://thisInstance.org> <"+MetaLanguage.tdbPrefixProperty+"> "+"\""+dbDirAbsoluteString+"\"^^<http://www.w3.org/2001/XMLSchema#string> ;\n.";
-		defServerStatements+="<http://thisInstance.org> <"+MetaLanguage.authConfigURI +"> "+"<"+AuthConfig.isConfigFileString+"> ;\n.";
+		String defServerStatements="<http://thisInstance.org> <"+MetaLanguage.tdbPrefixProperty+"> "+"\""+dbDirAbsoluteString+"\"^^<http://www.w3.org/2001/XMLSchema#string> ;\n.\n";
+		defServerStatements+="<http://thisInstance.org> <"+MetaLanguage.authConfigURI +"> "+"<"+AuthConfig.isConfigFileString+"> ;\n.\n";
+		String baseURL=getServerName()+"/web";
+		File diskPrefixFile=new File(getWorkingDirectory(),CoreConfig.baseDiskDir);
+		String diskPrefix=diskPrefixFile.getAbsolutePath();
+		defServerStatements+="<http://thisInstance.org> <"+MetaLanguage.baseURLProperty +"> "+"\"http://"+baseURL+"\" ;\n.\n";
+		defServerStatements+="<http://thisInstance.org> <"+MetaLanguage.diskPrefixProperty +"> "+"\""+diskPrefix+"\" ;\n.\n";
+		
 		createFileAndFillWithString(confDirAbsoluteString,"defaultServerConfig.ttl",defServerStatements);
 		
 		// TODO this is : me what I can on what. Arguably this should start with me can create anything at the top register (empty register?)
 		// However, as a conf option, one could be granted access to everything.
-		String defAuthStatements="<"+getDefaultUserURI()+"> <"+AuthConfig.allURI+"> "+"<"+AuthConfig.allURI+"> ;\n.";
+		String defAuthStatements="<"+getDefaultUserURI()+"> <"+AuthConfig.allURI+"> "+"<"+AuthConfig.allURI+"> ;\n.\n";
 		createFileAndFillWithString(authDirAbsoluteString,"defaultAuthConfig.ttl",defAuthStatements);
 	}
 	
@@ -309,6 +356,9 @@ public class Initializer {
 		return System.getProperty("user.dir");
 	}
 	
+	public Map<String,String> getPrefixMap() {
+		return nsPrefixMap;
+	}
 	
 	
 	

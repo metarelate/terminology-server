@@ -40,6 +40,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.tdb.TDB;
 import com.hp.hpl.jena.tdb.TDBFactory;
 
 public class TerminologyFactoryTDBImpl implements TerminologyFactory {
@@ -223,5 +224,15 @@ public class TerminologyFactoryTDBImpl implements TerminologyFactory {
     	return uriResult;
     	
     			
+	}
+
+	public void synch() {
+		Iterator<String> datasets=myDataset.listNames();
+		ArrayList<String>datasetNames =new ArrayList<String>();
+		while(datasets.hasNext()) datasetNames.add(datasets.next());
+		for(String datasetName: datasetNames) {
+			TDB.sync(myDataset.getNamedModel(datasetName));
+		}
+		
 	}
 }

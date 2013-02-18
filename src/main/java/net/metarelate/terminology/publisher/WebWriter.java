@@ -65,7 +65,7 @@ public class WebWriter {
 	private boolean overWriteFiles=false;				// Should we overwite files already present on the fle system ?
 	private String cssUrl=null; 						// TODO maybe we want a default in CoreConfig
 	
-	private Model labelRepository=null;					// A Jena model containing a set of triples with "optional" labels (non part of the wmo definitions)
+	//private Model labelRepository=null;					// A Jena model containing a set of triples with "optional" labels (non part of the wmo definitions)
 	private Map<String,String> prefixMap=null;
 	
 	private Hashtable<String,String> uri2Url=null;
@@ -85,9 +85,10 @@ public class WebWriter {
 		this.uri2Path=new Hashtable<String,String>();
 		this.prefixMap=extraTriplesInput.getNsPrefixMap();	
 	}
-	public void setLabelModel(Model labelModel) {
-		this.labelRepository=labelModel;
-	}
+	
+	//public void setLabelModel(Model labelModel) {
+	//	this.labelRepository=labelModel;
+	//}
 	
 	public void setPrefixMap(Map<String,String> map) {
 		this.prefixMap=map;
@@ -99,24 +100,24 @@ public class WebWriter {
 			String pi=psm.next();
 			SSLogger.log("WRITING TO WEB WITH PREFIX: "+pi+" for "+prefixMap.get(pi),SSLogger.DEBUG);
 		}
-		if(labelRepository==null) {
-			labelRepository=extraTriplesInInput;
-			SSLogger.log("No explicit label model selected, labels taken from config",SSLogger.DEBUG);
-		}
+		//if(labelRepository==null) {
+		//	labelRepository=extraTriplesInInput;
+		//	SSLogger.log("No explicit label model selected, labels taken from config",SSLogger.DEBUG);
+		//}
 		
-		String sitePrefix="";
+		//String sitePrefix="";
 		String diskPrefix="";
 		
 		// TODO these should be moved to the constructor
-		NodeIterator myIter=extraTriplesInInput.listObjectsOfProperty(MetaLanguage.sitePrefixProperty);
+		//NodeIterator myIter=extraTriplesInInput.listObjectsOfProperty(MetaLanguage.sitePrefixProperty);
+		//if(!myIter.hasNext()) throw new WebWriterException("Unable to find a site prefix");
+		//RDFNode node=myIter.nextNode();
+		//if(!node.isLiteral()) throw new WebWriterException("Unable to find a literal for site prefix");
+		//sitePrefix=((Literal) node).getValue().toString();
+		
+		NodeIterator  myIter=extraTriplesInInput.listObjectsOfProperty(MetaLanguage.diskPrefixProperty);
 		if(!myIter.hasNext()) throw new WebWriterException("Unable to find a site prefix");
 		RDFNode node=myIter.nextNode();
-		if(!node.isLiteral()) throw new WebWriterException("Unable to find a literal for site prefix");
-		sitePrefix=((Literal) node).getValue().toString();
-		
-		myIter=extraTriplesInInput.listObjectsOfProperty(MetaLanguage.diskPrefixProperty);
-		if(!myIter.hasNext()) throw new WebWriterException("Unable to find a site prefix");
-		node=myIter.nextNode();
 		if(!node.isLiteral()) throw new WebWriterException("Unable to find a literal for site prefix");
 		diskPrefix=((Literal) node).getValue().toString();
 		
@@ -140,7 +141,7 @@ public class WebWriter {
 		
 		
 		SSLogger.log("Starting WebWriter",SSLogger.DEBUG);
-		SSLogger.log("site prefix: "+sitePrefix,SSLogger.DEBUG);
+		//SSLogger.log("site prefix: "+sitePrefix,SSLogger.DEBUG);
 		SSLogger.log("disk prefix: "+diskPrefix,SSLogger.DEBUG);
 		
 		//Check that disk is viable.
@@ -148,7 +149,8 @@ public class WebWriter {
 		if(!baseFile.exists()) throw new WebWriterException("The directory: "+baseFile+" must be already present!\n This is a security check and it is required to create this directory outside this command.");
 		
 		//first we pre-compute URLs
-		preComputeReferences(rootCollection,sitePrefix,diskPrefix);
+		// TODO note: we just removed baseURL, let's check it works!
+		preComputeReferences(rootCollection,baseURL,diskPrefix);
 		writeSetToWeb(rootCollection);
 	}
 	
@@ -158,10 +160,10 @@ public class WebWriter {
 			String pi=psm.next();
 			SSLogger.log("WRITING TO WEB WITH PREFIX: "+pi+" for "+prefixMap.get(pi),SSLogger.DEBUG);
 		}
-		if(labelRepository==null) {
-			labelRepository=extraTriplesInInput;
-			SSLogger.log("No explicit label model selected, labels taken from config",SSLogger.DEBUG);
-		}
+		//if(labelRepository==null) {
+		//	labelRepository=extraTriplesInInput;
+		//	SSLogger.log("No explicit label model selected, labels taken from config",SSLogger.DEBUG);
+		//}
 		
 		
 		
@@ -242,7 +244,7 @@ public class WebWriter {
 	//TODO no need to propagate namespace anymore, and also directory could be pre-computed.
 
 	private void writeSetToWeb(TerminologySet collection) throws WebWriterException, IOException {
-		WebRendererSet myRenderer=new WebRendererSet(collection,uri2Url.get(collection.getURI()),labelRepository);
+		WebRendererSet myRenderer=new WebRendererSet(collection,uri2Url.get(collection.getURI()));
 		myRenderer.registerUrlMap(uri2Url);
 		// TODO these two values could be overridden to write a sub-tree of the file system
 		String collectionDirectoryPath=uri2Path.get(collection.getURI()); 	// the directory path
@@ -576,7 +578,7 @@ public class WebWriter {
 	
 	//TODO no need to propagate namespace anymore, and also directory could be pre-computed.
 	private void writeIndividualToWeb(TerminologyIndividual term) throws IOException, WebWriterException {
-		WebRendererIndividual myRenderer=new WebRendererIndividual(term,uri2Url.get(term.getURI()),labelRepository);
+		WebRendererIndividual myRenderer=new WebRendererIndividual(term,uri2Url.get(term.getURI()));
 		myRenderer.registerUrlMap(uri2Url);
 		String termDirectoryPath=uri2Path.get(term.getURI()); 	// the directory path
 		String termURL=uri2Url.get(term.getURI());
