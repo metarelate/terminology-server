@@ -74,8 +74,10 @@ public class Initializer {
 	public  TerminologyFactory myFactory=null;
 	public boolean debugMode=true;	// TODO this shold come from the configuration file
 	
-	public Initializer(String[] args) throws ConfigurationException {
-		// Process parameters
+	protected String rootDirString=CoreConfig.rootDirString;
+	
+	public Initializer(String confDir) throws ConfigurationException {
+		rootDirString=confDir;
 		construct();
 	}
 	
@@ -94,7 +96,7 @@ public class Initializer {
 		if(userHomeString==null) userHomeString = System.getProperty( "user.home" );
 		SSLogger.log("User Home: "+ userHomeString);
 		System.out.println("User Home: "+ userHomeString);
-		File rootDirectory=new File(userHomeString,CoreConfig.rootDirString);
+		File rootDirectory=new File(userHomeString,rootDirString);
 		checkOrCreateDirectory(rootDirectory);
 		// Note: we don't allow overriding of host or server name. This may be changed.
 		try {
@@ -301,6 +303,10 @@ public class Initializer {
 	public boolean hasRemote() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	public String getWorkingDirectory() {
+		return System.getProperty("user.dir");
 	}
 	
 	

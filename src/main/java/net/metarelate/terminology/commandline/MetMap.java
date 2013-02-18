@@ -17,8 +17,12 @@
  along with terminology-server. If not, see <http://www.gnu.org/licenses/>.
 */
 	
+
+//
 package net.metarelate.terminology.commandline;
 
+
+//TODO this is command is going to be obsoleted soon!!!
 import java.util.Map;
 
 import net.metarelate.terminology.config.CoreConfig;
@@ -217,7 +221,7 @@ public class MetMap extends CommandLineTool {
 			try {
 				TerminologyModelBuilderFromRDF builder;
 				builder=new TerminologyModelBuilderFromRDF(myFactory);
-				if(autoDefaults==true) builder.setAutodefaults(true);
+				//if(autoDefaults==true) builder.setAutodefaults(true);
 				if(globalOwnerURI!=null) builder.setGlobalOwnerURI(globalOwnerURI);
 				builder.generateModel(myConfigModel);
 				

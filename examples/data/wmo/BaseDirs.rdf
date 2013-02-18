@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <rdf:Property rdf:about="http://reference.metoffice.gov.uk/data/wmo/def/met#hasVersion"/>
+  <ns1:Class xmlns:ns1="http://www.w3.org/2000/01/rdf-schema#" rdf:about="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#TerminologySet"/>
+  <rdf:Property rdf:about="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#containedIn"/>
+  <rdf:Property rdf:about="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#nameSpace"/>
+  <rdf:Property rdf:about="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#pragma"/>
+  <ns2:TerminologySet xmlns:ns2="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#" rdf:about="http://reference.metoffice.gov.uk/data/wmo/tdcf/bufr">
+    <ns2:nameSpace>bufr</ns2:nameSpace>
+    <ns3:comment xmlns:ns3="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">A collection of tables relative to the BUFR standards.</ns3:comment>
+    <ns4:comment xmlns:ns4="http://www.w3.org/2000/01/rdf-schema#" xml:lang="it">Una collezione di tablelle relative allo standard BUFR.</ns4:comment>
+    <ns5:label xmlns:ns5="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">BUFR code tables</ns5:label>
+  </ns2:TerminologySet>
+  <ns6:TerminologySet xmlns:ns6="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#" rdf:about="http://reference.metoffice.gov.uk/data/wmo/tdcf/bufr/a">
+    <ns7:hasVersion xmlns:ns7="http://reference.metoffice.gov.uk/data/wmo/def/met#">i0</ns7:hasVersion>
+    <ns6:containedIn rdf:resource="http://reference.metoffice.gov.uk/data/wmo/tdcf/bufr"/>
+    <ns6:nameSpace>a</ns6:nameSpace>
+    <ns6:pragma rdf:resource="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#canonicalExpandDashSuppress"/>
+    <ns8:comment xmlns:ns8="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">data categories</ns8:comment>
+    <ns9:label xmlns:ns9="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Table A</ns9:label>
+  </ns6:TerminologySet>
+  <ns10:TerminologySet xmlns:ns10="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#" rdf:about="http://reference.metoffice.gov.uk/data/wmo/tdcf/bufr/b">
+    <ns11:hasVersion xmlns:ns11="http://reference.metoffice.gov.uk/data/wmo/def/met#">i0</ns11:hasVersion>
+    <ns10:containedIn rdf:resource="http://reference.metoffice.gov.uk/data/wmo/tdcf/bufr"/>
+    <ns10:nameSpace>b</ns10:nameSpace>
+    <ns12:label xmlns:ns12="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Table B</ns12:label>
+  </ns10:TerminologySet>
+  <ns13:TerminologySet xmlns:ns13="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#" rdf:about="http://reference.metoffice.gov.uk/data/wmo/tdcf/bufrcrex">
+    <ns13:nameSpace>bufrcrex</ns13:nameSpace>
+    <ns14:comment xmlns:ns14="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">A collection of tables common to the BUFR and CREX standards</ns14:comment>
+    <ns15:label xmlns:ns15="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">BUFR and CREX tables</ns15:label>
+  </ns13:TerminologySet>
+  <ns16:TerminologySet xmlns:ns16="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#" rdf:about="http://reference.metoffice.gov.uk/data/wmo/tdcf/bufrcrex/codes+flags">
+    <ns17:hasVersion xmlns:ns17="http://reference.metoffice.gov.uk/data/wmo/def/met#">i0</ns17:hasVersion>
+    <ns16:containedIn rdf:resource="http://reference.metoffice.gov.uk/data/wmo/tdcf/bufrcrex"/>
+    <ns16:nameSpace>codes+flags</ns16:nameSpace>
+    <ns18:comment xmlns:ns18="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Codes used in combination with BUFR or CREX table B to identify object of properties. Flags are compressed sets of statements.</ns18:comment>
+    <ns19:label xmlns:ns19="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">BUFR and CREX Codes and Flags Table</ns19:label>
+  </ns16:TerminologySet>
+  <ns20:TerminologySet xmlns:ns20="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#" rdf:about="http://reference.metoffice.gov.uk/data/wmo/tdcf/common">
+    <ns20:nameSpace>common</ns20:nameSpace>
+    <ns21:comment xmlns:ns21="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">A collection of tables common to the BUFR, CREX and GRIB standards</ns21:comment>
+    <ns22:comment xmlns:ns22="http://www.w3.org/2000/01/rdf-schema#" xml:lang="it">Una collezione di tabelle relatie agli standards BUFR, CREX e GRIB</ns22:comment>
+    <ns23:label xmlns:ns23="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Common code tables</ns23:label>
+  </ns20:TerminologySet>
+  <ns24:TerminologySet xmlns:ns24="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#" rdf:about="http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-1">
+    <ns25:hasVersion xmlns:ns25="http://reference.metoffice.gov.uk/data/wmo/def/met#">i0</ns25:hasVersion>
+    <ns24:containedIn rdf:resource="http://reference.metoffice.gov.uk/data/wmo/tdcf/common"/>
+    <ns24:nameSpace>c-1</ns24:nameSpace>
+    <ns26:comment xmlns:ns26="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Originating center</ns26:comment>
+    <ns27:label xmlns:ns27="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Table C-1</ns27:label>
+  </ns24:TerminologySet>
+  <ns28:TerminologySet xmlns:ns28="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#" rdf:about="http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-11">
+    <ns29:hasVersion xmlns:ns29="http://reference.metoffice.gov.uk/data/wmo/def/met#">i0</ns29:hasVersion>
+    <ns28:containedIn rdf:resource="http://reference.metoffice.gov.uk/data/wmo/tdcf/common"/>
+    <ns28:nameSpace>c-11</ns28:nameSpace>
+    <ns30:comment xmlns:ns30="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Originating centers</ns30:comment>
+    <ns31:label xmlns:ns31="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Table C-11</ns31:label>
+  </ns28:TerminologySet>
+  <ns32:TerminologySet xmlns:ns32="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#" rdf:about="http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-12">
+    <ns33:hasVersion xmlns:ns33="http://reference.metoffice.gov.uk/data/wmo/def/met#">i0</ns33:hasVersion>
+    <ns32:containedIn rdf:resource="http://reference.metoffice.gov.uk/data/wmo/tdcf/common"/>
+    <ns32:nameSpace>c-12</ns32:nameSpace>
+    <ns34:comment xmlns:ns34="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Originating sub-centers</ns34:comment>
+    <ns35:label xmlns:ns35="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Table C-12</ns35:label>
+  </ns32:TerminologySet>
+  <ns36:TerminologySet xmlns:ns36="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#" rdf:about="http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-13">
+    <ns37:hasVersion xmlns:ns37="http://reference.metoffice.gov.uk/data/wmo/def/met#">i0</ns37:hasVersion>
+    <ns36:containedIn rdf:resource="http://reference.metoffice.gov.uk/data/wmo/tdcf/common"/>
+    <ns36:nameSpace>c-13</ns36:nameSpace>
+    <ns38:comment xmlns:ns38="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Data sub-categories</ns38:comment>
+    <ns39:label xmlns:ns39="http://www.w3.org/2000/01/rdf-schema#">Table C-13</ns39:label>
+  </ns36:TerminologySet>
+  <ns40:TerminologySet xmlns:ns40="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#" rdf:about="http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-6">
+    <ns41:hasVersion xmlns:ns41="http://reference.metoffice.gov.uk/data/wmo/def/met#">i0</ns41:hasVersion>
+    <ns40:containedIn rdf:resource="http://reference.metoffice.gov.uk/data/wmo/tdcf/common"/>
+    <ns40:nameSpace>c-6</ns40:nameSpace>
+    <ns42:comment xmlns:ns42="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Chemical elements</ns42:comment>
+    <ns43:label xmlns:ns43="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Table C-6</ns43:label>
+  </ns40:TerminologySet>
+  <ns44:TerminologySet xmlns:ns44="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#" rdf:about="http://reference.metoffice.gov.uk/data/wmo/tdcf/common/x-clouds">
+    <ns44:containedIn rdf:resource="http://reference.metoffice.gov.uk/data/wmo/tdcf/common"/>
+    <ns44:nameSpace>x-clouds</ns44:nameSpace>
+    <ns45:label xmlns:ns45="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">(Sub) Cloud type</ns45:label>
+  </ns44:TerminologySet>
+  <ns46:TerminologySet xmlns:ns46="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#" rdf:about="http://reference.metoffice.gov.uk/data/wmo/tdcf/common/x-dataTypes">
+    <ns47:hasVersion xmlns:ns47="http://reference.metoffice.gov.uk/data/wmo/def/met#">i0</ns47:hasVersion>
+    <ns46:containedIn rdf:resource="http://reference.metoffice.gov.uk/data/wmo/tdcf/common"/>
+    <ns46:nameSpace>x-dataTypes</ns46:nameSpace>
+    <ns48:label xmlns:ns48="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Data types</ns48:label>
+  </ns46:TerminologySet>
+  <ns49:TerminologySet xmlns:ns49="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#" rdf:about="http://reference.metoffice.gov.uk/data/wmo/tdcf/common/x-dataUnits">
+    <ns50:hasVersion xmlns:ns50="http://reference.metoffice.gov.uk/data/wmo/def/met#">i0</ns50:hasVersion>
+    <ns49:containedIn rdf:resource="http://reference.metoffice.gov.uk/data/wmo/tdcf/common"/>
+    <ns49:nameSpace>x-dataUnits</ns49:nameSpace>
+    <ns51:label xmlns:ns51="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Data units</ns51:label>
+  </ns49:TerminologySet>
+  <ns52:TerminologySet xmlns:ns52="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#" rdf:about="http://reference.metoffice.gov.uk/data/wmo/tdcf/common/x-regions">
+    <ns53:hasVersion xmlns:ns53="http://reference.metoffice.gov.uk/data/wmo/def/met#">i0</ns53:hasVersion>
+    <ns52:containedIn rdf:resource="http://reference.metoffice.gov.uk/data/wmo/tdcf/common"/>
+    <ns52:nameSpace>x-regions</ns52:nameSpace>
+    <ns54:label xmlns:ns54="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Regions</ns54:label>
+  </ns52:TerminologySet>
+  <ns55:TerminologySet xmlns:ns55="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#" rdf:about="http://reference.metoffice.gov.uk/data/wmo/tdcf/common/x-temperatures">
+    <ns56:hasVersion xmlns:ns56="http://reference.metoffice.gov.uk/data/wmo/def/met#">i0</ns56:hasVersion>
+    <ns55:containedIn rdf:resource="http://reference.metoffice.gov.uk/data/wmo/tdcf/common"/>
+    <ns55:nameSpace>x-temperatures</ns55:nameSpace>
+    <ns57:label xmlns:ns57="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Temperatures</ns57:label>
+  </ns55:TerminologySet>
+  <ns58:TerminologySet xmlns:ns58="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#" rdf:about="http://reference.metoffice.gov.uk/data/wmo/tdcf/common/x-weather">
+    <ns59:hasVersion xmlns:ns59="http://reference.metoffice.gov.uk/data/wmo/def/met#">i0</ns59:hasVersion>
+    <ns58:containedIn rdf:resource="http://reference.metoffice.gov.uk/data/wmo/tdcf/common"/>
+    <ns58:nameSpace>x-weather</ns58:nameSpace>
+    <ns60:label xmlns:ns60="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">(Present) Weather</ns60:label>
+  </ns58:TerminologySet>
+  <ns61:TerminologySet xmlns:ns61="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#" rdf:about="http://reference.metoffice.gov.uk/data/wmo/tdcf/crex">
+    <ns61:nameSpace>crex</ns61:nameSpace>
+    <ns62:comment xmlns:ns62="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">A collection of tables relative to the CREX standards.</ns62:comment>
+    <ns63:comment xmlns:ns63="http://www.w3.org/2000/01/rdf-schema#" xml:lang="it">Una collezione di tablelle relative allo standard CREX.</ns63:comment>
+    <ns64:label xmlns:ns64="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">CREX code tables</ns64:label>
+  </ns61:TerminologySet>
+  <ns65:TerminologySet xmlns:ns65="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#" rdf:about="http://reference.metoffice.gov.uk/data/wmo/tdcf/crex/a">
+    <ns66:hasVersion xmlns:ns66="http://reference.metoffice.gov.uk/data/wmo/def/met#">i0</ns66:hasVersion>
+    <ns65:containedIn rdf:resource="http://reference.metoffice.gov.uk/data/wmo/tdcf/crex"/>
+    <ns65:nameSpace>a</ns65:nameSpace>
+    <ns67:label xmlns:ns67="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Table A</ns67:label>
+  </ns65:TerminologySet>
+  <ns68:TerminologySet xmlns:ns68="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#" rdf:about="http://reference.metoffice.gov.uk/data/wmo/tdcf/crex/b">
+    <ns69:hasVersion xmlns:ns69="http://reference.metoffice.gov.uk/data/wmo/def/met#">i0</ns69:hasVersion>
+    <ns68:containedIn rdf:resource="http://reference.metoffice.gov.uk/data/wmo/tdcf/crex"/>
+    <ns68:nameSpace>b</ns68:nameSpace>
+    <ns70:label xmlns:ns70="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Table B</ns70:label>
+  </ns68:TerminologySet>
+  <ns71:TerminologySet xmlns:ns71="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#" rdf:about="http://reference.metoffice.gov.uk/data/wmo/tdcf/grib">
+    <ns71:nameSpace>grib</ns71:nameSpace>
+    <ns72:comment xmlns:ns72="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">A collection of tables relative to the GRIB standard</ns72:comment>
+    <ns73:comment xmlns:ns73="http://www.w3.org/2000/01/rdf-schema#" xml:lang="it">Una collezione di tabelle relative allo standard GRIB</ns73:comment>
+    <ns74:label xmlns:ns74="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">GRIB tables</ns74:label>
+  </ns71:TerminologySet>
+  <ns75:TerminologySet xmlns:ns75="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#" rdf:about="http://reference.metoffice.gov.uk/data/wmo/tdcf/grib/codes+flags">
+    <ns76:hasVersion xmlns:ns76="http://reference.metoffice.gov.uk/data/wmo/def/met#">i0</ns76:hasVersion>
+    <ns75:containedIn rdf:resource="http://reference.metoffice.gov.uk/data/wmo/tdcf/grib"/>
+    <ns75:nameSpace>codes+flags</ns75:nameSpace>
+    <ns77:comment xmlns:ns77="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">GRIB Code and Flags table</ns77:comment>
+    <ns78:label xmlns:ns78="http://www.w3.org/2000/01/rdf-schema#">Code and Flags</ns78:label>
+  </ns75:TerminologySet>
+  <ns79:TerminologySet xmlns:ns79="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#" rdf:about="http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes">
+    <ns79:nameSpace>schemes</ns79:nameSpace>
+    <ns80:comment xmlns:ns80="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">A collection of standard independent schemes built on wmo codes</ns80:comment>
+    <ns81:comment xmlns:ns81="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Una collezioni di schemi indipendenti da standards e derivati da codici wmo</ns81:comment>
+    <ns82:label xmlns:ns82="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Schemes</ns82:label>
+  </ns79:TerminologySet>
+  <ns83:TerminologySet xmlns:ns83="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#" rdf:about="http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes/clouds">
+    <ns84:hasVersion xmlns:ns84="http://reference.metoffice.gov.uk/data/wmo/def/met#">i0</ns84:hasVersion>
+    <ns83:containedIn rdf:resource="http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes"/>
+    <ns83:nameSpace>clouds</ns83:nameSpace>
+    <ns85:label xmlns:ns85="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">(Sub) cloud types</ns85:label>
+  </ns83:TerminologySet>
+  <ns86:TerminologySet xmlns:ns86="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#" rdf:about="http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes/dataTypes">
+    <ns87:hasVersion xmlns:ns87="http://reference.metoffice.gov.uk/data/wmo/def/met#">i0</ns87:hasVersion>
+    <ns86:containedIn rdf:resource="http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes"/>
+    <ns86:nameSpace>dataTypes</ns86:nameSpace>
+    <ns88:label xmlns:ns88="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Data types</ns88:label>
+  </ns86:TerminologySet>
+  <ns89:TerminologySet xmlns:ns89="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#" rdf:about="http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes/dataUnits">
+    <ns90:hasVersion xmlns:ns90="http://reference.metoffice.gov.uk/data/wmo/def/met#">i0</ns90:hasVersion>
+    <ns89:containedIn rdf:resource="http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes"/>
+    <ns89:nameSpace>dataUnits</ns89:nameSpace>
+    <ns91:label xmlns:ns91="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Data units</ns91:label>
+  </ns89:TerminologySet>
+  <ns92:TerminologySet xmlns:ns92="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#" rdf:about="http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes/temperatures">
+    <ns93:hasVersion xmlns:ns93="http://reference.metoffice.gov.uk/data/wmo/def/met#">i0</ns93:hasVersion>
+    <ns92:containedIn rdf:resource="http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes"/>
+    <ns92:nameSpace>temperatures</ns92:nameSpace>
+    <ns94:label xmlns:ns94="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">Temperatures</ns94:label>
+  </ns92:TerminologySet>
+  <ns95:TerminologySet xmlns:ns95="http://reference.metoffice.gov.uk/data/wmo/meta/mapping#" rdf:about="http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes/weather">
+    <ns96:hasVersion xmlns:ns96="http://reference.metoffice.gov.uk/data/wmo/def/met#">i0</ns96:hasVersion>
+    <ns95:containedIn rdf:resource="http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes"/>
+    <ns95:nameSpace>weather</ns95:nameSpace>
+    <ns97:label xmlns:ns97="http://www.w3.org/2000/01/rdf-schema#" xml:lang="en">(Present) Weather</ns97:label>
+  </ns95:TerminologySet>
+  <rdf:Property rdf:about="http://www.w3.org/2000/01/rdf-schema#comment"/>
+  <rdf:Property rdf:about="http://www.w3.org/2000/01/rdf-schema#label"/>
+</rdf:RDF>

@@ -1,0 +1,224 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ns1: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ns2: <http://reference.metoffice.gov.uk/data/wmo/meta/mapping#> .
+@prefix ns7: <http://reference.metoffice.gov.uk/data/wmo/def/met#> .
+
+ns7:hasVersion
+    a rdf:Property .
+
+ns2:TerminologySet
+    a ns1:Class .
+
+ns2:containedIn
+    a rdf:Property .
+
+ns2:nameSpace
+    a rdf:Property .
+
+ns2:pragma
+    a rdf:Property .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/bufr>
+    ns2:nameSpace "bufr" ;
+    a ns2:TerminologySet ;
+    ns1:comment "A collection of tables relative to the BUFR standards."@en, "Una collezione di tablelle relative allo standard BUFR."@it ;
+    ns1:label "BUFR code tables"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/bufr/a>
+    ns7:hasVersion "i0" ;
+    ns2:containedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/bufr> ;
+    ns2:nameSpace "a" ;
+    ns2:pragma ns2:canonicalExpandDashSuppress ;
+    a ns2:TerminologySet ;
+    ns1:comment "data categories"@en ;
+    ns1:label "Table A"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/bufr/b>
+    ns7:hasVersion "i0" ;
+    ns2:containedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/bufr> ;
+    ns2:nameSpace "b" ;
+    a ns2:TerminologySet ;
+    ns1:label "Table B"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/bufrcrex>
+    ns2:nameSpace "bufrcrex" ;
+    a ns2:TerminologySet ;
+    ns1:comment "A collection of tables common to the BUFR and CREX standards"@en ;
+    ns1:label "BUFR and CREX tables"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/bufrcrex/codes+flags>
+    ns7:hasVersion "i0" ;
+    ns2:containedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/bufrcrex> ;
+    ns2:nameSpace "codes+flags" ;
+    a ns2:TerminologySet ;
+    ns1:comment "Codes used in combination with BUFR or CREX table B to identify object of properties. Flags are compressed sets of statements."@en ;
+    ns1:label "BUFR and CREX Codes and Flags Table"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/common>
+    ns2:nameSpace "common" ;
+    a ns2:TerminologySet ;
+    ns1:comment "A collection of tables common to the BUFR, CREX and GRIB standards"@en, "Una collezione di tabelle relatie agli standards BUFR, CREX e GRIB"@it ;
+    ns1:label "Common code tables"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-1>
+    ns7:hasVersion "i0" ;
+    ns2:containedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/common> ;
+    ns2:nameSpace "c-1" ;
+    a ns2:TerminologySet ;
+    ns1:comment "Originating center"@en ;
+    ns1:label "Table C-1"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-11>
+    ns7:hasVersion "i0" ;
+    ns2:containedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/common> ;
+    ns2:nameSpace "c-11" ;
+    a ns2:TerminologySet ;
+    ns1:comment "Originating centers"@en ;
+    ns1:label "Table C-11"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-12>
+    ns7:hasVersion "i0" ;
+    ns2:containedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/common> ;
+    ns2:nameSpace "c-12" ;
+    a ns2:TerminologySet ;
+    ns1:comment "Originating sub-centers"@en ;
+    ns1:label "Table C-12"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-13>
+    ns7:hasVersion "i0" ;
+    ns2:containedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/common> ;
+    ns2:nameSpace "c-13" ;
+    a ns2:TerminologySet ;
+    ns1:comment "Data sub-categories"@en ;
+    ns1:label "Table C-13" .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-6>
+    ns7:hasVersion "i0" ;
+    ns2:containedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/common> ;
+    ns2:nameSpace "c-6" ;
+    a ns2:TerminologySet ;
+    ns1:comment "Chemical elements"@en ;
+    ns1:label "Table C-6"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/common/x-clouds>
+    ns2:containedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/common> ;
+    ns2:nameSpace "x-clouds" ;
+    a ns2:TerminologySet ;
+    ns1:label "(Sub) Cloud type"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/common/x-dataTypes>
+    ns7:hasVersion "i0" ;
+    ns2:containedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/common> ;
+    ns2:nameSpace "x-dataTypes" ;
+    a ns2:TerminologySet ;
+    ns1:label "Data types"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/common/x-dataUnits>
+    ns7:hasVersion "i0" ;
+    ns2:containedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/common> ;
+    ns2:nameSpace "x-dataUnits" ;
+    a ns2:TerminologySet ;
+    ns1:label "Data units"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/common/x-regions>
+    ns7:hasVersion "i0" ;
+    ns2:containedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/common> ;
+    ns2:nameSpace "x-regions" ;
+    a ns2:TerminologySet ;
+    ns1:label "Regions"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/common/x-temperatures>
+    ns7:hasVersion "i0" ;
+    ns2:containedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/common> ;
+    ns2:nameSpace "x-temperatures" ;
+    a ns2:TerminologySet ;
+    ns1:label "Temperatures"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/common/x-weather>
+    ns7:hasVersion "i0" ;
+    ns2:containedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/common> ;
+    ns2:nameSpace "x-weather" ;
+    a ns2:TerminologySet ;
+    ns1:label "(Present) Weather"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/crex>
+    ns2:nameSpace "crex" ;
+    a ns2:TerminologySet ;
+    ns1:comment "A collection of tables relative to the CREX standards."@en, "Una collezione di tablelle relative allo standard CREX."@it ;
+    ns1:label "CREX code tables"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/crex/a>
+    ns7:hasVersion "i0" ;
+    ns2:containedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/crex> ;
+    ns2:nameSpace "a" ;
+    a ns2:TerminologySet ;
+    ns1:label "Table A"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/crex/b>
+    ns7:hasVersion "i0" ;
+    ns2:containedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/crex> ;
+    ns2:nameSpace "b" ;
+    a ns2:TerminologySet ;
+    ns1:label "Table B"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/grib>
+    ns2:nameSpace "grib" ;
+    a ns2:TerminologySet ;
+    ns1:comment "A collection of tables relative to the GRIB standard"@en, "Una collezione di tabelle relative allo standard GRIB"@it ;
+    ns1:label "GRIB tables"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/grib/codes+flags>
+    ns7:hasVersion "i0" ;
+    ns2:containedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/grib> ;
+    ns2:nameSpace "codes+flags" ;
+    a ns2:TerminologySet ;
+    ns1:comment "GRIB Code and Flags table"@en ;
+    ns1:label "Code and Flags" .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes>
+    ns2:nameSpace "schemes" ;
+    a ns2:TerminologySet ;
+    ns1:comment "A collection of standard independent schemes built on wmo codes"@en, "Una collezioni di schemi indipendenti da standards e derivati da codici wmo"@en ;
+    ns1:label "Schemes"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes/clouds>
+    ns7:hasVersion "i0" ;
+    ns2:containedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes> ;
+    ns2:nameSpace "clouds" ;
+    a ns2:TerminologySet ;
+    ns1:label "(Sub) cloud types"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes/dataTypes>
+    ns7:hasVersion "i0" ;
+    ns2:containedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes> ;
+    ns2:nameSpace "dataTypes" ;
+    a ns2:TerminologySet ;
+    ns1:label "Data types"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes/dataUnits>
+    ns7:hasVersion "i0" ;
+    ns2:containedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes> ;
+    ns2:nameSpace "dataUnits" ;
+    a ns2:TerminologySet ;
+    ns1:label "Data units"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes/temperatures>
+    ns7:hasVersion "i0" ;
+    ns2:containedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes> ;
+    ns2:nameSpace "temperatures" ;
+    a ns2:TerminologySet ;
+    ns1:label "Temperatures"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes/weather>
+    ns7:hasVersion "i0" ;
+    ns2:containedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes> ;
+    ns2:nameSpace "weather" ;
+    a ns2:TerminologySet ;
+    ns1:label "(Present) Weather"@en .
+
+ns1:comment
+    a rdf:Property .
+
+ns1:label
+    a rdf:Property .
+

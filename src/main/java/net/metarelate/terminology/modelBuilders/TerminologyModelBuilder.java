@@ -21,6 +21,7 @@ package net.metarelate.terminology.modelBuilders;
 
 import java.util.Iterator;
 
+import net.metarelate.terminology.config.CoreConfig;
 import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.coreModel.TerminologyFactory;
@@ -52,8 +53,8 @@ import com.hp.hpl.jena.rdf.model.Resource;
 public abstract class TerminologyModelBuilder {
 	protected TerminologyFactory myFactory=null;
 	protected Model globalConfigurationModel=null;
-	protected boolean autoDefaults=false;
 	protected String globalOwnerURI=null;
+	protected String actionMessage=CoreConfig.DEFAULT_FROM_RDF_DESCRIPTION;
 	
 	public TerminologyModelBuilder (TerminologyFactory factory) {
 		this.myFactory=factory; 
@@ -126,18 +127,22 @@ public abstract class TerminologyModelBuilder {
 	
 	protected abstract void buildContainmentStructure();
 
-	public void setAutodefaults(boolean b) {
-		this.autoDefaults=b;
-		
-	}
+
 
 	
 	public void setGlobalOwnerURI(String ownerURI) {
 		this.globalOwnerURI=ownerURI;
 		
 	}
-		
-
 	
+	public void setActionMessage(String message) {
+		this.actionMessage=message;
+		
+	}
+
+	public void setGlobalConfigurationModel(Model globalInput) {
+		globalConfigurationModel=globalInput;
+		
+	}
 	
 }
