@@ -32,6 +32,8 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import net.glxn.qrgen.QRCode;
+import net.glxn.qrgen.image.ImageType;
 import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.coreModel.TerminologyIndividual;
@@ -260,6 +262,7 @@ public class WebWriter {
 		String registerRDFFile=collectionDirectoryPath+"/"+"register.rdf"; 	// file (rdf)
 		String registerTTLFile=collectionDirectoryPath+"/"+"register.ttl"; 	// file (rdf)
 		String registerJSONFile=collectionDirectoryPath+"/"+"register.json"; 	// file (rdf)
+		String registerQRImageFile=collectionDirectoryPath+"/"+"register.gif";	//QR image
 		
 		String registerHtmlEnLink=collectionBaseURL+"/"+"register.en.html";
 		String registerHtmlItLink=collectionBaseURL+"/"+"register.it.html";
@@ -279,6 +282,11 @@ public class WebWriter {
 		BufferedWriter iHtmlOutIT = new BufferedWriter(indexHtmlStreamIT);
 		FileWriter indexHtmlStreamVar = new FileWriter(registerVarFile);
 		BufferedWriter iHtmlOutVar = new BufferedWriter(indexHtmlStreamVar);
+	
+		File registerQRImageFileFW= new File(registerQRImageFile);
+		FileOutputStream registerQRImageFileBW = new FileOutputStream(registerQRImageFileFW);
+		QRCode.from(collection.getURI()).to(ImageType.GIF).withSize(120,120).writeTo(registerQRImageFileBW);
+		registerQRImageFileBW.close();
 		
 		Model modelToWrite=ModelFactory.createDefaultModel();
 		
@@ -343,12 +351,14 @@ public class WebWriter {
 				String indexRDFFileVer=collectionVersionDirectoryPath+"/"+"register.rdf"; 	// file (rdf)
 				String indexTTLFileVer=collectionVersionDirectoryPath+"/"+"register.ttl"; 	// file (rdf)
 				String indexJSONFileVer=collectionVersionDirectoryPath+"/"+"register.json"; 	// file (rdf)
-
+				String registerQRImageFileVer=collectionVersionDirectoryPath+"/"+"register.gif";
+				
 				String indexHtmlLinkVerEN=collectionBaseURL+"/"+versions[i]+"/"+"register.en.html";
 				String indexHtmlLinkVerIT=collectionBaseURL+"/"+versions[i]+"/"+"register.it.html";
 				String indexRDFLinkVer=collectionBaseURL+"/"+versions[i]+"/"+"register.rdf";		// url (rdf)
 				String indexTTLLinkVer=collectionBaseURL+"/"+versions[i]+"/"+"register.ttl";		// url (rdf)
 				String indexJSONLinkVer=collectionBaseURL+"/"+versions[i]+"/"+"register.json";		// url (rdf)
+				
 				
 				File vDirectory=myCheckedMkDir(collectionVersionDirectoryPath,overWriteFiles);
 				/*
@@ -369,6 +379,11 @@ public class WebWriter {
 				BufferedWriter iHtmlOutVerIT = new BufferedWriter(indexHtmlStreamVerIT);
 				FileWriter indexVarHtmlStreamVer = new FileWriter(indexVarFileVer);
 				BufferedWriter iHtmlOutVarVer = new BufferedWriter(indexVarHtmlStreamVer);
+				//TODO QR always points to the last version
+				File registerQRImageFileFWVer= new File(registerQRImageFileVer);
+				FileOutputStream registerQRImageFileBWVer = new FileOutputStream(registerQRImageFileFWVer);
+				QRCode.from(collection.getURI()).to(ImageType.GIF).withSize(120,120).writeTo(registerQRImageFileBWVer);
+				registerQRImageFileBWVer.close();
 				
 				iHtmlOutVarVer.write(registerVarBlock);
 				iHtmlOutVarVer.close();
@@ -592,7 +607,10 @@ public class WebWriter {
 		String termIndexRDF=termDirectoryPath+"/code.rdf";
 		String termIndexTTL=termDirectoryPath+"/code.ttl";
 		String termIndexJSON=termDirectoryPath+"/code.json";
+		String individualQRImageFile=termDirectoryPath+"/"+"register.gif";	//QR image
 
+		
+		
 		String termURIHtmlEN=termURL+"/code.en.html";
 		String termURIHtmlIT=termURL+"/code.it.html";
 		String termURIRDF=termURL+"/code.rdf";
@@ -657,6 +675,11 @@ public class WebWriter {
 		iHtmlOutVar.write(termVarBlock);
 		iHtmlOutVar.close();		
 				
+		File individualQRImageFileFW= new File(individualQRImageFile);
+		FileOutputStream individualQRImageFileBW = new FileOutputStream(individualQRImageFileFW);
+		QRCode.from(term.getURI()).to(ImageType.GIF).withSize(120,120).writeTo(individualQRImageFileBW);
+		individualQRImageFileBW.close();
+		
 		SortedMap<String,String> stdMap=new TreeMap<String,String>();
 		stdMap.put("RDF/XML",termURIRDF);
 		stdMap.put("Turtle",termURITTL);
@@ -714,7 +737,7 @@ public class WebWriter {
 				String termIndexRDFVer=termDirectoryPathVer+"/code.rdf";
 				String termIndexTTLVer=termDirectoryPathVer+"/code.ttl";
 				String termIndexJSONVer=termDirectoryPathVer+"/code.json";
-
+				String individualQRImageFileVer=termDirectoryPathVer+"/"+"register.gif";
 				
 				String termURIHtmlVerEN=termURLVer+"/code.en.html";
 				String termURIHtmlVerIT=termURLVer+"/code.it.html";
@@ -728,6 +751,12 @@ public class WebWriter {
 				BufferedWriter iHtmlOutVerIT = new BufferedWriter(termHtmlStreamVerIT);
 				FileWriter termVarStreamVer = new FileWriter(termVarFileVer);
 				BufferedWriter iVarOutVer = new BufferedWriter(termVarStreamVer);
+				
+				//TODO QR Always points to the last version
+				File individualQRImageFileFWVer= new File(individualQRImageFileVer);
+				FileOutputStream individualQRImageFileBWVer = new FileOutputStream(individualQRImageFileFWVer);
+				QRCode.from(term.getURI()).to(ImageType.GIF).withSize(120,120).writeTo(individualQRImageFileBWVer);
+				individualQRImageFileBWVer.close();
 				
 				//Set<String> standardsVer=term.getStandardURIsForVersion(versions[v]);
 				Model modelToWriteVer=ModelFactory.createDefaultModel();

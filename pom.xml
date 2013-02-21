@@ -7,6 +7,7 @@
   <version>0.0.1</version>
   <name>terminologySever</name>
   <url>http://github.com/metarelate/terminology-server</url>
+  
   	<properties>
 		<wicket.version>6.3.0</wicket.version>
 		<jetty.version>7.6.3.v20120416</jetty.version>
@@ -44,7 +45,20 @@
     	<artifactId>servlet-api</artifactId>
     	<version>2.5</version>
     </dependency>
+
+    <dependency>
+    	<groupId>net.glxn</groupId>
+    	<artifactId>qrgen</artifactId>
+    	<version>1.1</version>
+    </dependency>
   </dependencies>
+  <repositories>
+    <repository>
+      <id>QRGen</id>
+      <name>QRGen Repo</name>
+      <url>http://kenglxn.github.com/QRGen/repository</url>
+    </repository>
+</repositories> 
  <build>
 	<resources>
 			<resource>
