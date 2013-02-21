@@ -40,6 +40,8 @@ import net.metarelate.terminology.coreModel.TerminologyFactory;
 import net.metarelate.terminology.coreModel.TerminologyFactoryTDBImpl;
 import net.metarelate.terminology.exceptions.ConfigurationException;
 import net.metarelate.terminology.exceptions.NonConformantRDFException;
+import net.metarelate.terminology.management.ConstraintsManager;
+import net.metarelate.terminology.management.RegistryPolicyManager;
 import net.metarelate.terminology.management.TerminologyManager;
 import net.metarelate.terminology.utils.SSLogger;
 import net.metarelate.terminology.utils.SimpleQueriesProcessor;
@@ -70,10 +72,12 @@ public class Initializer {
 	private static String prefixFileAbsoluteString=null;
 	public static String defaultUserName=null;
 	
-	private  AuthServer authServer=null;
+	private  AuthServer myAuthServer=null;
 	public  AuthRegistryManager myAuthManager=null;
 	public  TerminologyManager myTerminologyManager=null;
 	public  TerminologyFactory myFactory=null;
+	public ConstraintsManager myConstraintsManager=null;
+	public RegistryPolicyManager myRegistryPolicyManager=null;
 	public boolean debugMode=true;	// TODO this shold come from the configuration file
 	
 	protected String rootDirString=CoreConfig.rootDirString;
@@ -188,9 +192,11 @@ public class Initializer {
 		}
 		
 		myFactory=new TerminologyFactoryTDBImpl(tdbPath);
-		authServer=AuthServerFactory.createServerFromConfig(getConfigurationGraph());
-		myAuthManager=new AuthRegistryManager(authServer,myFactory);
-		myTerminologyManager=new TerminologyManager(myFactory,myAuthManager);
+		myAuthServer=AuthServerFactory.createServerFromConfig(getConfigurationGraph());
+		myRegistryPolicyManager=new RegistryPolicyManager(getConfigurationGraph());
+		myConstraintsManager=new ConstraintsManager(getConfigurationGraph());
+		myAuthManager=new AuthRegistryManager(myAuthServer,myFactory);
+		myTerminologyManager=new TerminologyManager(this);
 		
 	}
 

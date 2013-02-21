@@ -197,6 +197,16 @@ public class SimpleQueriesProcessor {
 		}
 		return null;
 	}
+
+	public static String getOptionalResourceObjectAsString(Resource subject,
+			Property predicate, Model allKnwoledge) {
+		NodeIterator nodeIter=allKnwoledge.listObjectsOfProperty(subject, predicate);
+		while (nodeIter.hasNext()) {
+			RDFNode node=nodeIter.nextNode();
+			if(node.isResource()) return node.asResource().getURI();
+		}
+		return null;
+	}
 	
 
 	
