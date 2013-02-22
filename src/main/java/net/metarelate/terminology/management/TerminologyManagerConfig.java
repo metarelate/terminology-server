@@ -5,9 +5,9 @@ public class TerminologyManagerConfig {
 	/**
 	 * Builtin states
 	 */
-	final public static String defaultStateURI="http://metarelate.net/core/core/states/default";
-	final public static String obsoletedStateURI="http://metarelate.net/core/core/states/obsoleted";
-	final public static String supersededStateURI="http://metarelate.net/core/core/states/superseded";
+	final public static String defaultStateURI="http://metarelate.net/core/states/default";
+	final public static String obsoletedStateURI="http://metarelate.net/core/states/obsoleted";
+	final public static String supersededStateURI="http://metarelate.net/core/states/superseded";
 	
 	/**
 	 * Builtin actions

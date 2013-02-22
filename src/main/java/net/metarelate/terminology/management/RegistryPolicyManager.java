@@ -96,6 +96,9 @@ public class RegistryPolicyManager {
 	private String[] extraActions=null;
 	private String[] allStates=null;
 	private String[] extraStates=null;
+	
+	private Map<String,ArrayList<String[]>> registerTransitions=new Hashtable<String,ArrayList<String[]>>();
+	private Map<String,ArrayList<String[]>> codeTransitions=new Hashtable<String,ArrayList<String[]>>();
 
 	
 	
@@ -131,7 +134,7 @@ public class RegistryPolicyManager {
 			allActions[i++]=act.getURI();
 		}
 		
-		SSLogger.log("Found actions: "+SSLogger.DEBUG);
+		SSLogger.log("Found actions: ",SSLogger.DEBUG);
 		for(String actionString:allActions) {
 			SSLogger.log(actionString,SSLogger.DEBUG);
 		}
@@ -141,8 +144,8 @@ public class RegistryPolicyManager {
 		 */
 		SSLogger.log("Looking for states");
 		StmtIterator statsIterator2=allConfig.listStatements(null,MetaLanguage.typeProperty,ResourceFactory.createResource(TerminologyManagerConfig.confStateType));
-		while(statsIterator.hasNext()) {
-			Statement currentStat=statsIterator.nextStatement();
+		while(statsIterator2.hasNext()) {
+			Statement currentStat=statsIterator2.nextStatement();
 			Resource currentState=currentStat.getSubject();
 			states.add(currentState);
 			Resource overridden=SimpleQueriesProcessor.getOptionalResourceObject(currentState, ResourceFactory.createProperty(TerminologyManagerConfig.confOverrides), allConfig);
@@ -152,9 +155,9 @@ public class RegistryPolicyManager {
 				if(overridden.getURI().equals(stateSupersedURI)) stateSupersedURI=overridden.getURI();
 			}
 		}
-		if(!actions.contains(ResourceFactory.createResource(stateDefaultURI))) actions.add(ResourceFactory.createResource(stateDefaultURI));
-		if(!actions.contains(ResourceFactory.createResource(stateObsoleteURI))) actions.add(ResourceFactory.createResource(stateObsoleteURI));
-		if(!actions.contains(ResourceFactory.createResource(stateSupersedURI))) actions.add(ResourceFactory.createResource(stateSupersedURI));
+		if(!states.contains(ResourceFactory.createResource(stateDefaultURI))) states.add(ResourceFactory.createResource(stateDefaultURI));
+		if(!states.contains(ResourceFactory.createResource(stateObsoleteURI))) states.add(ResourceFactory.createResource(stateObsoleteURI));
+		if(!states.contains(ResourceFactory.createResource(stateSupersedURI))) states.add(ResourceFactory.createResource(stateSupersedURI));
 		
 		allStates=new String[states.size()];
 		i=0;
@@ -162,10 +165,6 @@ public class RegistryPolicyManager {
 			allStates[i++]=stat.getURI();
 		}
 		
-		SSLogger.log("Found actions: ",SSLogger.DEBUG);
-		for(String actionString:allActions) {
-			SSLogger.log(actionString,SSLogger.DEBUG);
-		}
 		SSLogger.log("Found states: ",SSLogger.DEBUG);
 		for(String stateString:allStates) {
 			SSLogger.log(stateString,SSLogger.DEBUG);
@@ -195,21 +194,73 @@ public class RegistryPolicyManager {
 					transitionBlock[POST_AUX]=SimpleQueriesProcessor.getOptionalResourceObjectAsString(effectStat.getObject().asResource(), ResourceFactory.createProperty(TerminologyManagerConfig.confPostAux), allConfig);
 					SSLogger.log("Map:"+SSLogger.DEBUG);
 					for(String val:transitionBlock) SSLogger.log(val,SSLogger.DEBUG);
-					//TODO Register in map
-				
+					
+					if(!registerTransitions.containsKey(effectStat.getObject().asResource().getURI())) {
+						registerTransitions.put(effectStat.getObject().asResource().getURI(),new ArrayList<String[]>());
+					}
+					registerTransitions.get(effectStat.getObject().asResource().getURI()).add(transitionBlock);
+					
 				
 				}
 			}
 			SSLogger.log("Code transitions");
 			//TODO proceed for codes
+			StmtIterator codeActionsIter=allConfig.listStatements(action,ResourceFactory.createProperty(TerminologyManagerConfig.confEffectOnCode),(Resource)null);
+			while(codeActionsIter.hasNext()) {
+				Statement effectCode=codeActionsIter.nextStatement();
+				if(effectCode.getObject().isResource()) {
+					//TODO note that we could check for the type being actionRole, but we keep less pedantic for the time being.
+					SSLogger.log("Found transition: "+effectCode.getObject().asResource().getURI(),SSLogger.DEBUG);
+					String[] transitionBlock=new String[8];
+					transitionBlock[PRE_THIS]=SimpleQueriesProcessor.getOptionalResourceObjectAsString(effectCode.getObject().asResource(), ResourceFactory.createProperty(TerminologyManagerConfig.confPreThis), allConfig);
+					transitionBlock[PRE_UP]=SimpleQueriesProcessor.getOptionalResourceObjectAsString(effectCode.getObject().asResource(), ResourceFactory.createProperty(TerminologyManagerConfig.confPreUp), allConfig);
+					transitionBlock[PRE_DOWN]=SimpleQueriesProcessor.getOptionalResourceObjectAsString(effectCode.getObject().asResource(), ResourceFactory.createProperty(TerminologyManagerConfig.confPreDown), allConfig);
+					transitionBlock[PRE_AUX]=SimpleQueriesProcessor.getOptionalResourceObjectAsString(effectCode.getObject().asResource(), ResourceFactory.createProperty(TerminologyManagerConfig.confPreAux), allConfig);
+					transitionBlock[POST_THIS]=SimpleQueriesProcessor.getOptionalResourceObjectAsString(effectCode.getObject().asResource(), ResourceFactory.createProperty(TerminologyManagerConfig.confPostThis), allConfig);
+					transitionBlock[POST_UP]=SimpleQueriesProcessor.getOptionalResourceObjectAsString(effectCode.getObject().asResource(), ResourceFactory.createProperty(TerminologyManagerConfig.confPostUp), allConfig);
+					transitionBlock[POST_DOWN]=SimpleQueriesProcessor.getOptionalResourceObjectAsString(effectCode.getObject().asResource(), ResourceFactory.createProperty(TerminologyManagerConfig.confPostDown), allConfig);
+					transitionBlock[POST_AUX]=SimpleQueriesProcessor.getOptionalResourceObjectAsString(effectCode.getObject().asResource(), ResourceFactory.createProperty(TerminologyManagerConfig.confPostAux), allConfig);
+					SSLogger.log("Map:"+SSLogger.DEBUG);
+					for(String val:transitionBlock) SSLogger.log(val,SSLogger.DEBUG);
+					
+					if(!codeTransitions.containsKey(effectCode.getObject().asResource().getURI())) {
+						codeTransitions.put(effectCode.getObject().asResource().getURI(),new ArrayList<String[]>());
+					}
+					codeTransitions.get(effectCode.getObject().asResource().getURI()).add(transitionBlock);
+					
+				
+				}
+			}
 		}
-		
-		
-		
 		
 		/*
 		 * "Extra" actions definition
 		 */
+		actions.remove(ResourceFactory.createResource(actionUpdateURI));
+		actions.remove(ResourceFactory.createResource(actionObsoleteURI));
+		actions.remove(ResourceFactory.createResource(actionSupersedURI));
+		actions.remove(ResourceFactory.createResource(actionAddURI));
+		
+		states.remove(ResourceFactory.createResource(stateDefaultURI));
+		states.remove(ResourceFactory.createResource(stateObsoleteURI));
+		states.remove(ResourceFactory.createResource(stateSupersedURI));
+		
+		extraActions=new String[actions.size()];
+		i=0;
+		for(Resource action:actions) {
+			extraActions[i++]=action.getURI();
+		}
+		extraStates=new String[states.size()];
+		i=0;
+		for(Resource state:states) {
+			extraStates[i++]=state.getURI();
+		}
+		
+		SSLogger.log("Extra actions:",SSLogger.DEBUG);
+		for(String action:extraActions) SSLogger.log(action,SSLogger.DEBUG);
+		
+		SSLogger.log("Extra states:",SSLogger.DEBUG);
+		for(String state:extraStates) SSLogger.log(state,SSLogger.DEBUG);
 		
 		//allConfig.listObjectsOfProperty(TerminologyManagerConfig.); 
 		//TODO list states (override/replace)
