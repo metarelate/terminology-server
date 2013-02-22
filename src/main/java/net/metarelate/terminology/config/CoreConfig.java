@@ -19,6 +19,8 @@
 
 package net.metarelate.terminology.config;
 
+import net.metarelate.terminology.management.TerminologyManagerConfig;
+
 
 public class CoreConfig {
 	public static final String INIT_VERSION = "v0";
@@ -38,7 +40,7 @@ public class CoreConfig {
 
 	public static final String DEAFULT_FROM_RDF_IMPORT_ACTION = "http://metoffice.gov.uk/action/importFromTables";
 
-	public static final String DEFAULT_IMPORT_STATUS = MetaLanguage.statusOutOfRegistry.getURI();
+	public static final String DEFAULT_IMPORT_STATUS = TerminologyManagerConfig.defaultStateURI;
 
 	public static final String DEFAULT_LANGUAGE = "en";
 

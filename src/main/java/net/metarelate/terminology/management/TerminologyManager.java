@@ -46,6 +46,7 @@ import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.coreModel.Versioner;
 import net.metarelate.terminology.exceptions.AuthException;
 import net.metarelate.terminology.exceptions.ImpossibleOperationException;
+import net.metarelate.terminology.exceptions.InvalidProcessException;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
 import net.metarelate.terminology.exceptions.UnknownURIException;
@@ -65,42 +66,50 @@ public class TerminologyManager {
 		myInitializer=initializer;
 	}
 	
-	public void replaceEntityInformation(String entityURI, Model statsToReplace, String actionAuthor, String description) throws AuthException, RegistryAccessException {
+	public void replaceEntityInformation(String entityURI, Model statsToReplace, String actionAuthor, String description) throws AuthException, RegistryAccessException, InvalidProcessException {
 		amendEntityInformation(entityURI, statsToReplace, actionAuthor, description, MODE_REPLACE);
 	}
-	public void addToEntityInformation(String entityURI, Model statsToReplace, String actionAuthor, String description) throws AuthException, RegistryAccessException {
+	public void addToEntityInformation(String entityURI, Model statsToReplace, String actionAuthor, String description) throws AuthException, RegistryAccessException, InvalidProcessException {
 		amendEntityInformation(entityURI, statsToReplace, actionAuthor, description, MODE_ADD);
 
 	}
-	public void removeFromEntityInformation(String entityURI, Model statsToReplace, String actionAuthor, String description) throws AuthException, RegistryAccessException {
+	public void removeFromEntityInformation(String entityURI, Model statsToReplace, String actionAuthor, String description) throws AuthException, RegistryAccessException, InvalidProcessException {
 		amendEntityInformation(entityURI, statsToReplace, actionAuthor, description, MODE_REMOVE);		
 	}
 	
-	public void addTermToRegister(String codeURI, String registerURI, Model defaultEntityModel,String actionAuthor, String description, boolean isVersioned ) throws AuthException, RegistryAccessException {
+	public void addTermToRegister(String codeURI, String registerURI, Model defaultEntityModel,String actionAuthor, String description, boolean isVersioned ) throws AuthException, RegistryAccessException, InvalidProcessException {
 		addEntityToRegister( codeURI,  registerURI,  defaultEntityModel, actionAuthor,  description,  isVersioned, TerminologyEntity.INDIVIDUAL_TYPE);
 	}
-	public void addSubRegister(String codeURI, String registerURI, Model defaultEntityModel,String actionAuthor, String description, boolean isVersioned ) throws AuthException, RegistryAccessException {
+	public void addSubRegister(String codeURI, String registerURI, Model defaultEntityModel,String actionAuthor, String description, boolean isVersioned ) throws AuthException, RegistryAccessException, InvalidProcessException {
 		addEntityToRegister( codeURI,  registerURI,  defaultEntityModel, actionAuthor,  description,  isVersioned, TerminologyEntity.SET_TYPE);
 
 	}
 			//TODO we start refactoring from this!
-	private void addEntityToRegister(String codeURI, String registerURI, Model defaultEntityModel,String actionAuthor, String description, boolean isVersioned, int entityType ) throws AuthException, RegistryAccessException {
-		//////////////
+	private void addEntityToRegister(String codeURI, String registerURI, Model defaultEntityModel,String actionAuthor, String description, boolean isVersioned, int entityType ) throws AuthException, RegistryAccessException, InvalidProcessException {
 			if(!myInitializer.myAuthManager.can(actionAuthor,RegistryPolicyManager.actionAddURI,registerURI))
 					throw new AuthException(actionAuthor,RegistryPolicyManager.actionAddURI,registerURI);
+			
 			TerminologySet myRegister=checkSetExistance(registerURI);
 			if(myRegister==null) throw new RegistryAccessException("Unable to modify "+registerURI+" (register does not exist)");
 			if(myInitializer.myFactory.terminologyIndividualExist(codeURI)) {
 				// Note this is only for addding! Not for changing obsolete/valid status. In other words, a delete operation
 				throw new RegistryAccessException("Code "+codeURI+" exists. Use \"move\" to change register");
 			}
-				
 			String lastRegisterVersion=myRegister.getLastVersion();
 			String preRegisterStatus=myRegister.getStateURI(lastRegisterVersion);
-			String postRegisterStatus=preRegisterStatus;
-			if(preRegisterStatus!=null)
-				if(myInitializer.myRegistryPolicyManager.addTransitions.containsKey(preRegisterStatus))
-					postRegisterStatus=myInitializer.myRegistryPolicyManager.addTransitions.get(preRegisterStatus);
+			
+			// TODO note that we assume one parent only, so we pick one at random.
+			String fatherState=null;
+			TerminologySet oneFather=null;
+			Set<TerminologySet>containers= myRegister.getContainers(lastRegisterVersion);
+			if(containers.size()>0)
+				oneFather=containers.iterator().next();
+				fatherState=oneFather.getStateURI(oneFather.getLastVersion());
+			String results[]=null;
+			results=myInitializer.myRegistryPolicyManager.nextRegState(RegistryPolicyManager.actionAddURI, preRegisterStatus, fatherState, null, null);
+			String postRegisterStatus=results[RegistryPolicyManager.POST_THIS];
+			//TODO here we should propagte state transition up...
+			
 			String newRegisterVersion=Versioner.createNextVersion(lastRegisterVersion);
 				
 			//Now we create the entity
@@ -146,17 +155,24 @@ public class TerminologyManager {
 	
 	
 	
-	public void amendEntityInformation(String entityURI, Model statsToReplace, String actionAuthor, String description, int mode) throws AuthException, RegistryAccessException {
+	public void amendEntityInformation(String entityURI, Model statsToReplace, String actionAuthor, String description, int mode) throws AuthException, RegistryAccessException, InvalidProcessException {
 		if(!myInitializer.myAuthManager.can(actionAuthor,RegistryPolicyManager.actionUpdateURI,entityURI))
 			throw new AuthException(actionAuthor,RegistryPolicyManager.actionUpdateURI,entityURI);
 		TerminologyEntity myEntity=checkEntityExistance(entityURI);
 		if(myEntity==null) throw new RegistryAccessException("Unable to amend "+entityURI+" (entity does not exist)");
 		String lastVersion=myEntity.getLastVersion();
 		String preStatus=myEntity.getStateURI(lastVersion);
-		String postStatus=preStatus;
-		if(preStatus!=null)
-			if(myInitializer.myRegistryPolicyManager.updateTransitions.containsKey(preStatus))
-				postStatus=myInitializer.myRegistryPolicyManager.updateTransitions.get(preStatus);
+		
+		//TODO we only consider thisState, but we should consider all!
+		String[] result=null;
+		if(myInitializer.myFactory.terminologySetExist(entityURI))
+			result=myInitializer.myRegistryPolicyManager.nextRegState(RegistryPolicyManager.actionUpdateURI, preStatus, null, null, null);
+		if(myInitializer.myFactory.terminologyIndividualExist(entityURI))
+			result=myInitializer.myRegistryPolicyManager.nextCodeState(RegistryPolicyManager.actionUpdateURI, preStatus, null, null, null);
+		if(result==null) throw new InvalidProcessException("Something went wrong while considering next state");
+		
+		String postStatus=result[RegistryPolicyManager.POST_THIS];
+		
 		String newVersion=Versioner.createNextVersion(lastVersion);
 		myEntity.registerVersion(newVersion);
 		if(mode==MODE_REPLACE) {
@@ -192,35 +208,27 @@ public class TerminologyManager {
 		myEntity.synch();
 	}
 	
-	public void validate(String entityURI, String actionAuthor, String description, boolean validate) throws AuthException, RegistryAccessException {
-		if(validate) {
-			if(!myInitializer.myAuthManager.can(actionAuthor,RegistryPolicyManager.validateAction,entityURI))
-				throw new AuthException(actionAuthor,RegistryPolicyManager.validateAction,entityURI);
+	public void performGenericAction(String actionURI, String entityURI, String actionAuthor, String description) throws AuthException, RegistryAccessException, InvalidProcessException {
+		if(!myInitializer.myAuthManager.can(actionAuthor,actionURI,entityURI)) {
+				throw new AuthException(actionAuthor,actionURI,entityURI);
 		}
-		else {
-			if(!myInitializer.myAuthManager.can(actionAuthor,RegistryPolicyManager.invalidateAction,entityURI))
-				throw new AuthException(actionAuthor,RegistryPolicyManager.invalidateAction,entityURI);
-		}
-		
 		TerminologyEntity myEntity=checkEntityExistance(entityURI);
-		if(myEntity==null) throw new RegistryAccessException("Unable to change status to "+entityURI+" (entity does not exist)");
+		if(myEntity==null) throw new RegistryAccessException("Unable to perform generic operation on "+entityURI+" (entity does not exist)");
 		String lastVersion=myEntity.getLastVersion();
 		String preStatus=myEntity.getStateURI(lastVersion);
-		System.out.println(">>>PRE: "+preStatus);
-		if(preStatus==null) preStatus=RegistryPolicyManager.nullState;
-		String postStatus=null;
-		if(validate) {
-			if(myInitializer.myRegistryPolicyManager.validateTransitions.containsKey(preStatus))
-				postStatus=myInitializer.myRegistryPolicyManager.validateTransitions.get(preStatus);
-		} 
-		if(!validate) {
-			if(myInitializer.myRegistryPolicyManager.invalidateTransitions.containsKey(preStatus))
-				postStatus=myInitializer.myRegistryPolicyManager.invalidateTransitions.get(preStatus);
-		}
 		
-		if(postStatus==null) throw new RegistryAccessException("Unable to change status to "+entityURI+" (validation resulted didn't yield a state)");
-		if(postStatus.equals(RegistryPolicyManager.illegalState)) throw new RegistryAccessException("Unable to change status to "+entityURI+" (non viable transition)");
-
+		//TODO we only consider thisState, but we should consider all!
+		String[] result=null;
+		if(myInitializer.myFactory.terminologySetExist(entityURI))
+			result=myInitializer.myRegistryPolicyManager.nextRegState(actionURI, preStatus, null, null, null);
+		if(myInitializer.myFactory.terminologyIndividualExist(entityURI))
+			result=myInitializer.myRegistryPolicyManager.nextCodeState(actionURI, preStatus, null, null, null);
+		if(result==null) throw new InvalidProcessException("Something went wrong while considering next state");
+		
+	
+		String postStatus=result[RegistryPolicyManager.POST_THIS];
+		
+		
 		String newVersion=Versioner.createNextVersion(lastVersion);
 		myEntity.registerVersion(newVersion);
 		myEntity.replaceStatements(myEntity.getStatements(lastVersion), newVersion);
@@ -230,12 +238,9 @@ public class TerminologyManager {
 		myEntity.setActionAuthorURI(actionAuthor, newVersion);
 		if(description!=null) myEntity.setActionDescription(description,newVersion);
 		myEntity.linkVersions(lastVersion,newVersion);
-		
-		if(validate) 
-			myEntity.setActionURI(RegistryPolicyManager.validateAction,newVersion);
+		myEntity.setActionURI(actionURI,newVersion);
 
-		else 
-			myEntity.setActionURI(RegistryPolicyManager.invalidateAction,newVersion);
+		
 		
 		
 	}
@@ -245,14 +250,6 @@ public class TerminologyManager {
 
 	
 
-	
-	
-	public void removeSubRegister() {
-		
-	}
-	
-	
-	
 		
 		
 	
@@ -336,7 +333,7 @@ public class TerminologyManager {
 	}
 	
 	
-	private void propagateDeleteOverContainers(TerminologyEntity entityToDelete, String actionAuthorURI, String description) throws AuthException, RegistryAccessException, ModelException {
+	private void propagateDeleteOverContainers(TerminologyEntity entityToDelete, String actionAuthorURI, String description) throws AuthException, RegistryAccessException, ModelException, InvalidProcessException {
 		Set<TerminologySet> containers=entityToDelete.getContainers(entityToDelete.getLastVersion());
 		//Note: there should only be one container for the time being...
 		if(containers.size()>1) throw new ModelException("More than one container defined for "+entityToDelete);
@@ -350,7 +347,7 @@ public class TerminologyManager {
 	//TODO generalize to set
 	//TODO overall TerminologyManager is due a big overhaul!!!
 	public void delTermFromRegister(String termURI, String regURI,
-			String actionAuthorURI, String description) throws AuthException, RegistryAccessException {
+			String actionAuthorURI, String description) throws AuthException, RegistryAccessException, InvalidProcessException {
 			
 		if(!myInitializer.myAuthManager.can(actionAuthorURI,RegistryPolicyManager.actionObsoleteURI,regURI))
 			throw new AuthException(actionAuthorURI,RegistryPolicyManager.actionObsoleteURI,regURI);
@@ -384,15 +381,17 @@ public class TerminologyManager {
 	String newRegisterVersion=Versioner.createNextVersion(lastRegisterVersion);
 	String newTermVersion=Versioner.createNextVersion(lastTermVersion);
 	
-	String postRegisterStatus=preRegisterStatus;
-	if(preRegisterStatus!=null)
-		if(myInitializer.myRegistryPolicyManager.delRegTransitions.containsKey(preRegisterStatus))
-			postRegisterStatus=myInitializer.myRegistryPolicyManager.delRegTransitions.get(preRegisterStatus);
+	//TODO we only consider thisState, but we should consider all!
+	String[] result=null;
+	if(myInitializer.myFactory.terminologySetExist(termURI))
+		result=myInitializer.myRegistryPolicyManager.nextRegState(RegistryPolicyManager.actionObsoleteURI, preTermStatus, preRegisterStatus, null, null);
+	if(myInitializer.myFactory.terminologyIndividualExist(termURI))
+		result=myInitializer.myRegistryPolicyManager.nextCodeState(RegistryPolicyManager.actionObsoleteURI, preTermStatus, preRegisterStatus, null, null);
+	if(result==null) throw new InvalidProcessException("Something went wrong while considering next state");
+	String postTermStatus=result[RegistryPolicyManager.POST_THIS];
+	String postRegisterStatus=result[RegistryPolicyManager.POST_UP];
 	
-	String postTermStatus=preTermStatus;
-	if(preTermStatus!=null)
-		if(myInitializer.myRegistryPolicyManager.delTermTransitions.containsKey(preTermStatus))
-			postTermStatus=myInitializer.myRegistryPolicyManager.delTermTransitions.get(preTermStatus);
+
 	System.out.println(">>>pre Term Status: "+preTermStatus);
 	System.out.println(">>>post Term Status: "+postTermStatus);
 	DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -451,7 +450,7 @@ public class TerminologyManager {
 		
 	}
 	
-	private void propagateSupersedOverContainers(String urlToSupersed, String supersedingURL, String actionAuthorURI, String description) throws AuthException, RegistryAccessException, ModelException {
+	private void propagateSupersedOverContainers(String urlToSupersed, String supersedingURL, String actionAuthorURI, String description) throws AuthException, RegistryAccessException, ModelException, InvalidProcessException {
 		TerminologyIndividual termToSupersed=myInitializer.myFactory.getOrCreateTerminologyIndividual(urlToSupersed);
 		Set<TerminologySet> containers=termToSupersed.getContainers(termToSupersed.getLastVersion());
 		//Note: there should only be one container for the time being...
@@ -468,7 +467,7 @@ public class TerminologyManager {
 	
 	public void superseedTermInRegister(String termURI,
 			String superseedingTermURI, String regURI, 
-			String actionAuthorURI, String description) throws AuthException, RegistryAccessException {
+			String actionAuthorURI, String description) throws AuthException, RegistryAccessException, InvalidProcessException {
 		// TODO Auto-generated method stub
 		
 		if(!myInitializer.myAuthManager.can(actionAuthorURI,RegistryPolicyManager.actionSupersedURI,regURI))
@@ -497,22 +496,18 @@ public class TerminologyManager {
 	String newTermVersion=Versioner.createNextVersion(lastTermVersion);
 	String newSuperseedingVersion=Versioner.createNextVersion(lastSuperseedingsTermVersion);
 
-	String postRegisterStatus=preRegisterStatus;
-	if(preRegisterStatus!=null)
-		if(myInitializer.myRegistryPolicyManager.delRegTransitions.containsKey(preRegisterStatus))
-			postRegisterStatus=myInitializer.myRegistryPolicyManager.delRegTransitions.get(preRegisterStatus);
-
-	String postTermStatus=preTermStatus;
-	if(preTermStatus!=null)
-		if(myInitializer.myRegistryPolicyManager.superseededTransitions.containsKey(preTermStatus))
-			postTermStatus=myInitializer.myRegistryPolicyManager.superseededTransitions.get(preTermStatus);
-
-	String postSuperseedingTermStatus=preSuperseedingTermStatus;
-	if(preSuperseedingTermStatus!=null)
-		if(myInitializer.myRegistryPolicyManager.superseederTransitions.containsKey(preSuperseedingTermStatus))
-			postSuperseedingTermStatus=myInitializer.myRegistryPolicyManager.superseederTransitions.get(preSuperseedingTermStatus);
-	if(postSuperseedingTermStatus.equals(RegistryPolicyManager.illegalState)) throw new RegistryAccessException(superseedingTermURI+" is not in a viable state for superseeding "+termURI);
-
+	//TODO we only consider thisState, but we should consider all!
+	String[] result=null;
+	if(myInitializer.myFactory.terminologySetExist(termURI))
+		result=myInitializer.myRegistryPolicyManager.nextRegState(RegistryPolicyManager.actionSupersedURI, preTermStatus, preRegisterStatus, null, preSuperseedingTermStatus);
+	if(myInitializer.myFactory.terminologyIndividualExist(termURI))
+		result=myInitializer.myRegistryPolicyManager.nextCodeState(RegistryPolicyManager.actionSupersedURI, preTermStatus, preRegisterStatus, null, preSuperseedingTermStatus);
+	if(result==null) throw new InvalidProcessException("Something went wrong while considering next state");
+	String postTermStatus=result[RegistryPolicyManager.POST_THIS];
+	String postRegisterStatus=result[RegistryPolicyManager.POST_UP];
+	String postSuperseedingTermStatus=result[RegistryPolicyManager.POST_AUX];
+	
+	
 	
 	
 	DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");

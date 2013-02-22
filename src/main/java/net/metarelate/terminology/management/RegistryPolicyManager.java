@@ -32,18 +32,19 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 import net.metarelate.terminology.config.MetaLanguage;
+import net.metarelate.terminology.exceptions.InvalidProcessException;
 import net.metarelate.terminology.utils.SSLogger;
 import net.metarelate.terminology.utils.SimpleQueriesProcessor;
 
 public class RegistryPolicyManager {
-	private final static int PRE_THIS=0;
-	private final static int PRE_UP=1;
-	private final static int PRE_DOWN=2;
-	private final static int PRE_AUX=3;
-	private final static int POST_THIS=4;
-	private final static int POST_UP=5;
-	private final static int POST_DOWN=6;
-	private final static int POST_AUX=7;
+	final static int PRE_THIS=0;
+	final static int PRE_UP=1;
+	final static int PRE_DOWN=2;
+	final static int PRE_AUX=3;
+	final static int POST_THIS=4;
+	final static int POST_UP=5;
+	final static int POST_DOWN=6;
+	final static int POST_AUX=7;
 	
 	//TODO Remove from MetaLanguage
 	//public static final String actionUpdateURI=MetaLanguage.terminologyUpdateAction.getURI();
@@ -65,32 +66,19 @@ public class RegistryPolicyManager {
 	public static  String stateSupersedURI = TerminologyManagerConfig.supersededStateURI;	//TODO note that we not need to hardwire this
 	
 	//TODO Remove (and remove from MetaLanguage)
-	public static final String validateAction=MetaLanguage.terminologyValidateAction.getURI();
-	public static final String invalidateAction=MetaLanguage.terminologyInvalidateAction.getURI();
+	//public static final String validateAction=MetaLanguage.terminologyValidateAction.getURI();
+	//public static final String invalidateAction=MetaLanguage.terminologyInvalidateAction.getURI();
 	
 	
 	//TODO Remove (and remove from MetaLanguage)
-	static final String illegalState = MetaLanguage.statusIllegalResource.getURI();
-	public static final String nullState = MetaLanguage.statusNullResource.getURI();
+	//static final String illegalState = MetaLanguage.statusIllegalResource.getURI();
+	//public static final String nullState = MetaLanguage.statusNullResource.getURI();
 	
 	
 	//TODO Action without state transition! (but with permissions... where should it go?)
 	public static String tagAction=MetaLanguage.tagAction.getURI();
 	
 	
-	//TODO to remove
-	//public static RegistryPolicyManager tm=new RegistryPolicyManager(null);
-	
-	
-	//TODO to remove once the new map is ready
-	Map<String,String> updateTransitions=new Hashtable<String,String>();
-	Map<String,String> addTransitions=new Hashtable<String,String>();
-	Map<String,String> delTermTransitions=new Hashtable<String,String>();
-	Map<String,String> delRegTransitions=new Hashtable<String,String>();
-	Map<String,String> superseederTransitions=new Hashtable<String,String>();
-	Map<String,String> superseededTransitions=new Hashtable<String,String>();
-	Map<String,String> validateTransitions=new Hashtable<String,String>();
-	Map<String,String> invalidateTransitions=new Hashtable<String,String>();
 	
 	private String[] allActions=null;
 	private String[] extraActions=null;
@@ -262,69 +250,80 @@ public class RegistryPolicyManager {
 		SSLogger.log("Extra states:",SSLogger.DEBUG);
 		for(String state:extraStates) SSLogger.log(state,SSLogger.DEBUG);
 		
-		//allConfig.listObjectsOfProperty(TerminologyManagerConfig.); 
-		//TODO list states (override/replace)
-		//TODO list actions (override/replace)
-		//TODO load transitions (default in default file).
-	
-		//TODO here we need to read transitions from file!
-		// Note: need to record only chaging states
-		updateTransitions.put(MetaLanguage.statusWMOValidResource.getURI(),MetaLanguage.statusWMOValidResource.getURI());
-		updateTransitions.put(MetaLanguage.statusWMOValidationResource.getURI(),MetaLanguage.statusWMOValidationResource.getURI());
-		updateTransitions.put(MetaLanguage.statusWMOSupersededResource.getURI(),illegalState);
-		updateTransitions.put(MetaLanguage.statusWMORetiredResource.getURI(),illegalState);
-		updateTransitions.put(MetaLanguage.statusOutOfRegistry.getURI(),MetaLanguage.statusOutOfRegistry.getURI());
-
-		//updateTransitions.put(MetaLanguage.statusWMOValidationResource.getURI(),MetaLanguage.statusWMOValidationResource.getURI());
-	
-		addTransitions.put(MetaLanguage.statusWMOValidResource.getURI(),MetaLanguage.statusWMOValidResource.getURI());
-		addTransitions.put(MetaLanguage.statusWMOValidationResource.getURI(),illegalState);
-		addTransitions.put(MetaLanguage.statusWMOSupersededResource.getURI(),illegalState);
-		addTransitions.put(MetaLanguage.statusWMORetiredResource.getURI(),illegalState);
-
-
-		
-		delTermTransitions.put(MetaLanguage.statusWMOValidResource.getURI(),MetaLanguage.statusWMORetiredResource.getURI());
-		delTermTransitions.put(MetaLanguage.statusWMOValidationResource.getURI(),illegalState);
-		delTermTransitions.put(MetaLanguage.statusWMOSupersededResource.getURI(),illegalState);
-		delTermTransitions.put(MetaLanguage.statusWMORetiredResource.getURI(),illegalState);
-
 		
 		
-		delRegTransitions.put(MetaLanguage.statusWMOValidResource.getURI(),MetaLanguage.statusWMOValidResource.getURI());
-		delRegTransitions.put(MetaLanguage.statusWMOValidationResource.getURI(),MetaLanguage.statusWMOValidResource.getURI());
-		delRegTransitions.put(MetaLanguage.statusWMOSupersededResource.getURI(),illegalState);
-		delRegTransitions.put(MetaLanguage.statusWMORetiredResource.getURI(),illegalState);
-
-		
-		
-		
-		superseederTransitions.put(MetaLanguage.statusWMOValidResource.getURI(),RegistryPolicyManager.illegalState);
-		superseederTransitions.put(MetaLanguage.statusWMOValidationResource.getURI(),MetaLanguage.statusWMOValidationResource.getURI());
-		superseederTransitions.put(MetaLanguage.statusWMOSupersededResource.getURI(),illegalState);
-		superseederTransitions.put(MetaLanguage.statusWMORetiredResource.getURI(),illegalState);
-		
-
-		superseededTransitions.put(MetaLanguage.statusWMOValidResource.getURI(),MetaLanguage.statusWMOSupersededResource.getURI());
-		superseededTransitions.put(MetaLanguage.statusWMOValidationResource.getURI(),MetaLanguage.statusWMOSupersededResource.getURI());
-		superseededTransitions.put(MetaLanguage.statusWMOSupersededResource.getURI(),illegalState);
-		superseededTransitions.put(MetaLanguage.statusWMORetiredResource.getURI(),illegalState);
-
-		
-		validateTransitions.put(MetaLanguage.statusWMOValidResource.getURI(),MetaLanguage.statusWMOValidResource.getURI());
-		validateTransitions.put(MetaLanguage.statusOutOfRegistry.getURI(),MetaLanguage.statusWMOValidResource.getURI());
-		validateTransitions.put(MetaLanguage.statusWMOValidationResource.getURI(),MetaLanguage.statusWMOValidResource.getURI());
-		validateTransitions.put(nullState,MetaLanguage.statusWMOValidResource.getURI());
-
-		
-		invalidateTransitions.put(MetaLanguage.statusWMOValidResource.getURI(),MetaLanguage.statusWMOValidationResource.getURI());
-		invalidateTransitions.put(MetaLanguage.statusOutOfRegistry.getURI(),illegalState);
-		invalidateTransitions.put(MetaLanguage.statusWMOValidationResource.getURI(),illegalState);
-		invalidateTransitions.put(nullState,illegalState);
-
 		
 	
 	}
 	
+	public boolean isViableOperationOnReg(String actionURI, String thisState, String upState, String downState, String auxState) {
+		return isViableOperation(registerTransitions, actionURI,  thisState,  upState,  downState,  auxState);
+	}
+	
+	public boolean isViableOperationOnCode(String actionURI, String thisState, String upState, String downState, String auxState) {
+		return isViableOperation(codeTransitions, actionURI,  thisState,  upState,  downState,  auxState);
+
+	}
+	
+	private boolean isViableOperation(Map<String,ArrayList<String[]>> anyTransitions, String actionURI, String thisState, String upState, String downState, String auxState) {
+		if(thisState==null) thisState="";
+		if(upState==null) upState="";
+		if(downState==null) downState="";
+		if(auxState==null) auxState="";
+		
+		if(!anyTransitions.containsKey(actionURI)) return false;
+		ArrayList<String[]> transitionsForAction=anyTransitions.get(actionURI);
+		for(String[] transitionForAction:transitionsForAction) {
+			boolean score=true;
+			if(transitionForAction[PRE_THIS]!=null) 
+				if(!transitionForAction[PRE_THIS].equals(thisState)) score=false;
+			if(transitionForAction[PRE_UP]!=null) 
+				if(!transitionForAction[PRE_UP].equals(upState)) score=false;
+			if(transitionForAction[PRE_DOWN]!=null) 
+				if(!transitionForAction[PRE_DOWN].equals(downState)) score=false;
+			if(transitionForAction[PRE_AUX]!=null) 
+				if(!transitionForAction[PRE_AUX].equals(auxState)) score=false;
+			if(score==true) return true;
+		}
+		return false;
+		
+	}
+	
+	
+	
+	public String[] nextRegState(String actionURI, String thisState, String upState, String downState, String auxState) throws InvalidProcessException {
+		return nextAnyState(registerTransitions, actionURI,  thisState,  upState,  downState,  auxState);
+	}
+	public String[] nextCodeState(String actionURI, String thisState, String upState, String downState, String auxState) throws InvalidProcessException {
+		return nextAnyState(codeTransitions, actionURI,  thisState,  upState,  downState,  auxState);
+	}
+	
+	private String[] nextAnyState(Map<String,ArrayList<String[]>> anyTransitions, String actionURI, String thisState, String upState, String downState, String auxState) throws InvalidProcessException {
+		if(thisState==null) thisState="";
+		if(upState==null) upState="";
+		if(downState==null) downState="";
+		if(auxState==null) auxState="";
+		if(!anyTransitions.containsKey(actionURI)) throw new InvalidProcessException(actionURI,thisState,upState,downState,auxState);
+		ArrayList<String[]> transitionsForAction=anyTransitions.get(actionURI);
+		for(String[] transitionForAction:transitionsForAction) {
+			boolean score=true;
+			if(transitionForAction[PRE_THIS]!=null) 
+				if(!transitionForAction[PRE_THIS].equals(thisState)) score=false;
+			if(transitionForAction[PRE_UP]!=null) 
+				if(!transitionForAction[PRE_UP].equals(upState)) score=false;
+			if(transitionForAction[PRE_DOWN]!=null) 
+				if(!transitionForAction[PRE_DOWN].equals(downState)) score=false;
+			if(transitionForAction[PRE_AUX]!=null) 
+				if(!transitionForAction[PRE_AUX].equals(auxState)) score=false;
+			if(score==true) {
+				return transitionForAction;
+			}
+		}
+		throw new InvalidProcessException(actionURI,thisState,upState,downState,auxState);
+	}
+
+	public String[] getExtraActions() {
+		return extraActions;
+	}
 
 }

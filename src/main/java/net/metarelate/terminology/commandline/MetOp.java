@@ -26,6 +26,7 @@ import net.metarelate.terminology.auth.AuthRegistryManager;
 import net.metarelate.terminology.auth.AuthServer;
 import net.metarelate.terminology.auth.StubAuthServer;
 import net.metarelate.terminology.exceptions.AuthException;
+import net.metarelate.terminology.exceptions.InvalidProcessException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
 import net.metarelate.terminology.management.TerminologyManager;
 import net.metarelate.terminology.utils.SSLogger;
@@ -170,7 +171,7 @@ public class MetOp extends CommandLineTool {
 	}
 
 	@Override
-	protected void executeCommand() {
+	protected void executeCommand() throws InvalidProcessException {
 		// TODO this is only a stub
 		TerminologyManager myManager=myInitializer.myTerminologyManager;
 		if(dataContentFile==null) {
@@ -287,7 +288,7 @@ public class MetOp extends CommandLineTool {
 			System.out.println("Validating term or register: "+termURI);
 			System.out.println("Command issued from: "+actionAuthorURI);
 			System.out.println("description: "+description);
-					
+			/*	
 			try {
 				myManager.validate(termURI, actionAuthorURI, description, true);
 			} catch (AuthException e) {
@@ -298,6 +299,7 @@ public class MetOp extends CommandLineTool {
 				System.out.println("Registry error");
 				System.out.println(e.getLocalizedMessage());
 			}
+			*/
 		
 		}
 		
@@ -305,7 +307,7 @@ public class MetOp extends CommandLineTool {
 			System.out.println("Invalidating term or register: "+termURI);
 			System.out.println("Command issued from: "+actionAuthorURI);
 			System.out.println("description: "+description);
-					
+			/*		
 			try {
 				myManager.validate(termURI, actionAuthorURI, description, false);
 			} catch (AuthException e) {
@@ -316,6 +318,7 @@ public class MetOp extends CommandLineTool {
 				System.out.println("Registry error");
 				System.out.println(e.getLocalizedMessage());
 			}
+			*/
 		}
 		// TODO Auto-generated method stub
 

@@ -12,6 +12,7 @@ import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.ImpossibleOperationException;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
+import net.metarelate.terminology.management.RegistryPolicyManager;
 import net.metarelate.terminology.utils.StatementsOrganizer;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -246,7 +247,7 @@ public class ViewPage extends SuperPage {
 				setResponsePage(EditPage.class, pageParameters);
 			}
 		};
-		if(!CommandWebConsole.myInitializer.myAuthManager.can(CommandWebConsole.myInitializer.getDefaultUserURI(), MetaLanguage.terminologyUpdateAction.getURI(), urlToAction))
+		if(!CommandWebConsole.myInitializer.myAuthManager.can(CommandWebConsole.myInitializer.getDefaultUserURI(), RegistryPolicyManager.actionUpdateURI, urlToAction))
 			editButton.setEnabled(false);
 		else editButton.setEnabled(true);
 		form.add(editButton);
@@ -278,7 +279,7 @@ public class ViewPage extends SuperPage {
 		if(isCode) newCodeButton.setEnabled(false);
 		else {
 			// TODO auth here
-			if(!CommandWebConsole.myInitializer.myAuthManager.can(CommandWebConsole.myInitializer.getDefaultUserURI(), MetaLanguage.terminologyAddItemAction.getURI(), urlToAction))
+			if(!CommandWebConsole.myInitializer.myAuthManager.can(CommandWebConsole.myInitializer.getDefaultUserURI(), RegistryPolicyManager.actionAddURI, urlToAction))
 				newCodeButton.setEnabled(false);
 			else newCodeButton.setEnabled(true);
 		}
@@ -303,7 +304,7 @@ public class ViewPage extends SuperPage {
 		if(isCode) newRegisterButton.setEnabled(false);
 		else {
 			// TODO auth here
-			if(!CommandWebConsole.myInitializer.myAuthManager.can(CommandWebConsole.myInitializer.getDefaultUserURI(), MetaLanguage.terminologyAddItemAction.getURI(), urlToAction))
+			if(!CommandWebConsole.myInitializer.myAuthManager.can(CommandWebConsole.myInitializer.getDefaultUserURI(), RegistryPolicyManager.actionAddURI, urlToAction))
 				newRegisterButton.setEnabled(false);
 			else newRegisterButton.setEnabled(true);
 		}
@@ -325,7 +326,7 @@ public class ViewPage extends SuperPage {
 			}
 		};
 		
-		if(!CommandWebConsole.myInitializer.myAuthManager.can(CommandWebConsole.myInitializer.getDefaultUserURI(), MetaLanguage.terminologyDelItemAction.getURI(), urlToAction))
+		if(!CommandWebConsole.myInitializer.myAuthManager.can(CommandWebConsole.myInitializer.getDefaultUserURI(), RegistryPolicyManager.actionObsoleteURI, urlToAction))
 			obsoleteButton.setEnabled(false);
 		else obsoleteButton.setEnabled(true);
 		form.add(obsoleteButton);
@@ -349,7 +350,7 @@ public class ViewPage extends SuperPage {
 		
 		};
 		
-		if(!CommandWebConsole.myInitializer.myAuthManager.can(CommandWebConsole.myInitializer.getDefaultUserURI(), MetaLanguage.terminologySupersedAction.getURI(), urlToAction))
+		if(!CommandWebConsole.myInitializer.myAuthManager.can(CommandWebConsole.myInitializer.getDefaultUserURI(), RegistryPolicyManager.actionSupersedURI, urlToAction))
 			supersedButton.setEnabled(false);
 		else supersedButton.setEnabled(true);
 		
