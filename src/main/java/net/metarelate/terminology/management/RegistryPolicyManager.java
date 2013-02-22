@@ -183,10 +183,10 @@ public class RegistryPolicyManager {
 					SSLogger.log("Map:"+SSLogger.DEBUG);
 					for(String val:transitionBlock) SSLogger.log(val,SSLogger.DEBUG);
 					
-					if(!registerTransitions.containsKey(effectStat.getObject().asResource().getURI())) {
-						registerTransitions.put(effectStat.getObject().asResource().getURI(),new ArrayList<String[]>());
+					if(!registerTransitions.containsKey(action.getURI())) {
+						registerTransitions.put(action.getURI(),new ArrayList<String[]>());
 					}
-					registerTransitions.get(effectStat.getObject().asResource().getURI()).add(transitionBlock);
+					registerTransitions.get(action.getURI()).add(transitionBlock);
 					
 				
 				}
@@ -211,10 +211,10 @@ public class RegistryPolicyManager {
 					SSLogger.log("Map:"+SSLogger.DEBUG);
 					for(String val:transitionBlock) SSLogger.log(val,SSLogger.DEBUG);
 					
-					if(!codeTransitions.containsKey(effectCode.getObject().asResource().getURI())) {
-						codeTransitions.put(effectCode.getObject().asResource().getURI(),new ArrayList<String[]>());
+					if(!codeTransitions.containsKey(action.getURI())) {
+						codeTransitions.put(action.getURI(),new ArrayList<String[]>());
 					}
-					codeTransitions.get(effectCode.getObject().asResource().getURI()).add(transitionBlock);
+					codeTransitions.get(action.getURI()).add(transitionBlock);
 					
 				
 				}
@@ -292,9 +292,11 @@ public class RegistryPolicyManager {
 	
 	
 	public String[] nextRegState(String actionURI, String thisState, String upState, String downState, String auxState) throws InvalidProcessException {
+		SSLogger.log("nextRegCall",SSLogger.DEBUG);
 		return nextAnyState(registerTransitions, actionURI,  thisState,  upState,  downState,  auxState);
 	}
 	public String[] nextCodeState(String actionURI, String thisState, String upState, String downState, String auxState) throws InvalidProcessException {
+		SSLogger.log("nextCodeCall",SSLogger.DEBUG);
 		return nextAnyState(codeTransitions, actionURI,  thisState,  upState,  downState,  auxState);
 	}
 	
@@ -303,22 +305,70 @@ public class RegistryPolicyManager {
 		if(upState==null) upState="";
 		if(downState==null) downState="";
 		if(auxState==null) auxState="";
-		if(!anyTransitions.containsKey(actionURI)) throw new InvalidProcessException(actionURI,thisState,upState,downState,auxState);
+		if(!anyTransitions.containsKey(actionURI)) {
+			SSLogger.log("Action not found in transition table: "+actionURI,SSLogger.DEBUG);
+			SSLogger.log("Transition table was: ",SSLogger.DEBUG);
+			for(String elem:anyTransitions.keySet()) SSLogger.log(elem,SSLogger.DEBUG);
+			throw new InvalidProcessException(actionURI,thisState,upState,downState,auxState);
+		}
 		ArrayList<String[]> transitionsForAction=anyTransitions.get(actionURI);
 		for(String[] transitionForAction:transitionsForAction) {
 			boolean score=true;
-			if(transitionForAction[PRE_THIS]!=null) 
-				if(!transitionForAction[PRE_THIS].equals(thisState)) score=false;
-			if(transitionForAction[PRE_UP]!=null) 
-				if(!transitionForAction[PRE_UP].equals(upState)) score=false;
-			if(transitionForAction[PRE_DOWN]!=null) 
-				if(!transitionForAction[PRE_DOWN].equals(downState)) score=false;
-			if(transitionForAction[PRE_AUX]!=null) 
-				if(!transitionForAction[PRE_AUX].equals(auxState)) score=false;
+			SSLogger.log("Checking next action for: "+actionURI,SSLogger.DEBUG);
+			if(transitionForAction[PRE_THIS]!=null) {
+				SSLogger.log("Need to check THIS :"+transitionForAction[PRE_THIS],SSLogger.DEBUG);
+				SSLogger.log("Against :"+thisState,SSLogger.DEBUG);
+				if(!transitionForAction[PRE_THIS].equals(thisState)) {
+					SSLogger.log("Failed",SSLogger.DEBUG);
+					score=false;
+				}
+				else {
+					SSLogger.log("Passed",SSLogger.DEBUG);
+				}
+			}
+				
+			if(transitionForAction[PRE_UP]!=null) {
+				SSLogger.log("Need to check UP :"+transitionForAction[PRE_UP],SSLogger.DEBUG);
+				SSLogger.log("Against :"+upState,SSLogger.DEBUG);
+				if(!transitionForAction[PRE_UP].equals(upState)) {
+					SSLogger.log("Failed",SSLogger.DEBUG);
+					score=false;
+				}
+				else {
+					SSLogger.log("Passed",SSLogger.DEBUG);
+				}
+			}
+				
+			if(transitionForAction[PRE_DOWN]!=null) {
+				SSLogger.log("Need to check DOWN :"+transitionForAction[PRE_DOWN],SSLogger.DEBUG);
+				SSLogger.log("Against :"+downState,SSLogger.DEBUG);
+				if(!transitionForAction[PRE_DOWN].equals(downState)) {
+					SSLogger.log("Failed",SSLogger.DEBUG);
+					score=false;
+				}
+				else {
+					SSLogger.log("Passed",SSLogger.DEBUG);
+				}
+			}
+				
+			if(transitionForAction[PRE_AUX]!=null) {
+				SSLogger.log("Need to check AUX :"+transitionForAction[PRE_AUX],SSLogger.DEBUG);
+				SSLogger.log("Against :"+auxState,SSLogger.DEBUG);
+				if(!transitionForAction[PRE_AUX].equals(auxState)) {
+					SSLogger.log("Failed",SSLogger.DEBUG);
+					score=false;
+				}
+				else {
+					SSLogger.log("Passed",SSLogger.DEBUG);
+				}
+			}
+				
 			if(score==true) {
+				SSLogger.log("Success!",SSLogger.DEBUG);
 				return transitionForAction;
 			}
 		}
+		SSLogger.log("Failure!",SSLogger.DEBUG);
 		throw new InvalidProcessException(actionURI,thisState,upState,downState,auxState);
 	}
 

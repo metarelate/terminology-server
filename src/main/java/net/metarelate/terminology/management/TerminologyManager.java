@@ -239,6 +239,7 @@ public class TerminologyManager {
 		if(description!=null) myEntity.setActionDescription(description,newVersion);
 		myEntity.linkVersions(lastVersion,newVersion);
 		myEntity.setActionURI(actionURI,newVersion);
+		myEntity.synch();
 
 		
 		

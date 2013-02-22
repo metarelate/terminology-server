@@ -285,6 +285,11 @@ table.dataview caption { padding-bottom: 2px; }
 
 }
 
+.extraActionButton {
+	width:100px;
+	margin:0 auto;
+	background-color: yellow;
+}
 /* -------------------------------- */
 /* Header Styles					*/
 /* -------------------------------- */
