@@ -166,6 +166,7 @@ public class Initializer {
 			prefixFileAbsoluteString=prefixFile.getAbsolutePath();
 		}
 		checkOrCreatePrefixFile();
+		
 
 		// TODO Note also that we should be sure time is in synch globally
 	}
@@ -263,7 +264,11 @@ public class Initializer {
 		
 	}
 	
-	private void prepareDefaultFiles() throws ConfigurationException {		
+	private void prepareDefaultFiles() throws ConfigurationException {
+		//TODO we only do this is no config is found. If there is some config, it's up to the user to have it complete.
+		File confDir=new File(confDirAbsoluteString);
+		if(confDir.listFiles().length>0) return;
+			
 		String defServerStatements="<http://thisInstance.org> <"+MetaLanguage.tdbPrefixProperty+"> "+"\""+dbDirAbsoluteString+"\"^^<http://www.w3.org/2001/XMLSchema#string> ;\n.\n";
 		defServerStatements+="<http://thisInstance.org> <"+MetaLanguage.authConfigURI +"> "+"<"+AuthConfig.isConfigFileString+"> ;\n.\n";
 		String baseURL=getServerName()+"/web";
@@ -278,6 +283,98 @@ public class Initializer {
 		// However, as a conf option, one could be granted access to everything.
 		String defAuthStatements="<"+getDefaultUserURI()+"> <"+AuthConfig.allURI+"> "+"<"+AuthConfig.allURI+"> ;\n.\n";
 		createFileAndFillWithString(authDirAbsoluteString,"defaultAuthConfig.ttl",defAuthStatements);
+		
+		
+		String defProcessStatements=
+				"@prefix core:		<http://metarelate.net/core/types/>	.\n" +
+				"@prefix states: 	<http://metarelate.net/core/states/> .\n" +
+				"@prefix actions:	<http://metarelate.net/core/actions/> .\n" +
+				"@prefix config:		<http://metarelate.net/core/config/> .\n" +
+				"@prefix default:	<http://metarelate.net/default/config/> .\n" +
+				"@prefix rdfs:		<http://www.w3.org/2000/01/rdf-schema#> .\n" +
+				"actions:update a core:action;\n" +
+				"rdfs:label	\"Update\"@en;\n" +
+				"config:overrides actions:update;\n" +
+				"config:hasEffectOnCode default:actionUpdate1;\n" +
+				"config:hasEffectOnCode default:actionUpdate2;\n" +
+				"config:hasEffectOnReg default:actionUpdate1;\n" +
+				"config:hasEffectOnReg default:actionUpdate2;\n" +
+				".\n" +
+				"default:actionUpdate1 a core:actionRole;\n" +
+				"config:preThis states:default;\n" +
+				"config:postThis states:default;\n" +
+				".\n" +
+				"default:actionUpdate2 a core:actionRole;\n" +
+				"config:preThis states:valid;\n" +
+				"config:postThis	states:valid;\n" +
+				".\n" +
+				"actions:obsolete a core:action;\n" +
+				"rdfs:label	\"Obsolete\"@en;\n" +
+				"config:overrides actions:obsolete;\n" +
+				"config:hasEffectOnCode default:actionObsolete1;\n" +
+				"config:hasEffectOnCode default:actionObsolete2;\n" +
+				"config:hasEffectOnReg default:actionObsolete1;\n" +
+				"config:hasEffectOnReg default:actionObsolete2;\n" +
+				".\n" +
+				"default:actionObsolete1 a core:actionRole;\n" +
+				"config:preThis states:default;\n" +
+				"config:postThis states:obsoleted;\n" +
+				".\n" +
+				"default:actionObsolete2 a core:actionRole;\n" +
+				"config:preThis states:valid;\n" +
+				"config:postThis states:obsoleted;\n" +
+				".\n" +
+				"actions:supersed a core:action;\n" +
+				"rdfs:label	\"Supersed\"@en;\n" +
+				"config:overrides actions:supersed;\n" +
+				"config:hasEffectOnCode default:actionSupersed1 ;\n" +
+				".\n" +
+				"default:actionSupersed1 a core:actionRole;\n	" +
+				"config:preThis	states:valid;\n" +
+				"config:preAux	states:valid;\n" +
+				"config:postThis	states:superseded;\n" +
+				"config:postAux	states:valid;\n" +
+				".\n" +
+				"actions:add	a core:action;\n" +
+				"rdfs:label	\"Add\"@en;\n" +
+				"config:overrides actions:add;\n" +
+				"config:hasEffectOnReg default:addAction1 ;\n" +
+				"config:hasEffectOnReg default:addAction2 ;\n" +
+				".\n" +
+				"default:addAction1 a core:actionRole;\n" +
+				"config:preThis	states:valid;\n" +
+				"config:postThis	states:default;	\n" +
+				".\n" +
+				"default:addAction2 a core:actionRole;\n" +
+				"config:preThis	states:default;\n" +
+				"config:postThis	states:default;	\n" +
+				".\n" +
+				"actions:validate	a core:action;\n" +
+				"rdfs:label	\"Validate\"@en;	\n" +
+				"config:hasEffectOnReg default:validateAction1 ;\n" +
+				"config:hasEffectOnCode default:validateAction1 ;\n" +
+				".\n" +
+				"default:validateAction1  a core:actionRole; \n" +
+				"config:preThis states:default;\n" +
+				"config:postThis states:valid;\n" +
+				".\n" +
+				"states:obsoleted a core:state;\n" +
+				"rdfs:label	\"Obsoleted\"@en;\n" +
+				"config:overrides states:obsoleted;\n" +
+				".\n" +
+				"states:superseded a core:state;\n" +
+				"rdfs:label	\"Superseded\"@en;\n" +
+				"config:overrides states:superseded;\n" +
+				".\n" +
+				"states:default a core:state;\n" +
+				"rdfs:label	\"Default\"@en;\n" +
+				"config:overrides states:default;\n" +
+				".\n" +
+				"states:valid a core:state;\n" +
+				"rdfs:label	\"Valid\"@en;\n" +
+				".\n";
+
+		createFileAndFillWithString(confDirAbsoluteString,"defaultProcessConfig.ttl",defProcessStatements);
 	}
 	
 
@@ -288,8 +385,8 @@ public class Initializer {
 	}
 
 	private void createFileAndFillWithString(String dir, String fileName, String content) throws ConfigurationException {
-		File confDir=new File(dir);
-		if(confDir.listFiles().length==0) {
+		//File confDir=new File(dir);
+		//if(confDir.listFiles().length==0) {
 			//We need at least to specify a default TDB.
 
 			try {
@@ -301,7 +398,7 @@ public class Initializer {
 				throw new ConfigurationException("Unable to initialize configuration file: "+fileName+" in "+confDirAbsoluteString);
 			}
 			
-		}
+		//}
 		
 	}
 	

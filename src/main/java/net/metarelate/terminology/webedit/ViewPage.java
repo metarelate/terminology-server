@@ -13,6 +13,7 @@ import net.metarelate.terminology.exceptions.ImpossibleOperationException;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
 import net.metarelate.terminology.management.RegistryPolicyManager;
+import net.metarelate.terminology.utils.FunctionExecutor;
 import net.metarelate.terminology.utils.StatementsOrganizer;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -43,7 +44,7 @@ public class ViewPage extends SuperPage {
 	protected String entityType="undefined";// "Set" or "Individual": for displaying TODO consider multi-language
 	
 	ModalWindow obsoleteConfirmPanelWindow=null;
-	ObsoleteConfirmPanel obsoleteConfirmPanelContent=null;
+	GenericConfirmPanel obsoleteConfirmPanelContent=null;
 	
 	ModalWindow supersedPanelWindow=null;
     SupersedPanel1 supersedPanelContent1=null;
@@ -108,7 +109,7 @@ public class ViewPage extends SuperPage {
 		 **********************************************************************/
 	     
 		obsoleteConfirmPanelWindow=new ModalWindow("confirmPanel");
-	    obsoleteConfirmPanelContent=new ObsoleteConfirmPanel(obsoleteConfirmPanelWindow.getContentId(),this,urlToAction);
+	    obsoleteConfirmPanelContent=new GenericConfirmPanel(obsoleteConfirmPanelWindow.getContentId(),this,urlToAction);
 	    obsoleteConfirmPanelWindow.setContent(obsoleteConfirmPanelContent);
 	    obsoleteConfirmPanelWindow.setInitialHeight(200);
 	    obsoleteConfirmPanelWindow.setInitialWidth(400);
@@ -322,6 +323,15 @@ public class ViewPage extends SuperPage {
 			@Override
 			public void onSubmit(AjaxRequestTarget target, Form<?> form) {
 				target.add(feedbackPanel);	// TODO clarify the role of target
+				obsoleteConfirmPanelContent.setMessage("Do you realy want to obsolete this entity?");
+				obsoleteConfirmPanelContent.setExecutor(new FunctionExecutor(){
+					@Override
+					public void execute(AjaxRequestTarget target) {
+						proceedObsolete(target);
+						
+					}
+					
+				});
 				obsoleteConfirmPanelWindow.show(target);	
 			}
 		};
