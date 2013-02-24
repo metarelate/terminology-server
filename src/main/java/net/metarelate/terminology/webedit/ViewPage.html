@@ -23,16 +23,18 @@
 					<div wicket:id="feedback"></div>
 					<div wicket:id="confirmPanel"></div>
 					<div wicket:id="supersedPanel"></div>
-					
-					
+					<br/>
+					<br/>
 					<div wicket:id="versionList">
 						<div wicket:id="versionContainer">
 							<p>
 							<strong>Version: <span wicket:id="versionNumber">version</span></strong><br/>
-							Date: <span wicket:id="versionDate">date</span><br/>
-							Action: <span wicket:id="versionAction">date</span><br/>
-							By: <span wicket:id="versionAuthor">date</span><br/>
-							Description: <span wicket:id="versionDescription">date</span><br/>
+							<strong>State:</strong> <span wicket:id="versionState">date</span><br/>
+							<strong>Date:</strong> <span wicket:id="versionDate">date</span><br/>
+							<strong>Action:</strong> <span wicket:id="versionAction">date</span><br/>
+							<strong>By:</strong> <span wicket:id="versionAuthor">date</span><br/>
+							<strong>Description:</strong> <span wicket:id="versionDescription">date</span><br/>
+							<strong>Properties:</strong><br/>
 							<table class="propertyTable">
 								<!-- span wicket:id="statsContainer" -->
 									<tr wicket:id="statsContainer"><td><span wicket:id="property">prop</span></td><td><span wicket:id="value">value</span></td></tr>
@@ -54,7 +56,7 @@
 				<input wicket:id="newRegisterButton" type="submit" value="new sub register" class="actionButton" /><br/>
 				<input wicket:id="obsoleteButton" type="submit" value="obsolete" class="actionButton" /><br/>
 				<input wicket:id="supersedButton" type="submit" value="supersed" class="actionButton" /><br/>
-				<span wicket:id="extraButtons"><input wicket:id="extraButton" type="submit" value="action" class="extraActionButton" /><br/></span>
+				<span wicket:id="extraButtons"><input wicket:id="extraButton" type="submit" value="action" class="actionButton" /><br/></span>
 				<input wicket:id="pullButton" type="submit" value="pull" class="actionButton" /><br/>
 				<input wicket:id="pushButton" type="submit" value="push" class="actionButton" /><br/>
 					</form>

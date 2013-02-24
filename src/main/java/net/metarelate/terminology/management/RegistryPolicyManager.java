@@ -266,23 +266,29 @@ public class RegistryPolicyManager {
 	}
 	
 	private boolean isViableOperation(Map<String,ArrayList<String[]>> anyTransitions, String actionURI, String thisState, String upState, String downState, String auxState) {
-		if(thisState==null) thisState="";
-		if(upState==null) upState="";
-		if(downState==null) downState="";
-		if(auxState==null) auxState="";
+		//if(thisState==null) thisState="";
+		//if(upState==null) upState="";
+		//if(downState==null) downState="";
+		//if(auxState==null) auxState="";
 		
 		if(!anyTransitions.containsKey(actionURI)) return false;
 		ArrayList<String[]> transitionsForAction=anyTransitions.get(actionURI);
+		SSLogger.log("Action not found in transition table: "+actionURI,SSLogger.DEBUG);
+		SSLogger.log("Transition table was: ",SSLogger.DEBUG);
 		for(String[] transitionForAction:transitionsForAction) {
 			boolean score=true;
-			if(transitionForAction[PRE_THIS]!=null) 
-				if(!transitionForAction[PRE_THIS].equals(thisState)) score=false;
+			if(transitionForAction[PRE_THIS]!=null)
+					if(thisState!=null)
+						if(!transitionForAction[PRE_THIS].equals(thisState)) score=false;
 			if(transitionForAction[PRE_UP]!=null) 
-				if(!transitionForAction[PRE_UP].equals(upState)) score=false;
+				if(upState!=null)
+					if(!transitionForAction[PRE_UP].equals(upState)) score=false;
 			if(transitionForAction[PRE_DOWN]!=null) 
-				if(!transitionForAction[PRE_DOWN].equals(downState)) score=false;
+				if(downState!=null)
+					if(!transitionForAction[PRE_DOWN].equals(downState)) score=false;
 			if(transitionForAction[PRE_AUX]!=null) 
-				if(!transitionForAction[PRE_AUX].equals(auxState)) score=false;
+				if(auxState!=null)
+					if(!transitionForAction[PRE_AUX].equals(auxState)) score=false;
 			if(score==true) return true;
 		}
 		return false;
@@ -318,48 +324,56 @@ public class RegistryPolicyManager {
 			if(transitionForAction[PRE_THIS]!=null) {
 				SSLogger.log("Need to check THIS :"+transitionForAction[PRE_THIS],SSLogger.DEBUG);
 				SSLogger.log("Against :"+thisState,SSLogger.DEBUG);
-				if(!transitionForAction[PRE_THIS].equals(thisState)) {
-					SSLogger.log("Failed",SSLogger.DEBUG);
-					score=false;
-				}
-				else {
-					SSLogger.log("Passed",SSLogger.DEBUG);
+				if(thisState!=null) {
+					if(!transitionForAction[PRE_THIS].equals(thisState)) {
+						SSLogger.log("Failed",SSLogger.DEBUG);
+						score=false;
+					}
+					else {
+						SSLogger.log("Passed",SSLogger.DEBUG);
+					}
 				}
 			}
 				
 			if(transitionForAction[PRE_UP]!=null) {
 				SSLogger.log("Need to check UP :"+transitionForAction[PRE_UP],SSLogger.DEBUG);
 				SSLogger.log("Against :"+upState,SSLogger.DEBUG);
-				if(!transitionForAction[PRE_UP].equals(upState)) {
-					SSLogger.log("Failed",SSLogger.DEBUG);
-					score=false;
-				}
-				else {
-					SSLogger.log("Passed",SSLogger.DEBUG);
+				if(upState!=null) {
+					if(!transitionForAction[PRE_UP].equals(upState)) {
+						SSLogger.log("Failed",SSLogger.DEBUG);
+						score=false;
+					}
+					else {
+						SSLogger.log("Passed",SSLogger.DEBUG);
+					}
 				}
 			}
 				
 			if(transitionForAction[PRE_DOWN]!=null) {
 				SSLogger.log("Need to check DOWN :"+transitionForAction[PRE_DOWN],SSLogger.DEBUG);
 				SSLogger.log("Against :"+downState,SSLogger.DEBUG);
-				if(!transitionForAction[PRE_DOWN].equals(downState)) {
-					SSLogger.log("Failed",SSLogger.DEBUG);
-					score=false;
-				}
-				else {
-					SSLogger.log("Passed",SSLogger.DEBUG);
+				if(downState!=null) {
+					if(!transitionForAction[PRE_DOWN].equals(downState)) {
+						SSLogger.log("Failed",SSLogger.DEBUG);
+						score=false;
+					}
+					else {
+						SSLogger.log("Passed",SSLogger.DEBUG);
+					}
 				}
 			}
 				
 			if(transitionForAction[PRE_AUX]!=null) {
 				SSLogger.log("Need to check AUX :"+transitionForAction[PRE_AUX],SSLogger.DEBUG);
 				SSLogger.log("Against :"+auxState,SSLogger.DEBUG);
-				if(!transitionForAction[PRE_AUX].equals(auxState)) {
-					SSLogger.log("Failed",SSLogger.DEBUG);
-					score=false;
-				}
-				else {
-					SSLogger.log("Passed",SSLogger.DEBUG);
+				if(auxState!=null) {
+					if(!transitionForAction[PRE_AUX].equals(auxState)) {
+						SSLogger.log("Failed",SSLogger.DEBUG);
+						score=false;
+					}
+					else {
+						SSLogger.log("Passed",SSLogger.DEBUG);
+					}
 				}
 			}
 				

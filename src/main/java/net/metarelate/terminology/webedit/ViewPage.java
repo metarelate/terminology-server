@@ -159,6 +159,7 @@ public class ViewPage extends SuperPage {
 		    	WebMarkupContainer versionContainer=new WebMarkupContainer("versionContainer");
 		    	String currentVersion=item.getModelObject();
 		    	Label versionLabel=new Label("versionNumber",currentVersion);
+		    	Label versionState=new Label("versionState",TerminologyEntityWrapper.getObject().getStateURI(currentVersion));
 		    	Label versionDate=new Label("versionDate",TerminologyEntityWrapper.getObject().getActionDate(currentVersion)); 
 		    	Label versionAction=new Label(
 		    			"versionAction",
@@ -174,6 +175,7 @@ public class ViewPage extends SuperPage {
 		    			);
 		    	Label versionDescription=new Label("versionDescription",TerminologyEntityWrapper.getObject().getActionDescription(currentVersion));
 		    	versionContainer.add(versionLabel);
+		    	versionContainer.add(versionState);
 		    	versionContainer.add(versionDate);
 		    	versionContainer.add(versionAction);
 		    	versionContainer.add(versionAuthor);
@@ -437,6 +439,19 @@ public class ViewPage extends SuperPage {
 						null,
 						null,
 						CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlSuperseder).getStateURI(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlSuperseder).getLastVersion()) 
+						))
+					supersedEnabled=false;	
+			}
+			else supersedEnabled=false;
+		}
+		else {
+			if(CommandWebConsole.myInitializer.myFactory.terminologyIndividualExist(urlToAction)) {
+				if(!CommandWebConsole.myInitializer.myRegistryPolicyManager.isViableOperationOnCode(
+						RegistryPolicyManager.actionSupersedURI, 
+						CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlToAction).getStateURI(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlToAction).getLastVersion()), 
+						null,
+						null,
+						null
 						))
 					supersedEnabled=false;	
 			}
