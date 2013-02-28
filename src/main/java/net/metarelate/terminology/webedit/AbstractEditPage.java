@@ -3,8 +3,11 @@ package net.metarelate.terminology.webedit;
 import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.exceptions.AuthException;
+import net.metarelate.terminology.exceptions.ConfigurationException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
 import net.metarelate.terminology.exceptions.WebSystemException;
+import net.metarelate.terminology.management.ConstraintsManager;
+import net.metarelate.terminology.utils.SSLogger;
 
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
@@ -35,6 +38,7 @@ public abstract class AbstractEditPage  extends SuperPage {
 	protected TerminologyEntity myEntity=null;
 	protected String pageMessage="";
 	protected FeedbackPanel feedbackPanel=null;
+	protected String uriOfContainer=null;
 	
 	public AbstractEditPage(final PageParameters parameters) {
 		super(parameters);
@@ -44,7 +48,24 @@ public abstract class AbstractEditPage  extends SuperPage {
 	
 	protected abstract void buildEntity(Model statementsCollected,String description) throws WebSystemException;
 	
-	protected void buildForm() throws WebSystemException {
+	protected void buildForm() throws WebSystemException, ConfigurationException {
+		SSLogger.log("Building plan for form",SSLogger.DEBUG);
+		//SSLogger.log("Entity: "+myEntity.getURI(),SSLogger.DEBUG);
+		String[] constraints=null;
+		if(isNew) {
+			SSLogger.log("New mode",SSLogger.DEBUG);
+			if(isSet) constraints=CommandWebConsole.myInitializer.myConstraintsManager.getSortedConstraintsForNewReg(uriOfContainer);
+			if(isIndividual) constraints=CommandWebConsole.myInitializer.myConstraintsManager.getSortedConstraintsForNewCode(uriOfContainer);
+
+		}
+		else if(isEdit) {
+			SSLogger.log("Edit mode",SSLogger.DEBUG);
+			if(isSet) constraints=CommandWebConsole.myInitializer.myConstraintsManager.getSortedConstraintsForNewReg(myEntity.getURI());
+			if(isIndividual) constraints=CommandWebConsole.myInitializer.myConstraintsManager.getSortedConstraintsForNewCode(myEntity.getURI());
+		}
+		else {} //Something would be wrong if we end up here
+		for (String cons:constraints) SSLogger.log(cons,SSLogger.DEBUG);
+		
 		
 		// TODO what below should be generalized to all statements present (or required for a new term/set).
 		org.apache.wicket.model.Model<String> labelModel=null;

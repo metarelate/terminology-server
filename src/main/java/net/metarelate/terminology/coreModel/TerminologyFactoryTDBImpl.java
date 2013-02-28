@@ -235,4 +235,15 @@ public class TerminologyFactoryTDBImpl implements TerminologyFactory {
 		}
 		
 	}
+
+	public Set<TerminologySet> getRootsForURI(String uri) {
+		TerminologyEntity myEntity=getExistingTerminologyEntity(uri);
+		return myEntity.getContainers(myEntity.getLastVersion());
+	}
+
+	public TerminologyEntity getExistingTerminologyEntity(String uri) {
+		if(terminologyIndividualExist(uri)) return getOrCreateTerminologyIndividual(uri);
+		else if(terminologySetExist(uri)) return getOrCreateTerminologySet(uri);
+		else return null;
+	}
 }

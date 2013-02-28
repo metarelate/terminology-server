@@ -195,7 +195,7 @@ public class Initializer {
 		myFactory=new TerminologyFactoryTDBImpl(tdbPath);
 		myAuthServer=AuthServerFactory.createServerFromConfig(getConfigurationGraph());
 		myRegistryPolicyManager=new RegistryPolicyManager(getConfigurationGraph());
-		myConstraintsManager=new ConstraintsManager(getConfigurationGraph());
+		myConstraintsManager=new ConstraintsManager(this);
 		myAuthManager=new AuthRegistryManager(myAuthServer,myFactory);
 		myTerminologyManager=new TerminologyManager(this);
 		

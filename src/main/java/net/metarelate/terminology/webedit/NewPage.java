@@ -4,6 +4,7 @@ import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.AuthException;
+import net.metarelate.terminology.exceptions.ConfigurationException;
 import net.metarelate.terminology.exceptions.InvalidProcessException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
 import net.metarelate.terminology.exceptions.WebSystemException;
@@ -28,11 +29,11 @@ import com.hp.hpl.jena.rdf.model.Statement;
 
 public class NewPage  extends AbstractEditPage {
 	private static final long serialVersionUID = 1L;
-	private String uriOfContainer=null;
+	//private String uriOfContainer=null;
 	private String type=null;
 	AjaxyTextArea uriField=null;
 	Label uriStatus=null;
-	public NewPage(final PageParameters parameters) throws WebSystemException {
+	public NewPage(final PageParameters parameters) throws WebSystemException, ConfigurationException {
 		super(parameters);
 		//uriOfEntity=parameters.get("entity").toString();
 		uriToSupersed=parameters.get("superseding").toString();
@@ -80,7 +81,8 @@ public class NewPage  extends AbstractEditPage {
 		add(uriStatus);
 		
 	
-				
+		//TODO here is where we start with fields...
+		
 		buildForm();
 		postConstructionFinalize();
 		
