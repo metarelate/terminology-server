@@ -25,6 +25,8 @@ import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 public interface TerminologyEntity {
+	final int INDIVIDUAL_TYPE = 1;
+	final int SET_TYPE=2;
 	/**
 	 * Returns the URI representing the entity
 	 * @return the URI string (not null and not by design)
@@ -250,6 +252,13 @@ public interface TerminologyEntity {
 	public abstract String[] getVersions();
 	
 	/**
+	 * Returns an array containing version and all its preceding versions
+	 * (inverse chronological order)
+	 * @return
+	 */
+	public abstract String[] getVersionsChainFor(String version);
+	
+	/**
 	 * Return an URI representation of the entity for a given version.
 	 * @param version
 	 * @return
@@ -383,6 +392,7 @@ public interface TerminologyEntity {
 	String getGenericEndurantStringValueObject(Property property);
 	String getGenericEndurantURIObject(Property property);
 
-	public abstract void synch();	
+	public abstract void synch();
+
 	
 }

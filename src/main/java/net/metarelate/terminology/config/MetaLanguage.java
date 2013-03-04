@@ -43,6 +43,7 @@ public class MetaLanguage {
 	private static Set<Resource> indexRData=null;
 	private static Set<Property> indexPData=null;
 	
+	
 	/**
 	 * Configuration and instance management
 	 */

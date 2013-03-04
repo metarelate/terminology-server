@@ -81,7 +81,7 @@ public class EditPage  extends SuperPage {
 		return "Term edition";
 	}
 	@Override
-	String getCoreMessage() {
+	String getPageStateMessage() {
 		return "Nothing to say";
 	}
 

@@ -57,6 +57,7 @@ public class CommandWebConsole extends WebApplication
 		//mountPage("/search",SearchPage.class);
 		mountPage("/search",SearchPage.class);
 		mountPage("/view",ViewPage.class);
+		mountPage("/new",NewPage.class);
 	}
 	
 	

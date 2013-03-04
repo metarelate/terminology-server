@@ -83,19 +83,23 @@ public class TerminologySetTDBImpl extends
 	 * This method is independent of this individual being backed by TDB.
 	 * It could be abstracted, if different implementations are designed.
 	 */
-	public void unregisterContainedIndividual(TerminologyIndividual toRemove) {
-		unregisterContainedIndividual(toRemove,getDefaultVersion(),toRemove.getDefaultVersion());
+	public void unregisterContainedEntity(TerminologyEntity toRemove) {
+		unregisterContainedEntity(toRemove,getDefaultVersion(),toRemove.getDefaultVersion());
 	}
 
 	
-	public void unregisterContainedIndividual(
-			TerminologyIndividual myIndividual, String myVersion,
+	public void unregisterContainedEntity(
+			TerminologyEntity myIndividual, String containerVersion,
 			String containedVersion) {
 		// TODO fix here! (unclear what this comment was referring to!)
-		Model containerModel=getStatements(myVersion);
+		Model containerModel=getStatements(containerVersion);
 		Model containedModel=myIndividual.getStatements(containedVersion);
 		
+		//TODO it's either one or the other down here... perhaps we need to  move this higher in the abstraction chain
 		containerModel.remove(myRes,TDBModelsCoreConfig.hasRegisterItem,myIndividual.getResource());
+		containerModel.remove(myRes,TDBModelsCoreConfig.hasSubRegister,myIndividual.getResource());
+		//System.out.println("REMOVING: "+myRes+" --- "+TDBModelsCoreConfig.hasRegisterItem+
+		//		" ---"+myIndividual.getResource()+" FROM container version "+containerVersion);
 		containedModel.remove(myIndividual.getResource(),TDBModelsCoreConfig.definedInRegister,myRes);
 		/*
 		Resource versionModel=globalGraph.createResource(myIndividual.getVersionURI(myVersion));

@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import net.metarelate.terminology.config.MetaLanguage;
+import net.metarelate.terminology.coreModel.LabelManager;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.coreModel.TerminologyIndividual;
 import net.metarelate.terminology.coreModel.TerminologySet;
@@ -42,10 +43,17 @@ import org.apache.wicket.validation.validator.StringValidator;
 
 public class SearchPage extends SuperPage {
 	private static final long serialVersionUID = 1L;
-
+	boolean hasSuperseder=false;
+	String urlToSupersed=null;
+	String pageStateMessageString="Just searching";
 	public SearchPage(PageParameters parameters) {
 		super(parameters);
-		
+		urlToSupersed=parameters.get("superseding").toString();
+		if(urlToSupersed!=null) {
+			hasSuperseder=true;
+			pageStateMessageString="Search for a term to supersed: "+urlToSupersed;
+		}
+		postConstructionFinalize();
 		//final Label resultLabel=new Label("resultLabel","Nothing yet");
 		//resultLabel.setOutputMarkupId(true);
 		//add(resultLabel);
@@ -69,15 +77,29 @@ public class SearchPage extends SuperPage {
 		                	// TODO we coould have something more personalized here (Collection, Register..) or use an image...
 		                	String lastVersion=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(elementURI).getLastVersion();
 		                	String idLabel=SimpleQueriesProcessor.getOptionalLiteralValueAsString(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(elementURI).getResource(), MetaLanguage.notationProperty, CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(elementURI).getStatements(lastVersion));
-		                	String lastStatus=SimpleQueriesProcessor.getOptionalLiteralValueAsString(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(elementURI).getResource(), MetaLanguage.hasStatusProperty, CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(elementURI).getStatements(lastVersion));
+		                	
+		                	
+		                	String lastStatusURI=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(elementURI)
+		                	.getGenericVersionSpecificURIObject(MetaLanguage.hasStatusProperty,lastVersion);
+		                	
+		                	String lastStatus=CommandWebConsole.myInitializer.myFactory.getLabelManager().getLabelForURI(lastStatusURI, LabelManager.URI_IF_NULL);
 		                	if(idLabel==null) idLabel="undefined";
 		                	if(lastStatus==null) lastStatus="undefined";
 		                	item.add(new Label("resultID",idLabel));
 		                	item.add(new Label("resultDescription",CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(elementURI).getLabel(lastVersion)));
-		                	
 		                	BookmarkablePageLink pageLink=new BookmarkablePageLink("resultURI",ViewPage.class);
-		    		    	pageLink.getPageParameters().set("entity", elementURI);
-		    		    	pageLink.add(new Label("resultURILabel",elementURI));
+		                	if(hasSuperseder) {
+		                		System.out.println("has: "+elementURI);
+		                		pageLink.getPageParameters().set("entity", urlToSupersed);
+		                		pageLink.getPageParameters().set("superseder", elementURI);
+		        				
+		                	}
+		                	else {
+		                		System.out.println("has NOT ");
+		                		pageLink.getPageParameters().set("entity", elementURI);
+			    		    	
+		                	}
+		                	pageLink.add(new Label("resultURILabel",elementURI));
 		                	item.add(pageLink);
 		                	item.add(new Label("resultLastVersion",lastVersion));
 		                	item.add(new Label("resultStatus",lastStatus));
@@ -87,14 +109,29 @@ public class SearchPage extends SuperPage {
 		                	// TODO same note as above
 		                	String lastVersion=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(elementURI).getLastVersion();
 		                	String idLabel=SimpleQueriesProcessor.getOptionalLiteralValueAsString(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(elementURI).getResource(), MetaLanguage.notationProperty, CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(elementURI).getStatements(lastVersion));
-		                	String lastStatus=SimpleQueriesProcessor.getOptionalLiteralValueAsString(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(elementURI).getResource(), MetaLanguage.hasStatusProperty, CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(elementURI).getStatements(lastVersion));
+		                	
+		                	String lastStatusURI=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(elementURI)
+				                	.getGenericVersionSpecificURIObject(MetaLanguage.hasStatusProperty,lastVersion);
+				                	
+				            String lastStatus=CommandWebConsole.myInitializer.myFactory.getLabelManager().getLabelForURI(lastStatusURI, LabelManager.URI_IF_NULL);
+		                	
 
 		                	if(idLabel==null) idLabel="undefined";
 		                	if(lastStatus==null) lastStatus="undefined";
 		                	item.add(new Label("resultID",idLabel));
 		                	item.add(new Label("resultDescription",CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(elementURI).getLabel(lastVersion)));
 		                	BookmarkablePageLink pageLink=new BookmarkablePageLink("resultURI",ViewPage.class);
-		    		    	pageLink.getPageParameters().set("entity", elementURI);
+		                	if(hasSuperseder) {
+		                		System.out.println("has: "+elementURI);
+		                		pageLink.getPageParameters().set("entity", urlToSupersed);
+		                		pageLink.getPageParameters().set("superseder", elementURI);
+		        				
+		                	}
+		                	else {
+		                		System.out.println("has NOT ");
+		                		pageLink.getPageParameters().set("entity", elementURI);
+			    		    	
+		                	}
 		    		    	pageLink.add(new Label("resultURILabel",elementURI));
 		                	item.add(pageLink);
 		                	item.add(new Label("resultLastVersion",lastVersion));
@@ -114,18 +151,7 @@ public class SearchPage extends SuperPage {
 		                	//TODO to check: this may break Wicket Code as there are no instructions to render a link
 		                }
 		          
-		                /*
-		                item.add(AttributeModifier.replace("class", new AbstractReadOnlyModel()
-		                {
-		                    private static final long serialVersionUID = 1L;
-
-		                    @Override
-		                    public String getObject()
-		                    {
-		                        return (item.getIndex() % 2 == 1) ? "even" : "odd";
-		                    }
-		                }));
-		                */
+		              
 		            }
 		        };
 		        resultView.setOutputMarkupId(true);
@@ -245,17 +271,18 @@ public class SearchPage extends SuperPage {
 		 * Regsiters tree
 		 *********************************************************************/
 		
-		final AbstractTree<String> registerTree=new DefaultNestedTree<String>("registerTree",createRegRootModel())  {
+		AbstractTree<String> registerTree=new DefaultNestedTree<String>("registerTree",createRegRootModel())  {
 			/**
 			 * 
 			 */
 			private static final long serialVersionUID = 1L;
+			
 
 			@Override
 			protected Component newContentComponent(final String id, final IModel model) {
 				return new Folder(id, this, model) {
 					private static final long serialVersionUID = 1L;
-
+							
 				            /**
 				             * Always clickable.
 				             */
@@ -274,7 +301,7 @@ public class SearchPage extends SuperPage {
 				   		        String res[]=null;
 				   		        if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(selectedSetURI)) {
 				   		        	//TODO check consistency of defaults (versions)
-				   		        	Set<TerminologyIndividual> childrenSet=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(selectedSetURI).getIndividuals();
+				   		        	Set<TerminologyIndividual> childrenSet=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(selectedSetURI).getIndividuals(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(selectedSetURI).getLastVersion());
 				   		        	res=new String[childrenSet.size()+1];
 				   		        	res[0]=selectedSetURI;
 				   		        	Iterator<TerminologyIndividual> childrenIter=childrenSet.iterator();
@@ -317,7 +344,7 @@ public class SearchPage extends SuperPage {
 			}
 		};
 		
-		
+		//System.out.println("Building tree, maybe");
 		
 		add(registerTree);
 		
@@ -331,15 +358,7 @@ public class SearchPage extends SuperPage {
 
 		 
 		
-	/*
-	private class MyDefaultNestedTree extends DefaultNestedTree {
-
-		public MyDefaultNestedTree(String id, ITreeProvider provider) {
-			super(id, provider);
-		}
-		
-	}
-*/
+	
 	private ITreeProvider<String> createRegRootModel() {
 		return new ITreeProvider<String>(){
 
@@ -350,8 +369,9 @@ public class SearchPage extends SuperPage {
 
 			public Iterator<String> getChildren(String collection) {
 				ArrayList<String> resultList=new ArrayList<String>();
+				//System.out.println("Collectoon: "+collection+"version: "+CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(collection).getLastVersion());
 				if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(collection)) {
-					Set<TerminologySet> children=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(collection).getCollections();
+					Set<TerminologySet> children=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(collection).getCollections(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(collection).getLastVersion());
 					Iterator<TerminologySet> setIter=children.iterator();
 					while(setIter.hasNext()) {
 						resultList.add(setIter.next().getURI())
@@ -371,7 +391,7 @@ public class SearchPage extends SuperPage {
 
 			public boolean hasChildren(String collection) {
 				if(!CommandWebConsole.myInitializer.myFactory.terminologySetExist(collection)) return false;
-				Set<TerminologySet> children=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(collection).getCollections();
+				Set<TerminologySet> children=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(collection).getCollections(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(collection).getLastVersion());
 				if(children.size()>0) return true;
 				else return false;
 			}
@@ -391,8 +411,8 @@ public class SearchPage extends SuperPage {
 	}
 
 	@Override
-	String getCoreMessage() {
-		return "Just searching";
+	String getPageStateMessage() {
+		return pageStateMessageString;
 	}
 	
 	private class SearchResultList implements IDataProvider<String> {

@@ -29,7 +29,7 @@ package net.metarelate.terminology.exceptions;
  * @author andreasplendiani
  *
  */
-public class AuthException extends Exception {
+public class AuthException extends ImpossibleOperationException {
 
 	public AuthException(String actionAgent,
 			String actionURI, String entityURI) {

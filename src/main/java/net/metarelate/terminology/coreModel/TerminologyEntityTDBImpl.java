@@ -19,11 +19,18 @@
 	
 package net.metarelate.terminology.coreModel;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import net.metarelate.terminology.config.CoreConfig;
 import net.metarelate.terminology.config.MetaLanguage;
+import net.metarelate.terminology.utils.CodeComparator;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Literal;
@@ -34,6 +41,7 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.tdb.TDB;
 
@@ -476,5 +484,19 @@ public class TerminologyEntityTDBImpl implements TerminologyEntity{
 		// TODO calls to synch should be double checked (arguably, it's a TerminologyManager issue)
 		
 	}
+
+	public String[] getVersionsChainFor(String version) {
+		ArrayList<String> versions=new ArrayList<String>();
+		String currentVersion=getLastVersion();
+		versions.add(currentVersion);
+		while(getPreviousVersion(currentVersion)!=null) {
+			currentVersion=getPreviousVersion(currentVersion);
+			versions.add(currentVersion);
+		}
+		return versions.toArray(new String[0]);
+	}
+
+
+	
 	
 }

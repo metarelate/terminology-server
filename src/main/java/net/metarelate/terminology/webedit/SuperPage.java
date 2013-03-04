@@ -16,7 +16,7 @@ public abstract class SuperPage extends WebPage {
 		return "v. "+CoreConfig.VERSION_NUMBER+" ("+CoreConfig.VERSION_CODENAME+")";
 	}
 	abstract String getSubPage();
-	abstract String getCoreMessage();
+	abstract String getPageStateMessage();
 	public SuperPage(PageParameters parameters) {
 		super(parameters);
 		// More to do..
@@ -26,9 +26,13 @@ public abstract class SuperPage extends WebPage {
 		add(new Label("subTitle",getPageSubTitle()));
 		add(new NavigationBar("termNavBar",CommandWebConsole.LOCAL_CONFIGURATION_PAGE));
 		add(new Label("subPage",getSubPage()));
-		add(new Label("coreMessage",getCoreMessage()));
+		
 		add(new Footer("termFooter"));
 	
 
     }
+	public final void postConstructionFinalize() {
+		add(new Label("coreMessage",getPageStateMessage()));
+	}
+	
 }

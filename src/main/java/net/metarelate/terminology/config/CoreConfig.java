@@ -1,5 +1,5 @@
 /* 
- (C) British Crown Copyright 2011 - 2012, Met Office
+ (C) British Crown Copyright 2011 - 2013, Met Office
 
  This file is part of terminology-server.
 
@@ -23,8 +23,8 @@ package net.metarelate.terminology.config;
 public class CoreConfig {
 	public static final String INIT_VERSION = "v0";
 	
-	public static String VERSION_NUMBER="0.7.0";
-	public static String VERSION_CODENAME="tdb-all";
+	public static String VERSION_NUMBER="0.8.0";
+	public static String VERSION_CODENAME="wicketIntegration";
 	
 	public static String UNDEFINED_LABEL="undefined";
 	
@@ -50,4 +50,10 @@ public class CoreConfig {
 	public static final String dbDirString="db";
 	public static final String confDirString="conf";
 	public static final String authDirString = "auth";
+
+	public static final String seedFileString = "instanceSeed.ttl";
+	
+	public static final String hasInstanceIdentifierURI="http://metarelate.net/configuration/hasInstanceIdentifier";
+	public static final String selfURI="http://thisInstance.org";
+	
 }

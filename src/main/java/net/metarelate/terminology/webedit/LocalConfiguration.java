@@ -45,7 +45,7 @@ public final class LocalConfiguration extends SuperPage {
 	}
 
 	@Override
-	String getCoreMessage() {
+	String getPageStateMessage() {
 		return "";
 	}
 }
