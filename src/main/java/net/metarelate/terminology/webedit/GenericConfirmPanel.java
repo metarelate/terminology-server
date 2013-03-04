@@ -1,5 +1,7 @@
 package net.metarelate.terminology.webedit;
 
+import net.metarelate.terminology.utils.FunctionExecutor;
+
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
@@ -13,12 +15,13 @@ import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 
-public class ObsoleteConfirmPanel extends Panel
+public class GenericConfirmPanel extends Panel
 {
 	Label textLabel=null;
 	AjaxLink confirmButton=null;
 	AjaxLink abandonButton=null;
 	AjaxyTextArea description=null;
+	FunctionExecutor myExecutor=null;
 	
 	
     /**
@@ -26,11 +29,12 @@ public class ObsoleteConfirmPanel extends Panel
      * @param message
      * @param container
      */
-    public ObsoleteConfirmPanel(String id, final ViewPage viewPage, final String urlToAction)
+    public GenericConfirmPanel(String id, final ViewPage viewPage, final String urlToAction)
     {
         super(id);
-        String message="Do you really want to obsolete this term ?";	
+        String message="Do you really want to proceed with this action ?";	
         textLabel=new Label("text",message);
+        textLabel.setOutputMarkupId(true);
         add(textLabel);
         confirmButton=new AjaxLink("proceedButton",new ResourceModel("Proceed")) {
 
@@ -38,7 +42,8 @@ public class ObsoleteConfirmPanel extends Panel
 			public void onClick(AjaxRequestTarget target) {
 				target.add(viewPage.feedbackPanel);
 				viewPage.obsoleteConfirmPanelWindow.close(target); 
-				viewPage.proceedObsolete(target);
+				if(myExecutor!=null) myExecutor.execute(target);
+				//viewPage.proceedObsolete(target);
 				//PageParameters pageParameters = new PageParameters();
 				//pageParameters.add("entity", urlToAction);
 				//setResponsePage(ViewPage.class,pageParameters);
@@ -78,6 +83,13 @@ public class ObsoleteConfirmPanel extends Panel
     	return result;
     }
    
+    public void setMessage(String message) {
+    	textLabel.setDefaultModelObject(message);
+    }
+    
+    public void setExecutor(FunctionExecutor e) {
+    	myExecutor=e;
+    }
     
 
 }

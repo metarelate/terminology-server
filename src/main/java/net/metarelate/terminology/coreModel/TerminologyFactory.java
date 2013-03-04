@@ -128,6 +128,8 @@ public interface TerminologyFactory {
 			String textQueryString);
 	public abstract Set<String> extractSetsWithMarchingValue(
 			String textQueryString);
+
+	public abstract void synch();
 	
 	
 }

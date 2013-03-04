@@ -1,0 +1,164 @@
+@prefix metaMap: 	<http://reference.metoffice.gov.uk/data/wmo/meta/mapping#> .
+@prefix metModel:	<http://reference.metoffice.gov.uk/data/wmo/meta/model#> .
+@prefix metExtra:	<http://reference.metoffice.gov.uk/data/wmo/def/met#> .
+@prefix iso19135: 	<http://reference.metoffice.gov.uk/data/wmo/def/iso19135#> .
+@prefix wmo: 		<http://reference.metoffice.gov.uk/data/wmo/def/wmo#> .
+@prefix map:		<http://reference.metoffice.gov.uk/data/wmo/mapping/generic1#> .
+
+@prefix rdfs:   	<http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdf:    	<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:    	<http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: 		<http://www.w3.org/2004/02/skos/core#> .
+
+
+#The following namespaces are defined to ease the portability of this file.
+@prefix siteBase: 	<http://127.0.0.1:8888/MetOffice3/global/> .
+@prefix common:		<http://127.0.0.1:8888/MetOffice3/global/common/> .
+@prefix schemes:	<http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes/> .
+@prefix bufr:		<http://reference.metoffice.gov.uk/data/wmo/tdcf/bufr/> .
+@prefix crex:		<http://reference.metoffice.gov.uk/data/wmo/tdcf/crex/> .
+@prefix grib:		<http://reference.metoffice.gov.uk/data/wmo/tdcf/grib/> .
+@prefix bufrcrex:	<http://reference.metoffice.gov.uk/data/wmo/tdcf/bufrcrex/> .
+# TODO
+# do we still need the two following definitions ?
+@prefix bufrb: 		<http://reference.metoffice.gov.uk/data/wmo/tdcf/bufr/b/> .
+@prefix crexb: 		<http://reference.metoffice.gov.uk/data/wmo/tdcf/crex/b/> .
+
+
+
+
+[] a metaMap:publisherSpecs;
+	metaMap:tdbPrefix	"/home/ec2-user/DB/MetOffice";
+	.
+
+[] a metaMap:publisherSpecs;
+	metaMap:sitePrefix	"http://reference.metoffice.gov.uk/data/wmo/tdcf";
+	metaMap:diskPrefix	"/vaw/www/html/data/wmo/tdcf";
+	#metaMap:cssAddress	"http://localhost:8888/MetOffice3/web/MetStyle.css";
+	metaMap:baseURL		"http://reference.metoffice.gov.uk/data/wmo/tdcf";
+	.
+
+
+###########################################################################################################
+# Begin: override directives
+# These are needed to override URL and File Paths generations when incomplete mapping files are used.
+# The generation of these values is based on the root known by the system.
+# When the root doesn't correspond to the real root (e.g. in case of partial mappings) override directives
+# can be used to supplement the desired values
+###########################################################################################################
+
+#
+# Common Tables
+#
+common:c-13 metaMap:overridesDiskPrefix "/var/www/html/data/wmo/tdcf/common/c-13";
+metaMap:overrideSitePrefix "http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-13";
+.
+
+common:c-6 metaMap:overridesDiskPrefix "/var/www/html/data/wmo/tdcf/common/c-6";
+metaMap:overrideSitePrefix "http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-6";
+.
+
+common:c-1 metaMap:overridesDiskPrefix "/var/www/html/data/wmo/tdcf/common/c-1";
+metaMap:overrideSitePrefix "http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-1";
+.
+
+common:c-11 metaMap:overridesDiskPrefix "/var/www/html/data/wmo/tdcf/common/c-11";
+metaMap:overrideSitePrefix "http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-11";
+.
+
+common:c-12 metaMap:overridesDiskPrefix "/var/www/html/data/wmo/tdcf/common/c-12";
+metaMap:overrideSitePrefix "http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-12";
+.
+
+common:x-dataTypes metaMap:overridesDiskPrefix "/var/www/html/data/wmo/tdcf/common/x-dataTypes";
+metaMap:overrideSitePrefix "http://reference.metoffice.gov.uk/data/wmo/tdcf/common/x-dataTypes";
+.
+
+common:x-dataUnits metaMap:overridesDiskPrefix "/var/www/html/data/wmo/tdcf/common/x-dataUnits";
+metaMap:overrideSitePrefix "http://reference.metoffice.gov.uk/data/wmo/tdcf/common/x-dataUnits";
+.
+
+common:x-clouds metaMap:overridesDiskPrefix "/var/www/html/data/wmo/tdcf/common/x-clouds";
+metaMap:overrideSitePrefix "http://reference.metoffice.gov.uk/data/wmo/tdcf/common/x-clouds";
+.
+
+common:x-regions metaMap:overridesDiskPrefix "/var/www/html/data/wmo/tdcf/common/x-regions";
+metaMap:overrideSitePrefix "http://reference.metoffice.gov.uk/data/wmo/tdcf/common/x-regions";
+.
+
+common:x-temperatures metaMap:overridesDiskPrefix "/var/www/html/data/wmo/tdcf/common/x-temperatures";
+metaMap:overrideSitePrefix "http://reference.metoffice.gov.uk/data/wmo/tdcf/common/x-temperatures";
+.
+
+common:x-weather metaMap:overridesDiskPrefix "/var/www/html/data/wmo/tdcf/common/x-weather";
+metaMap:overrideSitePrefix "http://reference.metoffice.gov.uk/data/wmo/tdcf/common/x-weather";
+.
+
+#
+# Schemes
+#
+schemes:dataTypes metaMap:overridesDiskPrefix "/var/www/html/data/wmo/tdcf/schemes/dataTypes";
+metaMap:overrideSitePrefix "http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes/dataTypes";
+.
+
+schemes:dataUnits metaMap:overridesDiskPrefix "/var/www/html/data/wmo/tdcf/schemes/dataUnits";
+metaMap:overrideSitePrefix "http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes/dataUnits";
+.
+
+schemes:temperatures metaMap:overridesDiskPrefix "/var/www/html/data/wmo/tdcf/schemes/temperatures";
+metaMap:overrideSitePrefix "http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes/temperatures";
+.
+
+schemes:weather metaMap:overridesDiskPrefix "/var/www/html/data/wmo/tdcf/schemes/weather";
+metaMap:overrideSitePrefix "http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes/weather";
+.
+
+schemes:clouds metaMap:overridesDiskPrefix "/var/www/html/data/wmo/tdcf/schemes/clouds";
+metaMap:overrideSitePrefix "http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes/clouds";
+.
+
+schemes: metaMap:overridesDiskPrefix "/var/www/html/data/wmo/tdcf/schemes";
+metaMap:overrideSitePrefix "http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes";
+.	
+#
+# Other tables
+#
+bufr:a metaMap:overridesDiskPrefix "/var/www/html/data/wmo/tdcf/bufr/a";
+metaMap:overrideSitePrefix "http://reference.metoffice.gov.uk/data/wmo/tdcf/bufr/a";
+.
+
+bufr:b metaMap:overridesDiskPrefix "/var/www/html/data/wmo/tdcf/bufr/b";
+metaMap:overrideSitePrefix "http://reference.metoffice.gov.uk/data/wmo/tdcf/bufr/b";
+.
+
+crex:b metaMap:overridesDiskPrefix "/var/www/html/data/wmo/tdcf/crex/b";
+metaMap:overrideSitePrefix "http://reference.metoffice.gov.uk/data/wmo/tdcf/crex/b";
+.
+
+crex:a metaMap:overridesDiskPrefix "/var/www/html/data/wmo/tdcf/crex/a";
+metaMap:overrideSitePrefix "http://reference.metoffice.gov.uk/data/wmo/tdcf/crex/a";
+.
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/grib/codes+flags> metaMap:overridesDiskPrefix "/var/www/html/data/wmo/tdcf/grib/codes+flags";
+metaMap:overrideSitePrefix "http://reference.metoffice.gov.uk/data/wmo/tdcf/grib/codes+flags";
+.
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/bufrcrex:codes+flags> metaMap:overridesDiskPrefix "/var/www/html/data/wmo/tdcf/bufrcrex/bufrcrex/codes+flags";
+metaMap:overrideSitePrefix "http://reference.metoffice.gov.uk/data/wmo/tdcf/bufrcrex/codes+flags";
+.
+
+
+######################
+# Additional codes
+######################
+
+# TODO
+# The following "0" items are missing from CSV tables. They should be fully implemented here.
+# Do we still need these ?
+
+bufrb:0  wmo:classDescription "BUFR/CREX table entries";
+wmo:status wmo:Operational;
+.
+
+crexb:0  wmo:classDescription "BUFR/CREX table entries";
+wmo:status wmo:Operational;
+.

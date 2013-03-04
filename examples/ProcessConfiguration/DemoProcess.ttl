@@ -1,0 +1,19 @@
+<http://www.terminologymanager.com/actions/obsolete> <http://metarelate.net/terminologyServer/config/implements> <http://metarelate.net/terminologyServer/system/actions/obsolete> ;
+	<http://metarelate.net/terminologyServer/config/hasTransition> <http://example.com/trans1> ;
+	<http://metarelate.net/terminologyServer/config/hasTransition> <http://example.com/trans2> ;
+	<http://metarelate.net/terminologyServer/config/hasTransition> <http://example.com/trans3> ;
+	
+<http://metarelate.net/terminologyServer/config/hasTransition> <http://example.com/trans1>		
+
+
+<http://www.terminologymanager.com/actions/supersed> <http://metarelate.net/terminologyServer/config/implements> <http://metarelate.net/terminologyServer/system/actions/supersed>
+
+
+<http://www.terminologymanager.com/actions/amend> <http://metarelate.net/terminologyServer/config/implements> <http://metarelate.net/terminologyServer/system/actions/amend>
+
+
+<http://www.terminologymanager.com/actions/add> <http://metarelate.net/terminologyServer/config/implements> <http://metarelate.net/terminologyServer/system/actions/add>
+
+
+
+

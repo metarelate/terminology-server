@@ -17,8 +17,12 @@
  along with terminology-server. If not, see <http://www.gnu.org/licenses/>.
 */
 	
+
+//
 package net.metarelate.terminology.commandline;
 
+
+//TODO this is command is going to be obsoleted soon!!!
 import java.util.Map;
 
 import net.metarelate.terminology.config.CoreConfig;
@@ -217,7 +221,7 @@ public class MetMap extends CommandLineTool {
 			try {
 				TerminologyModelBuilderFromRDF builder;
 				builder=new TerminologyModelBuilderFromRDF(myFactory);
-				if(autoDefaults==true) builder.setAutodefaults(true);
+				//if(autoDefaults==true) builder.setAutodefaults(true);
 				if(globalOwnerURI!=null) builder.setGlobalOwnerURI(globalOwnerURI);
 				builder.generateModel(myConfigModel);
 				
@@ -260,7 +264,7 @@ public class MetMap extends CommandLineTool {
 						SSLogger.log("Generating web layout for: "+roots[i].getURI());
 						WebWriter myWriter=new WebWriter(roots[i],myConfigModel,writeOverwrite);
 						myWriter.setPrefixMap(prefixMap);		// TODO verify consistency with publisher/builder/factory
-						myWriter.setLabelModel(labelsModel);	// TODO verify consistency with publisher/builder/factory
+						//myWriter.setLabelModel(labelsModel);	// TODO verify consistency with publisher/builder/factory
 						myWriter.write();
 						
 					} catch (Exception e) {
@@ -279,7 +283,7 @@ public class MetMap extends CommandLineTool {
 							SSLogger.log("Generating web layout for: "+roots[i].getURI());
 							WebWriter myWriter=new WebWriter(roots[i],myConfigModel,writeOverwrite);
 							myWriter.setPrefixMap(prefixMap);		// TODO verify consistency with publisher/builder/factory
-							myWriter.setLabelModel(labelsModel);	// TODO verify consistency with publisher/builder/factory
+							//myWriter.setLabelModel(labelsModel);	// TODO verify consistency with publisher/builder/factory
 							myWriter.write(rootPath,rootURL);
 						} catch (Exception e) {
 							e.printStackTrace();

@@ -121,7 +121,7 @@ public interface TerminologyEntity {
 	 * Set the status (uri) for a given version.
 	 * The status may in principle be any URI, but only the ones defined in {@link uk.gov.metoffice.terminology.config.MetaLanguage}
 	 * guarantee a consistent state management respect to register operations. 
-	 * States could be easily extended @see {@link uk.gov.metoffice.terminology.management.RegistryPolicyConfig} and @see {@link uk.gov.metoffice.terminology.config.MetaLanguage}
+	 * States could be easily extended @see {@link RegistryPolicyManager.gov.metoffice.terminology.management.RegistryPolicyConfig} and @see {@link uk.gov.metoffice.terminology.config.MetaLanguage}
 	 * @param uri a uri corresponding to a specific state.
 	 * @param version
 	 */

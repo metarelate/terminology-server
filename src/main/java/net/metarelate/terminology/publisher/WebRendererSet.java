@@ -45,12 +45,11 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 public class WebRendererSet extends WebRendererItem {
 	TerminologySet myCollection=null;
-	public WebRendererSet(TerminologySet collection, String url,
-			Model labelRepository) {
+	public WebRendererSet(TerminologySet collection, String url) {
 		super(collection);
 		myCollection=collection;
 		itemUrl=url;
-		labelsModel=labelRepository;
+		//labelsModel=labelRepository;
 		entity=collection;
 		determineType(myCollection.getLastVersion());
 		SSLogger.log("created renderer for set "+collection.getURI()+" style :"+type);

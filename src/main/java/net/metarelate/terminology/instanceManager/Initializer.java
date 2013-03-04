@@ -27,6 +27,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Map;
 import java.util.UUID;
 
 import net.metarelate.terminology.auth.AuthConfig;
@@ -39,6 +40,8 @@ import net.metarelate.terminology.coreModel.TerminologyFactory;
 import net.metarelate.terminology.coreModel.TerminologyFactoryTDBImpl;
 import net.metarelate.terminology.exceptions.ConfigurationException;
 import net.metarelate.terminology.exceptions.NonConformantRDFException;
+import net.metarelate.terminology.management.ConstraintsManager;
+import net.metarelate.terminology.management.RegistryPolicyManager;
 import net.metarelate.terminology.management.TerminologyManager;
 import net.metarelate.terminology.utils.SSLogger;
 import net.metarelate.terminology.utils.SimpleQueriesProcessor;
@@ -66,16 +69,23 @@ public class Initializer {
 	private static String confDirAbsoluteString=null;
 	private static String authDirAbsoluteString=null;
 	private static String seedFileAbsoluteString=null;
+	private static String prefixFileAbsoluteString=null;
 	public static String defaultUserName=null;
 	
-	private  AuthServer authServer=null;
+	private  AuthServer myAuthServer=null;
 	public  AuthRegistryManager myAuthManager=null;
 	public  TerminologyManager myTerminologyManager=null;
 	public  TerminologyFactory myFactory=null;
+	public ConstraintsManager myConstraintsManager=null;
+	public RegistryPolicyManager myRegistryPolicyManager=null;
 	public boolean debugMode=true;	// TODO this shold come from the configuration file
 	
-	public Initializer(String[] args) throws ConfigurationException {
-		// Process parameters
+	protected String rootDirString=CoreConfig.rootDirString;
+	
+	private Map<String,String> nsPrefixMap=null;
+	
+	public Initializer(String confDir) throws ConfigurationException {
+		rootDirString=confDir;
 		construct();
 	}
 	
@@ -94,7 +104,7 @@ public class Initializer {
 		if(userHomeString==null) userHomeString = System.getProperty( "user.home" );
 		SSLogger.log("User Home: "+ userHomeString);
 		System.out.println("User Home: "+ userHomeString);
-		File rootDirectory=new File(userHomeString,CoreConfig.rootDirString);
+		File rootDirectory=new File(userHomeString,rootDirString);
 		checkOrCreateDirectory(rootDirectory);
 		// Note: we don't allow overriding of host or server name. This may be changed.
 		try {
@@ -148,10 +158,21 @@ public class Initializer {
 			seedFileAbsoluteString=seedFile.getAbsolutePath();
 		}
 		checkOrCreateSeedFile();
+		
+		File prefixFile;
+		if(prefixFileAbsoluteString!=null) prefixFile=new File(prefixFileAbsoluteString);
+		else{
+			prefixFile=new File(rootDirectory.getAbsolutePath(),CoreConfig.prefixFileString);
+			prefixFileAbsoluteString=prefixFile.getAbsolutePath();
+		}
+		checkOrCreatePrefixFile();
+		
 
 		// TODO Note also that we should be sure time is in synch globally
 	}
 	
+
+
 
 	public void buildSystemComponents() throws ConfigurationException {
 	Model configuration=null;
@@ -172,9 +193,11 @@ public class Initializer {
 		}
 		
 		myFactory=new TerminologyFactoryTDBImpl(tdbPath);
-		authServer=AuthServerFactory.createServerFromConfig(getConfigurationGraph());
-		myAuthManager=new AuthRegistryManager(authServer,myFactory);
-		myTerminologyManager=new TerminologyManager(myFactory,myAuthManager);
+		myAuthServer=AuthServerFactory.createServerFromConfig(getConfigurationGraph());
+		myRegistryPolicyManager=new RegistryPolicyManager(getConfigurationGraph());
+		myConstraintsManager=new ConstraintsManager(getConfigurationGraph());
+		myAuthManager=new AuthRegistryManager(myAuthServer,myFactory);
+		myTerminologyManager=new TerminologyManager(this);
 		
 	}
 
@@ -205,6 +228,33 @@ public class Initializer {
 		
 	}
 	
+	private void checkOrCreatePrefixFile() throws ConfigurationException {
+		// TODO Auto-generated method stub
+		File prefixFile=new File(prefixFileAbsoluteString);
+		if(!prefixFile.exists()) {
+			String defaultContent=
+					"@prefix rdfs:   	<http://www.w3.org/2000/01/rdf-schema#> .\n"+
+					"@prefix rdf:    	<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n"+
+					"@prefix xsd:    	<http://www.w3.org/2001/XMLSchema#> .\n"+
+					"@prefix skos: 		<http://www.w3.org/2004/02/skos/core#> .\n"+
+					"[] a <http://bog.us/bougs> ;\n" +
+					".";
+			writeInFile(prefixFile,defaultContent);
+		}
+		else {
+			Model prefixModel=ModelFactory.createDefaultModel();
+			try {
+				prefixModel.read(new FileInputStream(prefixFileAbsoluteString),"http://thisInstance.org/configuration/","Turtle");
+				nsPrefixMap=prefixModel.getNsPrefixMap();
+			} catch (FileNotFoundException e1) {
+				e1.printStackTrace();
+				throw new ConfigurationException("Prefixes file not found: "+seedFileAbsoluteString);
+			}
+			
+		}
+		
+	}
+	
 	
 	private void checkOrCreateDirectory (File dir) throws ConfigurationException  {
 		if(dir.exists()) {
@@ -214,15 +264,117 @@ public class Initializer {
 		
 	}
 	
-	private void prepareDefaultFiles() throws ConfigurationException {		
-		String defServerStatements="<http://thisInstance.org> <"+MetaLanguage.tdbPrefixProperty+"> "+"\""+dbDirAbsoluteString+"\"^^<http://www.w3.org/2001/XMLSchema#string> ;\n.";
-		defServerStatements+="<http://thisInstance.org> <"+MetaLanguage.authConfigURI +"> "+"<"+AuthConfig.isConfigFileString+"> ;\n.";
+	private void prepareDefaultFiles() throws ConfigurationException {
+		//TODO we only do this is no config is found. If there is some config, it's up to the user to have it complete.
+		File confDir=new File(confDirAbsoluteString);
+		if(confDir.listFiles().length>0) return;
+			
+		String defServerStatements="<http://thisInstance.org> <"+MetaLanguage.tdbPrefixProperty+"> "+"\""+dbDirAbsoluteString+"\"^^<http://www.w3.org/2001/XMLSchema#string> ;\n.\n";
+		defServerStatements+="<http://thisInstance.org> <"+MetaLanguage.authConfigURI +"> "+"<"+AuthConfig.isConfigFileString+"> ;\n.\n";
+		String baseURL=getServerName()+"/web";
+		File diskPrefixFile=new File(getWorkingDirectory(),CoreConfig.baseDiskDir);
+		String diskPrefix=diskPrefixFile.getAbsolutePath();
+		defServerStatements+="<http://thisInstance.org> <"+MetaLanguage.baseURLProperty +"> "+"\"http://"+baseURL+"\" ;\n.\n";
+		defServerStatements+="<http://thisInstance.org> <"+MetaLanguage.diskPrefixProperty +"> "+"\""+diskPrefix+"\" ;\n.\n";
+		
 		createFileAndFillWithString(confDirAbsoluteString,"defaultServerConfig.ttl",defServerStatements);
 		
 		// TODO this is : me what I can on what. Arguably this should start with me can create anything at the top register (empty register?)
 		// However, as a conf option, one could be granted access to everything.
-		String defAuthStatements="<"+getDefaultUserURI()+"> <"+AuthConfig.allURI+"> "+"<"+AuthConfig.allURI+"> ;\n.";
+		String defAuthStatements="<"+getDefaultUserURI()+"> <"+AuthConfig.allURI+"> "+"<"+AuthConfig.allURI+"> ;\n.\n";
 		createFileAndFillWithString(authDirAbsoluteString,"defaultAuthConfig.ttl",defAuthStatements);
+		
+		
+		String defProcessStatements=
+				"@prefix core:		<http://metarelate.net/core/types/>	.\n" +
+				"@prefix states: 	<http://metarelate.net/core/states/> .\n" +
+				"@prefix actions:	<http://metarelate.net/core/actions/> .\n" +
+				"@prefix config:		<http://metarelate.net/core/config/> .\n" +
+				"@prefix default:	<http://metarelate.net/default/config/> .\n" +
+				"@prefix rdfs:		<http://www.w3.org/2000/01/rdf-schema#> .\n" +
+				"actions:update a core:action;\n" +
+				"rdfs:label	\"Update\"@en;\n" +
+				"config:overrides actions:update;\n" +
+				"config:hasEffectOnCode default:actionUpdate1;\n" +
+				"config:hasEffectOnCode default:actionUpdate2;\n" +
+				"config:hasEffectOnReg default:actionUpdate1;\n" +
+				"config:hasEffectOnReg default:actionUpdate2;\n" +
+				".\n" +
+				"default:actionUpdate1 a core:actionRole;\n" +
+				"config:preThis states:default;\n" +
+				"config:postThis states:default;\n" +
+				".\n" +
+				"default:actionUpdate2 a core:actionRole;\n" +
+				"config:preThis states:valid;\n" +
+				"config:postThis	states:valid;\n" +
+				".\n" +
+				"actions:obsolete a core:action;\n" +
+				"rdfs:label	\"Obsolete\"@en;\n" +
+				"config:overrides actions:obsolete;\n" +
+				"config:hasEffectOnCode default:actionObsolete1;\n" +
+				"config:hasEffectOnCode default:actionObsolete2;\n" +
+				"config:hasEffectOnReg default:actionObsolete1;\n" +
+				"config:hasEffectOnReg default:actionObsolete2;\n" +
+				".\n" +
+				"default:actionObsolete1 a core:actionRole;\n" +
+				"config:preThis states:default;\n" +
+				"config:postThis states:obsoleted;\n" +
+				".\n" +
+				"default:actionObsolete2 a core:actionRole;\n" +
+				"config:preThis states:valid;\n" +
+				"config:postThis states:obsoleted;\n" +
+				".\n" +
+				"actions:supersed a core:action;\n" +
+				"rdfs:label	\"Supersed\"@en;\n" +
+				"config:overrides actions:supersed;\n" +
+				"config:hasEffectOnCode default:actionSupersed1 ;\n" +
+				".\n" +
+				"default:actionSupersed1 a core:actionRole;\n	" +
+				"config:preThis	states:valid;\n" +
+				"config:preAux	states:valid;\n" +
+				"config:postThis	states:superseded;\n" +
+				"config:postAux	states:valid;\n" +
+				".\n" +
+				"actions:add	a core:action;\n" +
+				"rdfs:label	\"Add\"@en;\n" +
+				"config:overrides actions:add;\n" +
+				"config:hasEffectOnReg default:addAction1 ;\n" +
+				"config:hasEffectOnReg default:addAction2 ;\n" +
+				".\n" +
+				"default:addAction1 a core:actionRole;\n" +
+				"config:preThis	states:valid;\n" +
+				"config:postThis	states:default;	\n" +
+				".\n" +
+				"default:addAction2 a core:actionRole;\n" +
+				"config:preThis	states:default;\n" +
+				"config:postThis	states:default;	\n" +
+				".\n" +
+				"actions:validate	a core:action;\n" +
+				"rdfs:label	\"Validate\"@en;	\n" +
+				"config:hasEffectOnReg default:validateAction1 ;\n" +
+				"config:hasEffectOnCode default:validateAction1 ;\n" +
+				".\n" +
+				"default:validateAction1  a core:actionRole; \n" +
+				"config:preThis states:default;\n" +
+				"config:postThis states:valid;\n" +
+				".\n" +
+				"states:obsoleted a core:state;\n" +
+				"rdfs:label	\"Obsoleted\"@en;\n" +
+				"config:overrides states:obsoleted;\n" +
+				".\n" +
+				"states:superseded a core:state;\n" +
+				"rdfs:label	\"Superseded\"@en;\n" +
+				"config:overrides states:superseded;\n" +
+				".\n" +
+				"states:default a core:state;\n" +
+				"rdfs:label	\"Default\"@en;\n" +
+				"config:overrides states:default;\n" +
+				".\n" +
+				"states:valid a core:state;\n" +
+				"rdfs:label	\"Valid\"@en;\n" +
+				".\n";
+
+		createFileAndFillWithString(confDirAbsoluteString,"defaultProcessConfig.ttl",defProcessStatements);
 	}
 	
 
@@ -233,8 +385,8 @@ public class Initializer {
 	}
 
 	private void createFileAndFillWithString(String dir, String fileName, String content) throws ConfigurationException {
-		File confDir=new File(dir);
-		if(confDir.listFiles().length==0) {
+		//File confDir=new File(dir);
+		//if(confDir.listFiles().length==0) {
 			//We need at least to specify a default TDB.
 
 			try {
@@ -246,7 +398,7 @@ public class Initializer {
 				throw new ConfigurationException("Unable to initialize configuration file: "+fileName+" in "+confDirAbsoluteString);
 			}
 			
-		}
+		//}
 		
 	}
 	
@@ -302,7 +454,14 @@ public class Initializer {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	public String getWorkingDirectory() {
+		return System.getProperty("user.dir");
+	}
 	
+	public Map<String,String> getPrefixMap() {
+		return nsPrefixMap;
+	}
 	
 	
 	

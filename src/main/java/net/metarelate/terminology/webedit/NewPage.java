@@ -4,6 +4,7 @@ import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.AuthException;
+import net.metarelate.terminology.exceptions.InvalidProcessException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
 import net.metarelate.terminology.exceptions.WebSystemException;
 
@@ -123,6 +124,10 @@ public class NewPage  extends AbstractEditPage {
 				// TODO Auto-generated catch block
 				getSession().error("Reg error");
 				e.printStackTrace();
+		} catch (InvalidProcessException e) {
+			// TODO Auto-generated catch block
+			getSession().error("Process error");
+			e.printStackTrace();
 		}
 		
 

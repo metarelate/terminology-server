@@ -22,6 +22,7 @@ package net.metarelate.terminology.commandline;
 import net.metarelate.terminology.coreModel.TerminologyFactory;
 import net.metarelate.terminology.coreModel.TerminologyFactoryTDBImpl;
 import net.metarelate.terminology.exceptions.ConfigurationException;
+import net.metarelate.terminology.exceptions.InvalidProcessException;
 import net.metarelate.terminology.instanceManager.Initializer;
 import net.metarelate.terminology.utils.SSLogger;
 /**
@@ -46,7 +47,7 @@ public abstract class CommandLineTool {
 	
 	protected abstract void printStartMessage();
 	protected abstract void parseLocal(String[] args);
-	protected abstract void executeCommand();
+	protected abstract void executeCommand() throws InvalidProcessException;
 	
 	public Initializer myInitializer=null;
 	
@@ -60,11 +61,15 @@ public abstract class CommandLineTool {
 		parseLocal(args);
 		try {
 			startupSystem();
+			executeCommand();
 		} catch (ConfigurationException e) {
 			e.printStackTrace();
 			System.exit(-1);
+		} catch (InvalidProcessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		executeCommand();
+		
 	}
 	
 	// Implementation detail:

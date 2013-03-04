@@ -12,6 +12,8 @@ import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.ImpossibleOperationException;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
+import net.metarelate.terminology.management.RegistryPolicyManager;
+import net.metarelate.terminology.utils.FunctionExecutor;
 import net.metarelate.terminology.utils.StatementsOrganizer;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -25,6 +27,7 @@ import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.LoadableDetachableModel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -42,7 +45,7 @@ public class ViewPage extends SuperPage {
 	protected String entityType="undefined";// "Set" or "Individual": for displaying TODO consider multi-language
 	
 	ModalWindow obsoleteConfirmPanelWindow=null;
-	ObsoleteConfirmPanel obsoleteConfirmPanelContent=null;
+	GenericConfirmPanel obsoleteConfirmPanelContent=null;
 	
 	ModalWindow supersedPanelWindow=null;
     SupersedPanel1 supersedPanelContent1=null;
@@ -107,7 +110,7 @@ public class ViewPage extends SuperPage {
 		 **********************************************************************/
 	     
 		obsoleteConfirmPanelWindow=new ModalWindow("confirmPanel");
-	    obsoleteConfirmPanelContent=new ObsoleteConfirmPanel(obsoleteConfirmPanelWindow.getContentId(),this,urlToAction);
+	    obsoleteConfirmPanelContent=new GenericConfirmPanel(obsoleteConfirmPanelWindow.getContentId(),this,urlToAction);
 	    obsoleteConfirmPanelWindow.setContent(obsoleteConfirmPanelContent);
 	    obsoleteConfirmPanelWindow.setInitialHeight(200);
 	    obsoleteConfirmPanelWindow.setInitialWidth(400);
@@ -156,6 +159,7 @@ public class ViewPage extends SuperPage {
 		    	WebMarkupContainer versionContainer=new WebMarkupContainer("versionContainer");
 		    	String currentVersion=item.getModelObject();
 		    	Label versionLabel=new Label("versionNumber",currentVersion);
+		    	Label versionState=new Label("versionState",TerminologyEntityWrapper.getObject().getStateURI(currentVersion));
 		    	Label versionDate=new Label("versionDate",TerminologyEntityWrapper.getObject().getActionDate(currentVersion)); 
 		    	Label versionAction=new Label(
 		    			"versionAction",
@@ -171,6 +175,7 @@ public class ViewPage extends SuperPage {
 		    			);
 		    	Label versionDescription=new Label("versionDescription",TerminologyEntityWrapper.getObject().getActionDescription(currentVersion));
 		    	versionContainer.add(versionLabel);
+		    	versionContainer.add(versionState);
 		    	versionContainer.add(versionDate);
 		    	versionContainer.add(versionAction);
 		    	versionContainer.add(versionAuthor);
@@ -246,9 +251,30 @@ public class ViewPage extends SuperPage {
 				setResponsePage(EditPage.class, pageParameters);
 			}
 		};
-		if(!CommandWebConsole.myInitializer.myAuthManager.can(CommandWebConsole.myInitializer.getDefaultUserURI(), MetaLanguage.terminologyUpdateAction.getURI(), urlToAction))
-			editButton.setEnabled(false);
-		else editButton.setEnabled(true);
+		boolean editActive=true;
+		if(!CommandWebConsole.myInitializer.myAuthManager.can(CommandWebConsole.myInitializer.getDefaultUserURI(), RegistryPolicyManager.actionUpdateURI, urlToAction))
+			editActive=false;
+		if(CommandWebConsole.myInitializer.myFactory.terminologyIndividualExist(urlToAction)) {
+			if(!CommandWebConsole.myInitializer.myRegistryPolicyManager.isViableOperationOnCode(
+					RegistryPolicyManager.actionUpdateURI, 
+					CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlToAction).getStateURI(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlToAction).getLastVersion()), 
+					null, 
+					null, 
+					null))
+				editActive=false;	
+		}
+		if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(urlToAction)) {
+			if(!CommandWebConsole.myInitializer.myRegistryPolicyManager.isViableOperationOnReg(
+					RegistryPolicyManager.actionUpdateURI, 
+					CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToAction).getStateURI(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToAction).getLastVersion()), 
+					null, 
+					null, 
+					null))
+				editActive=false;	
+		}
+		
+		
+		editButton.setEnabled(editActive);
 		form.add(editButton);
 		
 		
@@ -275,13 +301,26 @@ public class ViewPage extends SuperPage {
 			}
 			
 		};
-		if(isCode) newCodeButton.setEnabled(false);
-		else {
-			// TODO auth here
-			if(!CommandWebConsole.myInitializer.myAuthManager.can(CommandWebConsole.myInitializer.getDefaultUserURI(), MetaLanguage.terminologyAddItemAction.getURI(), urlToAction))
-				newCodeButton.setEnabled(false);
-			else newCodeButton.setEnabled(true);
-		}
+		
+		boolean newCodeEnabled=true;
+		if(isCode) newCodeEnabled=false;
+		
+		
+		if(!CommandWebConsole.myInitializer.myAuthManager.can(CommandWebConsole.myInitializer.getDefaultUserURI(), RegistryPolicyManager.actionAddURI, urlToAction))
+				newCodeEnabled=false;
+	
+		if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(urlToAction)) {
+			if(!CommandWebConsole.myInitializer.myRegistryPolicyManager.isViableOperationOnReg(
+					RegistryPolicyManager.actionAddURI, 
+					CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToAction).getStateURI(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToAction).getLastVersion()), 
+					null, 
+					null, 
+					null))
+				newCodeEnabled=false;	
+		}	
+		
+		
+		newCodeButton.setEnabled(newCodeEnabled);
 		form.add(newCodeButton);
 		
 	    /******************************************************************
@@ -300,13 +339,21 @@ public class ViewPage extends SuperPage {
 				setResponsePage(NewPage.class,pageParameters);
 			}
 		};
-		if(isCode) newRegisterButton.setEnabled(false);
-		else {
-			// TODO auth here
-			if(!CommandWebConsole.myInitializer.myAuthManager.can(CommandWebConsole.myInitializer.getDefaultUserURI(), MetaLanguage.terminologyAddItemAction.getURI(), urlToAction))
-				newRegisterButton.setEnabled(false);
-			else newRegisterButton.setEnabled(true);
-		}
+		boolean newRegisterEnabled=true;
+		if(isCode) newRegisterEnabled=false;
+		if(!CommandWebConsole.myInitializer.myAuthManager.can(CommandWebConsole.myInitializer.getDefaultUserURI(), RegistryPolicyManager.actionAddURI, urlToAction))
+				newRegisterEnabled=false;
+		if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(urlToAction)) {
+			if(!CommandWebConsole.myInitializer.myRegistryPolicyManager.isViableOperationOnReg(
+					RegistryPolicyManager.actionAddURI, 
+					CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToAction).getStateURI(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToAction).getLastVersion()), 
+					null, 
+					null, 
+					null))
+				newRegisterEnabled=false;	
+		}	
+		
+		newRegisterButton.setEnabled(newRegisterEnabled);
 		form.add(newRegisterButton);
 		
 
@@ -321,13 +368,43 @@ public class ViewPage extends SuperPage {
 			@Override
 			public void onSubmit(AjaxRequestTarget target, Form<?> form) {
 				target.add(feedbackPanel);	// TODO clarify the role of target
+				obsoleteConfirmPanelContent.setMessage("Do you realy want to obsolete this entity?");
+				obsoleteConfirmPanelContent.setExecutor(new FunctionExecutor(){
+					@Override
+					public void execute(AjaxRequestTarget target) {
+						proceedObsolete(target);
+						
+					}
+					
+				});
 				obsoleteConfirmPanelWindow.show(target);	
 			}
 		};
 		
-		if(!CommandWebConsole.myInitializer.myAuthManager.can(CommandWebConsole.myInitializer.getDefaultUserURI(), MetaLanguage.terminologyDelItemAction.getURI(), urlToAction))
-			obsoleteButton.setEnabled(false);
-		else obsoleteButton.setEnabled(true);
+		boolean obsoleteEnabled=true;
+		if(!CommandWebConsole.myInitializer.myAuthManager.can(CommandWebConsole.myInitializer.getDefaultUserURI(), RegistryPolicyManager.actionObsoleteURI, urlToAction))
+			obsoleteEnabled=false;
+		/////
+		if(CommandWebConsole.myInitializer.myFactory.terminologyIndividualExist(urlToAction)) {
+			if(!CommandWebConsole.myInitializer.myRegistryPolicyManager.isViableOperationOnCode(
+					RegistryPolicyManager.actionObsoleteURI, 
+					CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlToAction).getStateURI(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlToAction).getLastVersion()), 
+					null, 
+					null, 
+					null))
+				obsoleteEnabled=false;	
+		}
+		if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(urlToAction)) {
+			if(!CommandWebConsole.myInitializer.myRegistryPolicyManager.isViableOperationOnReg(
+					RegistryPolicyManager.actionObsoleteURI, 
+					CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToAction).getStateURI(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToAction).getLastVersion()), 
+					null, 
+					null, 
+					null))
+				obsoleteEnabled=false;	
+		}
+		////
+		obsoleteButton.setEnabled(obsoleteEnabled);
 		form.add(obsoleteButton);
 	
 		/********************************************************************
@@ -348,12 +425,136 @@ public class ViewPage extends SuperPage {
 			
 		
 		};
+		boolean supersedEnabled=true;
+		if(isSet) supersedEnabled=false;
 		
-		if(!CommandWebConsole.myInitializer.myAuthManager.can(CommandWebConsole.myInitializer.getDefaultUserURI(), MetaLanguage.terminologySupersedAction.getURI(), urlToAction))
-			supersedButton.setEnabled(false);
-		else supersedButton.setEnabled(true);
 		
+		if(!CommandWebConsole.myInitializer.myAuthManager.can(CommandWebConsole.myInitializer.getDefaultUserURI(), RegistryPolicyManager.actionSupersedURI, urlToAction))
+			supersedEnabled=false;
+		if(hasSuperseder) {
+			if(CommandWebConsole.myInitializer.myFactory.terminologyIndividualExist(urlToAction)) {
+				if(!CommandWebConsole.myInitializer.myRegistryPolicyManager.isViableOperationOnCode(
+						RegistryPolicyManager.actionSupersedURI, 
+						CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlToAction).getStateURI(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlToAction).getLastVersion()), 
+						null,
+						null,
+						CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlSuperseder).getStateURI(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlSuperseder).getLastVersion()) 
+						))
+					supersedEnabled=false;	
+			}
+			else supersedEnabled=false;
+		}
+		else {
+			if(CommandWebConsole.myInitializer.myFactory.terminologyIndividualExist(urlToAction)) {
+				if(!CommandWebConsole.myInitializer.myRegistryPolicyManager.isViableOperationOnCode(
+						RegistryPolicyManager.actionSupersedURI, 
+						CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlToAction).getStateURI(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlToAction).getLastVersion()), 
+						null,
+						null,
+						null
+						))
+					supersedEnabled=false;	
+			}
+			else supersedEnabled=false;
+		}
+		
+		
+		
+		
+		supersedButton.setEnabled(supersedEnabled);
 		form.add(supersedButton);
+		
+		
+		/********************************************************************
+		 * EXTRA Actions button list
+		 ********************************************************************/
+		
+		String[] extraActions=CommandWebConsole.myInitializer.myRegistryPolicyManager.getExtraActions();
+		List<String>actionsList=new ArrayList<String>();
+		for(String extraAct:extraActions) actionsList.add(extraAct);
+		
+		ListView<String> extraButtons = new ListView<String>("extraButtons", actionsList) {
+
+			@Override
+			protected void populateItem(ListItem<String> currentAction) {
+				final String actionURI=currentAction.getModelObject();
+				final String actionLabel=CommandWebConsole.myInitializer.myFactory.getLabelManager().getLabelForURI(actionURI, LabelManager.LANG_DEF_SHORTURI);
+				// TODO Auto-generated method stub
+				AjaxButton extraActionButton=new AjaxButton("extraButton"){
+					@Override
+					public void onSubmit(AjaxRequestTarget target,Form form) {
+						System.out.println("Action: "+actionURI);
+						target.add(feedbackPanel);	// TODO clarify the role of target
+						obsoleteConfirmPanelContent.setMessage("Do you really want to proceed with action "+actionLabel+" ?");
+						obsoleteConfirmPanelContent.setExecutor(new FunctionExecutor(){
+
+							@Override
+							public void execute(AjaxRequestTarget target) {
+								try {
+									CommandWebConsole.myInitializer.myTerminologyManager.performGenericAction(actionURI, urlToAction, CommandWebConsole.myInitializer.getDefaultUserURI(), obsoleteConfirmPanelContent.getDescription());
+								} catch (RegistryAccessException e) {
+									getSession().error("Impossible to perform action "+actionLabel+" on "+urlToAction+" (access denied)");
+									if(CommandWebConsole.myInitializer.debugMode) getSession().error(e.getMessage());
+									e.printStackTrace(); // TODO route to logger
+								} catch (ImpossibleOperationException e) {
+									getSession().error("Impossible to perform action "+actionLabel+" on "+urlToAction+" (operation not possible)");
+									if(CommandWebConsole.myInitializer.debugMode) getSession().error(e.getMessage());
+									e.printStackTrace(); // TODO route to logger
+								}
+							
+								//obsoleteConfirmPanelWindow.close(target);
+								PageParameters pageParameters = new PageParameters();
+								pageParameters.add("entity", urlToAction);
+								setResponsePage(ViewPage.class,pageParameters);
+							}
+							
+						});
+						obsoleteConfirmPanelWindow.show(target);
+					}
+					
+				
+				};
+				boolean isActive=false;
+				try {
+					if(CommandWebConsole.myInitializer.myAuthManager.can(CommandWebConsole.myInitializer.getDefaultUserURI(), actionURI, urlToAction))
+						isActive=true;
+					
+				} catch (RegistryAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				///
+				if(CommandWebConsole.myInitializer.myFactory.terminologyIndividualExist(urlToAction)) {
+					if(!CommandWebConsole.myInitializer.myRegistryPolicyManager.isViableOperationOnCode(
+							actionURI, 
+							CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlToAction).getStateURI(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlToAction).getLastVersion()), 
+							null, 
+							null, 
+							null))
+						isActive=false;	
+				}
+				if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(urlToAction)) {
+					if(!CommandWebConsole.myInitializer.myRegistryPolicyManager.isViableOperationOnReg(
+							actionURI, 
+							CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToAction).getStateURI(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToAction).getLastVersion()), 
+							null, 
+							null, 
+							null))
+						isActive=false;	
+				}
+				///
+				extraActionButton.setEnabled(isActive);
+				extraActionButton.setModel(new Model(actionLabel));
+				currentAction.add(extraActionButton);
+				
+				
+				///////
+				
+			}
+			
+		};
+		form.add(extraButtons);
+		
 		
 		
 		/********************************************************************

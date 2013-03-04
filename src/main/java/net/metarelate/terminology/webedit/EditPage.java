@@ -4,6 +4,7 @@ import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.AuthException;
+import net.metarelate.terminology.exceptions.InvalidProcessException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
 
 import org.apache.wicket.markup.html.WebPage;
@@ -62,6 +63,11 @@ public class EditPage  extends SuperPage {
 					e.printStackTrace();
 				}
 				// update label with labelValue
+				catch (InvalidProcessException e) {
+					// TODO Auto-generated catch block
+					getSession().error("Process error");
+					e.printStackTrace();
+				}
 				
 				PageParameters pageParameters = new PageParameters();
 				pageParameters.add("entity", urlToEdit);
@@ -74,6 +80,7 @@ public class EditPage  extends SuperPage {
 		add(form);
 		form.add(entityLabel);
 		add(new FeedbackPanel("feedback"));
+		postConstructionFinalize();
 		
     }
 	@Override

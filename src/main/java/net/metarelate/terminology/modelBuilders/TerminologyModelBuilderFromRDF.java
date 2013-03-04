@@ -126,14 +126,13 @@ public class TerminologyModelBuilderFromRDF extends TerminologyModelBuilder{
 		//SSLogger.log("Owner check: "+myCollection.getOwnerURI(),SSLogger.DEBUG);//TODO debug
 		//SSLogger.log("Collections has #versions: "+myCollection.getVersions().length,SSLogger.DEBUG);//TODO debug
 		
-		if(autoDefaults) {
-			myCollection.setActionURI(CoreConfig.DEAFULT_FROM_RDF_IMPORT_ACTION,myCollection.getDefaultVersion());
-			myCollection.setActionAuthorURI(globalOwnerURI,myCollection.getDefaultVersion());
-			myCollection.setActionDescription(CoreConfig.DEFAULT_FROM_RDF_DESCRIPTION,myCollection.getDefaultVersion());
-			DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-			Date date = new Date();
-			myCollection.setActionDate(dateFormat.format(date),myCollection.getDefaultVersion());
-		}
+		myCollection.setActionURI(CoreConfig.DEAFULT_FROM_RDF_IMPORT_ACTION,myCollection.getDefaultVersion());
+		myCollection.setActionAuthorURI(globalOwnerURI,myCollection.getDefaultVersion());
+		myCollection.setActionDescription(actionMessage,myCollection.getDefaultVersion());
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		Date date = new Date();
+		myCollection.setActionDate(dateFormat.format(date),myCollection.getDefaultVersion());
+		
 		
 		//Additional statements
 		Model myStats=myCollection.getStatements(myCollection.getDefaultVersion());	
@@ -172,14 +171,14 @@ public class TerminologyModelBuilderFromRDF extends TerminologyModelBuilder{
 		if(ownerURI!=null) myIndividual.setOwnerURI(ownerURI);
 		else if(globalOwnerURI!=null)  myIndividual.setOwnerURI(globalOwnerURI);
 		
-		if(autoDefaults) {
-			myIndividual.setActionURI(CoreConfig.DEAFULT_FROM_RDF_IMPORT_ACTION,myIndividual.getDefaultVersion());
-			myIndividual.setActionAuthorURI(globalOwnerURI,myIndividual.getDefaultVersion());
-			myIndividual.setActionDescription(CoreConfig.DEFAULT_FROM_RDF_DESCRIPTION,myIndividual.getDefaultVersion());
-			DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-			Date date = new Date();
-			myIndividual.setActionDate(dateFormat.format(date),myIndividual.getDefaultVersion());
-		}
+		
+		myIndividual.setActionURI(CoreConfig.DEAFULT_FROM_RDF_IMPORT_ACTION,myIndividual.getDefaultVersion());
+		myIndividual.setActionAuthorURI(globalOwnerURI,myIndividual.getDefaultVersion());
+		myIndividual.setActionDescription(actionMessage,myIndividual.getDefaultVersion());
+		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+		Date date = new Date();
+		myIndividual.setActionDate(dateFormat.format(date),myIndividual.getDefaultVersion());
+		
 		
 		//Additional statements
 		Model myStats=myIndividual.getStatements(myIndividual.getDefaultVersion());	
@@ -353,6 +352,10 @@ public class TerminologyModelBuilderFromRDF extends TerminologyModelBuilder{
 		}
 		
 	}
+
+
+
+
 
 
 	
