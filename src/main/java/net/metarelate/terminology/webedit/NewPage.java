@@ -6,6 +6,7 @@ import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.AuthException;
 import net.metarelate.terminology.exceptions.ConfigurationException;
 import net.metarelate.terminology.exceptions.InvalidProcessException;
+import net.metarelate.terminology.exceptions.PropertyConstraintException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
 import net.metarelate.terminology.exceptions.WebSystemException;
 
@@ -33,7 +34,7 @@ public class NewPage  extends AbstractEditPage {
 	private String type=null;
 	AjaxyTextArea uriField=null;
 	Label uriStatus=null;
-	public NewPage(final PageParameters parameters) throws WebSystemException, ConfigurationException {
+	public NewPage(final PageParameters parameters) throws WebSystemException, ConfigurationException, PropertyConstraintException {
 		super(parameters);
 		//uriOfEntity=parameters.get("entity").toString();
 		uriToSupersed=parameters.get("superseding").toString();

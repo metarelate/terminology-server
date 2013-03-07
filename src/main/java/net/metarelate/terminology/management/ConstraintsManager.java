@@ -11,6 +11,7 @@ import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.ConfigurationException;
+import net.metarelate.terminology.exceptions.PropertyConstraintException;
 import net.metarelate.terminology.instanceManager.Initializer;
 import net.metarelate.terminology.utils.SSLogger;
 
@@ -99,6 +100,7 @@ public class ConstraintsManager {
 				defaultRegConstraints, 
 				uriRegConstraints,
 				ConstraintsManagerConfig.regValidationCommandType);
+			SSLogger.log("For edit register found #rules: "+results.size(),SSLogger.DEBUG);
 		return makeSortedProperties(results);
 		
 	}
@@ -112,6 +114,7 @@ public class ConstraintsManager {
 				defaultCodeConstraints, 
 				uriCodeConstraints,
 				ConstraintsManagerConfig.codeValidationCommandType);
+		SSLogger.log("For edit code found #rules: "+results.size(),SSLogger.DEBUG);
 		return makeSortedProperties(results);
 	}
 	public String[] getSortedConstraintsForNewReg(String baseRegURI) throws ConfigurationException {
@@ -123,6 +126,7 @@ public class ConstraintsManager {
 				defaultRegConstraints, 
 				uriRegConstraints,
 				ConstraintsManagerConfig.regValidationCommandType);
+		SSLogger.log("For new regsiter found #rules: "+results.size(),SSLogger.DEBUG);
 		return makeSortedProperties(results);
 	}
 	public String[] getSortedConstraintsForNewCode(String baseRegURI) throws ConfigurationException {
@@ -134,6 +138,7 @@ public class ConstraintsManager {
 				defaultCodeConstraints, 
 				uriCodeConstraints,
 				ConstraintsManagerConfig.codeValidationCommandType);
+				SSLogger.log("For new code found #rules: "+results.size(),SSLogger.DEBUG);
 		return makeSortedProperties(results);
 	}
 	
@@ -142,6 +147,7 @@ public class ConstraintsManager {
 		TreeMap<String,String> orderedResults =new TreeMap<String,String>();
 		int i=0;
 		for(Resource res:results) {
+			System.out.println("Now: "+res.getURI());
 			NodeIterator propIterator=inputConfig.listObjectsOfProperty(res, ResourceFactory.createProperty(ConstraintsManagerConfig.onDataProperty));
 			if(!propIterator.hasNext()) {
 				propIterator=inputConfig.listObjectsOfProperty(res, ResourceFactory.createProperty(ConstraintsManagerConfig.onObjectProperty));
@@ -160,9 +166,10 @@ public class ConstraintsManager {
 			}
 			else {
 				order=order+i;
+				i++;
 				
 			}
-			while(!orderedResults.containsKey(order)) {order=order+"_";}
+			while(orderedResults.containsKey(order)) {order=order+"_";}
 			orderedResults.put(order,res.getURI()); //Note: we return resources, not properties!
 		}
 		return orderedResults.values().toArray(new String[0]);
@@ -228,36 +235,141 @@ public class ConstraintsManager {
 		
 	}
 
+	public boolean isOnDataProperty(String cons) {
+		if(inputConfig.contains(
+				ResourceFactory.createResource(cons),
+				ResourceFactory.createProperty(ConstraintsManagerConfig.onDataProperty)
+				)) return true;
+		else return false;
+	}
+	public boolean isOnObjectProperty(String cons) {
+		if(inputConfig.contains(
+				ResourceFactory.createResource(cons),
+				ResourceFactory.createProperty(ConstraintsManagerConfig.onObjectProperty)
+				)) return true;
+		else return false;
+	}
+	
+	public boolean isNumeric(String cons) {
+		if(inputConfig.contains(
+				ResourceFactory.createResource(cons),
+				ResourceFactory.createProperty(ConstraintsManagerConfig.hasType),
+				ResourceFactory.createResource(ConstraintsManagerConfig.numericType)
+				)) return true;
+		else return false;
+	}
+	
+	public String getForConstraintLanguage(String cons) {
+		String result=null;
+		NodeIterator possibleResultsIter=inputConfig.listObjectsOfProperty(ResourceFactory.createResource(cons), ResourceFactory.createProperty(ConstraintsManagerConfig.language));
+		while(possibleResultsIter.hasNext()) {
+			RDFNode tentativeResult=possibleResultsIter.nextNode();
+			if(tentativeResult.isLiteral()) return tentativeResult.asLiteral().getValue().toString();
+		}
+		return result;
+	}
+	
+	public String getPropertyForConstraint(String cons) throws PropertyConstraintException, ConfigurationException {
+		String result=null;
+		NodeIterator possibleResultsIter=null;
+		if(isDataConstraint(cons))
+			possibleResultsIter=inputConfig.listObjectsOfProperty(ResourceFactory.createResource(cons), ResourceFactory.createProperty(ConstraintsManagerConfig.onDataProperty));
+		else if(isObjectConstraint(cons)) 
+			possibleResultsIter=inputConfig.listObjectsOfProperty(ResourceFactory.createResource(cons), ResourceFactory.createProperty(ConstraintsManagerConfig.onObjectProperty));
+		else throw new PropertyConstraintException("Inconsistent type for "+cons);
+		while(possibleResultsIter.hasNext()) {
+			RDFNode tentativeResult=possibleResultsIter.nextNode();
+			if(tentativeResult.isResource()) return tentativeResult.asResource().getURI();
+		}
+		throw new ConfigurationException("Unable to find property for constraint: "+cons);
+	}
+	
+	public int getMinCardinalityForConstr(String cons) {
+		int result=-1;
+				NodeIterator possibleResultsIter=inputConfig.listObjectsOfProperty(ResourceFactory.createResource(cons), ResourceFactory.createProperty(ConstraintsManagerConfig.minCardinality));
+		while(possibleResultsIter.hasNext()) {
+			RDFNode tentativeResult=possibleResultsIter.nextNode();
+			if(tentativeResult.isLiteral()) result= tentativeResult.asLiteral().getInt();
+		}
+				
+		return result;
+	}
 
-	public int getMinCardinalityForRegProperty(String property) {
-		return 0;
+	public int getMaxCardinalityForConstr(String cons) {
+		int result=-1;
+				NodeIterator possibleResultsIter=inputConfig.listObjectsOfProperty(ResourceFactory.createResource(cons), ResourceFactory.createProperty(ConstraintsManagerConfig.maxCardinality));
+		while(possibleResultsIter.hasNext()) {
+			RDFNode tentativeResult=possibleResultsIter.nextNode();
+			if(tentativeResult.isLiteral()) result= tentativeResult.asLiteral().getInt();
+		}
+				
+		return result;
 	}
-	public int getMaxCardinalityForRegProperty(String property) {
-		return 0;
+
+
+	private boolean isDataConstraint(String cons) {
+		if(inputConfig.
+				contains(
+				ResourceFactory.createResource(cons),
+				ResourceFactory.createProperty(ConstraintsManagerConfig.onDataProperty)
+				))
+		return true;
+		else return false;
 	}
+
+	private boolean isObjectConstraint(String cons) {
+		if(inputConfig.
+				contains(
+				ResourceFactory.createResource(cons),
+				ResourceFactory.createProperty(ConstraintsManagerConfig.onObjectProperty)
+				))
+		return true;
+		else return false;
+	}
+
+
+	
 	public boolean isStringRegProperty(String property) {
 		return false;
 	}
-	public boolean isNumericRegProperty(String property) {
-		return false;
-	}
+
 	public boolean isPlainRegProperty(String property) {
 		return false;
 	}
-	public boolean isDataRegProperty(String property) {
-		return false;
-	}
-	public boolean isObjectRegProperty(String property) {
-		return false;
-	}
+
 	public String[] getRegPropertyRange(String property) {
 		return null;
 	}
-	public String getLanguageRegProperty(String property) {
-		return null;
-	}
+	
 	public String getSymmetricRegProperty(String property) {
 		return null;
 	}
+
+
+	public String[] getOptionsForConstraints(String cons) {
+		ArrayList<String>values=new ArrayList<String>();
+		NodeIterator possibleResultsIter=inputConfig.listObjectsOfProperty(ResourceFactory.createResource(cons), ResourceFactory.createProperty(ConstraintsManagerConfig.oneOf));
+		while(possibleResultsIter.hasNext()) {
+			RDFNode tentativeResult=possibleResultsIter.nextNode();
+			if(tentativeResult.isResource()) values.add(tentativeResult.asResource().getURI());
+		}
+		if(values.size()>0) return values.toArray(new String[0]);
+		else return null;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
 	
 }
