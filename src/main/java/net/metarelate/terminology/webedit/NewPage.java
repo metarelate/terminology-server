@@ -92,6 +92,7 @@ public class NewPage  extends AbstractEditPage {
 		
     }
 	
+	/*
 	@Override
 	protected void buildEntity(Model statementsCollected,String description) throws WebSystemException {
 		String uri=uriField.getText();
@@ -135,6 +136,7 @@ public class NewPage  extends AbstractEditPage {
 		
 
 	}
+	*/
 	
 	private boolean validateURI(String uri) {
 		if(uri.length()<8) {
@@ -190,11 +192,16 @@ public class NewPage  extends AbstractEditPage {
 	@Override
 	protected String getURIOfEntity() {
 		String result=uriField.getText();
-		System.out.println("URI of entity: "+result);
+		//System.out.println("URI of entity: "+result);
 		//if(result!=null)
 		//	if(validateURI(result)) return result;
 		return result;
 		
+	}
+
+	@Override
+	protected boolean isURIValid() {
+		return validateURI(getURIOfEntity());
 	} 
 	
 }

@@ -5,8 +5,11 @@ import java.util.ArrayList;
 
 import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
+import net.metarelate.terminology.exceptions.AuthException;
 import net.metarelate.terminology.exceptions.ConfigurationException;
+import net.metarelate.terminology.exceptions.InvalidProcessException;
 import net.metarelate.terminology.exceptions.PropertyConstraintException;
+import net.metarelate.terminology.exceptions.RegistryAccessException;
 import net.metarelate.terminology.exceptions.WebSystemException;
 import net.metarelate.terminology.utils.SSLogger;
 
@@ -53,8 +56,9 @@ public abstract class AbstractEditPage  extends SuperPage {
 	
 	
 	protected abstract String getURIOfEntity();
+	protected abstract boolean isURIValid();
 	
-	protected abstract void buildEntity(Model statementsCollected,String description) throws WebSystemException;
+	//protected abstract void buildEntity(Model statementsCollected,String description) throws WebSystemException;
 	
 
 	/**
@@ -99,7 +103,7 @@ public abstract class AbstractEditPage  extends SuperPage {
 		/*
 		 * Here we assemble a list of things that will be used to build the form.
 		 */
-		ArrayList<FormObject> formObjects=new ArrayList<FormObject>();
+		final ArrayList<FormObject> formObjects=new ArrayList<FormObject>();
 		
 		/*
 		 * First we start from constraints.
@@ -283,51 +287,95 @@ public abstract class AbstractEditPage  extends SuperPage {
 
 			@Override
 			protected void onSubmit() {
-				//NOTE: this method is executed only upon successful validation. We rely on this!
-				System.out.println("Page is valid");
-				String labelValue = entityLabel.getModel().getObject();
-				if(labelValue==null) labelValue=""; // TODO check that things work here
-				Statement newStatement=ResourceFactory.createStatement(ResourceFactory.createResource(getURIOfEntity()), MetaLanguage.labelProperty, ResourceFactory.createPlainLiteral(labelValue));
-				Model newStats=ModelFactory.createDefaultModel().add(newStatement);
-				System.out.println("Model collected: "+newStats.size()+" statements");
-				
-				try {
-					buildEntity(newStats,"bogus description");
-				} catch (WebSystemException e) {
-					getSession().error("Impossible to initialize entity");
-					return;
-					// TODO do nothing and return
-					//PageParameters pageParameters = new PageParameters();
-					//pageParameters.add("entity", getURIOfEntity());
-					//setResponsePage(ViewPage.class, pageParameters);
-					//e.printStackTrace();
-				} // TODO implement real one
-				
-				/**
-				 * What should happen here.
-				 * 1) check validation
-				 * 2) prepare metadata
-				 * 3) if this is a New Page:
-				 *  	a) create the entity			(Possibly in TerminologyWebConstructor and should move to TerminologyManager)
-				 *      b) register entity in container (Possibly in TerminologyWebConstructor and should move to TerminologyManager)
-				 * 		c) regsiter values				(Possibly in TerminologyWebConstructor and should move to TerminologyManager)
-				 * 4) if this is an Edit page: issue update
+				/*
+				 * TODO validators should have been called at this point. Can something be interecepted and added here ?
 				 */
+				//TODO note: we rely on what below!
+				SSLogger.log("Page is valid",SSLogger.DEBUG);
+				/*
+				 * We build the new model 
+				 * TODO we could capture exceptions in case of malformed URIs and the like, and route it to the validation
+				 * 
+				 */
+				Model newStatememts=ModelFactory.createDefaultModel();
+				for(FormObject f:formObjects) {
+					SSLogger.log("Collecting infos for statement with property: "+f.property,SSLogger.DEBUG);
+					if(f.value.getObject()!=null) {
+						if(f.isURI) {
+							newStatememts.add(ResourceFactory.createStatement(
+									ResourceFactory.createResource(getURIOfEntity()),
+									ResourceFactory.createProperty(f.property),
+									ResourceFactory.createResource(f.value.getObject())
+									));
+						}
+						else {
+							if(f.language!=null){
+								newStatememts.add(ResourceFactory.createStatement(
+										ResourceFactory.createResource(getURIOfEntity()),
+										ResourceFactory.createProperty(f.property),
+										newStatememts.createLiteral(f.value.getObject(),f.language)
+										//ResourceFactory.createLangLiteral(f.value.getObject(),f.language)
+										));
+										//TODO note the hack... we miss an operator!!!
+							}
+							else {
+								newStatememts.add(ResourceFactory.createStatement(
+									ResourceFactory.createResource(getURIOfEntity()),
+									ResourceFactory.createProperty(f.property),
+									ResourceFactory.createPlainLiteral(f.value.getObject())
+									));
+							}
+						}
+					}
+					else {} //This was empty...
+				}
+				
+				//String labelValue = entityLabel.getModel().getObject();
+				//if(labelValue==null) labelValue=""; // TODO check that things work here
+				//Statement newStatement=ResourceFactory.createStatement(ResourceFactory.createResource(getURIOfEntity()), MetaLanguage.labelProperty, ResourceFactory.createPlainLiteral(labelValue));
+				//Model newStats=ModelFactory.createDefaultModel().add(newStatement);
+				SSLogger.log("Collected model with : "+newStatememts.size()+" statements");
 				
 				/*
+				 * Here we prepare the metadata
+				 */
+				String urlToEdit=getURIOfEntity();
+				String userURI=CommandWebConsole.myInitializer.getDefaultUserURI();
+				String actionDescription="bogus right now"; //TODO we should add the description panel!
+				
+				
+				/*
+				 * The actual action!
+				 */
+				if(!isURIValid()) {
+					getSession().error("URI is invalid");
+					//throw new WebSystemException("Invalid URI");
+				}
 				try {
-					//Do nothing now, but we should get all statements and replace the model
-					CommandWebConsole.myInitializer.myTerminologyManager.replaceEntityInformation(uriOfEntity, newStats, CommandWebConsole.myInitializer.getDefaultUserURI(), "dumb edit");
+					if(isEdit) {
+						// Entity exists...
+						CommandWebConsole.myInitializer.myTerminologyManager.replaceEntityInformation(urlToEdit, newStatememts, CommandWebConsole.myInitializer.getDefaultUserURI(), actionDescription);
+					}
+					if(isNew) {
+						if(isSet) CommandWebConsole.myInitializer.myTerminologyManager.addSubRegister(urlToEdit, uriOfContainer, newStatememts, userURI, actionDescription, true);
+						if(isIndividual) CommandWebConsole.myInitializer.myTerminologyManager.addTermToRegister(urlToEdit, uriOfContainer, newStatememts, userURI, actionDescription, true);
+					}
 				} catch (AuthException e) {
-					// TODO Auto-generated catch block
 					getSession().error("Auth error");
 					e.printStackTrace();
+				} catch (InvalidProcessException e) {
+					getSession().error("Invalid process error");
+					e.printStackTrace();
 				} catch (RegistryAccessException e) {
-					// TODO Auto-generated catch block
 					getSession().error("Reg error");
 					e.printStackTrace();
 				}
-				*/
+				
+	
+				
+				/*
+				 * What should happen next
+				 */
 				if(isSuperseding) {
 					//route to to viewPage (target=superseding)
 					System.out.println("Superseding");
@@ -346,9 +394,7 @@ public abstract class AbstractEditPage  extends SuperPage {
 				}
 				
 				
-				// update label with labelValue
-				
-				
+		
 
 			}
 

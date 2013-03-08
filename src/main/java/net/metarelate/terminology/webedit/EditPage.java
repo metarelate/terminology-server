@@ -27,12 +27,13 @@ import com.hp.hpl.jena.rdf.model.Statement;
  */
 public class EditPage  extends AbstractEditPage {
 	private static final long serialVersionUID = 1L;
+	private String urlToEdit=null;
 	public EditPage(final PageParameters parameters) throws WebSystemException, ConfigurationException, PropertyConstraintException {
 		super(parameters);
 		/*
 		 * URL is fixed, we just show it.
 		 */
-		final String urlToEdit=parameters.get("entity").toString();
+		urlToEdit=parameters.get("entity").toString();
 		add(new Label("urlToEdit",urlToEdit));
 		
 		/*
@@ -138,15 +139,13 @@ public class EditPage  extends AbstractEditPage {
 	
 	@Override
 	protected String getURIOfEntity() {
-		// TODO Auto-generated method stub
-		return null;
+		return urlToEdit;
 	}
 	@Override
-	protected void buildEntity(Model statementsCollected, String description)
-			throws WebSystemException {
-		// TODO Auto-generated method stub
-		
+	protected boolean isURIValid() {
+		return true;
 	}
+	
 
 }
 
