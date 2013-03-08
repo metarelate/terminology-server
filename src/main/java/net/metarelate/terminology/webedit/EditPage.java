@@ -80,12 +80,12 @@ public class EditPage  extends AbstractEditPage {
 		
 			
 		
-		final TextField<String> entityLabel = new TextField<String>("entityLabel", org.apache.wicket.model.Model.of(terminologyEntityWrapper.getObject().getLabel(terminologyEntityWrapper.getObject().getLastVersion())));
+		//final TextField<String> entityLabel = new TextField<String>("entityLabel", org.apache.wicket.model.Model.of(terminologyEntityWrapper.getObject().getLabel(terminologyEntityWrapper.getObject().getLastVersion())));
 		//final TextField<String> entityLabel = new TextField<String>("entityLabel", org.apache.wicket.model.Model.of(""));
 
-		entityLabel.setRequired(true);
-		entityLabel.add(new LabelValidator());
-		
+		//entityLabel.setRequired(true);
+		//entityLabel.add(new LabelValidator());
+		/*
 		Form<?> form = new Form<Void>("editForm") {
 
 			@Override
@@ -118,8 +118,9 @@ public class EditPage  extends AbstractEditPage {
 				setResponsePage(ViewPage.class, pageParameters);
 
 			}
-
+		 
 		};
+		*/
 		//add(new Label("version",myEntity.getLastVersion()));
 		//add(form);
 		//form.add(entityLabel);

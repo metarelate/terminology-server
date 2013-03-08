@@ -54,6 +54,8 @@ public abstract class AbstractEditPage  extends SuperPage {
 	protected FeedbackPanel feedbackPanel=null;
 	protected String uriOfContainer=null;
 	
+	AjaxyTextArea actionDescription=null;
+	
 	public AbstractEditPage(final PageParameters parameters) {
 		super(parameters);
     }
@@ -62,6 +64,13 @@ public abstract class AbstractEditPage  extends SuperPage {
 	
 	protected abstract String getURIOfEntity();
 	protected abstract boolean isURIValid();
+	
+	public String getDescription() {
+		if(actionDescription!=null) {
+			return actionDescription.getText();
+		}
+		else return "";
+	}
 	
 	//protected abstract void buildEntity(Model statementsCollected,String description) throws WebSystemException;
 	
@@ -232,9 +241,7 @@ public abstract class AbstractEditPage  extends SuperPage {
 				formObjects.add(f);
 			}
 			
-			/*
-			 * TODO Here we should create validators.
-			 */
+			
 			
 		
 			
@@ -288,10 +295,10 @@ public abstract class AbstractEditPage  extends SuperPage {
 		if(isEdit) labelModel=org.apache.wicket.model.Model.of(terminologyEntityWrapper.getObject().getLabel(terminologyEntityWrapper.getObject().getLastVersion()));
 		else if(isNew) labelModel=new org.apache.wicket.model.Model<String>();
 		else throw new WebSystemException("Neither edit or new action for edit form");
-		final TextField<String> entityLabel = new TextField<String>("entityLabel", labelModel);
+		//final TextField<String> entityLabel = new TextField<String>("entityLabel", labelModel);
 		
-		entityLabel.setRequired(true);
-		entityLabel.add(new LabelValidator()); //TODO here is where we extend validation
+		//entityLabel.setRequired(true);
+		//entityLabel.add(new LabelValidator()); //TODO here is where we extend validation
 		
 		Form<?> form = new Form<Void>("editForm") {
 
@@ -376,11 +383,11 @@ public abstract class AbstractEditPage  extends SuperPage {
 				try {
 					if(isEdit) {
 						// Entity exists...
-						CommandWebConsole.myInitializer.myTerminologyManager.replaceEntityInformation(urlToEdit, newStatememts, CommandWebConsole.myInitializer.getDefaultUserURI(), actionDescription);
+						CommandWebConsole.myInitializer.myTerminologyManager.replaceEntityInformation(urlToEdit, newStatememts, CommandWebConsole.myInitializer.getDefaultUserURI(), getDescription());
 					}
 					if(isNew) {
-						if(isSet) CommandWebConsole.myInitializer.myTerminologyManager.addSubRegister(urlToEdit, uriOfContainer, newStatememts, userURI, actionDescription, true);
-						if(isIndividual) CommandWebConsole.myInitializer.myTerminologyManager.addTermToRegister(urlToEdit, uriOfContainer, newStatememts, userURI, actionDescription, true);
+						if(isSet) CommandWebConsole.myInitializer.myTerminologyManager.addSubRegister(urlToEdit, uriOfContainer, newStatememts, userURI, getDescription(), true);
+						if(isIndividual) CommandWebConsole.myInitializer.myTerminologyManager.addTermToRegister(urlToEdit, uriOfContainer, newStatememts, userURI, getDescription(), true);
 					}
 				} catch (AuthException e) {
 					getSession().error("Auth error");
@@ -443,10 +450,14 @@ public abstract class AbstractEditPage  extends SuperPage {
 		//for (AbstractFormValidator v:validators) form.add(v);
 		//add(new Label("version",myEntity.getLastVersion()));
 		add(form);
-		form.add(entityLabel);
+		//form.add(entityLabel);
 		feedbackPanel=new FeedbackPanel("feedback");
 		feedbackPanel.setOutputMarkupId(true);
 		add(feedbackPanel);
+		
+		actionDescription=new AjaxyTextArea("actionDescription");
+		add(actionDescription);
+		
 	}
 	
 
