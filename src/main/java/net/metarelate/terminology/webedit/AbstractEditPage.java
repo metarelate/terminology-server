@@ -12,9 +12,14 @@ import net.metarelate.terminology.exceptions.PropertyConstraintException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
 import net.metarelate.terminology.exceptions.WebSystemException;
 import net.metarelate.terminology.utils.SSLogger;
+import net.metarelate.terminology.webedit.validators.DaftValidator;
+import net.metarelate.terminology.webedit.validators.MaxCardinalityValidator;
+import net.metarelate.terminology.webedit.validators.MinCardinalityValidator;
+
 
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.markup.html.form.validation.AbstractFormValidator;
 import org.apache.wicket.markup.html.list.ListItem;
 import org.apache.wicket.markup.html.list.ListView;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
@@ -104,7 +109,7 @@ public abstract class AbstractEditPage  extends SuperPage {
 		 * Here we assemble a list of things that will be used to build the form.
 		 */
 		final ArrayList<FormObject> formObjects=new ArrayList<FormObject>();
-		
+		final ArrayList<DaftValidator> validators=new ArrayList<DaftValidator>();
 		/*
 		 * First we start from constraints.
 		 */
@@ -119,6 +124,11 @@ public abstract class AbstractEditPage  extends SuperPage {
 			boolean onData=CommandWebConsole.myInitializer.myConstraintsManager.isOnDataProperty(cons);
 			boolean onObject=CommandWebConsole.myInitializer.myConstraintsManager.isOnObjectProperty(cons);
 			
+			/**
+			 * We build and record the corresponding form validator
+			 */
+			if(minCardinality>0) validators.add(new MinCardinalityValidator(property,minCardinality));
+			if(maxCardinality>0) validators.add(new MaxCardinalityValidator(property,maxCardinality));
 			/*
 			 * How many form objects for this property ?
 			 */
@@ -347,10 +357,22 @@ public abstract class AbstractEditPage  extends SuperPage {
 				/*
 				 * The actual action!
 				 */
+				
+				/*
+				 * First, our "custom validation"...
+				 */
 				if(!isURIValid()) {
 					getSession().error("URI is invalid");
-					//throw new WebSystemException("Invalid URI");
+					return;
 				}
+				
+				for(DaftValidator v:validators) {
+					if(!v.validate(newStatememts)) {
+						getSession().error(v.getMessage());
+						return;
+					}
+				}
+				
 				try {
 					if(isEdit) {
 						// Entity exists...
@@ -375,7 +397,7 @@ public abstract class AbstractEditPage  extends SuperPage {
 				
 				/*
 				 * What should happen next
-				 */
+				 */	
 				if(isSuperseding) {
 					//route to to viewPage (target=superseding)
 					System.out.println("Superseding");
@@ -417,7 +439,8 @@ public abstract class AbstractEditPage  extends SuperPage {
 				*/
 			}}
 		);
-		
+		//TODO note that we have bypassed wicket validation here...
+		//for (AbstractFormValidator v:validators) form.add(v);
 		//add(new Label("version",myEntity.getLastVersion()));
 		add(form);
 		form.add(entityLabel);
