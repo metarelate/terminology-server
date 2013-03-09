@@ -28,6 +28,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -136,8 +137,8 @@ public abstract class AbstractEditPage  extends SuperPage {
 			/**
 			 * We build and record the corresponding form validator
 			 */
-			if(minCardinality>0) validators.add(new MinCardinalityValidator(property,minCardinality));
-			if(maxCardinality>0) validators.add(new MaxCardinalityValidator(property,maxCardinality));
+			if(minCardinality>0) validators.add(new MinCardinalityValidator(property,minCardinality,language));
+			if(maxCardinality>0) validators.add(new MaxCardinalityValidator(property,maxCardinality,language));
 			/*
 			 * How many form objects for this property ?
 			 */
@@ -145,7 +146,18 @@ public abstract class AbstractEditPage  extends SuperPage {
 			if(minCardinality>-1) nOfElements=minCardinality; //Never less than the minimum
 			if(maxCardinality>nOfElements) nOfElements=maxCardinality; //making some space if more are required.
 			//Now checking what we have in the model (unless it's edit, it should be empty)
-			int previouslyKnown=bagOfStatements.listObjectsOfProperty(ResourceFactory.createProperty(property)).toSet().size();
+			int previouslyKnown=0;
+			if(language==null) bagOfStatements.listObjectsOfProperty(ResourceFactory.createProperty(property)).toSet().size();
+			else {
+				NodeIterator objects=bagOfStatements.listObjectsOfProperty(ResourceFactory.createProperty(property));
+				while(objects.hasNext()) {
+					RDFNode object=objects.next();
+					if(object.isLiteral())
+						if(object.asLiteral().getLanguage()!=null)
+							if(language.equals(object.asLiteral().getLanguage()))
+								previouslyKnown++;
+				}
+			}
 			if(previouslyKnown>nOfElements) nOfElements=previouslyKnown; //we don't drop statements
 			SSLogger.log("Min.: "+minCardinality,SSLogger.DEBUG);
 			SSLogger.log("Max.: "+maxCardinality,SSLogger.DEBUG);
