@@ -13,8 +13,12 @@ import net.metarelate.terminology.exceptions.RegistryAccessException;
 import net.metarelate.terminology.exceptions.WebSystemException;
 import net.metarelate.terminology.utils.SSLogger;
 import net.metarelate.terminology.webedit.validators.DaftValidator;
+import net.metarelate.terminology.webedit.validators.InRegisterValidator;
+import net.metarelate.terminology.webedit.validators.IsNumericValidator;
+import net.metarelate.terminology.webedit.validators.IsURIValidator;
 import net.metarelate.terminology.webedit.validators.MaxCardinalityValidator;
 import net.metarelate.terminology.webedit.validators.MinCardinalityValidator;
+import net.metarelate.terminology.webedit.validators.OptionValidator;
 
 
 import org.apache.wicket.markup.html.form.Form;
@@ -124,7 +128,8 @@ public abstract class AbstractEditPage  extends SuperPage {
 		 * First we start from constraints.
 		 */
 		for(String cons:constraints) {
-			FormComponent currentFormItem=null;
+			//FormComponent currentFormItem=null;
+			SSLogger.log("Starting analysis for constraint: "+cons,SSLogger.DEBUG);
 			final String property=CommandWebConsole.myInitializer.myConstraintsManager.getPropertyForConstraint(cons);
 			String language=CommandWebConsole.myInitializer.myConstraintsManager.getForConstraintLanguage(cons);
 			int minCardinality=CommandWebConsole.myInitializer.myConstraintsManager.getMinCardinalityForConstr(cons);
@@ -133,12 +138,18 @@ public abstract class AbstractEditPage  extends SuperPage {
 			String[] options=CommandWebConsole.myInitializer.myConstraintsManager.getOptionsForConstraints(cons);
 			boolean onData=CommandWebConsole.myInitializer.myConstraintsManager.isOnDataProperty(cons);
 			boolean onObject=CommandWebConsole.myInitializer.myConstraintsManager.isOnObjectProperty(cons);
-			
+			boolean inRegister=CommandWebConsole.myInitializer.myConstraintsManager.isInRegisterForConstr(cons);
+			//System.out.println("Language: "+language);
 			/**
 			 * We build and record the corresponding form validator
 			 */
 			if(minCardinality>0) validators.add(new MinCardinalityValidator(property,minCardinality,language));
 			if(maxCardinality>0) validators.add(new MaxCardinalityValidator(property,maxCardinality,language));
+			if(isNumeric) validators.add(new IsNumericValidator(property));
+			if(onObject) validators.add(new IsURIValidator(property));
+			if(options!=null) validators.add(new OptionValidator(property,options));
+			if(inRegister) validators.add(new InRegisterValidator(property));
+			
 			/*
 			 * How many form objects for this property ?
 			 */
@@ -147,7 +158,7 @@ public abstract class AbstractEditPage  extends SuperPage {
 			if(maxCardinality>nOfElements) nOfElements=maxCardinality; //making some space if more are required.
 			//Now checking what we have in the model (unless it's edit, it should be empty)
 			int previouslyKnown=0;
-			if(language==null) bagOfStatements.listObjectsOfProperty(ResourceFactory.createProperty(property)).toSet().size();
+			if(language==null) previouslyKnown=bagOfStatements.listObjectsOfProperty(ResourceFactory.createProperty(property)).toSet().size();
 			else {
 				NodeIterator objects=bagOfStatements.listObjectsOfProperty(ResourceFactory.createProperty(property));
 				while(objects.hasNext()) {
@@ -159,6 +170,7 @@ public abstract class AbstractEditPage  extends SuperPage {
 				}
 			}
 			if(previouslyKnown>nOfElements) nOfElements=previouslyKnown; //we don't drop statements
+			if(nOfElements==0) nOfElements=1; //if it'smention, we are going to propose one field.
 			SSLogger.log("Min.: "+minCardinality,SSLogger.DEBUG);
 			SSLogger.log("Max.: "+maxCardinality,SSLogger.DEBUG);
 			SSLogger.log("Prev.: "+previouslyKnown,SSLogger.DEBUG);

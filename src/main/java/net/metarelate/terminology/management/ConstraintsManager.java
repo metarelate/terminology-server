@@ -327,7 +327,15 @@ public class ConstraintsManager {
 		else return false;
 	}
 
-
+	public boolean isInRegisterForConstr(String cons) {
+		if(inputConfig.
+				contains(
+				ResourceFactory.createResource(cons),
+				ResourceFactory.createProperty(ConstraintsManagerConfig.inRegister)
+				))
+		return true;
+		else return false;
+	}
 	
 	public boolean isStringRegProperty(String property) {
 		return false;
@@ -356,6 +364,9 @@ public class ConstraintsManager {
 		if(values.size()>0) return values.toArray(new String[0]);
 		else return null;
 	}
+
+
+
 
 
 

@@ -22,6 +22,7 @@ public class ConstraintsManagerConfig {
 	public static final String numericType=configPrefix+"Numeric";
 	public static final String hasValidationCommand=configPrefix+"validationCommand";
 	public static final String clearCommand= configPrefix+"clear";
+	public static final String inRegister = configPrefix+"inRegister";
 	public static String hasType=configPrefix+"hasType";
 
 
