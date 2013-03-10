@@ -320,6 +320,12 @@ public class MetaLanguage {
 		}
 		return modelOut;
 	}
+	public static Model filterForEditComplement(Model modelIn) {
+		Model answer=ModelFactory.createDefaultModel();
+		answer.add(modelIn);
+		answer.remove(filterForEdit(modelIn));
+		return answer;
+	}
 	
 	
 	private static void buildFilters() {

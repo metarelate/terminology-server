@@ -57,6 +57,7 @@ public class TerminologyManager {
 	private static final int MODE_REPLACE = 1;
 	private static final int MODE_ADD = 2;
 	private static final int MODE_REMOVE = 3;
+	private static final int MODE_SOBSTITUTE = 4;
 
 	Initializer myInitializer=null;
 	//TerminologyFactory myFactory;
@@ -68,6 +69,9 @@ public class TerminologyManager {
 	
 	public void replaceEntityInformation(String entityURI, Model statsToReplace, String actionAuthor, String description) throws AuthException, RegistryAccessException, InvalidProcessException {
 		amendEntityInformation(entityURI, statsToReplace, actionAuthor, description, MODE_REPLACE);
+	}
+	public void sobstituteEntityInformation(String entityURI, Model statsToReplace, String actionAuthor, String description) throws AuthException, RegistryAccessException, InvalidProcessException {
+		amendEntityInformation(entityURI, statsToReplace, actionAuthor, description, MODE_SOBSTITUTE);
 	}
 	public void addToEntityInformation(String entityURI, Model statsToReplace, String actionAuthor, String description) throws AuthException, RegistryAccessException, InvalidProcessException {
 		amendEntityInformation(entityURI, statsToReplace, actionAuthor, description, MODE_ADD);
@@ -192,7 +196,8 @@ public class TerminologyManager {
 			oldStatements.add(statsToReplace);
 			myEntity.getStatements(newVersion).add(oldStatements);
 		}
-			
+		if(mode==MODE_SOBSTITUTE)	
+			myEntity.replaceStatements(statsToReplace, newVersion);
 		if(mode==MODE_ADD) 
 			myEntity.getStatements(newVersion).add(myEntity.getStatements(lastVersion)).add(statsToReplace);
 		if(mode==MODE_REMOVE)
