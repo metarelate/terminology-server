@@ -1,6 +1,8 @@
 package net.metarelate.terminology.webedit;
 
 import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
 import net.metarelate.terminology.config.MetaLanguage;
@@ -21,6 +23,9 @@ import net.metarelate.terminology.webedit.validators.MinCardinalityValidator;
 import net.metarelate.terminology.webedit.validators.OptionValidator;
 
 
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.AjaxLink;
+import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.form.validation.AbstractFormValidator;
@@ -113,11 +118,16 @@ public abstract class AbstractEditPage  extends SuperPage {
 		for (String cons:constraints) SSLogger.log(cons,SSLogger.DEBUG);
 		
 		/*
-		 * We make a copy of statements already known (really only happens for an edit operation)
+		 * We make a copy of statements already known that should be edited.
+		 * We will use previusy known statements to make fields even if constraints don't propose them.
+		 * 
 		 */
 		com.hp.hpl.jena.rdf.model.Model bagOfStatements=ModelFactory.createDefaultModel();	//Note: hopefully this is serializable or wicket will complain
 		if(isEdit) bagOfStatements.add(MetaLanguage.filterForEdit(terminologyEntityWrapper.getObject().getStatements(terminologyEntityWrapper.getObject().getLastVersion())));
 		SSLogger.log("Previous statements: "+bagOfStatements.size(), SSLogger.DEBUG);
+		
+		final com.hp.hpl.jena.rdf.model.Model extraStatements=ModelFactory.createDefaultModel();
+		if(isEdit) extraStatements.add(MetaLanguage.filterForEditComplement(terminologyEntityWrapper.getObject().getStatements(terminologyEntityWrapper.getObject().getLastVersion())));
 		
 		/*
 		 * Here we assemble a list of things that will be used to build the form.
@@ -324,7 +334,7 @@ public abstract class AbstractEditPage  extends SuperPage {
 		//entityLabel.setRequired(true);
 		//entityLabel.add(new LabelValidator()); //TODO here is where we extend validation
 		
-		Form<?> form = new Form<Void>("editForm") {
+		final Form<?> form = new Form<Void>("editForm") {
 
 			@Override
 			protected void onSubmit() {
@@ -343,26 +353,70 @@ public abstract class AbstractEditPage  extends SuperPage {
 					SSLogger.log("Collecting infos for statement with property: "+f.property,SSLogger.DEBUG);
 					if(f.value.getObject()!=null) {
 						if(f.isURI) {
+							String prop=null;
+							if(!f.isNew) {
+								prop=f.property;
+							}
+							else{
+								try{
+									URL test=new URL(f.propValue.getObject());
+								} catch (Exception e) {
+									getSession().error("Invalid URL for property: "+f.propValue.getObject());
+									return;
+								}
+								prop=f.propValue.getObject();
+							}
+							
 							newStatememts.add(ResourceFactory.createStatement(
 									ResourceFactory.createResource(getURIOfEntity()),
-									ResourceFactory.createProperty(f.property),
+									ResourceFactory.createProperty(prop),
 									ResourceFactory.createResource(f.value.getObject())
 									));
 						}
 						else {
 							if(f.language!=null){
+								String prop=null;
+								if(!f.isNew) {
+									prop=f.property;
+								}
+								else {
+									try{
+										URL test=new URL(f.propValue.getObject());
+									} catch (Exception e) {
+										getSession().error("Invalid URL for property: "+f.propValue.getObject());
+										return;
+									}
+									prop=f.propValue.getObject();
+								}
+								
 								newStatememts.add(ResourceFactory.createStatement(
 										ResourceFactory.createResource(getURIOfEntity()),
-										ResourceFactory.createProperty(f.property),
+										ResourceFactory.createProperty(prop),
 										newStatememts.createLiteral(f.value.getObject(),f.language)
 										//ResourceFactory.createLangLiteral(f.value.getObject(),f.language)
 										));
 										//TODO note the hack... we miss an operator!!!
 							}
 							else {
+								String prop=null;
+								if(!f.isNew) {
+									prop=f.property;
+								}
+								else {
+									try{
+										URL test=new URL(f.propValue.getObject());
+									} catch (Exception e) {
+										getSession().error("Invalid URL for property: "+f.propValue.getObject());
+										return;
+									}
+									prop=f.propValue.getObject();
+								}
+								
+							
+								
 								newStatememts.add(ResourceFactory.createStatement(
 									ResourceFactory.createResource(getURIOfEntity()),
-									ResourceFactory.createProperty(f.property),
+									ResourceFactory.createProperty(prop),
 									ResourceFactory.createPlainLiteral(f.value.getObject())
 									));
 							}
@@ -382,7 +436,7 @@ public abstract class AbstractEditPage  extends SuperPage {
 				 */
 				String urlToEdit=getURIOfEntity();
 				String userURI=CommandWebConsole.myInitializer.getDefaultUserURI();
-				String actionDescription="bogus right now"; //TODO we should add the description panel!
+				//String actionDescription="bogus right now"; //TODO we should add the description panel!
 				
 				
 				/*
@@ -407,11 +461,11 @@ public abstract class AbstractEditPage  extends SuperPage {
 				try {
 					if(isEdit) {
 						// Entity exists...
-						CommandWebConsole.myInitializer.myTerminologyManager.replaceEntityInformation(urlToEdit, newStatememts, CommandWebConsole.myInitializer.getDefaultUserURI(), getDescription());
+						CommandWebConsole.myInitializer.myTerminologyManager.sobstituteEntityInformation(urlToEdit, newStatememts.add(extraStatements), CommandWebConsole.myInitializer.getDefaultUserURI(), getDescription());
 					}
 					if(isNew) {
-						if(isSet) CommandWebConsole.myInitializer.myTerminologyManager.addSubRegister(urlToEdit, uriOfContainer, newStatememts, userURI, getDescription(), true);
-						if(isIndividual) CommandWebConsole.myInitializer.myTerminologyManager.addTermToRegister(urlToEdit, uriOfContainer, newStatememts, userURI, getDescription(), true);
+						if(isSet) CommandWebConsole.myInitializer.myTerminologyManager.addSubRegister(urlToEdit, uriOfContainer, newStatememts.add(extraStatements), userURI, getDescription(), true);
+						if(isIndividual) CommandWebConsole.myInitializer.myTerminologyManager.addTermToRegister(urlToEdit, uriOfContainer, newStatememts.add(extraStatements), userURI, getDescription(), true);
 					}
 				} catch (AuthException e) {
 					getSession().error("Auth error");
@@ -452,22 +506,16 @@ public abstract class AbstractEditPage  extends SuperPage {
 			}
 
 		};
-		
+		form.setOutputMarkupId(true);
 		form.add(new ListView<FormObject>("formList",formObjects){
 
 			@Override
 			protected void populateItem(ListItem<FormObject> item) {
-				System.out.println("BINGO!");
-				if(item.getModelObject().options==null) item.add(new FormComponentComplexField("field",item.getModelObject()));
-				else item.add(new FormComponentOptions("field",item.getModelObject()));
-				/*
-				Label propLabel=new Label("nbogusLabel",item.getModelObject().property);
-				Label propValue=new Label("nbogusValue",item.getModelObject().value);
-				Label proplang=new Label("nbogusLanguage",item.getModelObject().language);
-				item.add(propLabel);
-				item.add(propValue);
-				item.add(proplang);
-				*/
+				if(item.getModelObject().isNew) item.add(new FormComponentNew("field",item.getModelObject())); 
+				else {
+					if(item.getModelObject().options==null) item.add(new FormComponentComplexField("field",item.getModelObject()));
+					else item.add(new FormComponentOptions("field",item.getModelObject()));
+				}
 			}}
 		);
 		//TODO note that we have bypassed wicket validation here...
@@ -479,19 +527,57 @@ public abstract class AbstractEditPage  extends SuperPage {
 		feedbackPanel.setOutputMarkupId(true);
 		add(feedbackPanel);
 		
+		add(new AjaxLink("addObjectField") {
+
+			@Override
+			public void onClick(AjaxRequestTarget target) {
+				target.add(form);
+				FormObject newField=new FormObject();
+				//newField.property="http://bogusNow";
+				newField.isURI=true;
+				newField.isNew=true;
+				formObjects.add(newField);
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+		add(new AjaxLink("addDataField"){
+
+			@Override
+			public void onClick(AjaxRequestTarget target) {
+				target.add(form);
+				FormObject newField=new FormObject();
+				//newField.property="http://bogusNow";
+				newField.isNew=true;
+				newField.isURI=false;
+				
+				formObjects.add(newField);
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+		
 		actionDescription=new AjaxyTextArea("actionDescription");
 		add(actionDescription);
 		
 	}
 	
-
+	/**
+	 * Used to package information needed to construct and operate a field
+	 * @author andreasplendiani
+	 *
+	 */
 	class FormObject implements Serializable{
-		String property=null;
-		boolean isNumeric=false;
-		boolean isURI=false;
-		String[] options=null;
-		String language=null;
-		org.apache.wicket.model.Model<String> value=null;
+		String property=null;		//The property this field refers to
+		boolean isNumeric=false;	//Whether this field is numeric
+		boolean isURI=false;		//Whether this field is a URI (object property)
+		String[] options=null;		//Option constraints (if it applies)
+		String language=null;		//Language constraints (if it applied)
+		org.apache.wicket.model.Model<String> value=null;	//Model for the value of the object (for wicket)
+		org.apache.wicket.model.Model<String> propValue=null;	//Model for the property (when it applies, e.g. for new fields)
+		boolean isNew=false;		//Whether this element has just be added (e.g.: property is from the model)
 		
 	}
 }
