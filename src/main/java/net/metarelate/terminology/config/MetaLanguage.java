@@ -43,6 +43,9 @@ public class MetaLanguage {
 	private static Set<Resource> indexRData=null;
 	private static Set<Property> indexPData=null;
 	
+	private static Set<Resource> indexREdit=null;
+	private static Set<Property> indexPEdit=null;
+	
 	
 	/**
 	 * Configuration and instance management
@@ -305,16 +308,29 @@ public class MetaLanguage {
 		
 	}
 	
+	public static Model filterForEdit(Model ModelIn) {
+		Model modelOut=ModelFactory.createDefaultModel();
+		if(indexPEdit==null) buildFilters();
+		StmtIterator stats=ModelIn.listStatements();
+		while(stats.hasNext()) {
+			Statement stat=stats.next();
+			if(!indexPEdit.contains(stat.getPredicate()) && !indexREdit.contains(stat.getObject())) {
+				modelOut.add(stat);
+			}
+		}
+		return modelOut;
+	}
+	
+	
 	private static void buildFilters() {
+		/*
+		 * What we don't want to see in a web representation
+		 */
 		indexRWeb=new HashSet<Resource>();
 		indexPWeb=new HashSet<Property>();
 		//Filters for web
 		
-		//indexPWeb.add(sitePrefixProperty);
-		//indexPWeb.add(diskPrefixProperty);
 		indexPWeb.add(nameSpaceProperty);			// TODO should not be in model either!
-		//indexPWeb.add(cssAddressProperty);
-		//indexPWeb.add(tdbPrefixProperty);
 		indexPWeb.add(hasStandardProperty);
 		indexPWeb.add(hasManagerProperty);
 		indexPWeb.add(hasSubRegisterProperty);
@@ -335,20 +351,35 @@ public class MetaLanguage {
 		indexPWeb.add(labelProperty);				// std. prop
 		indexPWeb.add(typeProperty);				// std. prop
 		indexPWeb.add(commentProperty);				// std. prop
-		// Labels
-		// 
 		
-		//indexR.add(validStatus);
-		//indexR.add(toBeValidatedStatus);
 		indexRWeb.add(terminologySetType);
-		//indexRWeb.add(conceptCollectionType);
-		//indexRWeb.add(registryType);
-		//indexRWeb.add(entityIndividualType);
-		//indexRWeb.add(conceptIndividualType);
-		//indexRWeb.add(regsiterItemType);
-		
-		
 		indexRWeb.add(standardType);
+		
+		/*
+		 * What is not up to edit
+		 */
+		indexREdit=new HashSet<Resource>();
+		indexPEdit=new HashSet<Property>();
+		
+		
+		indexPEdit.add(nameSpaceProperty);			// TODO should not be in model either!
+		indexPEdit.add(hasSubRegisterProperty);
+		indexPEdit.add(hasRegisterItemProperty);
+		indexPEdit.add(hasStatusProperty);
+		indexPEdit.add(hasVersionProperty);			//TODO these bits are in the global graph anyway... something to cleanup!
+		indexPEdit.add(hasPreviousVersionProperty);
+		indexPEdit.add(versionActionDateProperty);
+		indexPEdit.add(versionActionProperty);
+		indexPEdit.add(versionActorProperty);
+		indexPEdit.add(versionActionDescription);
+		//indexPWeb.add(containedInProperty);
+		//indexPWeb.add(containsProperty);
+		indexPEdit.add(hasNonVersionModel);
+		indexPEdit.add(definedInRegister);
+		//indexPEdit.add(typeProperty);				// std. prop
+		indexPEdit.add(commentProperty);				// std. prop
+		
+
 		
 		// Filters for Data
 		indexRData=new HashSet<Resource>();
@@ -426,6 +457,8 @@ public class MetaLanguage {
 		indexRModel.add(terminologySetType);
 		
 	}
+
+
 	
 	
 		  

@@ -195,7 +195,7 @@ public class Initializer {
 		myFactory=new TerminologyFactoryTDBImpl(tdbPath);
 		myAuthServer=AuthServerFactory.createServerFromConfig(getConfigurationGraph());
 		myRegistryPolicyManager=new RegistryPolicyManager(getConfigurationGraph());
-		myConstraintsManager=new ConstraintsManager(getConfigurationGraph());
+		myConstraintsManager=new ConstraintsManager(this);
 		myAuthManager=new AuthRegistryManager(myAuthServer,myFactory);
 		myTerminologyManager=new TerminologyManager(this);
 		
@@ -375,6 +375,101 @@ public class Initializer {
 				".\n";
 
 		createFileAndFillWithString(confDirAbsoluteString,"defaultProcessConfig.ttl",defProcessStatements);
+	
+		String validationStatements=
+				"@prefix core:		<http://metarelate.net/core/types/>	.\n"+
+				"@prefix states: 	<http://metarelate.net/core/states/> .\n"+
+				"@prefix actions:	<http://metarelate.net/core/actions/> .\n"+
+				"@prefix config:		<http://metarelate.net/core/config/> .\n"+
+				"@prefix default:	<http://metarelate.net/default/config/> .\n"+
+				"@prefix rdfs:		<http://www.w3.org/2000/01/rdf-schema#> .\n"+
+				"@prefix rdf:		<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n"+
+				"@prefix skos:		<http://www.w3.org/2004/02/skos/core#> .\n"+
+				"\n"+
+				"default:typesXRegisters a config:RegisterValidationConstraint;\n"+
+				"	config:onObjectProperty	rdf:type; \n"+
+				"	config:pseudoOrder 	\"A\";\n"+
+				"	config:minCardinality	\"1\";\n"+
+				"	config:oneOf	skos:Collection;\n"+
+				"	config:oneOf	skos:Scheme;\n"+
+				"	config:oneOf	default:GenericCollection;\n"+
+				"	.\n"+
+				"	\n"+
+				"default:labelXRegisters a config:RegisterValidationConstraint;\n"+
+				"	config:onDataProperty	rdfs:label; \n"+
+				"	config:pseudoOrder 	\"B\";\n"+
+				"	config:minCardinality	\"1\";\n"+
+				"	config:maxCardinality	\"1\";\n"+
+				"	config:language			\"en\";\n"+
+				"	.\n"+
+				"	\n"+
+				"default:notationXRegisters a config:RegisterValidationConstraint;\n"+
+				"	config:onDataProperty	skos:notation; \n"+
+				"	config:pseudoOrder 	\"C\";\n"+
+				"	config:minCardinality	\"1\";\n"+
+				"	config:maxCardinality	\"1\";\n"+
+				"	config:type			config:String;\n"+
+				"	.	\n"+
+				"	\n"+
+				"default:descriptionXRegistersEN a config:RegisterValidationConstraint;\n"+
+				"	config:onDataProperty	rdfs:description; \n"+
+				"	config:pseudoOrder 	\"D\";\n"+
+				"	config:minCardinality	\"1\";\n"+
+				"	config:maxCardinality	\"1\";\n"+
+				"	config:language			\"en\";\n"+
+				"	.\n"+
+				"	\n"+
+				"default:descriptionXRegistersIT a config:RegisterValidationConstraint;\n"+
+				"	config:onDataProperty	rdfs:description; \n"+
+				"	config:pseudoOrder 	\"E\";\n"+
+				"	config:minCardinality	\"0\";\n"+
+				"	config:maxCardinality	\"1\";\n"+
+				"	config:language			\"it\";\n"+
+				"	.\n"+
+				" \n"+
+				"default:typesXCodes a config:CodeValidationConstraint;\n"+
+				"	config:onObjectProperty	rdf:type; \n"+
+				"	config:pseudoOrder 	\"A\";\n"+
+				"	config:minCardinality	\"1\";\n"+
+				"	config:oneOf	skos:Concept;\n"+
+				"	config:oneOf	default:GenericConcept;\n"+
+				"	.\n"+
+				" \n"+
+				"default:labelXCodes a config:CodeValidationConstraint;\n"+
+				"	config:onDataProperty	rdfs:label; \n"+
+				"	config:pseudoOrder 	\"B\";\n"+
+				"	config:minCardinality	\"1\";\n"+
+				"	config:maxCardinality	\"1\";\n"+
+				"	config:language			\"en\";\n"+
+				"	.\n"+
+				"	\n"+
+				"default:notationXCodes a config:CodeValidationConstraint;\n"+
+				"	config:onDataProperty	skos:notation; \n"+
+				"	config:pseudoOrder 	\"C\";\n"+
+				"	config:minCardinality	\"1\";\n"+
+				"	config:maxCardinality	\"1\";\n"+
+				"	config:type			config:String;\n"+
+				"	.\n"+
+				"	\n"+
+				"default:descriptionXCodesEN a config:CodeValidationConstraint;\n"+
+				"	config:onDataProperty	rdfs:description; \n"+
+				"	config:pseudoOrder 	\"D\";\n"+
+				"	config:minCardinality	\"1\";\n"+
+				"	config:maxCardinality	\"1\";\n"+
+				"	config:language			\"en\";\n"+
+				"	.	\n"+
+				"	\n"+
+				"default:descriptionXCodesIT a config:CodeValidationConstraint;\n"+
+				"	config:onDataProperty	rdfs:description; \n"+
+				"	config:pseudoOrder 	\"E\";\n"+
+				"	config:minCardinality	\"0\";\n"+
+				"	config:maxCardinality	\"1\";\n"+
+				"	config:language			\"it\";\n"+
+				"	.	\n";
+				
+				
+			
+		createFileAndFillWithString(confDirAbsoluteString,"defaultValidationRules.ttl",validationStatements);
 	}
 	
 

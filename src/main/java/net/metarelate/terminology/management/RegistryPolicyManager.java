@@ -273,22 +273,40 @@ public class RegistryPolicyManager {
 		
 		if(!anyTransitions.containsKey(actionURI)) return false;
 		ArrayList<String[]> transitionsForAction=anyTransitions.get(actionURI);
-		SSLogger.log("Action not found in transition table: "+actionURI,SSLogger.DEBUG);
-		SSLogger.log("Transition table was: ",SSLogger.DEBUG);
+		SSLogger.log("Checking for viability of action: "+actionURI,SSLogger.DEBUG);
+		SSLogger.log("Pre_this: "+thisState,SSLogger.DEBUG);
+		SSLogger.log("Pre_up: "+upState,SSLogger.DEBUG);
+		SSLogger.log("Pre_down: "+downState,SSLogger.DEBUG);
+		SSLogger.log("Pre_aux: "+auxState,SSLogger.DEBUG);
 		for(String[] transitionForAction:transitionsForAction) {
 			boolean score=true;
 			if(transitionForAction[PRE_THIS]!=null)
 					if(thisState!=null)
-						if(!transitionForAction[PRE_THIS].equals(thisState)) score=false;
+						if(!transitionForAction[PRE_THIS].equals(thisState)) {
+							score=false;
+							SSLogger.log("This violation: "+transitionForAction[PRE_THIS],SSLogger.DEBUG);
+						}
 			if(transitionForAction[PRE_UP]!=null) 
 				if(upState!=null)
-					if(!transitionForAction[PRE_UP].equals(upState)) score=false;
+					if(!transitionForAction[PRE_UP].equals(upState)) {
+						score=false;
+						SSLogger.log("Up violation: "+transitionForAction[PRE_UP],SSLogger.DEBUG);
+
+					}
 			if(transitionForAction[PRE_DOWN]!=null) 
 				if(downState!=null)
-					if(!transitionForAction[PRE_DOWN].equals(downState)) score=false;
+					if(!transitionForAction[PRE_DOWN].equals(downState)) {
+						score=false;
+						SSLogger.log("Down violation: "+transitionForAction[PRE_DOWN],SSLogger.DEBUG);
+
+					}
 			if(transitionForAction[PRE_AUX]!=null) 
 				if(auxState!=null)
-					if(!transitionForAction[PRE_AUX].equals(auxState)) score=false;
+					if(!transitionForAction[PRE_AUX].equals(auxState)) {
+						score=false;
+						SSLogger.log("Aux violation: "+transitionForAction[PRE_AUX],SSLogger.DEBUG);
+
+					}
 			if(score==true) return true;
 		}
 		return false;

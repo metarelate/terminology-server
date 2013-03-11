@@ -130,6 +130,9 @@ public interface TerminologyFactory {
 			String textQueryString);
 
 	public abstract void synch();
+
+	public Set<TerminologySet> getRootsForURI(String uri);
+	public TerminologyEntity getExistingTerminologyEntity(String uri);
 	
 	
 }

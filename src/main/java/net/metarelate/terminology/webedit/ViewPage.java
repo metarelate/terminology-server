@@ -440,9 +440,14 @@ public class ViewPage extends SuperPage {
 						null,
 						CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlSuperseder).getStateURI(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlSuperseder).getLastVersion()) 
 						))
-					supersedEnabled=false;	
+					supersedEnabled=false;
+				System.out.println("Supersed: non viable operation 1");
 			}
-			else supersedEnabled=false;
+			else {
+				supersedEnabled=false;
+				System.out.println("Supersed: unknown URL 1");
+			}
+			
 		}
 		else {
 			if(CommandWebConsole.myInitializer.myFactory.terminologyIndividualExist(urlToAction)) {
@@ -454,8 +459,12 @@ public class ViewPage extends SuperPage {
 						null
 						))
 					supersedEnabled=false;	
+					System.out.println("Supersed: non viable operation 2");
 			}
-			else supersedEnabled=false;
+			else {
+				supersedEnabled=false;
+				System.out.println("Supersed: unknown URL 2");
+			}
 		}
 		
 		

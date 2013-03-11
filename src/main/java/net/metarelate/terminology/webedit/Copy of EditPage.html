@@ -19,29 +19,20 @@
 			<div id="mainPanel">
 				<div wicket:id="feedback"></div>
 				<article>
-					<wicket:child />
+					<h1>Editing : <span wicket:id="urlToEdit">Register</span></h1>
 					
+					<!-- properties table and version info -->
 					<form wicket:id="editForm">
-					<div wicket:id="formList">
-						<div wicket:id="field"></div>
-						<!--
-						<span wicket:id="nbogusLabel"></span>
-						<span wicket:id="nbogusValue"></span>
-						<span wicket:id="nbogusLanguage"></span>
-						-->
-						
-					</div>	
-						<!-- properties table and version info -->
-						<!-- temp note -->
-						<input type="submit" value="Proceed" />
-					</form>	
-						<p>
-						<i>Action description</i>:<br/> 
-						<textarea wicket:id="actionDescription" rows="6" cols="40"></textarea>
-						</p>
-						
-					
-				
+					<!-- temp note -->
+					<p>
+					<i>Note: only labels for the time being!</i>
+					</p>
+					<p>
+					<label>Label</label>: 
+					<input wicket:id="entityLabel" type="text" size="40" />
+					</p>
+					<input type="submit" value="Update" />
+				</form>
 				</article>
 			</div>
 			<div id="sidePanel">

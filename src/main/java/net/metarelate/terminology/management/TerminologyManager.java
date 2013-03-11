@@ -125,7 +125,8 @@ public class TerminologyManager {
 			newTerm.setOwnerURI(actionAuthor);
 			newTerm.setActionURI(RegistryPolicyManager.actionAddURI ,newTerm.getDefaultVersion());
 			newTerm.setActionAuthorURI(actionAuthor,newTerm.getDefaultVersion());
-			newTerm.setActionDescription("New term added to registry",newTerm.getDefaultVersion());
+			if(description==null) description="New term added to registry";
+			newTerm.setActionDescription(description,newTerm.getDefaultVersion()); //TODO default should be handled more coherently
 			newTerm.addStatements(defaultEntityModel,newTerm.getDefaultVersion());
 			DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 			Date date = new Date();

@@ -2,46 +2,90 @@ package net.metarelate.terminology.webedit;
 
 import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
-import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.AuthException;
+import net.metarelate.terminology.exceptions.ConfigurationException;
 import net.metarelate.terminology.exceptions.InvalidProcessException;
+import net.metarelate.terminology.exceptions.PropertyConstraintException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
+import net.metarelate.terminology.exceptions.WebSystemException;
 
-import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.basic.MultiLineLabel;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
-
+import org.apache.wicket.model.LoadableDetachableModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
-
-public class EditPage  extends SuperPage {
+/**
+ * Specialized the behaviour of the AbstractEdit page for an edit operation
+ * @author andreasplendiani
+ *
+ */
+public class EditPage  extends AbstractEditPage {
 	private static final long serialVersionUID = 1L;
-	public EditPage(final PageParameters parameters) {
+	private String urlToEdit=null;
+	public EditPage(final PageParameters parameters) throws WebSystemException, ConfigurationException, PropertyConstraintException {
 		super(parameters);
-		final String urlToEdit=parameters.get("entity").toString();
+		/*
+		 * URL is fixed, we just show it.
+		 */
+		urlToEdit=parameters.get("entity").toString();
 		add(new Label("urlToEdit",urlToEdit));
 		
-		TerminologyEntity myEntity=null;
-		if(CommandWebConsole.myInitializer.myFactory.terminologyIndividualExist(urlToEdit)) myEntity=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlToEdit);
-		else if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(urlToEdit)) myEntity=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToEdit);
+		/*
+		 * Things to set that are specific of edit
+		 */
+		isNew=false;
+		isEdit=true;
+		pageMessage="Nothing to say";
+		/*
+		 * We now the entity here, so we just create it
+		 */
+		if(CommandWebConsole.myInitializer.myFactory.terminologyIndividualExist(urlToEdit)) {
+			//myEntity=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlToEdit);
+			isSet=false;
+			isIndividual=true;
+		}
+		else if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(urlToEdit)) {
+			//myEntity=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToEdit);
+			isSet=true;
+			isIndividual=false;
+		}
 		else {
 			// TODO nothing was found, which is impossible. But let's add some fall back action here anyway...
 		}
-				
 		
-		final TextField<String> entityLabel = new TextField<String>("entityLabel", org.apache.wicket.model.Model.of(myEntity.getLabel(myEntity.getLastVersion())));
+		terminologyEntityWrapper=new LoadableDetachableModel<TerminologyEntity>() {
+			@Override
+			protected TerminologyEntity load() {
+				if(isSet) return CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToEdit);
+				else if(isIndividual) return CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlToEdit);
+				else return null; //TODO this should not happen
+			}
+			
+		};
+		
+		
+		buildForm();
+		postConstructionFinalize();
+		///
+		
+
+		
+		
+		
+			
+		
+		//final TextField<String> entityLabel = new TextField<String>("entityLabel", org.apache.wicket.model.Model.of(terminologyEntityWrapper.getObject().getLabel(terminologyEntityWrapper.getObject().getLastVersion())));
 		//final TextField<String> entityLabel = new TextField<String>("entityLabel", org.apache.wicket.model.Model.of(""));
 
-		entityLabel.setRequired(true);
-		entityLabel.add(new LabelValidator());
-		
+		//entityLabel.setRequired(true);
+		//entityLabel.add(new LabelValidator());
+		/*
 		Form<?> form = new Form<Void>("editForm") {
 
 			@Override
@@ -74,13 +118,14 @@ public class EditPage  extends SuperPage {
 				setResponsePage(ViewPage.class, pageParameters);
 
 			}
-
+		 
 		};
+		*/
 		//add(new Label("version",myEntity.getLastVersion()));
-		add(form);
-		form.add(entityLabel);
-		add(new FeedbackPanel("feedback"));
-		postConstructionFinalize();
+		//add(form);
+		//form.add(entityLabel);
+		//add(new FeedbackPanel("feedback"));
+		//postConstructionFinalize();
 		
     }
 	@Override
@@ -89,8 +134,19 @@ public class EditPage  extends SuperPage {
 	}
 	@Override
 	String getPageStateMessage() {
-		return "Nothing to say";
+		return pageMessage;
 	}
+	
+	
+	@Override
+	protected String getURIOfEntity() {
+		return urlToEdit;
+	}
+	@Override
+	protected boolean isURIValid() {
+		return true;
+	}
+	
 
 }
 
