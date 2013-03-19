@@ -26,7 +26,9 @@ import net.metarelate.terminology.auth.AuthRegistryManager;
 import net.metarelate.terminology.auth.AuthServer;
 import net.metarelate.terminology.auth.StubAuthServer;
 import net.metarelate.terminology.exceptions.AuthException;
+import net.metarelate.terminology.exceptions.ImporterException;
 import net.metarelate.terminology.exceptions.InvalidProcessException;
+import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
 import net.metarelate.terminology.management.TerminologyManager;
 import net.metarelate.terminology.utils.SSLogger;
@@ -202,6 +204,10 @@ public class MetOp extends CommandLineTool {
 			} catch (RegistryAccessException e) {
 				System.out.println("Registry error");
 				System.out.println(e.getLocalizedMessage());
+			} catch (ModelException e) {
+				System.out.println("Model error");
+				System.out.println(e.getLocalizedMessage());
+				e.printStackTrace();
 			}
 		}
 
@@ -223,6 +229,13 @@ public class MetOp extends CommandLineTool {
 			} catch (RegistryAccessException e) {
 				System.out.println("Registry error");
 				System.out.println(e.getLocalizedMessage());
+			} catch (ModelException e) {
+				System.out.println("Model error");
+				System.out.println(e.getLocalizedMessage());
+				e.printStackTrace();
+			} catch (ImporterException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 		
@@ -239,6 +252,10 @@ public class MetOp extends CommandLineTool {
 				myManager.tagRelease(actionAuthorURI,tag,description);
 			} catch (AuthException e) {
 				System.out.println("Auth error");
+				System.out.println(e.getLocalizedMessage());
+				e.printStackTrace();
+			} catch (ModelException e) {
+				System.out.println("Model error");
 				System.out.println(e.getLocalizedMessage());
 				e.printStackTrace();
 			}
@@ -260,6 +277,10 @@ public class MetOp extends CommandLineTool {
 			} catch (RegistryAccessException e) {
 				System.out.println("Registry error");
 				System.out.println(e.getLocalizedMessage());
+			} catch (ModelException e) {
+				System.out.println("Model error");
+				System.out.println(e.getLocalizedMessage());
+				e.printStackTrace();
 			}
 		}
 		
@@ -281,6 +302,10 @@ public class MetOp extends CommandLineTool {
 			} catch (RegistryAccessException e) {
 				System.out.println("Registry error");
 				System.out.println(e.getLocalizedMessage());
+			} catch (ModelException e) {
+				System.out.println("Model error");
+				System.out.println(e.getLocalizedMessage());
+				e.printStackTrace();
 			}
 		}
 		

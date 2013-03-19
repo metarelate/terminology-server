@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import net.metarelate.terminology.config.CoreConfig;
 import net.metarelate.terminology.exceptions.ConfigurationException;
+import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.instanceManager.Initializer;
 
 public class ts {
@@ -11,17 +12,29 @@ public class ts {
 	
 	public static void main(String[] args) {
 		System.out.println("Starting tServer v."+CoreConfig.VERSION_NUMBER+" ("+CoreConfig.VERSION_CODENAME+")");
+		String sysDir=null;
+		boolean debug=false;
+		if(args.length<1) {
+			commandUnknownError();
+			return;
+		}
+		if(args[0].equals("-d") && args.length<2) {
+			commandUnknownError();
+			return;
+		}
 		
 		/**
-		 * First we check if one of the argument contains the system directory, which we need for everything.
-		 * TODO eventually we could catch here all parameters relevant to initializer, and provide the remaining
-		 * or arguments in args.
+		 * We first collect things we need for the rest of the execution
 		 */
-		String sysDir=null;
+		
 		boolean nextIsSysDir=false;
 		for(String arg:args) {
 			if(arg.equalsIgnoreCase("-sys") || arg.equalsIgnoreCase("system")) {
 				nextIsSysDir=true;
+			}
+			if(arg.equalsIgnoreCase("-d")) {
+				debug=true;
+				System.out.println("Debug mode");
 			}
 			if(nextIsSysDir) {
 				sysDir=arg;
@@ -33,39 +46,41 @@ public class ts {
 		 * Building the initializer
 		 */
 		try {
-			// TODO see what to do with configurations...
-			if(sysDir!=null) myInitializer=new Initializer(sysDir);
+			if(sysDir!=null) myInitializer=new Initializer(sysDir,debug);
 			else myInitializer=new Initializer();
 		} catch (ConfigurationException e) {
-			// TODO Auto-generated catch block
+			System.out.println("Sorry, could not start the system");
 			e.printStackTrace();
 		}
-		//for(String arg: args) {
-		//	System.out.println(arg);
-		//}
+		
 		/*************
 		 * Building command executors		
 		 */
+		String argument=args[0];
+		if(debug) argument=args[1];
 		
 		TsCommand command=null;
-		if(args[0].equalsIgnoreCase("ingest")) {
+		if(argument.equalsIgnoreCase("ingest")) {
 			System.out.println("Command: Ingest");
 			command =new CommandIngest(myInitializer,Arrays.copyOfRange(args,2,args.length)); // TODO excpet the first two!
 		}
-		else if(args[0].equalsIgnoreCase("publish")) {
+		else if(argument.equalsIgnoreCase("publish")) {
 			command =new CommandPublish(myInitializer,args); // TODO excpet the first two!
 		}
-		else if(args[0].equalsIgnoreCase("check")) {
+		else if(argument.equalsIgnoreCase("check")) {
 			command =new CommandCheck(myInitializer,args); // TODO excpet the first two!
 		}
-		else if(args[0].equalsIgnoreCase("clean")) {
+		else if(argument.equalsIgnoreCase("clean")) {
 			command =new CommandClean(myInitializer,args); // TODO excpet the first two!
 		}
-		else if(args[0].equalsIgnoreCase("command")) {
+		else if(argument.equalsIgnoreCase("command")) {
 			command =new CommandCommand(myInitializer,args); // TODO excpet the first two!
 		}
-		else if(args[0].equalsIgnoreCase("tag")) {
+		else if(argument.equalsIgnoreCase("tag")) {
 			command =new TagCommand(myInitializer,args); // TODO excpet the first two!
+		}
+		else if(argument.equalsIgnoreCase("web")) {
+			command =new WebCommand(myInitializer,args); // TODO excpet the first two!
 		}
 		else {
 			commandUnknownError();
@@ -76,18 +91,24 @@ public class ts {
 		 * Execution
 		 */
 		
-		command.execute();
+		try {
+			command.execute();
+		} catch (ModelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 	
 	private static void commandUnknownError() {
 		System.out.println("Unknown command.\n" +
-				"Usage: ts ingest (import terminologies in rdf or labels)\n" +
-				"       ts publish (publish terminology)\n" +
-				"       ts check (check for constraints)\n" +
-				"       ts clean (remove from terminology)\n"+
-				"       ts command (single term actions)\n"+
-				"       ts tag (tag the current terminology state)");
+				"Usage: ts [-d] ingest 	[help] [parameters] (import terminologies in rdf or labels)\n" +
+				"       ts [-d] publish [help] [parameters]	(publish terminology)\n" +
+				"       ts [-d] check 	[help] [parameters]	(check for constraints)\n" +
+				"       ts [-d] clean 	[help] [parameters]	(remove from terminology)\n"+
+				"       ts [-d] command [help] [parameters]	(single term actions)\n"+
+				"       ts [-d] tag 	[help] [parameters]	(tag the current terminology state)\n" +
+				"		ts [-d] web 	[help] [parameters]	(start the edit interface on port 8080)");
 	}
 
 }

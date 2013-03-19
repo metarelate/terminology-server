@@ -9,9 +9,12 @@ import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.exceptions.AuthException;
 import net.metarelate.terminology.exceptions.ConfigurationException;
+import net.metarelate.terminology.exceptions.ImporterException;
 import net.metarelate.terminology.exceptions.InvalidProcessException;
+import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.PropertyConstraintException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
+import net.metarelate.terminology.exceptions.UnknownURIException;
 import net.metarelate.terminology.exceptions.WebSystemException;
 import net.metarelate.terminology.utils.SSLogger;
 import net.metarelate.terminology.webedit.validators.DaftValidator;
@@ -90,8 +93,10 @@ public abstract class AbstractEditPage  extends SuperPage {
 	 * @throws WebSystemException
 	 * @throws ConfigurationException
 	 * @throws PropertyConstraintException 
+	 * @throws UnknownURIException 
+	 * @throws ModelException 
 	 */
-	protected void buildForm() throws WebSystemException, ConfigurationException, PropertyConstraintException {
+	protected void buildForm() throws WebSystemException, ConfigurationException, PropertyConstraintException, UnknownURIException, ModelException {
 		/*
 		 * If this is an edit action, the TerminologyEntityModel is initialized, and it will be used in this page.
 		 * If this is a new action, it will be created on submit
@@ -475,6 +480,12 @@ public abstract class AbstractEditPage  extends SuperPage {
 					e.printStackTrace();
 				} catch (RegistryAccessException e) {
 					getSession().error("Reg error");
+					e.printStackTrace();
+				} catch (ModelException e) {
+					getSession().error("Model consistency error");
+					e.printStackTrace();
+				} catch (ImporterException e) {
+					getSession().error("Importer error!");
 					e.printStackTrace();
 				}
 				

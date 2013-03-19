@@ -71,6 +71,7 @@ public class Initializer {
 	private static String seedFileAbsoluteString=null;
 	private static String prefixFileAbsoluteString=null;
 	public static String defaultUserName=null;
+	private String rootDirectoryString=null;
 	
 	private  AuthServer myAuthServer=null;
 	public  AuthRegistryManager myAuthManager=null;
@@ -93,10 +94,19 @@ public class Initializer {
 		construct();
 	}
 	
+	public Initializer(String sysDir, boolean debug) throws ConfigurationException {
+		debugMode=debug;
+		construct();
+	}
+
 	public void construct() throws ConfigurationException{
 		prepareConfigurationLayout();
 		prepareDefaultFiles();
 		buildSystemComponents();
+	}
+	
+	public String getRootDirectory() {
+		return rootDirectoryString;
 	}
 	
 	//TODO Inits could be made more modular
@@ -106,12 +116,13 @@ public class Initializer {
 		System.out.println("User Home: "+ userHomeString);
 		File rootDirectory=new File(userHomeString,rootDirString);
 		checkOrCreateDirectory(rootDirectory);
+		rootDirectoryString=rootDirectory.getAbsolutePath();
 		// Note: we don't allow overriding of host or server name. This may be changed.
 		try {
 			InetAddress myAddress=InetAddress.getLocalHost();
 			serverAddress=myAddress.getHostAddress();
 			serverName=myAddress.getHostName();
-			defaultUserName=System.clearProperty("user.name");
+			defaultUserName=System.getProperty("user.name");
 		} catch (UnknownHostException e) {
 			serverAddress="Unknown";
 			serverName="Unknown";

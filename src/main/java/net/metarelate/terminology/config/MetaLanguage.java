@@ -48,10 +48,15 @@ public class MetaLanguage {
 	
 	
 	/**
-	 * Configuration and instance management
+	 * Metarelate constructs. Used internally by the TerminologyManager.
 	 */
 	public static final String authConfigURI="http://metarelate.net/config/hasAuthConfigType";
 	public static final Property authConfigProperty=ResourceFactory.createProperty(authConfigURI);
+	
+	public static final Property containedInProperty =ResourceFactory.createProperty("http://metarelate.net/core/types#containedIn");
+	public static final Property containsProperty   =ResourceFactory.createProperty("http://metarelate.net/core/types#contains");
+	public static final Resource terminologySetType=ResourceFactory.createResource("http://metarelate.net/core/types/TerminologySet");
+	public static final Resource terminologyIndividualType=ResourceFactory.createResource("http://metarelate.net/core/types/TerminologyIndividual");
 	
 	/**
 	 * General usage properties
@@ -72,34 +77,7 @@ public class MetaLanguage {
 	public static final Resource isoRegistryType =ResourceFactory.createResource("http://reference.metoffice.gov.uk/data/wmo/def/iso19135#Register");
 	public static final Resource isoRegistryItemType =ResourceFactory.createResource("http://reference.metoffice.gov.uk/data/wmo/def/iso19135#RegisterItem");
 	
-	//states!
-	//public static final Resource statusWMOValidationResource=ResourceFactory.createResource("http://reference.metoffice.gov.uk/data/wmo/def/wmo#Validation");
-	//public static final Resource statusWMOValidResource=ResourceFactory.createResource("http://reference.metoffice.gov.uk/data/wmo/def/wmo#Operational");
-	//public static final Resource statusWMOSupersededResource=ResourceFactory.createResource("http://reference.metoffice.gov.uk/data/wmo/def/wmo#Superseded");
-	//public static final Resource statusWMORetiredResource=ResourceFactory.createResource("http://reference.metoffice.gov.uk/data/wmo/def/wmo#Retired");
 	
-	//public static final Resource statusWMOValidationResource=ResourceFactory.createResource("http://reference.metoffice.gov.uk/data/wmo/def/wmo#Validation");
-	//public static final Resource statusWMOOperationalResource=ResourceFactory.createResource("http://reference.metoffice.gov.uk/data/wmo/def/wmo#Operational");
-
-	//public static final Resource statusISONotValidResource=ResourceFactory.createResource("http://reference.metoffice.gov.uk/data/wmo/def/iso19135#NotValid");
-	//public static final Resource statusISOValidResource=ResourceFactory.createResource("http://reference.metoffice.gov.uk/data/wmo/def/iso19135#Valid");
-
-	//public static final Resource statusOutOfRegistry = ResourceFactory.createResource("http://reference.metoffice.gov.uk/data/wmo/def/met#outOfRegistryStatus");
-	//public static final Resource statusObsolete = ResourceFactory.createResource("http://meoffice.gov.uk/terminology/extra/obsoleteStatus");
-	//public static final Resource statusIllegalResource = ResourceFactory.createResource("http://reference.metoffice.gov.uk/data/wmo/meta/model#outOfRegistryStatus");
-	//public static final Resource statusNullResource = ResourceFactory.createResource("http://reference.metoffice.gov.uk/data/wmo/meta/model#outOfRegistryStatus");
-
-	
-	//Actions!
-	//public static final Resource terminologyUpdateAction=ResourceFactory.createResource("http://reference.metoffice.gov.uk/data/wmo/def/met#updateAction");
-	//public static final Resource terminologyAddItemAction = ResourceFactory.createResource("http://reference.metoffice.gov.uk/data/wmo/def/met#addItemAction");
-	//public static final Resource terminologyDelItemAction = ResourceFactory.createResource("http://reference.metoffice.gov.uk/data/wmo/def/met#delItemAction");
-	//public static final Resource terminologyDelFromRegAction = ResourceFactory.createResource("http://reference.metoffice.gov.uk/data/wmo/def/met#obseleteTerm");
-	//public static final Resource terminologySupersedAction = ResourceFactory.createResource("http://reference.metoffice.gov.uk/data/wmo/def/met#supersedTerm");
-
-	//public static final Resource terminologyValidateAction = ResourceFactory.createResource("http://reference.metoffice.gov.uk/data/wmo/def/met#validateTerm");
-	//public static final Resource terminologyInvalidateAction = ResourceFactory.createResource("http://reference.metoffice.gov.uk/data/wmo/def/met#invalidateTerm");
-
 	
 	
 	public static final Resource tagAction=ResourceFactory.createResource("http://reference.metoffice.gov.uk/data/wmo/def/met#tag");
@@ -142,13 +120,6 @@ public class MetaLanguage {
 	
 	
 	
-	/**
-	 * These structural relations are only used in the RDF representation used to build a model.
-	 * There are filtered in the model statements.
-	 */
-	public static final Property containedInProperty =ResourceFactory.createProperty("http://reference.metoffice.gov.uk/data/wmo/meta/mapping#containedIn");
-	public static final Property containsProperty   =ResourceFactory.createProperty("http://reference.metoffice.gov.uk/data/wmo/meta/mapping#contains");
-	
 	
 	
 	/**
@@ -182,8 +153,7 @@ public class MetaLanguage {
 	
 	public static final Resource standardType=ResourceFactory.createResource("http://reference.metoffice.gov.uk/data/wmo/meta/mapping#standard");
 	
-	public static final Resource terminologySetType=ResourceFactory.createResource("http://reference.metoffice.gov.uk/data/wmo/meta/mapping#TerminologySet");
-	public static final Resource terminologyIndividualType=ResourceFactory.createResource("http://reference.metoffice.gov.uk/data/wmo/meta/mapping#TerminologyIndividual");
+	
 	
 	
 	//New!!!

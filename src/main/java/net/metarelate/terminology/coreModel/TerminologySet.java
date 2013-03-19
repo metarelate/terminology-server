@@ -21,6 +21,8 @@ package net.metarelate.terminology.coreModel;
 
 import java.util.Set;
 
+import net.metarelate.terminology.exceptions.ModelException;
+
 public interface TerminologySet extends TerminologyEntity{
 	
 	/**
@@ -71,40 +73,46 @@ public interface TerminologySet extends TerminologyEntity{
 	/**
 	 * Get all individuals contained in this collection in the default version
 	 * @return
+	 * @throws ModelException 
 	 */
-	public Set<TerminologyIndividual> getIndividuals();
+	public Set<TerminologyIndividual> getIndividuals() throws ModelException;
 
 	/**
 	 * Get all individuals contained in this collection in the given version
 	 * @param version
 	 * @return
+	 * @throws ModelException 
 	 */
-	public Set<TerminologyIndividual> getIndividuals(String version) ;
+	public Set<TerminologyIndividual> getIndividuals(String version) throws ModelException ;
 
 	/**
 	 * Get all collections (sub-registers) for the default version
 	 * @return
+	 * @throws ModelException 
 	 */
-	public Set<TerminologySet> getCollections() ;
+	public Set<TerminologySet> getCollections() throws ModelException ;
 
 	/**
 	 * Get all collections (sub-registers) for the given version
 	 * @param version
 	 * @return
+	 * @throws ModelException 
 	 */
-	public abstract Set<TerminologySet> getCollections(String version) ;
+	public abstract Set<TerminologySet> getCollections(String version) throws ModelException ;
 
 	/**
 	 * Returns the union all sub-registers ever contained in any version, without duplicates.
 	 * @return
+	 * @throws ModelException 
 	 */
-	public Set<TerminologySet> getAllKnownContainedCollections() ;
+	public Set<TerminologySet> getAllKnownContainedCollections() throws ModelException ;
 	
 	/**
 	 * Returns the union all individuals ever contained in any version, without duplicates.
 	 * @return
+	 * @throws ModelException 
 	 */
-	public Set<TerminologyIndividual> getAllKnownContainedInviduals() ;
+	public Set<TerminologyIndividual> getAllKnownContainedInviduals() throws ModelException ;
 
 
 

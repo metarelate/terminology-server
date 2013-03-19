@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
+import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.instanceManager.Initializer;
 import net.metarelate.terminology.utils.SSLogger;
 
@@ -36,11 +37,13 @@ public abstract class TsCommand {
 
 	
 	
-	public void execute() {
+	public void execute() throws ModelException {
 		localExecute();
 		myInitializer.myFactory.synch();
 	}
-	public abstract void localExecute();
+	public abstract void localExecute() throws ModelException;
+	
+	public abstract void localHelp();
 	
 	protected Model readIntoModel(ArrayList<String> files) {
 		Model inputModel=ModelFactory.createDefaultModel();

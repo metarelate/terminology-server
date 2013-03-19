@@ -28,6 +28,8 @@ import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.coreModel.TerminologyFactory;
 import net.metarelate.terminology.coreModel.TerminologyIndividual;
 import net.metarelate.terminology.coreModel.TerminologySet;
+import net.metarelate.terminology.exceptions.ModelException;
+import net.metarelate.terminology.exceptions.UnknownURIException;
 import net.metarelate.terminology.utils.SSLogger;
 import net.metarelate.terminology.utils.SimpleQueriesProcessor;
 
@@ -52,7 +54,7 @@ public class ComputeTreePragmaProcessor extends PragmaProcessor {
 	}
 
 	@Override
-	public void run() {
+	public void run() throws UnknownURIException, ModelException {
 		if(rootSet==null) return;
 		SSLogger.log("*** PRAGMA Computation ***",SSLogger.DEBUG);
 		SSLogger.log("Root collection : "+rootSet.getURI(),SSLogger.DEBUG);
@@ -149,7 +151,7 @@ public class ComputeTreePragmaProcessor extends PragmaProcessor {
 			return;
 		}
 		SSLogger.log("Found top concept: "+topConcept.getURI(),SSLogger.DEBUG);
-		TerminologyEntity topConceptEntity=myFactory.getOrCreateTerminologyIndividual(topConcept.getURI());
+		TerminologyEntity topConceptEntity=myFactory.getCheckedTerminologyIndividual(topConcept.getURI());
 		if(topConceptEntity==null) {
 			SSLogger.log("Unknown top concept, end of pragma",SSLogger.DEBUG);
 			return;
@@ -164,7 +166,7 @@ public class ComputeTreePragmaProcessor extends PragmaProcessor {
 			Resource narr=narrIter.nextNode().asResource();
 			//System.out.println(">> "+narr.getURI());
 			if(myFactory.terminologyIndividualExist(narr.getURI())) {
-				leafsSet.add(myFactory.getOrCreateTerminologyIndividual(narr.getURI()));
+				leafsSet.add(myFactory.getUncheckedTerminologyIndividual(narr.getURI()));
 			}
 			totalCounter++;
 			
@@ -174,7 +176,7 @@ public class ComputeTreePragmaProcessor extends PragmaProcessor {
 		// 4) remove all narrower from Top concept
 		SSLogger.log("Removing all narrower from top concept",SSLogger.DEBUG);
 		//Model tempModel=ModelFactory.createDefaultModel();
-		Model topConceptModel=topConceptEntity.getStatements(topConceptEntity.getDefaultVersion());
+		Model topConceptModel=topConceptEntity.getStatements(topConceptEntity.getLastVersion());
 		SSLogger.log("Top concept had : "+topConceptModel.size()+" statements",SSLogger.DEBUG);
 		StmtIterator resIter=topConceptModel.listStatements(topConceptEntity.getResource(),MetaLanguage.skosNarrowerProperty,(Resource)null);
 		topConceptModel.remove(resIter);
@@ -187,7 +189,7 @@ public class ComputeTreePragmaProcessor extends PragmaProcessor {
 		int affectCount=0;
 		while(termsIterator.hasNext()) {
 			TerminologyIndividual term=termsIterator.next();
-			Model termModel=term.getStatements(term.getDefaultVersion());
+			Model termModel=term.getStatements(term.getLastVersion());
 			long pre=termModel.size();
 			StmtIterator toRemove=termModel.listStatements(term.getResource(),MetaLanguage.skosBroaderProperty,(Resource)null);
 			termModel.remove(toRemove);
@@ -342,8 +344,8 @@ public class ComputeTreePragmaProcessor extends PragmaProcessor {
 	private int paintTreeSchemeTerms(ExpandedURI tempRoot) {
 		// TODO to fix!
 		int result=0;
-		if(myFactory.getOrCreateTerminologyIndividual(tempRoot.uri)!=null) {
-			tempRoot.myIndividual=myFactory.getOrCreateTerminologyIndividual(tempRoot.uri);
+		if(myFactory.terminologyIndividualExist(tempRoot.uri)) {
+			tempRoot.myIndividual=myFactory.getUncheckedTerminologyIndividual(tempRoot.uri);
 			SSLogger.log("Found ind for :"+tempRoot.uri);
 			result+=1;
 		}
@@ -373,8 +375,8 @@ public class ComputeTreePragmaProcessor extends PragmaProcessor {
 	}
 		
 	private void assertPair(TerminologyEntity child, TerminologyEntity parent) {
-		child.getStatements(child.getDefaultVersion()).add(ResourceFactory.createStatement(child.getResource(), MetaLanguage.skosBroaderProperty, parent.getResource()));
-		parent.getStatements(parent.getDefaultVersion()).add(ResourceFactory.createStatement(parent.getResource(),MetaLanguage.skosNarrowerProperty,child.getResource()));
+		child.getStatements(child.getLastVersion()).add(ResourceFactory.createStatement(child.getResource(), MetaLanguage.skosBroaderProperty, parent.getResource()));
+		parent.getStatements(parent.getLastVersion()).add(ResourceFactory.createStatement(parent.getResource(),MetaLanguage.skosNarrowerProperty,child.getResource()));
 	}
 		
 	private void propAssert(ExpandedURI uriItem) {

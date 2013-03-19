@@ -45,6 +45,8 @@ import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.coreModel.TerminologyFactory;
 import net.metarelate.terminology.coreModel.TerminologyIndividual;
 import net.metarelate.terminology.coreModel.TerminologySet;
+import net.metarelate.terminology.exceptions.ModelException;
+import net.metarelate.terminology.exceptions.WebSystemException;
 import net.metarelate.terminology.utils.CodeComparator;
 import net.metarelate.terminology.utils.SimpleQueriesProcessor;
 
@@ -68,7 +70,7 @@ public abstract class WebRendererItem {
 		this.myLabelManager=entity.getFactory().getLabelManager();
 	}
 	
-	public String getHtmlRepresentation(String version, boolean versionPage, String language, SortedMap<String,String> dataLangMap, SortedMap<String,String> langMap, String baseURL) {
+	public String getHtmlRepresentation(String version, boolean versionPage, String language, SortedMap<String,String> dataLangMap, SortedMap<String,String> langMap, String baseURL) throws WebSystemException, ModelException {
 		String result1=getVersionOpening(version,versionPage,language);
 		String result2=getBredCrumbs(version,language,baseURL);
 		String result3=	"<div id=\"content\">\n" +
@@ -289,7 +291,7 @@ public abstract class WebRendererItem {
 				"<li><a href=\"http://www.metoffice.gov.uk/about-us/legal/privacy-and-cookie\">Privacy and cookies</a></li>\n" +
 				"</ul>\n" +
 				"<ul id=\"footerRight\">\n" +
-				"<li class=\"first\"><a href=\"http://www.metoffice.gov.uk/about-us/legal#licences\">© Crown copyright</a></li>\n" +
+				"<li class=\"first\"><a href=\"http://www.metoffice.gov.uk/about-us/legal#licences\">ï¿½ Crown copyright</a></li>\n" +
 				"<li><a href=\"http://www.metoffice.gov.uk/\">www.metoffice.gov.uk</a></li>\n" +
 				"</ul>\n" +
 				"</div>\n" +
@@ -345,8 +347,9 @@ public abstract class WebRendererItem {
 	 * The approach here taken (list the first father of the current node recursively) works only if
 	 * only one father x term or register is present. This is the intended usage, but this restriction is not enforced by the code.
 	 * The following code would break if more than one father is present.
+	 * @throws ModelException 
 	 */
-	private String getBredCrumbs(String version, String language,String baseURL) {
+	private String getBredCrumbs(String version, String language,String baseURL) throws ModelException {
 		String current=entity.getNotation(version);
 		if(current==null || current=="") current=entity.getLabel(version,language);
 		if(current==null) current=entity.getLabel(version,CoreConfig.DEFAULT_LANGUAGE);
@@ -444,7 +447,7 @@ public abstract class WebRendererItem {
 	/*
 	public abstract String getVersionHeader(SortedMap<String,String> stdMap, String version);
 	*/
-	public abstract String getNavigationPanel(String version, String language);
+	public abstract String getNavigationPanel(String version, String language) throws WebSystemException, ModelException;
 	
 	
 	public String getStatementsBlock(Model statsModel, String language) {
@@ -538,7 +541,7 @@ public abstract class WebRendererItem {
 			if(object.isURIResource()) {
 				TerminologyEntity objectEntity=null;
 				if(entity.getFactory().terminologyIndividualExist(object.asResource().getURI())) {
-					objectEntity=entity.getFactory().getOrCreateTerminologyIndividual(object.asResource().getURI());
+					objectEntity=entity.getFactory().getUncheckedTerminologyIndividual(object.asResource().getURI());
 					seed=objectEntity.getNotation(objectEntity.getLastVersion());
 				}
 					

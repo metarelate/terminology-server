@@ -11,7 +11,9 @@ import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.ConfigurationException;
+import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.PropertyConstraintException;
+import net.metarelate.terminology.exceptions.UnknownURIException;
 import net.metarelate.terminology.instanceManager.Initializer;
 import net.metarelate.terminology.utils.SSLogger;
 
@@ -90,9 +92,9 @@ public class ConstraintsManager {
 	}
 	
 	
-	public String[] getSortedConstraintsForReg(String uri) throws ConfigurationException {
+	public String[] getSortedConstraintsForReg(String uri) throws ConfigurationException, UnknownURIException, ModelException {
 		ArrayList<Resource> results=new ArrayList<Resource>();
-		TerminologyEntity entity=myInitializer.myFactory.getExistingTerminologyEntity(uri);
+		TerminologyEntity entity=myInitializer.myFactory.getCheckedTerminologyEntity(uri);
 		Set<TerminologySet> containers=entity.getContainers(entity.getLastVersion());
 		getConstraintsForEntityRecursively(
 				entity.getResource(),
@@ -104,9 +106,9 @@ public class ConstraintsManager {
 		return makeSortedProperties(results);
 		
 	}
-	public String[] getSortedConstraintsForCode(String uri) throws ConfigurationException {
+	public String[] getSortedConstraintsForCode(String uri) throws ConfigurationException, UnknownURIException, ModelException {
 		ArrayList<Resource> results=new ArrayList<Resource>();
-		TerminologyEntity entity=myInitializer.myFactory.getExistingTerminologyEntity(uri);
+		TerminologyEntity entity=myInitializer.myFactory.getCheckedTerminologyEntity(uri);
 		Set<TerminologySet> containers=entity.getContainers(entity.getLastVersion());
 		getConstraintsForEntityRecursively(
 				entity.getResource(),
@@ -117,9 +119,9 @@ public class ConstraintsManager {
 		SSLogger.log("For edit code found #rules: "+results.size(),SSLogger.DEBUG);
 		return makeSortedProperties(results);
 	}
-	public String[] getSortedConstraintsForNewReg(String baseRegURI) throws ConfigurationException {
+	public String[] getSortedConstraintsForNewReg(String baseRegURI) throws ConfigurationException, UnknownURIException, ModelException {
 		ArrayList<Resource> results=new ArrayList<Resource>();
-		TerminologyEntity entity=myInitializer.myFactory.getExistingTerminologyEntity(baseRegURI);
+		TerminologyEntity entity=myInitializer.myFactory.getCheckedTerminologyEntity(baseRegURI);
 		getConstraintsForEntityRecursively(
 				entity.getResource(),
 				results, 
@@ -129,9 +131,9 @@ public class ConstraintsManager {
 		SSLogger.log("For new regsiter found #rules: "+results.size(),SSLogger.DEBUG);
 		return makeSortedProperties(results);
 	}
-	public String[] getSortedConstraintsForNewCode(String baseRegURI) throws ConfigurationException {
+	public String[] getSortedConstraintsForNewCode(String baseRegURI) throws ConfigurationException, UnknownURIException, ModelException {
 		ArrayList<Resource> results=new ArrayList<Resource>();
-		TerminologyEntity entity=myInitializer.myFactory.getExistingTerminologyEntity(baseRegURI);
+		TerminologyEntity entity=myInitializer.myFactory.getCheckedTerminologyEntity(baseRegURI);
 		getConstraintsForEntityRecursively(
 				entity.getResource(),
 				results, 
@@ -176,7 +178,7 @@ public class ConstraintsManager {
 	}
 
 
-	private void getConstraintsForEntityRecursively(Resource entity,ArrayList<Resource>currentResult, Set<Resource> defaultConstraints, Map<String,Set<Resource>> specificConstraints,String breakCommand) {
+	private void getConstraintsForEntityRecursively(Resource entity,ArrayList<Resource>currentResult, Set<Resource> defaultConstraints, Map<String,Set<Resource>> specificConstraints,String breakCommand) throws UnknownURIException, ModelException {
 		Set<TerminologySet>roots=myInitializer.myFactory.getRootsForURI(entity.getURI());
 		System.out.println("Resolving for "+entity.getURI());
 		if(specificConstraints.containsKey(entity.getURI())) {

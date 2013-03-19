@@ -22,6 +22,9 @@ package net.metarelate.terminology.coreModel;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.metarelate.terminology.exceptions.ModelException;
+import net.metarelate.terminology.exceptions.UnknownURIException;
+
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.RDFNode;
@@ -41,7 +44,7 @@ public class TerminologySetTDBImpl extends
 	 * It could be abstracted, if different implementations are designed.
 	 */
 	public void registerContainedCollection(TerminologySet myCollection) {
-		registerContainedCollection(myCollection,getDefaultVersion(),myCollection.getDefaultVersion());
+		registerContainedCollection(myCollection,getLastVersion(),myCollection.getLastVersion());
 		
 	}
 
@@ -68,7 +71,7 @@ public class TerminologySetTDBImpl extends
 	 * It could be abstracted, if different implementations are designed.
 	 */
 	public void registerContainedIndividual(TerminologyIndividual myIndividual) {
-		registerContainedIndividual(myIndividual,getDefaultVersion(),myIndividual.getDefaultVersion());		
+		registerContainedIndividual(myIndividual,getLastVersion(),myIndividual.getLastVersion());		
 	}
 
 	public void registerContainedIndividual(TerminologyIndividual myIndividual,
@@ -84,7 +87,7 @@ public class TerminologySetTDBImpl extends
 	 * It could be abstracted, if different implementations are designed.
 	 */
 	public void unregisterContainedEntity(TerminologyEntity toRemove) {
-		unregisterContainedEntity(toRemove,getDefaultVersion(),toRemove.getDefaultVersion());
+		unregisterContainedEntity(toRemove,getLastVersion(),toRemove.getLastVersion());
 	}
 
 	
@@ -110,18 +113,25 @@ public class TerminologySetTDBImpl extends
 	/**
 	 * This method is independent of this individual being backed by TDB.
 	 * It could be abstracted, if different implementations are designed.
+	 * @throws ModelException 
 	 */
-	public Set<TerminologyIndividual> getIndividuals() {
-		return getIndividuals(getDefaultVersion());
+	public Set<TerminologyIndividual> getIndividuals() throws ModelException {
+		return getIndividuals(getLastVersion());
 	}
 
 	
-	public Set<TerminologyIndividual> getIndividuals(String version) {
+	public Set<TerminologyIndividual> getIndividuals(String version) throws ModelException {
 		Set<TerminologyIndividual>answer=new HashSet<TerminologyIndividual>();
 		NodeIterator regItemIter=getStatements(version).listObjectsOfProperty(myRes, TDBModelsCoreConfig.hasRegisterItem);
 		while(regItemIter.hasNext()) {
 			RDFNode currRegItem=regItemIter.nextNode();
-			if(currRegItem.isResource()) answer.add(myFactory.getOrCreateTerminologyIndividual(currRegItem.asResource().getURI()));
+			if(currRegItem.isResource())
+				try {
+					answer.add(myFactory.getCheckedTerminologyIndividual(currRegItem.asResource().getURI()));
+				} catch (UnknownURIException e) {
+					e.printStackTrace();
+					throw new ModelException("Inconsisent individual "+currRegItem.asResource().getURI()+" for version "+version+" of "+getURI());
+				}
 		}
 		return answer;
 	}
@@ -129,24 +139,31 @@ public class TerminologySetTDBImpl extends
 	/**
 	 * This method is independent of this individual being backed by TDB.
 	 * It could be abstracted, if different implementations are designed.
+	 * @throws ModelException 
 	 */
-	public Set<TerminologySet> getCollections() {
-		return getCollections(getDefaultVersion());
+	public Set<TerminologySet> getCollections() throws ModelException {
+		return getCollections(getLastVersion());
 	}
 
 	
-	public Set<TerminologySet> getCollections(String version) {
+	public Set<TerminologySet> getCollections(String version) throws ModelException {
 		Set<TerminologySet>answer=new HashSet<TerminologySet>();
 		NodeIterator subRegIter=getStatements(version).listObjectsOfProperty(myRes, TDBModelsCoreConfig.hasSubRegister);
 		while(subRegIter.hasNext()) {
 			RDFNode currSubReg=subRegIter.nextNode();
-			if(currSubReg.isResource()) answer.add(((TerminologyFactoryTDBImpl)myFactory).getOrCreateTerminologySet(currSubReg.asResource().getURI()));
+			if(currSubReg.isResource())
+				try {
+					answer.add(((TerminologyFactoryTDBImpl)myFactory).getCheckedTerminologySet(currSubReg.asResource().getURI()));
+				} catch (UnknownURIException e) {
+					e.printStackTrace();
+					throw new ModelException("Inconsistent collection "+currSubReg.asResource().getURI()+" for version "+version+" of "+getURI());
+				}
 		}
 		return answer;
 	}
 
 	
-	public Set<TerminologySet> getAllKnownContainedCollections() {
+	public Set<TerminologySet> getAllKnownContainedCollections() throws ModelException {
 		Set<TerminologySet>answer=new HashSet<TerminologySet>();
 		//System.out.println(">>All collections");
 		String[] myVersions=getVersions();
@@ -154,21 +171,33 @@ public class TerminologySetTDBImpl extends
 			NodeIterator subRegIter=getStatements(myVersions[i]).listObjectsOfProperty(myRes, TDBModelsCoreConfig.hasSubRegister);
 			while(subRegIter.hasNext()) {
 				RDFNode currSubReg=subRegIter.nextNode();
-				if(currSubReg.isResource()) answer.add(((TerminologyFactoryTDBImpl)myFactory).getOrCreateTerminologySet(currSubReg.asResource().getURI()));
+				if(currSubReg.isResource())
+					try {
+						answer.add(((TerminologyFactoryTDBImpl)myFactory).getCheckedTerminologySet(currSubReg.asResource().getURI()));
+					} catch (UnknownURIException e) {
+						e.printStackTrace();
+						throw new ModelException("Inconsistent collection "+currSubReg.asResource().getURI()+" for "+getURI());
+					}
 			}
 		}
 		
 		return answer;
 	}
 
-	public Set<TerminologyIndividual> getAllKnownContainedInviduals() {
+	public Set<TerminologyIndividual> getAllKnownContainedInviduals() throws ModelException {
 		Set<TerminologyIndividual>answer=new HashSet<TerminologyIndividual>();
 		String[] myVersions=getVersions();
 		for(int i=0;i<myVersions.length;i++) {
 			NodeIterator regItemIter=getStatements(myVersions[i]).listObjectsOfProperty(myRes, TDBModelsCoreConfig.hasRegisterItem);
 			while(regItemIter.hasNext()) {
 				RDFNode currRegItem=regItemIter.nextNode();
-				if(currRegItem.isResource()) answer.add(((TerminologyFactoryTDBImpl)myFactory).getOrCreateTerminologyIndividual(currRegItem.asResource().getURI()));
+				if(currRegItem.isResource())
+					try {
+						answer.add(((TerminologyFactoryTDBImpl)myFactory).getCheckedTerminologyIndividual(currRegItem.asResource().getURI()));
+					} catch (UnknownURIException e) {
+						e.printStackTrace();
+						throw new ModelException("Inconsistent individual "+currRegItem.asResource().getURI()+" for "+getURI());
+					}
 			}
 		}
 		return answer;

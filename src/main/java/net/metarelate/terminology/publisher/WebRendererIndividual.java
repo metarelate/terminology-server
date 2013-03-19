@@ -29,6 +29,9 @@ import java.util.TreeMap;
 import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.coreModel.TerminologyIndividual;
 import net.metarelate.terminology.coreModel.TerminologySet;
+import net.metarelate.terminology.exceptions.ModelException;
+import net.metarelate.terminology.exceptions.UnknownURIException;
+import net.metarelate.terminology.exceptions.WebSystemException;
 import net.metarelate.terminology.utils.SSLogger;
 import net.metarelate.terminology.utils.SimpleQueriesProcessor;
 
@@ -109,11 +112,18 @@ public class WebRendererIndividual extends WebRendererItem {
 	}
 */
 	@Override
-	public String getNavigationPanel(String version, String language) {
+	public String getNavigationPanel(String version, String language) throws WebSystemException {
 		
 		String result1="<section id=\"second\">"+
 		"<h2 id=\"definedInRegStr\">"+WebRendererStrings.getValueFor(WebRendererStrings.DEFINED_IN_REGISTER , language)+"</h2>";
-		Iterator<TerminologySet> myUnsortedContainers=myTerm.getContainers(version).iterator();
+		Iterator<TerminologySet> myUnsortedContainers;
+		try {
+			myUnsortedContainers = myTerm.getContainers(version).iterator();
+		} catch (ModelException e) {
+			SSLogger.log(e.getMessage(),SSLogger.DEBUG);
+			e.printStackTrace();
+			throw new WebSystemException("Cannot build navigation panel for "+myTerm.getURI());
+		}
 		SortedMap<String,TerminologySet> containersSorted=new TreeMap<String,TerminologySet>();
 		int bogusCounter=1;
 		while(myUnsortedContainers.hasNext()) {

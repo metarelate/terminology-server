@@ -27,6 +27,8 @@ import java.util.Set;
 import net.metarelate.terminology.coreModel.TerminologyFactory;
 import net.metarelate.terminology.coreModel.TerminologyIndividual;
 import net.metarelate.terminology.coreModel.TerminologySet;
+import net.metarelate.terminology.exceptions.ImporterException;
+import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.utils.SSLogger;
 
 import com.hp.hpl.jena.rdf.model.Literal;
@@ -64,7 +66,7 @@ public class PragmaComputeExpandDashAndSuppress extends PragmaProcessor {
 	}
 
 	@Override
-	public void run() {
+	public void run() throws ImporterException, ModelException {
 		SSLogger.log("*** PRAGMA Computation ***",SSLogger.DEBUG);
 		SSLogger.log("On collection : "+terminologySet.getURI(),SSLogger.DEBUG);
 		SSLogger.log("To suppress : "+toSuppress,SSLogger.DEBUG);
@@ -82,7 +84,7 @@ public class PragmaComputeExpandDashAndSuppress extends PragmaProcessor {
 		}
 			
 		Set<TerminologyIndividual> terms=terminologySet.getIndividuals();
-		SSLogger.log("Version (default) :"+terminologySet.getDefaultVersion(),SSLogger.DEBUG);
+		SSLogger.log("Version (default) :"+terminologySet.getLastVersion(),SSLogger.DEBUG);
 		SSLogger.log("Individuals count :"+terms.size(),SSLogger.DEBUG);
 		Set<TerminologyIndividual> termsToRemove=new HashSet<TerminologyIndividual>();
 		Set<TerminologyIndividual> termsToAdd=new HashSet<TerminologyIndividual>();
@@ -158,14 +160,15 @@ public class PragmaComputeExpandDashAndSuppress extends PragmaProcessor {
 					}
 					String newURI=root+lastSeparator+numberS;
 					SSLogger.log("Pragma: geration of "+newURI,SSLogger.DEBUG);
-					TerminologyIndividual newTerm=myFactory.getOrCreateTerminologyIndividual(newURI,term.getLastVersion());
+					TerminologyIndividual newTerm=myFactory.createNewVersionedTerminologyIndividual(newURI);
+					newTerm.registerVersion(term.getLastVersion());
 					term.cloneTo(newTerm);
 					String newNS=""+curr;
 					newTerm.setLocalNamespace(newNS);
 					termsToAdd.add(newTerm);
 					//Now the overrideProp bit
 					if(overrideProps!=null && overrideProps.size()>0) {
-						Model newTermModel=newTerm.getStatements(newTerm.getDefaultVersion());
+						Model newTermModel=newTerm.getStatements(newTerm.getLastVersion());
 						propIter=overrideProps.iterator();
 						while(propIter.hasNext()) {
 							Property ovProp=propIter.next();

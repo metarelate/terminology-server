@@ -28,6 +28,9 @@ import java.util.Set;
 
 import net.metarelate.terminology.config.CoreConfig;
 import net.metarelate.terminology.config.MetaLanguage;
+import net.metarelate.terminology.exceptions.ImporterException;
+import net.metarelate.terminology.exceptions.ModelException;
+import net.metarelate.terminology.exceptions.UnknownURIException;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.Query;
@@ -52,13 +55,13 @@ public class TerminologyFactoryTDBImpl implements TerminologyFactory {
 	private LabelManager myLabelManager=null;
 	private BackgroundKnowledgeManager myBackgroundKnowledgeManager=null;
 	
-	private Hashtable<String,TerminologyIndividual> alreadyCreatedIndividuals;
-	private Hashtable<String,TerminologySet> alreadyCreatedSets;
+	//private Hashtable<String,TerminologyIndividual> alreadyCreatedIndividuals;
+	//private Hashtable<String,TerminologySet> alreadyCreatedSets;
 	
 	public TerminologyFactoryTDBImpl(String tdbLocation) {
 		super();
-		alreadyCreatedIndividuals=new Hashtable<String,TerminologyIndividual>();
-		alreadyCreatedSets=new Hashtable<String,TerminologySet>();
+		//alreadyCreatedIndividuals=new Hashtable<String,TerminologyIndividual>();
+		//alreadyCreatedSets=new Hashtable<String,TerminologySet>();
 		myDataset=TDBFactory.createDataset(tdbLocation);
 		globalGraph=myDataset.getNamedModel(TDBModelsCoreConfig.globalModel);
 		labelGraph=myDataset.getNamedModel(TDBModelsCoreConfig.labelModel);
@@ -71,106 +74,186 @@ public class TerminologyFactoryTDBImpl implements TerminologyFactory {
 		return myDataset;
 	}
 
-	public boolean terminologySetExist(String uri) {
-		return globalGraph.contains(ResourceFactory.createStatement(ResourceFactory.createResource(uri), TDBModelsCoreConfig.hasTypeProperty, TDBModelsCoreConfig.TerminologySetType));
-		
+	/**
+	 * Creates a new TerminologySet (versioned), initialized at init-version. 
+	 * Throws exception if the TerminologySet already exists.
+	 * @throws ImporterException 
+	 */
+	public TerminologySet createNewVersionedTerminologySet(String uri) throws ImporterException {
+		if(terminologyEntityExist(uri)) throw new ImporterException("Attempt to create a new Set when an entity with the same URI exists: "+uri);
+		TerminologySetTDBImpl result= new TerminologySetTDBImpl(uri, this);
+		result.setIsVersioned(true);
+		result.registerVersion(CoreConfig.VERSION_INIT);
+		globalGraph.add(ResourceFactory.createStatement(ResourceFactory.createResource(uri), TDBModelsCoreConfig.hasTypeProperty, TDBModelsCoreConfig.TerminologySetType));
+		TDB.sync(globalGraph);
+		return result;
 	}
 
-	public TerminologySet getOrCreateTerminologySet(String uri) {
-		//My new test!
-		if(alreadyCreatedSets.containsKey(uri)) return alreadyCreatedSets.get(uri);
-		TerminologySetTDBImpl result=null;
-		result= new TerminologySetTDBImpl(uri, this);
-		if(result.getNumberOfVersions()==0) result.registerVersion(CoreConfig.INIT_VERSION);
-		result.setDefaultVersion(result.getLastVersion());
+	/**
+	 * Creates a new TerminologySet (un-versioned), initialized at default-version. 
+	 * Throws exception if the TerminologySet already exists.
+	 * @throws ImporterException 
+	 */
+	public TerminologySet createNewUnversionedTerminologySet(String uri) throws ImporterException {
+		if(terminologyEntityExist(uri)) throw new ImporterException("Attempt to create a new Set when an entity with the same URI exists: "+uri);
+		TerminologySetTDBImpl result= new TerminologySetTDBImpl(uri, this);
+		result.setIsVersioned(false);
+		result.registerVersion(CoreConfig.VERSION_DEFUALT);
 		globalGraph.add(ResourceFactory.createStatement(ResourceFactory.createResource(uri), TDBModelsCoreConfig.hasTypeProperty, TDBModelsCoreConfig.TerminologySetType));
-		alreadyCreatedSets.put(uri, result);
+		TDB.sync(globalGraph);
+		return result;
+	}
+	
+	
+	/**
+	 * Returns a TerminologySet already known for a given URI. 
+	 * Throw exception if not such TerminologySet has been defined.
+	 */
+	public TerminologySet getCheckedTerminologySet(String uri) throws UnknownURIException {
+		//My new test!
+		if(!terminologySetExist(uri)) throw new UnknownURIException(uri);
+		TerminologySetTDBImpl result=new TerminologySetTDBImpl(uri, this);
 		return result;
 
 	}
+	
+	public TerminologySet getUncheckedTerminologySet(String uri)  {
+		//My new test!
+		if(!terminologySetExist(uri)) return null;
+		else return new TerminologySetTDBImpl(uri, this);
+		
 
+	}
+
+	/*
 	public TerminologySet getOrCreateTerminologySet(String uri, String version) {
 		TerminologySet result=null;
 		if(alreadyCreatedSets.containsKey(uri)) {
 			result= alreadyCreatedSets.get(uri);
 			result.registerVersion(version);
-			result.setDefaultVersion(version);
+			//result.setDefaultVersion(version);
 			return result;
 		}
 		result= new TerminologySetTDBImpl(uri, this);
 		result.registerVersion(version);
-		result.setDefaultVersion(version);
+		//result.setDefaultVersion(version);
 		globalGraph.add(ResourceFactory.createStatement(ResourceFactory.createResource(uri), TDBModelsCoreConfig.hasTypeProperty, TDBModelsCoreConfig.TerminologySetType));
 		alreadyCreatedSets.put(uri, result);
 		result.setIsVersioned(true);
 		return result;
 	}
+	*/
 
-	public boolean terminologyIndividualExist(String uri) {
-		return globalGraph.contains(ResourceFactory.createStatement(ResourceFactory.createResource(uri), TDBModelsCoreConfig.hasTypeProperty, TDBModelsCoreConfig.TerminologyIndividualType));
-	}
 	
-	public TerminologyIndividual getOrCreateTerminologyIndividual(String uri) {
+	/*
+	public TerminologyIndividual getOrCreateUnversionedTerminologyIndividual(String uri) {
 		if(alreadyCreatedIndividuals.containsKey(uri)) return alreadyCreatedIndividuals.get(uri);
 		TerminologyIndividualTDBImpl result=null;
 		result= new TerminologyIndividualTDBImpl(uri, this);
-		if(result.getNumberOfVersions()==0) result.registerVersion(CoreConfig.INIT_VERSION);
-		result.setDefaultVersion(result.getLastVersion());
+		result.setIsVersioned(false);
+		if(result.getNumberOfVersions()==0) result.registerVersion(CoreConfig.VERSION_DEFUALT);
+		//result.setDefaultVersion(result.getLastVersion());
 		globalGraph.add(ResourceFactory.createStatement(ResourceFactory.createResource(uri), TDBModelsCoreConfig.hasTypeProperty, TDBModelsCoreConfig.TerminologyIndividualType));
 		alreadyCreatedIndividuals.put(uri, result);
 		return result;
 	
 	}
+	*/
+	
+	/**
+	 * Creates a new TerminologySet (versioned), initialized at init-version. 
+	 * Throws exception if the TerminologySet already exists.
+	 * @throws ImporterException 
+	 */
+	public TerminologyIndividual createNewVersionedTerminologyIndividual(String uri) throws ImporterException {
+		if(terminologyEntityExist(uri)) throw new ImporterException("Attempt to create a new Individual when an entity with the same URI exists: "+uri);
+		TerminologyIndividualTDBImpl result= new TerminologyIndividualTDBImpl(uri, this);
+		result.setIsVersioned(true);
+		result.registerVersion(CoreConfig.VERSION_INIT);
+		globalGraph.add(ResourceFactory.createStatement(ResourceFactory.createResource(uri), TDBModelsCoreConfig.hasTypeProperty, TDBModelsCoreConfig.TerminologyIndividualType));
+		TDB.sync(globalGraph);
+		return result;
+	}
 
+	/**
+	 * Creates a new TerminologySet (un-versioned), initialized at default-version. 
+	 * Throws exception if the TerminologySet already exists.
+	 * @throws ImporterException 
+	 */
+	public TerminologyIndividual createNewUnversionedTerminologyIndividual(String uri) throws ImporterException {
+		if(terminologyEntityExist(uri)) throw new ImporterException("Attempt to create a new Individual when an entity with the same URI exists: "+uri);
+		TerminologyIndividualTDBImpl result= new TerminologyIndividualTDBImpl(uri, this);
+		result.setIsVersioned(false);
+		result.registerVersion(CoreConfig.VERSION_DEFUALT);
+		globalGraph.add(ResourceFactory.createStatement(ResourceFactory.createResource(uri), TDBModelsCoreConfig.hasTypeProperty, TDBModelsCoreConfig.TerminologyIndividualType));
+		TDB.sync(globalGraph);
+		return result;
+	}
+	
+	
+	/**
+	 * Returns a TerminologySet already known for a given URI. 
+	 * Throw exception if not such TerminologySet has been defined.
+	 */
+	public TerminologyIndividual getCheckedTerminologyIndividual(String uri) throws UnknownURIException {
+		//My new test!
+		if(!terminologyIndividualExist(uri)) throw new UnknownURIException(uri);
+		TerminologyIndividualTDBImpl result=new TerminologyIndividualTDBImpl(uri, this);
+		return result;
+
+	}
+	
+	public TerminologyIndividual getUncheckedTerminologyIndividual(String uri) {
+		//My new test!
+		if(!terminologyIndividualExist(uri)) return null;
+		else return new TerminologyIndividualTDBImpl(uri, this);
+
+	}
+	
+	/*
 	public TerminologyIndividual getOrCreateTerminologyIndividual(String uri,
 			String version) {
 		TerminologyIndividual result=null;;
 		if(alreadyCreatedIndividuals.containsKey(uri)) {
 			result= alreadyCreatedIndividuals.get(uri);
 			result.registerVersion(version);
-			result.setDefaultVersion(version);
+			//result.setDefaultVersion(version);
 			return result;
 		}
 		result= new TerminologyIndividualTDBImpl(uri, this);
 		result.registerVersion(version);
-		result.setDefaultVersion(version);
+		//result.setDefaultVersion(version);
 		globalGraph.add(ResourceFactory.createStatement(ResourceFactory.createResource(uri), TDBModelsCoreConfig.hasTypeProperty, TDBModelsCoreConfig.TerminologyIndividualType));
 		alreadyCreatedIndividuals.put(uri, result);
 		result.setIsVersioned(true);
 		return result;
 
 	}
+	*/
 
 	public Collection<TerminologySet> getAllSets() {
 		ResIterator setNodes=globalGraph.listSubjectsWithProperty(TDBModelsCoreConfig.hasTypeProperty,TDBModelsCoreConfig.TerminologySetType);
+		ArrayList<TerminologySet> result=new ArrayList<TerminologySet>();
 		while(setNodes.hasNext()) {
 			Resource currSetRes=setNodes.nextResource();
-			if(!alreadyCreatedSets.containsKey(currSetRes.getURI())) {
-				TerminologySetTDBImpl myTDBSet=new TerminologySetTDBImpl(currSetRes.getURI(),this);
-				myTDBSet.setDefaultVersion(myTDBSet.getLastVersion());
-				
-				alreadyCreatedSets.put(currSetRes.getURI(),myTDBSet);	
-			}
+			result.add(getUncheckedTerminologySet(currSetRes.getURI()));
 		}
-		return alreadyCreatedSets.values();
+		return result;
 		
 	}
 
-	public Collection<TerminologyIndividual> getAllIndividuals() {
+	public Collection<TerminologyIndividual> getAllIndividuals() throws ModelException {
 		ResIterator setIndividuals=globalGraph.listSubjectsWithProperty(TDBModelsCoreConfig.hasTypeProperty,TDBModelsCoreConfig.TerminologyIndividualType);
+		ArrayList<TerminologyIndividual> result=new ArrayList<TerminologyIndividual>();
 		while(setIndividuals.hasNext()) {
 			Resource currIndRes=setIndividuals.nextResource();
-			if(!alreadyCreatedIndividuals.containsKey(currIndRes.getURI())) {
-				TerminologyIndividualTDBImpl myTDBInd=new TerminologyIndividualTDBImpl(currIndRes.getURI(),this);
-				myTDBInd.setDefaultVersion(myTDBInd.getLastVersion());
-				alreadyCreatedIndividuals.put(currIndRes.getURI(),myTDBInd);	
-			}
+			result.add(getUncheckedTerminologyIndividual(currIndRes.getURI()));
 		}
-		return alreadyCreatedIndividuals.values();
+		return result;
 
 	}
 
-	public TerminologySet[] getRootCollections() {
+	public TerminologySet[] getRootCollections() throws ModelException {
 		ArrayList<TerminologySet> myRoots=new ArrayList<TerminologySet>();
 		Collection<TerminologySet> mySets= getAllSets();
 		Iterator<TerminologySet> mySetsIter=mySets.iterator();
@@ -236,14 +319,35 @@ public class TerminologyFactoryTDBImpl implements TerminologyFactory {
 		
 	}
 
-	public Set<TerminologySet> getRootsForURI(String uri) {
-		TerminologyEntity myEntity=getExistingTerminologyEntity(uri);
+	public Set<TerminologySet> getRootsForURI(String uri) throws ModelException, UnknownURIException  {
+		TerminologyEntity myEntity=getCheckedTerminologyEntity(uri);
 		return myEntity.getContainers(myEntity.getLastVersion());
 	}
 
-	public TerminologyEntity getExistingTerminologyEntity(String uri) {
-		if(terminologyIndividualExist(uri)) return getOrCreateTerminologyIndividual(uri);
-		else if(terminologySetExist(uri)) return getOrCreateTerminologySet(uri);
+	public TerminologyEntity getCheckedTerminologyEntity(String uri) throws UnknownURIException {
+		if(terminologyIndividualExist(uri)) return getCheckedTerminologyIndividual(uri);
+		else if(terminologySetExist(uri)) return getCheckedTerminologySet(uri);
 		else return null;
 	}
+
+	public TerminologyEntity getUncheckedTerminologyEntity(String uri) {
+		if(terminologyIndividualExist(uri)) return getUncheckedTerminologyIndividual(uri);
+		else if(terminologySetExist(uri)) return getUncheckedTerminologySet(uri);
+		else return null;
+	}
+
+	public boolean terminologySetExist(String uri) {
+		return globalGraph.contains(ResourceFactory.createStatement(ResourceFactory.createResource(uri), TDBModelsCoreConfig.hasTypeProperty, TDBModelsCoreConfig.TerminologySetType));
+		
+	}
+	
+	public boolean terminologyIndividualExist(String uri) {
+		return globalGraph.contains(ResourceFactory.createStatement(ResourceFactory.createResource(uri), TDBModelsCoreConfig.hasTypeProperty, TDBModelsCoreConfig.TerminologyIndividualType));
+	}
+	
+	public boolean terminologyEntityExist(String uri) {
+		return terminologySetExist(uri) || terminologyIndividualExist(uri);
+	}
+	
+	
 }

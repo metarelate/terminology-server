@@ -38,6 +38,8 @@ import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.coreModel.TerminologyIndividual;
 import net.metarelate.terminology.coreModel.TerminologySet;
+import net.metarelate.terminology.exceptions.ModelException;
+import net.metarelate.terminology.exceptions.WebSystemException;
 import net.metarelate.terminology.exceptions.WebWriterException;
 import net.metarelate.terminology.utils.SSLogger;
 import net.metarelate.terminology.utils.SimpleQueriesProcessor;
@@ -96,7 +98,7 @@ public class WebWriter {
 		this.prefixMap=map;
 	}
 	
-	public void write() throws WebWriterException, IOException {
+	public void write() throws WebWriterException, IOException, ModelException, WebSystemException {
 		Iterator<String> psm= prefixMap.keySet().iterator();
 		while(psm.hasNext()) {
 			String pi=psm.next();
@@ -156,7 +158,7 @@ public class WebWriter {
 		writeSetToWeb(rootCollection);
 	}
 	
-	public void write(String rootPath, String rootURL) throws WebWriterException, IOException {
+	public void write(String rootPath, String rootURL) throws WebWriterException, IOException, ModelException, WebSystemException {
 		Iterator<String> psm= prefixMap.keySet().iterator();
 		while(psm.hasNext()) {
 			String pi=psm.next();
@@ -185,7 +187,7 @@ public class WebWriter {
 	}
 	
 	
-	private void preComputeReferences(TerminologySet collection,String urlPrefix, String diskPrefix) {
+	private void preComputeReferences(TerminologySet collection,String urlPrefix, String diskPrefix) throws ModelException {
 		//System.out.println(">>>>Precomputing references for: "+collection.getURI());
 		//Here we check for overrides
 		String myNSBit=collection.getLocalNamespace();
@@ -241,11 +243,13 @@ public class WebWriter {
 	 * @param pathAccumulatedPrefix
 	 * @throws WebWriterException
 	 * @throws IOException
+	 * @throws ModelException 
+	 * @throws WebSystemException 
 	 * @throws ConfigFileException
 	 */
 	//TODO no need to propagate namespace anymore, and also directory could be pre-computed.
 
-	private void writeSetToWeb(TerminologySet collection) throws WebWriterException, IOException {
+	private void writeSetToWeb(TerminologySet collection) throws WebWriterException, IOException, ModelException, WebSystemException {
 		WebRendererSet myRenderer=new WebRendererSet(collection,uri2Url.get(collection.getURI()));
 		myRenderer.registerUrlMap(uri2Url);
 		// TODO these two values could be overridden to write a sub-tree of the file system
@@ -329,7 +333,7 @@ public class WebWriter {
 		modelToWrite.add(MetaLanguage.filterForData(collection.getStatements(collection.getLastVersion())));
 
 		if(collection.isVersioned()) {
-			triplifyVersion( (TerminologySet)collection, modelToWrite,((TerminologySet)collection).getDefaultVersion());
+			triplifyVersion( (TerminologySet)collection, modelToWrite,lastVersion);
 		}
 		
 		
@@ -592,7 +596,7 @@ public class WebWriter {
 	
 	
 	//TODO no need to propagate namespace anymore, and also directory could be pre-computed.
-	private void writeIndividualToWeb(TerminologyIndividual term) throws IOException, WebWriterException {
+	private void writeIndividualToWeb(TerminologyIndividual term) throws IOException, WebWriterException, WebSystemException, ModelException {
 		WebRendererIndividual myRenderer=new WebRendererIndividual(term,uri2Url.get(term.getURI()));
 		myRenderer.registerUrlMap(uri2Url);
 		String termDirectoryPath=uri2Path.get(term.getURI()); 	// the directory path
@@ -698,7 +702,7 @@ public class WebWriter {
 		triplifyTermLinks(term,modelToWrite);
 
 		if(term.isVersioned()) {
-			triplifyVersion( term, modelToWrite,term.getDefaultVersion());
+			triplifyVersion( term, modelToWrite,term.getLastVersion());
 		}
 		
 		writeModel(modelToWrite,termIndexRDF,termIndexTTL,termIndexJSON);

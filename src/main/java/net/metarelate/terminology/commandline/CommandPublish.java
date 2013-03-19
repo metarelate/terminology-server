@@ -3,6 +3,7 @@ package net.metarelate.terminology.commandline;
 import java.util.ArrayList;
 
 import net.metarelate.terminology.coreModel.TerminologySet;
+import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.instanceManager.Initializer;
 import net.metarelate.terminology.publisher.WebWriter;
 import net.metarelate.terminology.utils.SSLogger;
@@ -15,6 +16,10 @@ public class CommandPublish extends TsCommand {
 		super(myInitializer,args);
 		boolean nextIsURI=false;
 		boolean nextIsRootPath=false;
+		for(String arg:args) if(arg.equals("help")) {
+			localHelp();
+			return;
+		}
 		for(String arg:args) {
 			if(arg.equalsIgnoreCase("-ow") || arg.equalsIgnoreCase("-overwrite")) {
 				overwrite=true;
@@ -39,7 +44,7 @@ public class CommandPublish extends TsCommand {
 	}
 
 	@Override
-	public void localExecute() {
+	public void localExecute() throws ModelException {
 		//SSLogger.log("ModelFactory knows "+myInitializer.myFactory.getAllSets().size()+ " sets",SSLogger.DEBUG);
 		//SSLogger.log("ModelFactory knows "+myInitializer.myFactory.getAllIndividuals().size()+ " individuals",SSLogger.DEBUG);
 		TerminologySet[] roots=myInitializer.myFactory.getRootCollections();
@@ -84,6 +89,11 @@ public class CommandPublish extends TsCommand {
 		
 	}
 
+	@Override
+	public void localHelp() {
+		System.out.println("ts publish [under refactoring!]");
 	
+		
+	}
 
 }

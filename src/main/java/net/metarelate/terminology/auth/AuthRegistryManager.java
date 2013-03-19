@@ -26,6 +26,7 @@ import net.metarelate.terminology.coreModel.TerminologyFactory;
 import net.metarelate.terminology.coreModel.TerminologyIndividual;
 import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.AuthException;
+import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
 /**
  * Manages permissions to operate on the Registry Manager.
@@ -52,9 +53,10 @@ public  class AuthRegistryManager {
 	 * @param server the authority server (that follows an Open World assumption)
 	 * @param factory (the terminology factory). This knows about the containment of registers.
 	 * @return true if the operation is authorized, false otherwise.
+	 * @throws ModelException 
 	 */
 	public boolean can(String agent,
-			String action, String entity) throws RegistryAccessException {
+			String action, String entity) throws RegistryAccessException, ModelException {
 		System.out.println("Asking auth for: "+agent+" "+action+" "+entity);
 		if(agent==null) agent=AuthConfig.allURI;
 		if(action==null) action=AuthConfig.allURI;
@@ -81,11 +83,11 @@ public  class AuthRegistryManager {
 			boolean answer=false;
 			Set<TerminologySet> containers;
 			if(myFactory.terminologyIndividualExist(entity)) {
-				TerminologyIndividual myInd=myFactory.getOrCreateTerminologyIndividual(entity);
+				TerminologyIndividual myInd=myFactory.getUncheckedTerminologyIndividual(entity);
 				containers=myInd.getContainers(myInd.getLastVersion());
 			}
 			else if(myFactory.terminologySetExist(entity)) {
-				TerminologySet mySet=myFactory.getOrCreateTerminologySet(entity);
+				TerminologySet mySet=myFactory.getUncheckedTerminologySet(entity);
 				containers=mySet.getContainers(mySet.getLastVersion());
 			}
 			else throw new RegistryAccessException("Unknown: "+entity);

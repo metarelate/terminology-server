@@ -22,6 +22,9 @@ package net.metarelate.terminology.modelBuilders;
 import com.hp.hpl.jena.rdf.model.Model;
 
 import net.metarelate.terminology.coreModel.TerminologyFactory;
+import net.metarelate.terminology.exceptions.ImporterException;
+import net.metarelate.terminology.exceptions.ModelException;
+import net.metarelate.terminology.exceptions.UnknownURIException;
 import net.metarelate.terminology.utils.SSLogger;
 
 public abstract class PragmaProcessor {
@@ -33,7 +36,7 @@ public abstract class PragmaProcessor {
 		//this.globalConfigurationModel = globalConfigurationModel;
 	}
 
-	public abstract void run();
+	public abstract void run() throws ImporterException, ModelException, UnknownURIException;
 	
 	protected int getNumber(String uri) {
 		//////

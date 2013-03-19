@@ -23,7 +23,8 @@ import net.metarelate.terminology.management.TerminologyManagerConfig;
 
 
 public class CoreConfig {
-	public static final String INIT_VERSION = "v0";
+	public static final String VERSION_INIT = "0";
+	public static final String VERSION_DEFUALT = "0";
 	
 	public static String VERSION_NUMBER="0.8.0";
 	public static String VERSION_CODENAME="wicketIntegration";
@@ -38,8 +39,9 @@ public class CoreConfig {
 
 	
 
-	public static final String DEAFULT_FROM_RDF_IMPORT_ACTION = "http://metoffice.gov.uk/action/importFromTables";
-
+	public static final String DEAFULT_FROM_RDF_IMPORT_ACTION = "http://metarelate.net/actions/batchImport";
+	public static final String DEAFULT_FROM_RDF_REIMPORT_ACTION = "http://metarelate.net/actions/batchImportOverride";
+	
 	public static final String DEFAULT_IMPORT_STATUS = TerminologyManagerConfig.defaultStateURI;
 
 	public static final String DEFAULT_LANGUAGE = "en";
@@ -62,5 +64,6 @@ public class CoreConfig {
 	
 	public static final String hasInstanceIdentifierURI="http://metarelate.net/configuration/hasInstanceIdentifier";
 	public static final String selfURI="http://thisInstance.org";
+	
 	
 }

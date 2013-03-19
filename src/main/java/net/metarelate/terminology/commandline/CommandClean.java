@@ -6,6 +6,10 @@ public class CommandClean extends TsCommand {
 
 	public CommandClean(Initializer myInitializer, String[] args) {
 		super(myInitializer, args);
+		for(String arg:args) if(arg.equals("help")) {
+			localHelp();
+			return;
+		}
 		// TODO Auto-generated constructor stub
 	}
 
@@ -15,4 +19,9 @@ public class CommandClean extends TsCommand {
 
 	}
 
+	@Override
+	public void localHelp() {
+		System.out.println("This method is not implemented yet. Please come back later!");
+		
+	}
 }
