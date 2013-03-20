@@ -372,6 +372,11 @@ public class SearchPage extends SuperPage {
 	private ITreeProvider<String> createRegRootModel() {
 		return new ITreeProvider<String>(){
 
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
 			public void detach() {
 				// TODO Auto-generated method stub
 				

@@ -114,6 +114,8 @@ public interface TerminologySet extends TerminologyEntity{
 	 */
 	public Set<TerminologyIndividual> getAllKnownContainedInviduals() throws ModelException ;
 
+	public abstract boolean containsEntity(TerminologyEntity myTerm);
+
 
 
 

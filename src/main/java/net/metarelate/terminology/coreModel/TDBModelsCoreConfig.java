@@ -32,9 +32,9 @@ public class TDBModelsCoreConfig {
 	static final String 	extraModel = "http://metoffice.gov.uk/terminology/impl/model/backgroundKnowledgeModel";
 	static final Property	hasTypeProperty = MetaLanguage.typeProperty;
 	static final RDFNode 	TerminologySetType = MetaLanguage.terminologySetType;
-	static final Property 	hasSubRegister = MetaLanguage.hasSubRegisterProperty;
-	static final Property 	hasRegisterItem = MetaLanguage.hasRegisterItemProperty;
-	static final Property 	definedInRegister = MetaLanguage.definedInRegister;
+	static final Property 	hasSubRegister = MetaLanguage.definesProperty;
+	static final Property 	hasRegisterItem = MetaLanguage.definesProperty;
+	static final Property 	definedInRegister = MetaLanguage.definedInProperty;
 
 	static final RDFNode 	TerminologyIndividualType = MetaLanguage.terminologyIndividualType;
 	static final Property 	hasVersionURIProperty=ResourceFactory.createProperty("http://metoffice.gov.uk/terminology/impl/model/hasVersionModel");

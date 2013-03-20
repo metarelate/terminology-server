@@ -47,6 +47,7 @@ public class CommandIngest extends TsCommand {
 		
 		System.out.println("Starting execution");
 		System.out.print("Debug mode is: ");
+		System.out.println(debugOn);
 		if(debugOn) System.out.println("On");
 		else System.out.println("Off");
 		System.out.println("Message: "+message);
@@ -61,9 +62,11 @@ public class CommandIngest extends TsCommand {
 			//builder.setGlobalOwnerURI(myInitializer.getDefaultUserURI());
 			builder.setActionMessage(message);
 			Model globalInput=readIntoModel(files);
-				// TODO change builder to accommodate these....
+			
+			// TODO change builder to accommodate these....
 			if(labelsOnly) {
 				//builder.setGlobalConfigurationModel(globalInput);
+				builder.registerInput(globalInput);
 				myInitializer.myFactory.getLabelManager().registerLabels(builder.getLabels());
 					
 			}

@@ -20,11 +20,13 @@ public abstract class TsCommand {
 		this.myInitializer = myInitializer;
 		boolean isMessage=false;
 		for(String arg : args) {
+			/*
 			if(arg.equalsIgnoreCase("-d") || arg.equalsIgnoreCase("-debug")) {
 				debugOn=true;
 				SSLogger.showDebug(true);
 			}
-			else if(arg.equalsIgnoreCase("-m") || arg.equalsIgnoreCase("-message")) {
+			*/
+			if(arg.equalsIgnoreCase("-m") || arg.equalsIgnoreCase("-message")) {
 				isMessage=true;
 			}
 			else if(isMessage==true) {

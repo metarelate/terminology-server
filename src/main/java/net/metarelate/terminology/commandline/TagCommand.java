@@ -8,8 +8,9 @@ public class TagCommand extends TsCommand {
 	Initializer myInitializer=null;
 	String tag=null;
 	String message="";
-	public TagCommand(Initializer myInitializer, String[] args) {
+	public TagCommand(Initializer myInitializer, String[] args, boolean debug) {
 		super(myInitializer, args);
+		debugOn=debug;
 		for(String arg:args) if(arg.equals("help")) {
 			localHelp();
 			return;

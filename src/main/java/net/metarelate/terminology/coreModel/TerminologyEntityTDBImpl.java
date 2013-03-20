@@ -112,6 +112,7 @@ public class TerminologyEntityTDBImpl implements TerminologyEntity{
 		StmtIterator toRemove=globalGraph.listStatements(myRes,MetaLanguage.nameSpaceProperty,(Resource)null);
 		globalGraph.remove(toRemove);
 		globalGraph.add(globalGraph.createStatement(myRes,MetaLanguage.nameSpaceProperty,ResourceFactory.createPlainLiteral(lns)));
+		TDB.sync(globalGraph);
 	}
 	
 	/**
@@ -278,9 +279,9 @@ public class TerminologyEntityTDBImpl implements TerminologyEntity{
 	//}
 
 	public void setIsVersioned(boolean isVersioned) {
-		StmtIterator toRemove=globalGraph.listStatements(myRes,TDBModelsCoreConfig.hasOwnerProperty,(Resource)null);
+		StmtIterator toRemove=globalGraph.listStatements(myRes,TDBModelsCoreConfig.isVersionedProperty,(Resource)null);
 		globalGraph.remove(toRemove);
-		globalGraph.add(globalGraph.createStatement(myRes, TDBModelsCoreConfig.isVersionedProperty, globalGraph.createLiteral("TRUE")));
+		if(isVersioned) globalGraph.add(globalGraph.createStatement(myRes, TDBModelsCoreConfig.isVersionedProperty, globalGraph.createLiteral("TRUE")));
 
 	}
 

@@ -113,7 +113,7 @@ public class Initializer {
 	public void prepareConfigurationLayout() throws ConfigurationException {
 		if(userHomeString==null) userHomeString = System.getProperty( "user.home" );
 		SSLogger.log("User Home: "+ userHomeString);
-		System.out.println("User Home: "+ userHomeString);
+		//System.out.println("User Home: "+ userHomeString);
 		File rootDirectory=new File(userHomeString,rootDirString);
 		checkOrCreateDirectory(rootDirectory);
 		rootDirectoryString=rootDirectory.getAbsolutePath();

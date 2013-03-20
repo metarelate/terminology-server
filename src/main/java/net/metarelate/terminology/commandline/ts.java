@@ -34,7 +34,7 @@ public class ts {
 			}
 			if(arg.equalsIgnoreCase("-d")) {
 				debug=true;
-				System.out.println("Debug mode");
+				System.out.println("Debug mode On");
 			}
 			if(nextIsSysDir) {
 				sysDir=arg;
@@ -65,22 +65,22 @@ public class ts {
 			command =new CommandIngest(myInitializer,Arrays.copyOfRange(args,2,args.length)); // TODO excpet the first two!
 		}
 		else if(argument.equalsIgnoreCase("publish")) {
-			command =new CommandPublish(myInitializer,args); // TODO excpet the first two!
+			command =new CommandPublish(myInitializer,args,debug); // TODO excpet the first two!
 		}
 		else if(argument.equalsIgnoreCase("check")) {
-			command =new CommandCheck(myInitializer,args); // TODO excpet the first two!
+			command =new CommandCheck(myInitializer,args,debug); // TODO excpet the first two!
 		}
 		else if(argument.equalsIgnoreCase("clean")) {
-			command =new CommandClean(myInitializer,args); // TODO excpet the first two!
+			command =new CommandClean(myInitializer,args,debug); // TODO excpet the first two!
 		}
 		else if(argument.equalsIgnoreCase("command")) {
-			command =new CommandCommand(myInitializer,args); // TODO excpet the first two!
+			command =new CommandCommand(myInitializer,args,debug); // TODO excpet the first two!
 		}
 		else if(argument.equalsIgnoreCase("tag")) {
-			command =new TagCommand(myInitializer,args); // TODO excpet the first two!
+			command =new TagCommand(myInitializer,args,debug); // TODO excpet the first two!
 		}
 		else if(argument.equalsIgnoreCase("web")) {
-			command =new WebCommand(myInitializer,args); // TODO excpet the first two!
+			command =new WebCommand(myInitializer,args,debug); // TODO excpet the first two!
 		}
 		else {
 			commandUnknownError();

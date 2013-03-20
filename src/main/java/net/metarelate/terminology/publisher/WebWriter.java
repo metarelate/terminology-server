@@ -540,14 +540,14 @@ public class WebWriter {
 		Iterator<TerminologySet> myCollIter=childrenSet.iterator();
 		while(myCollIter.hasNext()) {
 			TerminologySet myColl=myCollIter.next();
-			modelToWrite.add(ResourceFactory.createStatement(collectionResource,MetaLanguage.hasSubRegisterProperty,ResourceFactory.createResource(myColl.getURI())));
+			modelToWrite.add(ResourceFactory.createStatement(collectionResource,MetaLanguage.definesProperty,ResourceFactory.createResource(myColl.getURI())));
 		}
 	
 		Iterator<TerminologyIndividual> myIndIter=indSet.iterator();
 		while(myIndIter.hasNext()) {
 			TerminologyIndividual myInd=myIndIter.next();
 			
-			modelToWrite.add(ResourceFactory.createStatement(collectionResource,MetaLanguage.hasRegisterItemProperty,ResourceFactory.createResource(myInd.getURI())));
+			modelToWrite.add(ResourceFactory.createStatement(collectionResource,MetaLanguage.definesProperty,ResourceFactory.createResource(myInd.getURI())));
 			
 		}
 		

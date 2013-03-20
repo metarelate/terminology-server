@@ -12,9 +12,9 @@ import net.metarelate.terminology.instanceManager.Initializer;
 
 public class WebCommand extends TsCommand {
 	private int port=8080;
-	public WebCommand(Initializer myInitializer, String[] args) {
+	public WebCommand(Initializer myInitializer, String[] args, boolean debug) {
 		super(myInitializer, args);
-		
+		debugOn=debug;
 		for(String arg:args) if(arg.equals("help")) {
 			localHelp();
 			return;

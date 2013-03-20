@@ -254,12 +254,17 @@ public class TerminologyFactoryTDBImpl implements TerminologyFactory {
 	}
 
 	public TerminologySet[] getRootCollections() throws ModelException {
+		System.out.println("Finding root collections");
 		ArrayList<TerminologySet> myRoots=new ArrayList<TerminologySet>();
 		Collection<TerminologySet> mySets= getAllSets();
 		Iterator<TerminologySet> mySetsIter=mySets.iterator();
 		while(mySetsIter.hasNext()) {
 			TerminologySet mySet=mySetsIter.next();
-			if(mySet.isRoot()) myRoots.add(mySet);
+			System.out.println("Testing "+mySet.getURI());
+			if(mySet.isRoot()) {
+				myRoots.add(mySet);
+				System.out.println("Root");
+			}
 		}
 		return myRoots.toArray(new TerminologySet[myRoots.size()]);
 		

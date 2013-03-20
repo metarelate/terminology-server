@@ -76,7 +76,7 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 public class TerminologyModelBuilder {
 	protected Initializer myInitializer=null;
-	protected Model globalConfigurationModel=null;
+	protected Model inputGraph=null;
 	protected String actionMessage=CoreConfig.DEFAULT_FROM_RDF_DESCRIPTION;
 	protected boolean updateMode=false;
 	Hashtable<String, String> entityToVersion=null; //Maps entity to be imported to their "operative" version.
@@ -90,25 +90,25 @@ public class TerminologyModelBuilder {
 	/**
 	 * Generates a terminology model from a collection of RDF resources which describe the terminology resources
 	 * and that provides instruction for the model builder (e.g.: reasoning type, pragma operations, ...)
-	 * @param unifiedConfigurationModel
+	 * @param globalInput
 	 * @throws NonConformantRDFException
 	 * @throws ConfigurationException 
 	 * @throws ImporterException 
 	 * @throws ModelException 
 	 * @throws UnknownURIException 
 	 */
-	public void generateModel(Model unifiedConfigurationModel,boolean updateMode, String message) throws ConfigurationException, ImporterException, UnknownURIException, ModelException  {
-		this.globalConfigurationModel=unifiedConfigurationModel;
+	public void generateModel(Model globalInput,boolean updateMode, String message) throws ConfigurationException, ImporterException, UnknownURIException, ModelException  {
+		this.inputGraph=globalInput;
 		this.updateMode=updateMode;
 		if(message!=null) this.actionMessage=message;
 		entityToVersion=new Hashtable<String,String>();
-		globalConfigurationModel=myInitializer.getConfigurationGraph();
+		//inputGraph=myInitializer.getConfigurationGraph();
 		SSLogger.log("Starting import, update mode="+updateMode,SSLogger.DEBUG);
-		SSLogger.log("Number of known statements in input: "+globalConfigurationModel.size(),SSLogger.DEBUG);
-		ReasonerProxy.customReason(globalConfigurationModel);
-		SSLogger.log("Number of statements after reasoning: "+globalConfigurationModel.size(),SSLogger.DEBUG);
-		fillBackwardContainment(globalConfigurationModel);
-		SSLogger.log("Number of statements after containment completion: "+globalConfigurationModel.size(),SSLogger.DEBUG);
+		SSLogger.log("Number of known statements in input: "+inputGraph.size(),SSLogger.DEBUG);
+		ReasonerProxy.customReason(inputGraph);
+		SSLogger.log("Number of statements after reasoning: "+inputGraph.size(),SSLogger.DEBUG);
+		fillBackwardContainment(inputGraph);
+		SSLogger.log("Number of statements after containment completion: "+inputGraph.size(),SSLogger.DEBUG);
 		generateIndividuals();
 		generateSets();
 		//buildContainmentStructure(); TODO verify this is obsolete now 
@@ -126,17 +126,21 @@ public class TerminologyModelBuilder {
 	
 	private void fillBackwardContainment(Model model) {
 		Model newStats=ModelFactory.createDefaultModel();
-		StmtIterator cin=model.listStatements(null,MetaLanguage.containedInProperty,(Resource)null);
+		StmtIterator cin=model.listStatements(null,MetaLanguage.definedInProperty,(Resource)null);
 		while(cin.hasNext()) {
+			System.out.println("contained");
 			Statement stat=cin.nextStatement();
-			if(stat.getObject().isResource())
-				newStats.add(stat.getObject().asResource(),MetaLanguage.containsProperty,stat.getResource());
+			if(stat.getObject().isResource()) {
+				newStats.add(stat.getObject().asResource(),MetaLanguage.definesProperty,stat.getSubject());
+			}
 		}
-		StmtIterator cis=model.listStatements(null,MetaLanguage.containsProperty,(Resource)null);
+		StmtIterator cis=model.listStatements(null,MetaLanguage.definesProperty,(Resource)null);
 		while(cis.hasNext()) {
+			System.out.println("contains");
 			Statement stat=cis.nextStatement();
-			if(stat.getObject().isResource())
-				newStats.add(stat.getObject().asResource(),MetaLanguage.containedInProperty,stat.getResource());
+			if(stat.getObject().isResource()) {
+				newStats.add(stat.getObject().asResource(),MetaLanguage.definedInProperty,stat.getSubject());
+			}
 		}
 		model.add(newStats);
 		//return model.add(newStats);
@@ -168,7 +172,7 @@ public class TerminologyModelBuilder {
 
 	protected void generateSets() throws ConfigurationException, ImporterException  {
 		SSLogger.log("Generating Code Sets",SSLogger.DEBUG);
-		ResIterator terminologySetIterator=globalConfigurationModel.listResourcesWithProperty(MetaLanguage.typeProperty,MetaLanguage.terminologySetType);		
+		ResIterator terminologySetIterator=inputGraph.listResourcesWithProperty(MetaLanguage.typeProperty,MetaLanguage.terminologySetType);		
 		while(terminologySetIterator.hasNext()) {
 			Resource currentEntitySet=terminologySetIterator.nextResource();
 			generateEntity(currentEntitySet,true);
@@ -179,7 +183,7 @@ public class TerminologyModelBuilder {
 	
 	protected void generateIndividuals() throws ConfigurationException, ImporterException  {
 		SSLogger.log("Generating Code Individual",SSLogger.DEBUG);
-		ResIterator entityIndividualIter=globalConfigurationModel.listResourcesWithProperty(MetaLanguage.typeProperty,MetaLanguage.terminologyIndividualType);
+		ResIterator entityIndividualIter=inputGraph.listResourcesWithProperty(MetaLanguage.typeProperty,MetaLanguage.terminologyIndividualType);
 		while(entityIndividualIter.hasNext()) {
 			Resource currentEntityIndividual=entityIndividualIter.nextResource();
 			generateEntity(currentEntityIndividual,false);
@@ -208,21 +212,25 @@ public class TerminologyModelBuilder {
 		TerminologyEntity myEntity;
 		String version=null;
 		boolean isVersioned=true;
-		if(SimpleQueriesProcessor.hasOptionalLiteral(entityResource,MetaLanguage.hasVersionProperty,globalConfigurationModel) ) {
-			version=SimpleQueriesProcessor.getOptionalLiteral(entityResource,MetaLanguage.hasVersionProperty,globalConfigurationModel).getValue().toString();
+		if(SimpleQueriesProcessor.hasOptionalLiteral(entityResource,MetaLanguage.hasVersionProperty,inputGraph) ) {
+			version=SimpleQueriesProcessor.getOptionalLiteral(entityResource,MetaLanguage.hasVersionProperty,inputGraph).getValue().toString();
 		}
 		int versionNumber=0;
 		if(version!=null) {
+			SSLogger.log("Found version: "+version,SSLogger.DEBUG);
 			try {
 				versionNumber=Integer.parseInt(version);
 			} catch (NumberFormatException e) {
 				throw new ConfigurationException("Unparsable version number for "+entityResource.getURI()+" ("+version+")");
 			}
 		}
+		else SSLogger.log("No version specified",SSLogger.DEBUG);
 		//Entity is unversioned, we just act on it idempotently.
 		if(versionNumber<0) {
 			isVersioned=false;
+			SSLogger.log("Un-versioned",SSLogger.DEBUG);
 		}
+		else SSLogger.log("Versioned",SSLogger.DEBUG);
 		//First we check if the individual already existed, if it is new, we just create it.
 		if(!(myInitializer.myFactory.terminologyEntityExist(entityResource.getURI()))) {
 			SSLogger.log("This individual was never declared before",SSLogger.DEBUG);
@@ -249,12 +257,22 @@ public class TerminologyModelBuilder {
 			String lastVersion=myEntity.getLastVersion();
 			Model oldStatements=myEntity.getStatements(lastVersion);
 			Model newStatement=collectFilteredMetadataForEntity(myEntity);
+			complementState(myEntity.getResource(), newStatement);
 			Model newOnly=newStatement.difference(oldStatements);
 			Model oldOnly=oldStatements.difference(newStatement);
 			if(newOnly.size()==0 && oldOnly.size()==0) {
 				SSLogger.log("Nothing changed, doing nothing",SSLogger.DEBUG);
 			}
 			else {
+				SSLogger.log("Something changed from last time: ",SSLogger.DEBUG);
+				StmtIterator oldOnlyIter=oldOnly.listStatements();
+				while(oldOnlyIter.hasNext()) {
+					SSLogger.log("Missing: "+oldOnlyIter.nextStatement().toString(),SSLogger.DEBUG);
+				}
+				StmtIterator newOnlyIter=newOnly.listStatements();
+				while(newOnlyIter.hasNext()) {
+					SSLogger.log("Added: "+newOnlyIter.nextStatement().toString(),SSLogger.DEBUG);
+				}
 				if(!isVersioned) {
 					SSLogger.log("Non versioned: overriding statements",SSLogger.DEBUG);
 					//myIndividual=myInitializer.myFactory.getUncheckedTerminologyIndividual(currentIndividual.getURI());
@@ -306,7 +324,7 @@ public class TerminologyModelBuilder {
 		}
 		
 		
-		Literal myNs=SimpleQueriesProcessor.getOptionalLiteral(entityResource, MetaLanguage.nameSpaceProperty, globalConfigurationModel);
+		Literal myNs=SimpleQueriesProcessor.getOptionalLiteral(entityResource, MetaLanguage.nameSpaceProperty, inputGraph);
 		if(myNs!=null) myEntity.setLocalNamespace(myNs.getValue().toString());
 			
 	}
@@ -318,11 +336,12 @@ public class TerminologyModelBuilder {
 
 	private Model collectFilteredMetadataForEntity(TerminologyEntity e) {
 		Model result=ModelFactory.createDefaultModel();
-		StmtIterator iter=globalConfigurationModel.listStatements(e.getResource(),null,(RDFNode)null);
+		StmtIterator iter=inputGraph.listStatements(e.getResource(),null,(RDFNode)null);
 		while(iter.hasNext()) {
 			Statement stat=iter.next();
 			boolean okstat=true;
 			if(stat.getPredicate().equals(MetaLanguage.nameSpaceProperty)) okstat=false;
+			if(stat.getPredicate().equals(MetaLanguage.hasVersionProperty)) okstat=false;
 			if(stat.getObject().isResource()) {
 				if(stat.getObject().asResource().equals(MetaLanguage.terminologySetType) || stat.getObject().asResource().equals(MetaLanguage.terminologyIndividualType)) okstat=false;
 			}
@@ -332,8 +351,14 @@ public class TerminologyModelBuilder {
 	}
 
 	private void fillDefaultStateIfNone(TerminologyEntity entity, String version) {
-		String statusURI= SimpleQueriesProcessor.getOptionalLiteralValueAsString(entity.getResource(), MetaLanguage.hasStatusProperty, globalConfigurationModel);
+		String statusURI= SimpleQueriesProcessor.getOptionalLiteralValueAsString(entity.getResource(), MetaLanguage.hasStatusProperty, inputGraph);
 		if(statusURI==null) entity.setStateURI(CoreConfig.DEFAULT_IMPORT_STATUS,version); //TODO move default somewhere better
+		
+	}
+	
+	private void complementState(Resource subject, Model model) {
+		String statusURI= SimpleQueriesProcessor.getOptionalLiteralValueAsString(subject, MetaLanguage.hasStatusProperty, model);
+		if(statusURI==null) model.add(ResourceFactory.createStatement(subject, MetaLanguage.hasStatusProperty, ResourceFactory.createResource(CoreConfig.DEFAULT_IMPORT_STATUS))); //TODO move default somewhere better
 		
 	}
 
@@ -357,7 +382,7 @@ public class TerminologyModelBuilder {
 	}
 	
 	public Model getLabels() {
-		StmtIterator labelStats=globalConfigurationModel.listStatements(null,MetaLanguage.labelProperty,(RDFNode)null);
+		StmtIterator labelStats=inputGraph.listStatements(null,MetaLanguage.labelProperty,(RDFNode)null);
 		Model labelModel=ModelFactory.createDefaultModel();
 		labelModel.add(labelStats);
 		SSLogger.log("Labels found: "+labelModel.size(),SSLogger.DEBUG);
@@ -365,7 +390,7 @@ public class TerminologyModelBuilder {
 	}
 	
 	public Model getPropertyMetadata() {
-		StmtIterator stIter=globalConfigurationModel.listStatements((Resource)null,MetaLanguage.propertyHasFocus,(Resource)null);
+		StmtIterator stIter=inputGraph.listStatements((Resource)null,MetaLanguage.propertyHasFocus,(Resource)null);
 		Model propMetaModel=ModelFactory.createDefaultModel();
 		propMetaModel.add(stIter);
 		SSLogger.log("PropertyMetadata found: "+propMetaModel.size(),SSLogger.DEBUG);
@@ -379,12 +404,12 @@ public class TerminologyModelBuilder {
 		SSLogger.log("*************************************",SSLogger.DEBUG);
 		SSLogger.log("Checking pragmas",SSLogger.DEBUG);
 		SSLogger.log("*************************************",SSLogger.DEBUG);
-		StmtIterator pragmaStatements=globalConfigurationModel.listStatements(null, MetaLanguage.pragmaProperty, (Resource)null);
+		StmtIterator pragmaStatements=inputGraph.listStatements(null, MetaLanguage.pragmaProperty, (Resource)null);
 		while (pragmaStatements.hasNext()) {
 			Statement pragmaStatement=pragmaStatements.next();
 			Resource pragmaNode=pragmaStatement.getObject().asResource();
 			//System.out.println(pragmaStatement.toString());
-			StmtIterator pragmaTypes=globalConfigurationModel.listStatements(pragmaNode,MetaLanguage.typeProperty,(Resource)null);
+			StmtIterator pragmaTypes=inputGraph.listStatements(pragmaNode,MetaLanguage.typeProperty,(Resource)null);
 			while(pragmaTypes.hasNext()) {
 				// TODO add try/catch malformed model
 				Resource pragmaType=pragmaTypes.next().getObject().asResource();
@@ -395,15 +420,15 @@ public class TerminologyModelBuilder {
 					int pad=-1;
 					boolean hardLimitCut=false;
 					boolean toSuppress=false;
-					if(globalConfigurationModel.contains(pragmaNode, MetaLanguage.pragmaPropProperty, MetaLanguage.pragmaSuppress)) toSuppress=true;
-					if(globalConfigurationModel.contains(pragmaNode, MetaLanguage.pragmaPropProperty, MetaLanguage.pragmaHardLimitCut)) hardLimitCut=true;
-					Literal maxValue=SimpleQueriesProcessor.getOptionalLiteral(pragmaNode, MetaLanguage.pragmaHardLimit, globalConfigurationModel);
+					if(inputGraph.contains(pragmaNode, MetaLanguage.pragmaPropProperty, MetaLanguage.pragmaSuppress)) toSuppress=true;
+					if(inputGraph.contains(pragmaNode, MetaLanguage.pragmaPropProperty, MetaLanguage.pragmaHardLimitCut)) hardLimitCut=true;
+					Literal maxValue=SimpleQueriesProcessor.getOptionalLiteral(pragmaNode, MetaLanguage.pragmaHardLimit, inputGraph);
 					if(maxValue!=null) {
 						try {
 							maxLimit=maxValue.getInt();
 						} catch (Exception e) {}
 					}
-					Literal padValue=SimpleQueriesProcessor.getOptionalLiteral(pragmaNode, MetaLanguage.pragmaPad, globalConfigurationModel);
+					Literal padValue=SimpleQueriesProcessor.getOptionalLiteral(pragmaNode, MetaLanguage.pragmaPad, inputGraph);
 					if(padValue!=null) {
 						try {
 							pad=padValue.getInt();
@@ -414,7 +439,7 @@ public class TerminologyModelBuilder {
 					//System.out.println(">>>>>>>"+overridePropRes);
 					ArrayList<Property> overrideProps=new ArrayList<Property>();
 					//Property overrideProp=null;
-					NodeIterator ovvIter=globalConfigurationModel.listObjectsOfProperty(pragmaNode, MetaLanguage.pragmaOverrideProp);
+					NodeIterator ovvIter=inputGraph.listObjectsOfProperty(pragmaNode, MetaLanguage.pragmaOverrideProp);
 					while(ovvIter.hasNext()) {
 						//System.out.println("Type: .-.");
 						RDFNode node=ovvIter.next();
@@ -430,13 +455,13 @@ public class TerminologyModelBuilder {
 				}
 				else if(pragmaType.equals(MetaLanguage.pragmaExpandTree)) {
 	
-					Resource treeCollectionResource=SimpleQueriesProcessor.getOptionalResourceObject(pragmaNode, MetaLanguage.pragmaTreeCollection, globalConfigurationModel);
-					Resource schemeResource=SimpleQueriesProcessor.getOptionalResourceObject(pragmaNode, MetaLanguage.pragmaSchemaProperty, globalConfigurationModel);
+					Resource treeCollectionResource=SimpleQueriesProcessor.getOptionalResourceObject(pragmaNode, MetaLanguage.pragmaTreeCollection, inputGraph);
+					Resource schemeResource=SimpleQueriesProcessor.getOptionalResourceObject(pragmaNode, MetaLanguage.pragmaSchemaProperty, inputGraph);
 					TerminologySet rootSet=null;
 					if(treeCollectionResource!=null) rootSet=myInitializer.myFactory.getCheckedTerminologySet(treeCollectionResource.getURI());
 					//if(leafsCollectionResource!=null) leafsSet=allCollections.get(leafsCollectionResource.getURI());
 					if(rootSet!=null) {
-						PragmaProcessor myProc=new ComputeTreePragmaProcessor(myInitializer.myFactory,globalConfigurationModel,rootSet,schemeResource);
+						PragmaProcessor myProc=new ComputeTreePragmaProcessor(myInitializer.myFactory,inputGraph,rootSet,schemeResource);
 						myProc.run();
 						
 					}
@@ -447,6 +472,11 @@ public class TerminologyModelBuilder {
 				}
 			}
 		}
+		
+	}
+
+	public void registerInput(Model globalInput) {
+		this.inputGraph=globalInput;
 		
 	}
 

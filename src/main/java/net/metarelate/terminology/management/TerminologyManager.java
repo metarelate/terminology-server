@@ -96,7 +96,8 @@ public class TerminologyManager {
 			
 			TerminologySet myRegister=null;
 			if(!myInitializer.myFactory.terminologySetExist(registerURI)) throw new RegistryAccessException("Unable to modify "+registerURI+" (register does not exist)");
-			if(!myInitializer.myFactory.terminologyIndividualExist(codeURI)) {
+			myRegister=myInitializer.myFactory.getUncheckedTerminologySet(registerURI);
+			if(myInitializer.myFactory.terminologyIndividualExist(codeURI)) {
 				// Note this is only for addding! Not for changing obsolete/valid status. In other words, a delete operation
 				throw new RegistryAccessException("Code "+codeURI+" exists. Use \"move\" to change register");
 			}
@@ -121,12 +122,12 @@ public class TerminologyManager {
 			TerminologyEntity newTerm=null;
 			//TODO dirty use of a type system!!!! should be a bit re-designed (e.g.: use entity more!)
 			if(entityType==TerminologyEntity.INDIVIDUAL_TYPE) {
-				if(!myInitializer.myFactory.terminologyEntityExist(codeURI)) throw new RegistryAccessException("Impossible to add individual "+codeURI+" as an entity with the same URI already exists");
+				if(myInitializer.myFactory.terminologyEntityExist(codeURI)) throw new RegistryAccessException("Impossible to add individual "+codeURI+" as an entity with the same URI already exists");
 				if(isVersioned) newTerm=myInitializer.myFactory.createNewVersionedTerminologyIndividual(codeURI);
 				else newTerm=myInitializer.myFactory.createNewUnversionedTerminologyIndividual(codeURI);
 			}
 			else if(entityType==TerminologyEntity.SET_TYPE) {
-				if(!myInitializer.myFactory.terminologyEntityExist(codeURI)) throw new RegistryAccessException("Impossible to add set "+codeURI+" as an entity with the same URI already exists");
+				if(myInitializer.myFactory.terminologyEntityExist(codeURI)) throw new RegistryAccessException("Impossible to add set "+codeURI+" as an entity with the same URI already exists");
 				if(isVersioned) newTerm=myInitializer.myFactory.createNewVersionedTerminologySet(codeURI);
 				else newTerm=myInitializer.myFactory.createNewUnversionedTerminologySet(codeURI);
 			}
@@ -174,6 +175,7 @@ public class TerminologyManager {
 			throw new AuthException(actionAuthor,RegistryPolicyManager.actionUpdateURI,entityURI);
 		TerminologyEntity myEntity=null;
 		if(!myInitializer.myFactory.terminologyEntityExist(entityURI)) throw new RegistryAccessException("Unable to amend "+entityURI+" (entity does not exist)");
+		myEntity=myInitializer.myFactory.getUncheckedTerminologyEntity(entityURI);
 		String lastVersion=myEntity.getLastVersion();
 		String preStatus=myEntity.getStateURI(lastVersion);
 		
@@ -229,6 +231,7 @@ public class TerminologyManager {
 		}
 		TerminologyEntity myEntity=null;
 		if(!myInitializer.myFactory.terminologyEntityExist(entityURI)) throw new RegistryAccessException("Unable to perform generic operation on "+entityURI+" (entity does not exist)");
+		myEntity=myInitializer.myFactory.getUncheckedTerminologyEntity(entityURI);
 		String lastVersion=myEntity.getLastVersion();
 		String preStatus=myEntity.getStateURI(lastVersion);
 		
@@ -369,13 +372,16 @@ public class TerminologyManager {
 			throw new AuthException(actionAuthorURI,RegistryPolicyManager.actionObsoleteURI,regURI);
 	TerminologySet myRegister=null;
 	if(!myInitializer.myFactory.terminologySetExist(regURI)) throw new RegistryAccessException("Unable to modify "+regURI+" (register does not exist)");
-	
+	myRegister=myInitializer.myFactory.getUncheckedTerminologySet(regURI);
 	TerminologyEntity myTerm=null;
 	if(myInitializer.myFactory.terminologyIndividualExist(termURI)) {
 		myTerm=myInitializer.myFactory.getUncheckedTerminologyIndividual(termURI);
 		if(myTerm==null) throw new RegistryAccessException("Code "+termURI+" does not exists.");
-		if(!myRegister.getIndividuals(myRegister.getLastVersion()).contains(myTerm))
+		if(!myRegister.containsEntity(myTerm)) {
+			//TODO entity/set doesn't play well with this test!
 			throw new RegistryAccessException("Code "+termURI+" is not contained in the last version of "+regURI);
+		}
+			
 	}
 	if(myInitializer.myFactory.terminologySetExist(termURI)) {
 		myTerm=myInitializer.myFactory.getUncheckedTerminologySet(termURI);
@@ -490,13 +496,15 @@ public class TerminologyManager {
 			throw new AuthException(actionAuthorURI,RegistryPolicyManager.actionSupersedURI,regURI);
 	TerminologySet myRegister=null;
 	if(!myInitializer.myFactory.terminologySetExist(regURI)) throw new RegistryAccessException("Unable to modify "+regURI+" (register does not exist)");
+	myRegister=myInitializer.myFactory.getUncheckedTerminologySet(regURI);
 	
 	TerminologyIndividual myTerm=null;
 	if(!myInitializer.myFactory.terminologyIndividualExist(termURI)) throw new RegistryAccessException("Code "+termURI+" does not exists.");
+	myTerm=myInitializer.myFactory.getUncheckedTerminologyIndividual(termURI);
 	
 	TerminologyIndividual superseedingTerm=null;
 	if(!myInitializer.myFactory.terminologyIndividualExist(superseedingTermURI)) throw new RegistryAccessException("Code "+superseedingTermURI+" does not exist. Add it first.");
-	
+	superseedingTerm=myInitializer.myFactory.getUncheckedTerminologyIndividual(superseedingTermURI);
 	
 	
 	String lastRegisterVersion=myRegister.getLastVersion();

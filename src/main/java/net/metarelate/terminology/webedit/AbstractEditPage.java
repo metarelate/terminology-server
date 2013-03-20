@@ -63,6 +63,7 @@ public abstract class AbstractEditPage  extends SuperPage {
 	protected boolean isSuperseding=false;
 	//protected TerminologyEntity myEntity=null;
 	LoadableDetachableModel<TerminologyEntity> terminologyEntityWrapper=null;
+	LoadableDetachableModel<Model> extraStatements=null;
 	protected String pageMessage="";
 	protected FeedbackPanel feedbackPanel=null;
 	protected String uriOfContainer=null;
@@ -131,8 +132,18 @@ public abstract class AbstractEditPage  extends SuperPage {
 		if(isEdit) bagOfStatements.add(MetaLanguage.filterForEdit(terminologyEntityWrapper.getObject().getStatements(terminologyEntityWrapper.getObject().getLastVersion())));
 		SSLogger.log("Previous statements: "+bagOfStatements.size(), SSLogger.DEBUG);
 		
-		final com.hp.hpl.jena.rdf.model.Model extraStatements=ModelFactory.createDefaultModel();
-		if(isEdit) extraStatements.add(MetaLanguage.filterForEditComplement(terminologyEntityWrapper.getObject().getStatements(terminologyEntityWrapper.getObject().getLastVersion())));
+		
+		extraStatements=new LoadableDetachableModel<Model>() {
+			@Override
+			protected Model load() {
+				Model result=ModelFactory.createDefaultModel();
+				if(isEdit) result.add(MetaLanguage.filterForEditComplement(terminologyEntityWrapper.getObject().getStatements(terminologyEntityWrapper.getObject().getLastVersion())));
+				//TODO note that the wrapper is null for non edit
+				return result;
+			}
+			
+		};
+		
 		
 		/*
 		 * Here we assemble a list of things that will be used to build the form.
@@ -466,11 +477,11 @@ public abstract class AbstractEditPage  extends SuperPage {
 				try {
 					if(isEdit) {
 						// Entity exists...
-						CommandWebConsole.myInitializer.myTerminologyManager.sobstituteEntityInformation(urlToEdit, newStatememts.add(extraStatements), CommandWebConsole.myInitializer.getDefaultUserURI(), getDescription());
+						CommandWebConsole.myInitializer.myTerminologyManager.sobstituteEntityInformation(urlToEdit, newStatememts.add(extraStatements.getObject()), CommandWebConsole.myInitializer.getDefaultUserURI(), getDescription());
 					}
 					if(isNew) {
-						if(isSet) CommandWebConsole.myInitializer.myTerminologyManager.addSubRegister(urlToEdit, uriOfContainer, newStatememts.add(extraStatements), userURI, getDescription(), true);
-						if(isIndividual) CommandWebConsole.myInitializer.myTerminologyManager.addTermToRegister(urlToEdit, uriOfContainer, newStatememts.add(extraStatements), userURI, getDescription(), true);
+						if(isSet) CommandWebConsole.myInitializer.myTerminologyManager.addSubRegister(urlToEdit, uriOfContainer, newStatememts.add(extraStatements.getObject()), userURI, getDescription(), true);
+						if(isIndividual) CommandWebConsole.myInitializer.myTerminologyManager.addTermToRegister(urlToEdit, uriOfContainer, newStatememts.add(extraStatements.getObject()), userURI, getDescription(), true);
 					}
 				} catch (AuthException e) {
 					getSession().error("Auth error");

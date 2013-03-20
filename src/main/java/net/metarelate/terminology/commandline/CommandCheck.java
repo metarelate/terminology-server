@@ -4,8 +4,9 @@ import net.metarelate.terminology.instanceManager.Initializer;
 
 public class CommandCheck extends TsCommand {
 
-	public CommandCheck(Initializer myInitializer, String[] args) {
+	public CommandCheck(Initializer myInitializer, String[] args, boolean debug) {
 		super(myInitializer, args);
+		debugOn=debug;
 		for(String arg:args) if(arg.equals("help")) {
 			localHelp();
 			return;

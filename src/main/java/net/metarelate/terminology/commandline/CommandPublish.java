@@ -12,8 +12,9 @@ public class CommandPublish extends TsCommand {
 	boolean overwrite=false;
 	String selectedURI=null;
 	String rootPath=null;
-	public CommandPublish(Initializer myInitializer,String[] args) {
+	public CommandPublish(Initializer myInitializer,String[] args, boolean debug) {
 		super(myInitializer,args);
+		debugOn=debug;
 		boolean nextIsURI=false;
 		boolean nextIsRootPath=false;
 		for(String arg:args) if(arg.equals("help")) {

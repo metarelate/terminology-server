@@ -53,8 +53,8 @@ public class MetaLanguage {
 	public static final String authConfigURI="http://metarelate.net/config/hasAuthConfigType";
 	public static final Property authConfigProperty=ResourceFactory.createProperty(authConfigURI);
 	
-	public static final Property containedInProperty =ResourceFactory.createProperty("http://metarelate.net/core/types#containedIn");
-	public static final Property containsProperty   =ResourceFactory.createProperty("http://metarelate.net/core/types#contains");
+	public static final Property definedInProperty =ResourceFactory.createProperty("http://metarelate.net/core/types/definedIn");
+	public static final Property definesProperty   =ResourceFactory.createProperty("http://metarelate.net/core/types/defines");
 	public static final Resource terminologySetType=ResourceFactory.createResource("http://metarelate.net/core/types/TerminologySet");
 	public static final Resource terminologyIndividualType=ResourceFactory.createResource("http://metarelate.net/core/types/TerminologyIndividual");
 	
@@ -99,7 +99,7 @@ public class MetaLanguage {
 	// The address of the css file
 	public static final Property cssAddressProperty=ResourceFactory.createProperty("http://reference.metoffice.gov.uk/data/wmo/meta/mapping#cssAddress");
 	// For every entity a namespace to be used to compose a URL 
-	public static final Property nameSpaceProperty=ResourceFactory.createProperty("http://reference.metoffice.gov.uk/data/wmo/meta/mapping#nameSpace");	
+	public static final Property nameSpaceProperty=ResourceFactory.createProperty("http://metarelate.net/core/types/hasNamespace");	
 	// Override the base path for a specific collection (or entity?) // TODO decide
 	public static final Property overrideBasePathProperty=ResourceFactory.createProperty("http://reference.metoffice.gov.uk/data/wmo/meta/mapping#overridesDiskPrefix");	
 	// Override the base namespace for a specific collection (or entity?) // TODO decide
@@ -128,14 +128,14 @@ public class MetaLanguage {
 	 * TODO we may have different properties for registers, collections and the like.
 	 */
 	// Links a code to a set of standards that this code can have information for. On tdb-named, this is a relation among named graphs. In RDF, this is a relation among URIs.
-	public static final Property hasStandardProperty=ResourceFactory.createProperty("http://reference.metoffice.gov.uk/data/wmo/meta/mapping#standardSpecific"); // TODO standards may be osboleted soon
+	//public static final Property hasStandardProperty=ResourceFactory.createProperty("http://reference.metoffice.gov.uk/data/wmo/meta/mapping#standardSpecific"); // TODO standards may be osboleted soon
 	// Collection contains collection
-	public static final Property hasSubRegisterProperty =ResourceFactory.createProperty("http://reference.metoffice.gov.uk/data/wmo/def/iso19135#subRegister");
+	//public static final Property hasSubRegisterProperty =ResourceFactory.createProperty("http://reference.metoffice.gov.uk/data/wmo/def/iso19135#subRegister");
 	// Collection contains terms
-	public static final Property hasRegisterItemProperty =ResourceFactory.createProperty("http://reference.metoffice.gov.uk/data/wmo/def/iso19135#registerItem");
+	//public static final Property hasRegisterItemProperty =ResourceFactory.createProperty("http://reference.metoffice.gov.uk/data/wmo/def/iso19135#registerItem");
 	// Collection to versions
 	
-	public static final Property definedInRegister = ResourceFactory.createProperty("http://reference.metoffice.gov.uk/data/wmo/def/iso19135#definedInRegister");
+	//public static final Property definedInRegister = ResourceFactory.createProperty("http://reference.metoffice.gov.uk/data/wmo/def/iso19135#definedInRegister");
 
 	
 	
@@ -179,7 +179,7 @@ public class MetaLanguage {
 	 * TODO these are not in the model
 	 * an equivalent set of properties should be used to publish metadata in RDF.
 	 */
-	public static final Property hasVersionProperty=ResourceFactory.createProperty("http://reference.metoffice.gov.uk/data/wmo/def/met#hasVersion");
+	public static final Property hasVersionProperty=ResourceFactory.createProperty("http://metarelate.net/core/types/hasVersion");
 	public static final Property hasPreviousVersionProperty=ResourceFactory.createProperty("http://reference.metoffice.gov.uk/data/wmo/def/met#hasPreviousVersion");
 	public static final Property versionActionDateProperty=ResourceFactory.createProperty("http://reference.metoffice.gov.uk/data/wmo/def/met#hasActionDate");
 	public static final Property versionActionProperty=ResourceFactory.createProperty("http://reference.metoffice.gov.uk/data/wmo/def/met#hasAction");
@@ -205,8 +205,10 @@ public class MetaLanguage {
 	 * Reasoning support
 	 * (not in model)
 	 */
-	public static final Property symmetricProperty=ResourceFactory.createProperty("http://reference.metoffice.gov.uk/data/wmo/meta/mapping#symmetric");
-	public static final Property generatesProperty=ResourceFactory.createProperty("http://reference.metoffice.gov.uk/data/wmo/meta/mapping#generates");
+	public static final Property generatesPropertyProperty=ResourceFactory.createProperty("http://metarelate.net/core/types/generatesProperty");
+	public static final Property generatesTypeProperty=ResourceFactory.createProperty("http://metarelate.net/core/types/generatesType");
+
+	public static final Property symmetricProperty=ResourceFactory.createProperty("http://metarelate.net/core/types/symmetric");
 	
 	
 	public static final Property propertyHasFocus = ResourceFactory.createProperty("http://reference.metoffice.gov.uk/data/wmo/meta/model#propertyFocus");
@@ -307,10 +309,10 @@ public class MetaLanguage {
 		//Filters for web
 		
 		indexPWeb.add(nameSpaceProperty);			// TODO should not be in model either!
-		indexPWeb.add(hasStandardProperty);
+		//indexPWeb.add(hasStandardProperty);
 		indexPWeb.add(hasManagerProperty);
-		indexPWeb.add(hasSubRegisterProperty);
-		indexPWeb.add(hasRegisterItemProperty);
+		//indexPWeb.add(hasSubRegisterProperty);
+		//indexPWeb.add(hasRegisterItemProperty);
 		
 		indexPWeb.add(hasStatusProperty);
 		indexPWeb.add(hasVersionProperty);
@@ -322,7 +324,7 @@ public class MetaLanguage {
 		//indexPWeb.add(containedInProperty);
 		//indexPWeb.add(containsProperty);
 		indexPWeb.add(hasNonVersionModel);
-		indexPWeb.add(definedInRegister);
+		//indexPWeb.add(definedInRegister);
 		indexPWeb.add(notationProperty);			// std. prop
 		indexPWeb.add(labelProperty);				// std. prop
 		indexPWeb.add(typeProperty);				// std. prop
@@ -339,8 +341,8 @@ public class MetaLanguage {
 		
 		
 		indexPEdit.add(nameSpaceProperty);			// TODO should not be in model either!
-		indexPEdit.add(hasSubRegisterProperty);
-		indexPEdit.add(hasRegisterItemProperty);
+		//indexPEdit.add(hasSubRegisterProperty);
+		//indexPEdit.add(hasRegisterItemProperty);
 		indexPEdit.add(hasStatusProperty);
 		indexPEdit.add(hasVersionProperty);			//TODO these bits are in the global graph anyway... something to cleanup!
 		indexPEdit.add(hasPreviousVersionProperty);
@@ -351,7 +353,7 @@ public class MetaLanguage {
 		//indexPWeb.add(containedInProperty);
 		//indexPWeb.add(containsProperty);
 		indexPEdit.add(hasNonVersionModel);
-		indexPEdit.add(definedInRegister);
+		//indexPEdit.add(definedInRegister);
 		//indexPEdit.add(typeProperty);				// std. prop
 		indexPEdit.add(commentProperty);				// std. prop
 		
@@ -402,8 +404,8 @@ public class MetaLanguage {
 		indexPModel.add(pragmaProperty);
 		indexPModel.add(pragmaPropProperty);
 		indexPModel.add(pragmaOverrideProp);
-		indexPModel.add(containedInProperty);		// model constr.
-		indexPModel.add(containsProperty);			// model constr.
+		indexPModel.add(definedInProperty);		// model constr.
+		indexPModel.add(definesProperty);			// model constr.
 		
 		indexRModel.add(hasVersionProperty);		// version (name) is managed by data structures, rather than "term statements"
 
@@ -412,7 +414,8 @@ public class MetaLanguage {
 		indexPModel.add(containsIndividual);		// (tdb) should never be found by design
 		indexPModel.add(hasVersionModel);			// (tdb) should never be found by design
 		indexPModel.add(symmetricProperty);			
-		indexPModel.add(generatesProperty);		
+		indexPModel.add(generatesPropertyProperty);
+		indexPModel.add(generatesTypeProperty);	
 		
 		indexPModel.add(overrideBaseSiteProperty);
 		indexPModel.add(overrideBasePathProperty);

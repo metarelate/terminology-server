@@ -4,8 +4,9 @@ import net.metarelate.terminology.instanceManager.Initializer;
 
 public class CommandClean extends TsCommand {
 
-	public CommandClean(Initializer myInitializer, String[] args) {
+	public CommandClean(Initializer myInitializer, String[] args, boolean debug) {
 		super(myInitializer, args);
+		debugOn=debug;
 		for(String arg:args) if(arg.equals("help")) {
 			localHelp();
 			return;
