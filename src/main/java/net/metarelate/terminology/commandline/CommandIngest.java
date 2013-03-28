@@ -14,14 +14,10 @@ public class CommandIngest extends TsCommand {
 	private boolean labelsOnly=false;
 	boolean updateMode=false;
 	private ArrayList<String> files=new ArrayList<String>();
-	public CommandIngest(Initializer myInitializer,String[] args ) {
-		super(myInitializer,args);
+	public CommandIngest(Initializer myInitializer,String[] args,boolean debug) {
+		super(myInitializer,args,debug);
 		boolean nextAreFiles=false;
 		
-		for(String arg:args) if(arg.equals("help")) {
-			localHelp();
-			return;
-		}
 		for(String arg:args) {
 			if(arg.equalsIgnoreCase("-lo") || arg.equalsIgnoreCase("-labelsOnly")) {
 				labelsOnly=true;
@@ -37,9 +33,7 @@ public class CommandIngest extends TsCommand {
 			}
 		}
 		
-		// TODO if index of -l (label only): gets only the labels
-		// TODO -m "" this is the message
-		// TODO collect files
+		
 	}
 	
 	@Override
@@ -93,14 +87,23 @@ public class CommandIngest extends TsCommand {
 	}
 	
 	@Override
-	public void localHelp() {
-		System.out.println("ts ingest [-lo | -labelsOnly] [-u | -update] -f|-files LIST_OF_FILES");
-		System.out.println("builds a model from the corresponding input files");
-		System.out.println("if labelsOnly is set, it only imports labels from the specified files");
-		System.out.println("if update is set, the system create a new version of a code/set if the entity is versioned, no version is specified and some statements change");
-		System.out.println("Note that configuration parameters should be set in configuration files, not in the files to be imported");
+	public String getLocalHelpMessage() {
+		return getStaticLocalHelpMessage();
+	}
 	
-		
+
+	public static String getStaticLocalHelpMessage() {
+		return "ts ingest [-lo | -labelsOnly] [-u | -update] -f|-files LIST_OF_FILES\n"+
+		"builds a model from the corresponding input files\n"+
+		"if labelsOnly is set, it only imports labels from the specified files\n"+
+		"if update is set, the system create a new version of a code/set if the entity is versioned, no version is specified and some statements change\n"+
+		"Note that configuration parameters should be set in configuration files, not in the files to be imported";
+	}
+
+	@Override
+	public boolean validate() {
+		if(files.size()==0) return false;
+		else return true;
 	}
 
 	

@@ -27,8 +27,8 @@ package net.metarelate.terminology.utils;
 public class SSLogger {
 	public static int DEBUG=1;
 	public static int WARNING=1;
-	private static boolean showDebug=true;
-	private static boolean showWarning=true;
+	private static boolean showDebug=false;
+	private static boolean showWarning=false;
 	
 	public static void showDebug(boolean show) {
 		showDebug=show;
@@ -42,8 +42,8 @@ public class SSLogger {
 	}
 	public static void log(String message, int level) {
 		if(level==DEBUG && showDebug) System.out.println("DEBUG: "+message);
-		else if(level==WARNING && showWarning) System.out.println("WARNNG: "+message);
-		else System.out.println(message);
+		if(level==WARNING && showWarning) System.out.println("WARNNG: "+message);
+		//else System.out.println(message);
 	}
 
 }

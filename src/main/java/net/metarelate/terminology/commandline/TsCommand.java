@@ -15,10 +15,11 @@ public abstract class TsCommand {
 	public Initializer myInitializer=null;
 	protected boolean debugOn=false;
 	protected String message="";
-	public TsCommand(Initializer myInitializer,String[] args) {
+	public TsCommand(Initializer myInitializer,String[] args,boolean debug) {
 		super();
 		this.myInitializer = myInitializer;
 		boolean isMessage=false;
+		this.debugOn=debug;
 		for(String arg : args) {
 			/*
 			if(arg.equalsIgnoreCase("-d") || arg.equalsIgnoreCase("-debug")) {
@@ -40,12 +41,21 @@ public abstract class TsCommand {
 	
 	
 	public void execute() throws ModelException {
-		localExecute();
-		myInitializer.myFactory.synch();
+		if(!validate()) {
+			
+			System.out.println("Wrong usage:");
+			System.out.println(getLocalHelpMessage());
+		}
+		else {
+			localExecute();
+			myInitializer.myFactory.synch();
+		}
 	}
 	public abstract void localExecute() throws ModelException;
+	public abstract boolean validate();
+	//No abstract static in Java! Must be a design error...
 	
-	public abstract void localHelp();
+	public abstract String getLocalHelpMessage();
 	
 	protected Model readIntoModel(ArrayList<String> files) {
 		Model inputModel=ModelFactory.createDefaultModel();

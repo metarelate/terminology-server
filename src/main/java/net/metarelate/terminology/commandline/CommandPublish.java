@@ -13,14 +13,10 @@ public class CommandPublish extends TsCommand {
 	String selectedURI=null;
 	String rootPath=null;
 	public CommandPublish(Initializer myInitializer,String[] args, boolean debug) {
-		super(myInitializer,args);
-		debugOn=debug;
+		super(myInitializer,args,debug);
 		boolean nextIsURI=false;
 		boolean nextIsRootPath=false;
-		for(String arg:args) if(arg.equals("help")) {
-			localHelp();
-			return;
-		}
+		
 		for(String arg:args) {
 			if(arg.equalsIgnoreCase("-ow") || arg.equalsIgnoreCase("-overwrite")) {
 				overwrite=true;
@@ -89,12 +85,20 @@ public class CommandPublish extends TsCommand {
 			
 		
 	}
-
 	@Override
-	public void localHelp() {
-		System.out.println("ts publish [under refactoring!]");
+	public String getLocalHelpMessage() {
+		return getStaticLocalHelpMessage();
+	}
+	public static String getStaticLocalHelpMessage() {
+		return "ts publish [under refactoring!]";
 	
 		
+	}
+
+	@Override
+	public boolean validate() {
+		// TODO Depends on refactoring
+		return false;
 	}
 
 }

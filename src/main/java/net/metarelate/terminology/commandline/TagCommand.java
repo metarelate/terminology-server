@@ -9,14 +9,11 @@ public class TagCommand extends TsCommand {
 	String tag=null;
 	String message="";
 	public TagCommand(Initializer myInitializer, String[] args, boolean debug) {
-		super(myInitializer, args);
-		debugOn=debug;
-		for(String arg:args) if(arg.equals("help")) {
-			localHelp();
-			return;
-		}
+		super(myInitializer, args,debug);
+		
+	
 		boolean nextIsTag=false;
-		boolean nextIsMessage=false;
+		
 		for(String arg:args) {
 			if(arg.equalsIgnoreCase("-t")) {
 				nextIsTag=true;
@@ -25,13 +22,7 @@ public class TagCommand extends TsCommand {
 				tag=arg;
 				nextIsTag=false;
 			}
-			if(arg.equalsIgnoreCase("-m")) {
-				nextIsMessage=true;
-			}
-			else if(nextIsTag) {
-				message=arg;
-				nextIsMessage=false;
-			}
+			
 		}
 		this.myInitializer=myInitializer;
 		
@@ -41,9 +32,7 @@ public class TagCommand extends TsCommand {
 
 	@Override
 	public void localExecute() throws ModelException {
-		if(tag==null) {
-			localHelp();
-		}
+		
 		String authorURI=myInitializer.getDefaultUserURI();
 		try {
 			myInitializer.myTerminologyManager.tagRelease(authorURI, tag, message);
@@ -56,11 +45,23 @@ public class TagCommand extends TsCommand {
 	}
 	
 	@Override
-	public void localHelp() {
-		System.out.println("ts tag -t tag -m message");
-		System.out.println("tag the current state of the terminology server");
-		System.out.println("-t tag: required ");
-		System.out.println("-t message: optional ");
+	public String getLocalHelpMessage() {
+		return getStaticLocalHelpMessage();
+	}
+	
+	public static String getStaticLocalHelpMessage() {
+		return "ts tag -t tag -m message\n"+
+		"tag the current state of the terminology server\n"+
+		"-t tag: required\n"+
+		"-t message: optional ";
+	}
+
+
+
+	@Override
+	public boolean validate() {
+		if(tag==null) return false;
+		else return true;
 	}
 
 }

@@ -13,12 +13,8 @@ import net.metarelate.terminology.instanceManager.Initializer;
 public class WebCommand extends TsCommand {
 	private int port=8080;
 	public WebCommand(Initializer myInitializer, String[] args, boolean debug) {
-		super(myInitializer, args);
-		debugOn=debug;
-		for(String arg:args) if(arg.equals("help")) {
-			localHelp();
-			return;
-		}
+		super(myInitializer, args,debug);
+		
 		boolean nextIsPort=false;
 		for(String arg:args) {
 			if(arg.equalsIgnoreCase("--port") || arg.equalsIgnoreCase("-port")) {
@@ -101,12 +97,23 @@ public class WebCommand extends TsCommand {
           }        
 	  }
 
-	@Override
-	public void localHelp() {
-		System.out.println("ts web [--port number]");
-		System.out.println("Starts a web server for local admin on the port specified (defaults to 8080)");
-		System.out.println("Attention: works only if properly configured!");
-		
+	
+	public static String getStaticLocalHelpMessage() {
+		return "ts web [--port number]\n"+
+		"Starts a web server for local admin on the port specified (defaults to 8080)\n"+
+		"Attention: works only if properly configured!\n";
 	}
+
+	@Override
+	public boolean validate() {
+		return true;
+	}
+
+	@Override
+	public String getLocalHelpMessage() {
+		return getStaticLocalHelpMessage();
+	}
+	
+	
 
 }
