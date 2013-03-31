@@ -119,20 +119,20 @@ public class WebWriter {
 		//if(!node.isLiteral()) throw new WebWriterException("Unable to find a literal for site prefix");
 		//sitePrefix=((Literal) node).getValue().toString();
 		
-		NodeIterator  myIter=extraTriplesInInput.listObjectsOfProperty(MetaLanguage.diskPrefixProperty);
+		NodeIterator  myIter=extraTriplesInInput.listObjectsOfProperty(PublisherConfig.diskPrefixProperty);
 		if(!myIter.hasNext()) throw new WebWriterException("Unable to find a site prefix");
 		RDFNode node=myIter.nextNode();
 		if(!node.isLiteral()) throw new WebWriterException("Unable to find a literal for site prefix");
 		diskPrefix=((Literal) node).getValue().toString();
 		
-		myIter=extraTriplesInInput.listObjectsOfProperty(MetaLanguage.baseURLProperty);
+		myIter=extraTriplesInInput.listObjectsOfProperty(PublisherConfig.baseURLProperty);
 		if(!myIter.hasNext()) SSLogger.log("No base URL specified, going for /",SSLogger.DEBUG);
 		node=myIter.nextNode();
 		if(!node.isLiteral()) throw new WebWriterException("baseURL should be a literal!");
 		baseURL=((Literal) node).getValue().toString();
 		
 		//TODO Obsolete
-		myIter=extraTriplesInInput.listObjectsOfProperty(MetaLanguage.cssAddressProperty);
+		myIter=extraTriplesInInput.listObjectsOfProperty(PublisherConfig.cssAddressProperty);
 		if(myIter.hasNext()) {
 			node=myIter.nextNode();
 			if(node.isLiteral()){ 
@@ -192,8 +192,8 @@ public class WebWriter {
 		//Here we check for overrides
 		String myNSBit=collection.getLocalNamespace();
 
-		Literal basePath=SimpleQueriesProcessor.getOptionalLiteral(collection.getResource(), MetaLanguage.overrideBasePathProperty, extraTriplesInInput);
-		Literal baseNamespace=SimpleQueriesProcessor.getOptionalLiteral(collection.getResource(), MetaLanguage.overrideBaseSiteProperty, extraTriplesInInput);
+		Literal basePath=SimpleQueriesProcessor.getOptionalLiteral(collection.getResource(), PublisherConfig.overrideBasePathProperty, extraTriplesInInput);
+		Literal baseNamespace=SimpleQueriesProcessor.getOptionalLiteral(collection.getResource(), PublisherConfig.overrideBaseSiteProperty, extraTriplesInInput);
 		String collectionURL=urlPrefix+"/"+myNSBit;
 		// if we have an override directive, we re-define it
 		if(baseNamespace!=null) {
@@ -627,7 +627,7 @@ public class WebWriter {
 		
 		// TODO obsolete ?
 		//Resource termResource=ResourceFactory.createResource(term.getURI());
-		NodeIterator myIter=extraTriplesInInput.listObjectsOfProperty(term.getResource(),MetaLanguage.localIdProperty);
+		NodeIterator myIter=extraTriplesInInput.listObjectsOfProperty(term.getResource(),MetaLanguage.nameSpaceProperty);
 		String myID="";
 		if(myIter.hasNext()) {
 			RDFNode node=myIter.nextNode();

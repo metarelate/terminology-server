@@ -1,5 +1,7 @@
 package net.metarelate.terminology.webedit;
 
+import net.metarelate.terminology.utils.SSLogger;
+
 import org.apache.wicket.util.time.Duration;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.bio.SocketConnector;
@@ -11,7 +13,7 @@ import org.eclipse.jetty.webapp.WebAppContext;
 public class Start {
     public static void main(String[] args) throws Exception {
         int timeout = (int) Duration.ONE_HOUR.getMilliseconds();
-
+        SSLogger.showDebug(true);
         Server server = new Server();
         SocketConnector connector = new SocketConnector();
 

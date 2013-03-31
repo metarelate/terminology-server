@@ -77,7 +77,7 @@ public class TerminologyEntityTDBImpl implements TerminologyEntity{
 		myRes=ResourceFactory.createResource(uri);
 		versioner=new Versioner(this);
 		myDataset=factory.getDataset();
-		globalGraph=myDataset.getNamedModel(TDBModelsCoreConfig.globalModel);		
+		globalGraph=myDataset.getNamedModel(CoreConfig.globalModel);		
 	}
 	
 	public String getURI() {
@@ -183,14 +183,14 @@ public class TerminologyEntityTDBImpl implements TerminologyEntity{
 	}
 
 	public void setOwnerURI(String uri) {
-		StmtIterator toRemove=globalGraph.listStatements(myRes,TDBModelsCoreConfig.hasOwnerProperty,(Resource)null);
+		StmtIterator toRemove=globalGraph.listStatements(myRes,MetaLanguage.hasManagerProperty,(Resource)null);
 		globalGraph.remove(toRemove);
-		globalGraph.add(globalGraph.createStatement(myRes, TDBModelsCoreConfig.hasOwnerProperty, globalGraph.createResource(uri)));
+		globalGraph.add(globalGraph.createStatement(myRes, MetaLanguage.hasManagerProperty, globalGraph.createResource(uri)));
 	}
 	
 	public String getOwnerURI() {
 		//Note there's only one!
-		NodeIterator ownerIter=globalGraph.listObjectsOfProperty(myRes, TDBModelsCoreConfig.hasOwnerProperty);
+		NodeIterator ownerIter=globalGraph.listObjectsOfProperty(myRes, MetaLanguage.hasManagerProperty);
 		if(ownerIter.hasNext())
 			return ownerIter.next().asResource().getURI();
 		return null;
@@ -301,7 +301,7 @@ public class TerminologyEntityTDBImpl implements TerminologyEntity{
 		while(versModelIter.hasNext()) {
 			RDFNode tempValue=versModelIter.nextNode();
 			if(tempValue.isResource()) {
-				NodeIterator versionLabelIter=globalGraph.listObjectsOfProperty(tempValue.asResource(), TDBModelsCoreConfig.hasVersionName);
+				NodeIterator versionLabelIter=globalGraph.listObjectsOfProperty(tempValue.asResource(), MetaLanguage.hasVersionProperty);
 				while(versionLabelIter.hasNext()) {
 					RDFNode tempValue2=versionLabelIter.nextNode();
 					if(tempValue2.isLiteral()) tempVersions.add(tempValue2.asLiteral().getValue().toString());
@@ -343,7 +343,7 @@ public class TerminologyEntityTDBImpl implements TerminologyEntity{
 
 	public void registerVersion(String version) {
 		globalGraph.add(globalGraph.createStatement(myRes, TDBModelsCoreConfig.hasVersionURIProperty, globalGraph.createResource(getVersionURI(version))));
-		globalGraph.add(globalGraph.createStatement(globalGraph.createResource(getVersionURI(version)), TDBModelsCoreConfig.hasVersionName, globalGraph.createLiteral(version)));
+		globalGraph.add(globalGraph.createStatement(globalGraph.createResource(getVersionURI(version)), MetaLanguage.hasVersionProperty, globalGraph.createLiteral(version)));
 
 	}
 	
@@ -359,7 +359,7 @@ public class TerminologyEntityTDBImpl implements TerminologyEntity{
 		while(preVersions.hasNext()) {
 			RDFNode ver=preVersions.nextNode();
 			if(ver.isResource()) {
-				NodeIterator verValue=globalGraph.listObjectsOfProperty(ver.asResource(),TDBModelsCoreConfig.hasVersionName);
+				NodeIterator verValue=globalGraph.listObjectsOfProperty(ver.asResource(),MetaLanguage.hasVersionProperty);
 				if(verValue.hasNext()) {
 					RDFNode name=verValue.nextNode();
 					if(name.isLiteral()) return name.asLiteral().getValue().toString();
@@ -376,7 +376,7 @@ public class TerminologyEntityTDBImpl implements TerminologyEntity{
 		ResIterator nextVersions=globalGraph.listSubjectsWithProperty(TDBModelsCoreConfig.hasPreviousVersionProperty,globalGraph.createResource(getVersionURI(version)));
 		while(nextVersions.hasNext()) {
 			Resource ver=nextVersions.nextResource();
-			NodeIterator verValue=globalGraph.listObjectsOfProperty(ver.asResource(),TDBModelsCoreConfig.hasVersionName);
+			NodeIterator verValue=globalGraph.listObjectsOfProperty(ver.asResource(),MetaLanguage.hasVersionProperty);
 			if(verValue.hasNext()) {
 				RDFNode name=verValue.nextNode();
 					if(name.isLiteral()) return name.asLiteral().getValue().toString();

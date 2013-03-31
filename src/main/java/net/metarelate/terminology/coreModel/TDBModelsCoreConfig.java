@@ -26,10 +26,11 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 // TODO we should switch all of these to properties and resources (no strings)
+// TODO this should all move to MetaLanguage or CoreConfig
 public class TDBModelsCoreConfig {
-	static final String 	globalModel="http://metoffice.gov.uk/terminology/impl/model/globalModel";
-	static final String 	labelModel="http://metoffice.gov.uk/terminology/impl/model/labelModel";
-	static final String 	extraModel = "http://metoffice.gov.uk/terminology/impl/model/backgroundKnowledgeModel";
+	//static final String 	globalModel="http://metoffice.gov.uk/terminology/impl/model/globalModel";
+	//static final String 	labelModel="http://metoffice.gov.uk/terminology/impl/model/labelModel";
+	//static final String 	extraModel = "http://metoffice.gov.uk/terminology/impl/model/backgroundKnowledgeModel";
 	static final Property	hasTypeProperty = MetaLanguage.typeProperty;
 	static final RDFNode 	TerminologySetType = MetaLanguage.terminologySetType;
 	static final Property 	hasSubRegister = MetaLanguage.definesProperty;
@@ -37,15 +38,14 @@ public class TDBModelsCoreConfig {
 	static final Property 	definedInRegister = MetaLanguage.definedInProperty;
 
 	static final RDFNode 	TerminologyIndividualType = MetaLanguage.terminologyIndividualType;
-	static final Property 	hasVersionURIProperty=ResourceFactory.createProperty("http://metoffice.gov.uk/terminology/impl/model/hasVersionModel");
-	static final Property 	hasOwnerProperty=MetaLanguage.hasManagerProperty;
+	static final Property 	hasVersionURIProperty=ResourceFactory.createProperty("http://metarelate.net/core/structure/hasVersionStatements");
+	//static final Property 	hasOwnerProperty=MetaLanguage.hasManagerProperty;
 	static final Property 	hasStateURI = MetaLanguage.hasStatusProperty;
 	static final Property 	hasActionURI = MetaLanguage.versionActionProperty;
 	static final Property 	hasActionAuthorURI = MetaLanguage.versionActorProperty;
 	static final Property 	hasActionDate = MetaLanguage.versionActionDateProperty;
 	static final Property 	hasActionDescription = MetaLanguage.versionActionDescription;
-	static final Property 	isVersionedProperty = ResourceFactory.createProperty("http://metoffice.gov.uk/terminology/impl/model/isVersioningActive");
-	static final Property 	hasVersionName = MetaLanguage.hasVersionProperty;
+	static final Property 	isVersionedProperty = ResourceFactory.createProperty("http://metarelate.net/core/system/isVersioningActive");
 	static final Property 	hasPreviousVersionProperty = MetaLanguage.hasPreviousVersionProperty;
 	
 	

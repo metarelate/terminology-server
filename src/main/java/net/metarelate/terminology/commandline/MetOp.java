@@ -24,7 +24,6 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import net.metarelate.terminology.auth.AuthRegistryManager;
 import net.metarelate.terminology.auth.AuthServer;
-import net.metarelate.terminology.auth.StubAuthServer;
 import net.metarelate.terminology.exceptions.AuthException;
 import net.metarelate.terminology.exceptions.ImporterException;
 import net.metarelate.terminology.exceptions.InvalidProcessException;

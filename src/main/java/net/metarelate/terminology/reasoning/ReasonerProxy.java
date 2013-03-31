@@ -60,7 +60,7 @@ public class ReasonerProxy {
 	}
 	
 	private static void computeSymmetric(Model rdfToInferOn) {
-		StmtIterator myStats=rdfToInferOn.listStatements(null,MetaLanguage.symmetricProperty,(Resource)null);
+		StmtIterator myStats=rdfToInferOn.listStatements(null,ReasonerProxyConfig.symmetricProperty,(Resource)null);
 		Hashtable<Property,Property> symProps=new Hashtable<Property,Property>();
 		while(myStats.hasNext()) {
 			Statement stat=myStats.next();
@@ -89,7 +89,7 @@ public class ReasonerProxy {
 	
 	private static void computeGenerates(Model rdfToInferOn) {
 		SSLogger.log("Looking for generative properties",SSLogger.DEBUG);
-		StmtIterator myStats=rdfToInferOn.listStatements(null,MetaLanguage.generatesPropertyProperty,(Resource)null);
+		StmtIterator myStats=rdfToInferOn.listStatements(null,ReasonerProxyConfig.generatesPropertyProperty,(Resource)null);
 		Hashtable<Property,Set<Property>> genProps=new Hashtable<Property,Set<Property>>();
 		while(myStats.hasNext()) {
 			Statement stat=myStats.next();
@@ -129,7 +129,7 @@ public class ReasonerProxy {
 		
 		///
 		
-		StmtIterator myStats2=rdfToInferOn.listStatements(null,MetaLanguage.generatesTypeProperty,(Resource)null);
+		StmtIterator myStats2=rdfToInferOn.listStatements(null,ReasonerProxyConfig.generatesTypeProperty,(Resource)null);
 		Hashtable<Resource,Set<Resource>> genTypes=new Hashtable<Resource,Set<Resource>>();
 		while(myStats2.hasNext()) {
 			Statement stat=myStats2.next();

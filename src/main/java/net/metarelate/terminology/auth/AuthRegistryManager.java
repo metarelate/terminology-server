@@ -58,18 +58,18 @@ public  class AuthRegistryManager {
 	public boolean can(String agent,
 			String action, String entity) throws RegistryAccessException, ModelException {
 		System.out.println("Asking auth for: "+agent+" "+action+" "+entity);
-		if(agent==null) agent=AuthConfig.allURI;
-		if(action==null) action=AuthConfig.allURI;
-		if(entity==null) entity=AuthConfig.allURI;
+		if(agent==null) agent=AuthConfig.allActors;
+		if(action==null) action=AuthConfig.allActions;
+		if(entity==null) entity=AuthConfig.allEntities;
 		
 		if(myAuthServer.contains(agent,action,entity) ||
-				myAuthServer.contains(agent,action,AuthConfig.allURI)	||
-				myAuthServer.contains(agent,AuthConfig.allURI,entity)	||
-				myAuthServer.contains(agent,AuthConfig.allURI,AuthConfig.allURI)	||
-				myAuthServer.contains(AuthConfig.allURI,action,entity)	||
-				myAuthServer.contains(AuthConfig.allURI,action,AuthConfig.allURI)	||
-				myAuthServer.contains(AuthConfig.allURI,AuthConfig.allURI,entity)	||
-				myAuthServer.contains(AuthConfig.allURI,AuthConfig.allURI,AuthConfig.allURI)	
+				myAuthServer.contains(agent,action,AuthConfig.allEntities)	||
+				myAuthServer.contains(agent,AuthConfig.allActions,entity)	||
+				myAuthServer.contains(agent,AuthConfig.allActions,AuthConfig.allEntities)	||
+				myAuthServer.contains(AuthConfig.allActors,action,entity)	||
+				myAuthServer.contains(AuthConfig.allActors,action,AuthConfig.allEntities)	||
+				myAuthServer.contains(AuthConfig.allActors,AuthConfig.allActions,entity)	||
+				myAuthServer.contains(AuthConfig.allActors,AuthConfig.allActions,AuthConfig.allEntities)	
 				
 				) {
 			
@@ -78,7 +78,7 @@ public  class AuthRegistryManager {
 		
 		}
 		else {
-			if(entity.equals(AuthConfig.allURI))
+			if(entity.equals(AuthConfig.allEntities))
 				return false;
 			boolean answer=false;
 			Set<TerminologySet> containers;

@@ -414,21 +414,21 @@ public class TerminologyModelBuilder {
 				// TODO add try/catch malformed model
 				Resource pragmaType=pragmaTypes.next().getObject().asResource();
 				SSLogger.log("Found pragma of type: "+pragmaType.getURI(),SSLogger.DEBUG);
-				if(pragmaType.equals(MetaLanguage.pragmaExpandDashAndSuppress)) {
+				if(pragmaType.equals(TerminologyModelBuilderConfig.pragmaExpandDashAndSuppress)) {
 					//Here we collect this pragma parameters
 					int maxLimit=-1;
 					int pad=-1;
 					boolean hardLimitCut=false;
 					boolean toSuppress=false;
-					if(inputGraph.contains(pragmaNode, MetaLanguage.pragmaPropProperty, MetaLanguage.pragmaSuppress)) toSuppress=true;
-					if(inputGraph.contains(pragmaNode, MetaLanguage.pragmaPropProperty, MetaLanguage.pragmaHardLimitCut)) hardLimitCut=true;
-					Literal maxValue=SimpleQueriesProcessor.getOptionalLiteral(pragmaNode, MetaLanguage.pragmaHardLimit, inputGraph);
+					if(inputGraph.contains(pragmaNode, TerminologyModelBuilderConfig.pragmaPropProperty, TerminologyModelBuilderConfig.pragmaSuppress)) toSuppress=true;
+					if(inputGraph.contains(pragmaNode, TerminologyModelBuilderConfig.pragmaPropProperty, TerminologyModelBuilderConfig.pragmaHardLimitCut)) hardLimitCut=true;
+					Literal maxValue=SimpleQueriesProcessor.getOptionalLiteral(pragmaNode, TerminologyModelBuilderConfig.pragmaHardLimit, inputGraph);
 					if(maxValue!=null) {
 						try {
 							maxLimit=maxValue.getInt();
 						} catch (Exception e) {}
 					}
-					Literal padValue=SimpleQueriesProcessor.getOptionalLiteral(pragmaNode, MetaLanguage.pragmaPad, inputGraph);
+					Literal padValue=SimpleQueriesProcessor.getOptionalLiteral(pragmaNode, TerminologyModelBuilderConfig.pragmaPad, inputGraph);
 					if(padValue!=null) {
 						try {
 							pad=padValue.getInt();
@@ -439,7 +439,7 @@ public class TerminologyModelBuilder {
 					//System.out.println(">>>>>>>"+overridePropRes);
 					ArrayList<Property> overrideProps=new ArrayList<Property>();
 					//Property overrideProp=null;
-					NodeIterator ovvIter=inputGraph.listObjectsOfProperty(pragmaNode, MetaLanguage.pragmaOverrideProp);
+					NodeIterator ovvIter=inputGraph.listObjectsOfProperty(pragmaNode, TerminologyModelBuilderConfig.pragmaOverrideProp);
 					while(ovvIter.hasNext()) {
 						//System.out.println("Type: .-.");
 						RDFNode node=ovvIter.next();
@@ -453,10 +453,10 @@ public class TerminologyModelBuilder {
 						myProc.run();
 					}
 				}
-				else if(pragmaType.equals(MetaLanguage.pragmaExpandTree)) {
+				else if(pragmaType.equals(TerminologyModelBuilderConfig.pragmaExpandTree)) {
 	
-					Resource treeCollectionResource=SimpleQueriesProcessor.getOptionalResourceObject(pragmaNode, MetaLanguage.pragmaTreeCollection, inputGraph);
-					Resource schemeResource=SimpleQueriesProcessor.getOptionalResourceObject(pragmaNode, MetaLanguage.pragmaSchemaProperty, inputGraph);
+					Resource treeCollectionResource=SimpleQueriesProcessor.getOptionalResourceObject(pragmaNode, TerminologyModelBuilderConfig.pragmaTreeCollection, inputGraph);
+					Resource schemeResource=SimpleQueriesProcessor.getOptionalResourceObject(pragmaNode, TerminologyModelBuilderConfig.pragmaSchemaProperty, inputGraph);
 					TerminologySet rootSet=null;
 					if(treeCollectionResource!=null) rootSet=myInitializer.myFactory.getCheckedTerminologySet(treeCollectionResource.getURI());
 					//if(leafsCollectionResource!=null) leafsSet=allCollections.get(leafsCollectionResource.getURI());

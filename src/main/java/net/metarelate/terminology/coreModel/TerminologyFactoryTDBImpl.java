@@ -63,9 +63,9 @@ public class TerminologyFactoryTDBImpl implements TerminologyFactory {
 		//alreadyCreatedIndividuals=new Hashtable<String,TerminologyIndividual>();
 		//alreadyCreatedSets=new Hashtable<String,TerminologySet>();
 		myDataset=TDBFactory.createDataset(tdbLocation);
-		globalGraph=myDataset.getNamedModel(TDBModelsCoreConfig.globalModel);
-		labelGraph=myDataset.getNamedModel(TDBModelsCoreConfig.labelModel);
-		extraGraph=myDataset.getNamedModel(TDBModelsCoreConfig.extraModel);
+		globalGraph=myDataset.getNamedModel(CoreConfig.globalModel);
+		labelGraph=myDataset.getNamedModel(CoreConfig.labelModel);
+		extraGraph=myDataset.getNamedModel(CoreConfig.extraModel);
 		myLabelManager=new LabelManagerTDBImpl(labelGraph);
 		myBackgroundKnowledgeManager=new BackgroundKnowledgeManagerTDBImpl(extraGraph);
 	}
@@ -294,7 +294,7 @@ public class TerminologyFactoryTDBImpl implements TerminologyFactory {
 	private Set<String> extractTypedResourcesMatchingLiteratConstraint(String type, String constraint){
 		
     	String queryString="select distinct ?s where {\n"+ 
-    			"graph <"+TDBModelsCoreConfig.globalModel+">{ ?s a <"+type+">}\n"+
+    			"graph <"+CoreConfig.globalModel+">{ ?s a <"+type+">}\n"+
     			"graph ?g {?s ?p ?l .\n"+ 
     			"filter regex(?l,\""+constraint+"\")}\n"+
     			"}";

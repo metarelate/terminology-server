@@ -1,5 +1,6 @@
 package net.metarelate.terminology.webedit.validators;
 
+import net.metarelate.terminology.management.ConstraintsManagerConfig;
 import net.metarelate.terminology.webedit.CommandWebConsole;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -22,9 +23,10 @@ public class InRegisterValidator implements DaftValidator {
 			RDFNode object=objects.nextNode();
 			if(!object.isURIResource()) return false;
 			if((!CommandWebConsole.myInitializer.myFactory.terminologyIndividualExist(object.asResource().getURI()))
-			&&
-			(!CommandWebConsole.myInitializer.myFactory.terminologySetExist(object.asResource().getURI()))
+					&&
+					(!CommandWebConsole.myInitializer.myFactory.terminologySetExist(object.asResource().getURI()))
 			) return false;
+			
 		}
 		return true;
 	}

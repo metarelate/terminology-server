@@ -1,0 +1,315 @@
+@prefix : <http://metarelate.net/core#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <http://metarelate.net/core> .
+
+<http://metarelate.net/core> rdf:type owl:Ontology ;
+                             
+                             owl:imports <http://metarelate.net/config> ;
+                             
+                             owl:versionIRI <http://metarelate.net/core/v0> .
+
+
+#################################################################
+#
+#    Annotation properties
+#
+#################################################################
+
+
+
+
+#################################################################
+#
+#    Datatypes
+#
+#################################################################
+
+
+
+
+#################################################################
+#
+#    Object Properties
+#
+#################################################################
+
+
+###  http://metarelate.net/core/dataSpecialProperty
+
+<http://metarelate.net/core/dataSpecialProperty> rdf:type owl:ObjectProperty .
+
+
+
+###  http://metarelate.net/core/metadataProperties
+
+<http://metarelate.net/core/metadataProperties> rdf:type owl:ObjectProperty .
+
+
+
+###  http://metarelate.net/core/systemProperties
+
+<http://metarelate.net/core/systemProperties> rdf:type owl:ObjectProperty .
+
+
+
+###  http://metarelate.net/core/data/definedIn
+
+<http://metarelate.net/core/data/definedIn> rdf:type owl:ObjectProperty ;
+                                            
+                                            rdfs:comment "Specifies that a code or sub-register is defined in a given register. Can be re-defined." ;
+                                            
+                                            rdfs:subPropertyOf <http://metarelate.net/core/dataSpecialProperty> .
+
+
+
+###  http://metarelate.net/core/data/defines
+
+<http://metarelate.net/core/data/defines> rdf:type owl:ObjectProperty ;
+                                          
+                                          rdfs:comment "specifies that a register defines a given code or sub-regsiter. Can be re-defined." ;
+                                          
+                                          rdfs:subPropertyOf <http://metarelate.net/core/dataSpecialProperty> .
+
+
+
+###  http://metarelate.net/core/data/state
+
+<http://metarelate.net/core/data/state> rdf:type owl:ObjectProperty ;
+                                        
+                                        rdfs:comment "the state property for a code or register. Can be re-defined." ;
+                                        
+                                        rdfs:subPropertyOf <http://metarelate.net/core/dataSpecialProperty> .
+
+
+
+###  http://metarelate.net/core/data/superseded
+
+<http://metarelate.net/core/data/superseded> rdf:type owl:ObjectProperty ;
+                                             
+                                             rdfs:comment "Can be re-defined" ;
+                                             
+                                             rdfs:subPropertyOf <http://metarelate.net/core/dataSpecialProperty> .
+
+
+
+###  http://metarelate.net/core/data/superseds
+
+<http://metarelate.net/core/data/superseds> rdf:type owl:ObjectProperty ;
+                                            
+                                            rdfs:comment "Can be re-defined" ;
+                                            
+                                            rdfs:subPropertyOf <http://metarelate.net/core/dataSpecialProperty> .
+
+
+
+###  http://metarelate.net/core/meta/hasAction
+
+<http://metarelate.net/core/meta/hasAction> rdf:type owl:ObjectProperty ;
+                                            
+                                            rdfs:comment "the action performed.  Can be re-defined." ;
+                                            
+                                            rdfs:subPropertyOf <http://metarelate.net/core/metadataProperties> .
+
+
+
+###  http://metarelate.net/core/meta/hasActor
+
+<http://metarelate.net/core/meta/hasActor> rdf:type owl:ObjectProperty ;
+                                           
+                                           rdfs:comment "who performed an action. Can be re-defined." ;
+                                           
+                                           rdfs:subPropertyOf <http://metarelate.net/core/metadataProperties> .
+
+
+
+###  http://metarelate.net/core/meta/hasOwner
+
+<http://metarelate.net/core/meta/hasOwner> rdf:type owl:ObjectProperty ;
+                                           
+                                           rdfs:comment "The owner (checked for auth). Can be re-defined." ;
+                                           
+                                           rdfs:subPropertyOf <http://metarelate.net/core/metadataProperties> .
+
+
+
+###  http://metarelate.net/core/structure/hasPreviousVersion
+
+<http://metarelate.net/core/structure/hasPreviousVersion> rdf:type owl:ObjectProperty ;
+                                                          
+                                                          rdfs:comment "Can be re-defined." ;
+                                                          
+                                                          rdfs:subPropertyOf <http://metarelate.net/states/strucuralProperty> .
+
+
+
+###  http://metarelate.net/core/structure/hasVersionStatements
+
+<http://metarelate.net/core/structure/hasVersionStatements> rdf:type owl:ObjectProperty ;
+                                                            
+                                                            rdfs:comment "Links a resource to a graph containing statements valid at a specific version of the resource." ;
+                                                            
+                                                            rdfs:subPropertyOf <http://metarelate.net/states/strucuralProperty> .
+
+
+
+###  http://metarelate.net/states/strucuralProperty
+
+<http://metarelate.net/states/strucuralProperty> rdf:type owl:ObjectProperty .
+
+
+
+
+
+#################################################################
+#
+#    Data properties
+#
+#################################################################
+
+
+###  http://metarelate.net/core/dataSpecialDataProperties
+
+<http://metarelate.net/core/dataSpecialDataProperties> rdf:type owl:DatatypeProperty .
+
+
+
+###  http://metarelate.net/core/metaDataProperties
+
+<http://metarelate.net/core/metaDataProperties> rdf:type owl:DatatypeProperty .
+
+
+
+###  http://metarelate.net/core/structureDataProperties
+
+<http://metarelate.net/core/structureDataProperties> rdf:type owl:DatatypeProperty .
+
+
+
+###  http://metarelate.net/core/systemDataProperty
+
+<http://metarelate.net/core/systemDataProperty> rdf:type owl:DatatypeProperty .
+
+
+
+###  http://metarelate.net/core/data/comment
+
+<http://metarelate.net/core/data/comment> rdf:type owl:DatatypeProperty ;
+                                          
+                                          rdfs:comment "the comment property (used for display). Can be re-defined." ;
+                                          
+                                          rdfs:subPropertyOf <http://metarelate.net/core/dataSpecialDataProperties> .
+
+
+
+###  http://metarelate.net/core/data/label
+
+<http://metarelate.net/core/data/label> rdf:type owl:DatatypeProperty ;
+                                        
+                                        rdfs:comment "the label property (used for display). Can be re-defined." ;
+                                        
+                                        rdfs:subPropertyOf <http://metarelate.net/core/dataSpecialDataProperties> .
+
+
+
+###  http://metarelate.net/core/data/notation
+
+<http://metarelate.net/core/data/notation> rdf:type owl:DatatypeProperty ;
+                                           
+                                           rdfs:comment "the notation property. Notation is used for display and in some circumstances it may be used as a default for the local id.  Can be re-defined." ;
+                                           
+                                           rdfs:subPropertyOf <http://metarelate.net/core/dataSpecialDataProperties> .
+
+
+
+###  http://metarelate.net/core/meta/hasActionDate
+
+<http://metarelate.net/core/meta/hasActionDate> rdf:type owl:DatatypeProperty ;
+                                                
+                                                rdfs:comment "The date in which an action was made. Can be re-defined." ;
+                                                
+                                                rdfs:subPropertyOf <http://metarelate.net/core/metaDataProperties> .
+
+
+
+###  http://metarelate.net/core/meta/hasActionDescription
+
+<http://metarelate.net/core/meta/hasActionDescription> rdf:type owl:DatatypeProperty ;
+                                                       
+                                                       rdfs:comment "A free text description for an action. Can be re-defined." ;
+                                                       
+                                                       rdfs:subPropertyOf <http://metarelate.net/core/metaDataProperties> .
+
+
+
+###  http://metarelate.net/core/meta/hasVersion
+
+<http://metarelate.net/core/meta/hasVersion> rdf:type owl:DatatypeProperty ;
+                                             
+                                             rdfs:comment "The version String. Used for import and display. Can be re-defined." ;
+                                             
+                                             rdfs:subPropertyOf <http://metarelate.net/core/metaDataProperties> .
+
+
+
+###  http://metarelate.net/core/structure/hasTag
+
+<http://metarelate.net/core/structure/hasTag> rdf:type owl:DatatypeProperty ;
+                                              
+                                              rdfs:comment "Species that a version model is associated to a tag." ;
+                                              
+                                              rdfs:subPropertyOf <http://metarelate.net/core/structureDataProperties> .
+
+
+
+###  http://metarelate.net/core/system/hasNamespace
+
+<http://metarelate.net/core/system/hasNamespace> rdf:type owl:DatatypeProperty ;
+                                                 
+                                                 rdfs:comment "String used to compose a URI fore registers and codes. If not provides, it defaults to the last \"segment\" of the URI." ;
+                                                 
+                                                 rdfs:subPropertyOf <http://metarelate.net/core/systemDataProperty> .
+
+
+
+###  http://metarelate.net/core/system/isVersioningActive
+
+<http://metarelate.net/core/system/isVersioningActive> rdf:type owl:DatatypeProperty ;
+                                                       
+                                                       rdfs:comment "is asserted with value true for a resource for which the system is performing versioning." ;
+                                                       
+                                                       rdfs:subPropertyOf <http://metarelate.net/core/systemDataProperty> .
+
+
+
+
+
+#################################################################
+#
+#    Classes
+#
+#################################################################
+
+
+###  http://metarelate.net/core/meta/TerminologyIndividual
+
+<http://metarelate.net/core/meta/TerminologyIndividual> rdf:type owl:Class ;
+                                                        
+                                                        rdfs:subClassOf <http://metarelate.net/config/TerminologyEntity> .
+
+
+
+###  http://metarelate.net/core/meta/TerminologySet
+
+<http://metarelate.net/core/meta/TerminologySet> rdf:type owl:Class ;
+                                                 
+                                                 rdfs:subClassOf <http://metarelate.net/config/TerminologyEntity> .
+
+
+
+
+###  Generated by the OWL API (version 3.3.1957) http://owlapi.sourceforge.net
+

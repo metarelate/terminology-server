@@ -31,7 +31,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 public class AuthServerFactory {
 	public static AuthServer createServerFromConfig(Model config) throws ConfigurationException {
 		AuthServer myServer=null;
-		Resource authType=SimpleQueriesProcessor.getOptionalConfigurationParameterSingleResource(config,MetaLanguage.authConfigProperty );
+		Resource authType=SimpleQueriesProcessor.getOptionalConfigurationParameterSingleResource(config,AuthConfig.authConfigProperty );
 		if(authType.getURI().equals(AuthConfig.isConfigFileString)) {
 			
 		}
