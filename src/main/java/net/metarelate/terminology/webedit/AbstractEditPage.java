@@ -24,6 +24,7 @@ import net.metarelate.terminology.webedit.validators.IsURIValidator;
 import net.metarelate.terminology.webedit.validators.MaxCardinalityValidator;
 import net.metarelate.terminology.webedit.validators.MinCardinalityValidator;
 import net.metarelate.terminology.webedit.validators.OptionValidator;
+import net.metarelate.terminology.webedit.validators.PatternValidator;
 
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -165,6 +166,10 @@ public abstract class AbstractEditPage  extends SuperPage {
 			boolean onData=CommandWebConsole.myInitializer.myConstraintsManager.isOnDataProperty(cons);
 			boolean onObject=CommandWebConsole.myInitializer.myConstraintsManager.isOnObjectProperty(cons);
 			boolean inRegister=CommandWebConsole.myInitializer.myConstraintsManager.isInRegisterForConstr(cons);
+			String registerTarget=null;
+			if(inRegister) registerTarget=CommandWebConsole.myInitializer.myConstraintsManager.getRegisterTargetForConstr(cons);
+			String pattern=null;	
+			pattern=CommandWebConsole.myInitializer.myConstraintsManager.getPatternForConstr(cons);
 			//System.out.println("Language: "+language);
 			/**
 			 * We build and record the corresponding form validator
@@ -174,7 +179,8 @@ public abstract class AbstractEditPage  extends SuperPage {
 			if(isNumeric) validators.add(new IsNumericValidator(property));
 			if(onObject) validators.add(new IsURIValidator(property));
 			if(options!=null) validators.add(new OptionValidator(property,options));
-			if(inRegister) validators.add(new InRegisterValidator(property));
+			if(inRegister) validators.add(new InRegisterValidator(property,registerTarget));
+			if(pattern!=null) validators.add(new PatternValidator(property,pattern));
 			
 			/*
 			 * How many form objects for this property ?
@@ -382,7 +388,12 @@ public abstract class AbstractEditPage  extends SuperPage {
 								}
 								prop=f.propValue.getObject();
 							}
-							
+							try{
+								URL test2=new URL(f.value.getObject());
+							} catch (Exception e) {
+								getSession().error("Invalid URL for a object property target: "+f.value.getObject());
+								return;
+							}
 							newStatememts.add(ResourceFactory.createStatement(
 									ResourceFactory.createResource(getURIOfEntity()),
 									ResourceFactory.createProperty(prop),

@@ -1,0 +1,1 @@
+Note that only TableC4 and BaseDirs have been adapted to the latest version of the meta-language used to define terminologies.

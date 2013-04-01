@@ -6,6 +6,8 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
@@ -365,6 +367,63 @@ public class ConstraintsManager {
 		}
 		if(values.size()>0) return values.toArray(new String[0]);
 		else return null;
+	}
+
+	/**
+	 * Only ask if a regsiter constraint is detected, or it will rise an exception if no register constraint is present
+	 * @param cons
+	 * @return
+	 * @throws PropertyConstraintException
+	 * @throws ConfigurationException
+	 */
+	public String getRegisterTargetForConstr(String cons) throws PropertyConstraintException, ConfigurationException {
+		// TODO Auto-generated method stub
+		NodeIterator possibleResultsIter=null;
+		if(isObjectConstraint(cons)) 
+			possibleResultsIter=inputConfig.listObjectsOfProperty(ResourceFactory.createResource(cons), ResourceFactory.createProperty(ConstraintsManagerConfig.inRegister));
+		else throw new PropertyConstraintException("Register constraint not defined for an object property in: "+cons);
+		while(possibleResultsIter.hasNext()) {
+			RDFNode tentativeResult=possibleResultsIter.nextNode();
+			if(tentativeResult.isResource()) return tentativeResult.asResource().getURI();
+		}
+		throw new ConfigurationException("Unable to find targer for inRegister restriction for constraint: "+cons);
+		
+		////
+		//return null;
+	}
+
+	/**
+	 * We return null if no valid pattern constraint is specified
+	 * @param cons
+	 * @return
+	 * @throws ConfigurationException 
+	 */
+	public String getPatternForConstr(String cons) throws ConfigurationException {
+		String result=null;
+		NodeIterator possibleResultsIter=null;
+		if(isDataConstraint(cons)) {
+			possibleResultsIter=inputConfig.listObjectsOfProperty(ResourceFactory.createResource(cons), ResourceFactory.createProperty(ConstraintsManagerConfig.pattern));
+			while(possibleResultsIter.hasNext()) {
+				RDFNode tentativeResult=possibleResultsIter.nextNode();
+				if(tentativeResult.isLiteral()) {
+					result=tentativeResult.asLiteral().getValue().toString();
+					try {
+						Pattern.compile(result);
+					} catch (PatternSyntaxException e) {
+						throw new ConfigurationException("Invalid pattern syntax in constraint : "+cons);
+					}
+					return result;
+				}
+				
+			}
+		}
+			
+		
+		
+		
+		
+		// TODO Auto-generated method stub
+		return result;
 	}
 
 

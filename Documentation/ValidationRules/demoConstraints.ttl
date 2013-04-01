@@ -1,7 +1,4 @@
-@prefix core:		<http://metarelate.net/core/types/>	.
-@prefix states: 	<http://metarelate.net/core/states/> .
-@prefix actions:	<http://metarelate.net/core/actions/> .
-@prefix config:		<http://metarelate.net/core/config/> .
+@prefix config:		<http://metarelate.net/config/> .
 @prefix default:	<http://metarelate.net/default/config/> .
 @prefix rdfs:		<http://www.w3.org/2000/01/rdf-schema#> .
 @prefix rdf:		<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -159,20 +156,35 @@ default:descriptionXRegistersFRC6 a config:RegisterValidationConstraint;
 
 default:refersToXCode a config:CodeValidationConstraint;
 	config:appliesTo	<http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-6> ;
-	config:onObjectProperty	default:refersTo; 
+	config:onObjectProperty	default:refersToC6; 
 	config:pseudoOrder 	"F";
 	config:minCardinality	"0";
-	config:inRegister	"Any";
+	config:inRegister	<http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-6>;
 	config:hasSymmetric	<default:refersTo>; #We have unbounded propagation for the time being.
 	.
-	
 
 default:refersToXCode2 a config:CodeValidationConstraint;
 	config:appliesTo	<http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-6> ;
-	config:onDataProperty	default:hasNumber; 
+	config:onObjectProperty	default:refersToAnyValid; 
 	config:pseudoOrder 	"G";
+	config:minCardinality	"0";
+	config:inRegister	config:allRegisters;
+	.	
+
+
+default:refersToXCode3 a config:CodeValidationConstraint;
+	config:appliesTo	<http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-6> ;
+	config:onDataProperty	default:hasNumber; 
+	config:pseudoOrder 	"H";
 	config:minCardinality	"0";
 	config:hasType		config:Numeric;
 	.
+default:refersToXCode4 a config:CodeValidationConstraint;
+	config:appliesTo	<http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-6> ;
+	config:onDataProperty	default:hasPattern; 
+	config:pseudoOrder 	"I";
+	config:minCardinality	"0";
+	config:pattern		"\\D\\D";
+	.	
 
 

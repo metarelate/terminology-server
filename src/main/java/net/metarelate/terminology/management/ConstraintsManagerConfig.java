@@ -23,7 +23,7 @@ public class ConstraintsManagerConfig {
 	public static final String hasValidationCommand=configPrefix+"validationCommand";
 	public static final String clearCommand= configPrefix+"clear";
 	public static final String inRegister = configPrefix+"inRegister";
-	public static final String notationPattern = configPrefix+"pattern";
+	public static final String pattern = configPrefix+"pattern";
 	public static String hasType=configPrefix+"hasType";
 	public static final String allRegisters = configPrefix+"allRegisters";
 

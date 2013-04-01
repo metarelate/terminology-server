@@ -388,10 +388,9 @@ public class Initializer {
 		createFileAndFillWithString(confDirAbsoluteString,"defaultProcessConfig.ttl",defProcessStatements);
 	
 		String validationStatements=
-				"@prefix core:		<http://metarelate.net/core/types/>	.\n"+
-				"@prefix states: 	<http://metarelate.net/core/states/> .\n"+
-				"@prefix actions:	<http://metarelate.net/core/actions/> .\n"+
-				"@prefix config:		<http://metarelate.net/config/> .\n"+
+				"@prefix states: 	<http://metarelate.net/states/> .\n"+
+				"@prefix actions:	<http://metarelate.net/actions/> .\n"+
+				"@prefix config:	<http://metarelate.net/config/> .\n"+
 				"@prefix default:	<http://metarelate.net/default/config/> .\n"+
 				"@prefix rdfs:		<http://www.w3.org/2000/01/rdf-schema#> .\n"+
 				"@prefix rdf:		<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n"+
@@ -483,10 +482,9 @@ public class Initializer {
 		createFileAndFillWithString(confDirAbsoluteString,"defaultValidationRules.ttl",validationStatements);
 		
 		String defPropStatements=
-				"@prefix core:		<http://metarelate.net/core/types/>	.\n"+
-				"@prefix states: 	<http://metarelate.net/core/states/> .\n"+
-				"@prefix actions:	<http://metarelate.net/core/actions/> .\n"+
-				"@prefix config:		<http://metarelate.net/core/config/> .\n"+
+				"@prefix states: 	<http://metarelate.net/states/> .\n"+
+				"@prefix actions:	<http://metarelate.net/actions/> .\n"+
+				"@prefix config:	<http://metarelate.net/config/> .\n"+
 				"@prefix default:	<http://metarelate.net/default/config/> .\n"+
 				"@prefix rdfs:		<http://www.w3.org/2000/01/rdf-schema#> .\n"+
 				"@prefix rdf:		<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n"+
