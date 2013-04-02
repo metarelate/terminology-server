@@ -1,5 +1,5 @@
 /* 
- (C) British Crown Copyright 2011 - 2012, Met Office
+ (C) British Crown Copyright 2011 - 2013, Met Office
 
  This file is part of terminology-server.
 
@@ -22,6 +22,10 @@ package net.metarelate.terminology.coreModel;
 import java.util.Collection;
 import java.util.Set;
 
+import net.metarelate.terminology.exceptions.ImporterException;
+import net.metarelate.terminology.exceptions.ModelException;
+import net.metarelate.terminology.exceptions.UnknownURIException;
+
 /**
  * Factory responsible for the creation of terminology objects (individuals and sets).
  * The responsibility of the factory is to create objects, serve objects already created or 
@@ -43,36 +47,57 @@ public interface TerminologyFactory {
 	public abstract boolean terminologySetExist(String uri) ;
 	
 	/**
-	 * Returns "the" terminology set object associated to this URI, if it has been created, or creates and returns a new one.
-	 * 
-	 * @param uri
-	 * @return
-	 */
-	public abstract TerminologySet getOrCreateTerminologySet(String uri) ;
-	
-	/**
-	 * Returns "the" terminology set object associated to this URI, if it has been created, or creates and returns a new one.
-	 * In additions registers the version provided and sets it as default.
-	 * @param uri
-	 * @param version
-	 * @return
-	 */
-	public abstract TerminologySet getOrCreateTerminologySet(String uri, String version) ;
-
-	/**
 	 * Returns true if a Terminology Individual with the specified URI already exist.
 	 * @param uri
 	 * @return
 	 */
 	public abstract boolean terminologyIndividualExist(String uri) ;
 	
+	public abstract boolean terminologyEntityExist(String uri);
+	
+	/**
+	 * Returns "the" terminology set object associated to this URI, if it has been created, or creates and returns a new one.
+	 * 
+	 * @param uri
+	 * @return
+	 */
+	//public abstract TerminologySet getOrCreateUnversionedTerminologySet(String uri) ;
+	
+	public abstract TerminologySet getCheckedTerminologySet(String uri) throws UnknownURIException ;
+	public abstract TerminologySet getUncheckedTerminologySet(String uri) ;
+	
+	public abstract TerminologySet createNewVersionedTerminologySet(String uri) throws ImporterException;
+	
+	public abstract TerminologySet createNewUnversionedTerminologySet(String uri) throws ImporterException;
+	
+	
+	
+	public abstract TerminologyIndividual getCheckedTerminologyIndividual(String uri) throws UnknownURIException ;
+	public abstract TerminologyIndividual getUncheckedTerminologyIndividual(String uri)  ;
+
+	//public abstract TerminologySet createNewVersionedTerminologySet() ;
+	public abstract TerminologyIndividual createNewVersionedTerminologyIndividual(String uri) throws ImporterException ;
+	
+	public abstract TerminologyIndividual createNewUnversionedTerminologyIndividual(String uri) throws ImporterException ;
+
+	/**
+	 * Returns "the" terminology set object associated to this URI, if it has been created, or creates and returns a new one.
+	 * In additions registers the version provided and sets it as default.
+	 * @param uri
+	 * @param version
+	 * @return
+	 */
+	//public abstract TerminologySet getOrCreateTerminologySet(String uri, String version) ;
+
+
+	
 	/**
 	 * Returns "the" terminology individual object associated to this URI, if it has been created, or creates and returns a new one.
 	 * 
 	 * @param uri
 	 * @return
 	 */
-	public abstract TerminologyIndividual getOrCreateTerminologyIndividual(String uri) ;
+	//public abstract TerminologyIndividual getOrCreateUnversionedTerminologyIndividual(String uri) ;
 	
 	/**
 	 * Returns "the" terminology individual object associated to this URI, if it has been created, or creates and returns a new one.
@@ -81,21 +106,23 @@ public interface TerminologyFactory {
 	 * @param version
 	 * @return
 	 */
-	public abstract TerminologyIndividual getOrCreateTerminologyIndividual(String uri, String version) ;
+	//public abstract TerminologyIndividual getOrCreateTerminologyIndividual(String uri, String version) ;
 
 	/**
 	 * Returns all terminology sets known (created) by this terminology factory.
 	 * Note that once created, a terminology entity is never deleted.
 	 * @return
+	 * @throws ModelException 
 	 */
-	public abstract Collection<TerminologySet> getAllSets();
+	public abstract Collection<TerminologySet> getAllSets() throws ModelException;
 	
 	/**
 	 * Returns all terminology individuals known (created) by this terminology factory.
 	 * Note that once created, a terminology entity is never deleted.
 	 * @return
+	 * @throws ModelException 
 	 */
-	public abstract Collection<TerminologyIndividual> getAllIndividuals();
+	public abstract Collection<TerminologyIndividual> getAllIndividuals() throws ModelException;
 	
 	/**
 	 * Returns a list of collections (sets) that are not contained in other collections.
@@ -104,8 +131,9 @@ public interface TerminologyFactory {
 	 * {@link TerminologyFactory#synchRootCollections()} is called after the last method that could alter containment among registers.
 	 * (Note that is usually happens only at "creation" through a builder, in the current prototype.
 	 * @return
+	 * @throws ModelException 
 	 */
-	public abstract TerminologySet[] getRootCollections() ;
+	public abstract TerminologySet[] getRootCollections() throws ModelException ;
 	
 	/**
 	 * Computes which collections (set, registers) are the top collections.
@@ -131,8 +159,11 @@ public interface TerminologyFactory {
 
 	public abstract void synch();
 
-	public Set<TerminologySet> getRootsForURI(String uri);
-	public TerminologyEntity getExistingTerminologyEntity(String uri);
+	public Set<TerminologySet> getRootsForURI(String uri) throws  ModelException, UnknownURIException;
+	public TerminologyEntity getCheckedTerminologyEntity(String uri) throws UnknownURIException;
+	public TerminologyEntity getUncheckedTerminologyEntity(String uri);
+
+	
 	
 	
 }

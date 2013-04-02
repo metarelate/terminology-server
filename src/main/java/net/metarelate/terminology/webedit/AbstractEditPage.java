@@ -9,9 +9,12 @@ import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.exceptions.AuthException;
 import net.metarelate.terminology.exceptions.ConfigurationException;
+import net.metarelate.terminology.exceptions.ImporterException;
 import net.metarelate.terminology.exceptions.InvalidProcessException;
+import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.PropertyConstraintException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
+import net.metarelate.terminology.exceptions.UnknownURIException;
 import net.metarelate.terminology.exceptions.WebSystemException;
 import net.metarelate.terminology.utils.SSLogger;
 import net.metarelate.terminology.webedit.validators.DaftValidator;
@@ -21,6 +24,7 @@ import net.metarelate.terminology.webedit.validators.IsURIValidator;
 import net.metarelate.terminology.webedit.validators.MaxCardinalityValidator;
 import net.metarelate.terminology.webedit.validators.MinCardinalityValidator;
 import net.metarelate.terminology.webedit.validators.OptionValidator;
+import net.metarelate.terminology.webedit.validators.PatternValidator;
 
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -60,6 +64,7 @@ public abstract class AbstractEditPage  extends SuperPage {
 	protected boolean isSuperseding=false;
 	//protected TerminologyEntity myEntity=null;
 	LoadableDetachableModel<TerminologyEntity> terminologyEntityWrapper=null;
+	LoadableDetachableModel<Model> extraStatements=null;
 	protected String pageMessage="";
 	protected FeedbackPanel feedbackPanel=null;
 	protected String uriOfContainer=null;
@@ -90,8 +95,10 @@ public abstract class AbstractEditPage  extends SuperPage {
 	 * @throws WebSystemException
 	 * @throws ConfigurationException
 	 * @throws PropertyConstraintException 
+	 * @throws UnknownURIException 
+	 * @throws ModelException 
 	 */
-	protected void buildForm() throws WebSystemException, ConfigurationException, PropertyConstraintException {
+	protected void buildForm() throws WebSystemException, ConfigurationException, PropertyConstraintException, UnknownURIException, ModelException {
 		/*
 		 * If this is an edit action, the TerminologyEntityModel is initialized, and it will be used in this page.
 		 * If this is a new action, it will be created on submit
@@ -126,8 +133,18 @@ public abstract class AbstractEditPage  extends SuperPage {
 		if(isEdit) bagOfStatements.add(MetaLanguage.filterForEdit(terminologyEntityWrapper.getObject().getStatements(terminologyEntityWrapper.getObject().getLastVersion())));
 		SSLogger.log("Previous statements: "+bagOfStatements.size(), SSLogger.DEBUG);
 		
-		final com.hp.hpl.jena.rdf.model.Model extraStatements=ModelFactory.createDefaultModel();
-		if(isEdit) extraStatements.add(MetaLanguage.filterForEditComplement(terminologyEntityWrapper.getObject().getStatements(terminologyEntityWrapper.getObject().getLastVersion())));
+		
+		extraStatements=new LoadableDetachableModel<Model>() {
+			@Override
+			protected Model load() {
+				Model result=ModelFactory.createDefaultModel();
+				if(isEdit) result.add(MetaLanguage.filterForEditComplement(terminologyEntityWrapper.getObject().getStatements(terminologyEntityWrapper.getObject().getLastVersion())));
+				//TODO note that the wrapper is null for non edit
+				return result;
+			}
+			
+		};
+		
 		
 		/*
 		 * Here we assemble a list of things that will be used to build the form.
@@ -149,6 +166,10 @@ public abstract class AbstractEditPage  extends SuperPage {
 			boolean onData=CommandWebConsole.myInitializer.myConstraintsManager.isOnDataProperty(cons);
 			boolean onObject=CommandWebConsole.myInitializer.myConstraintsManager.isOnObjectProperty(cons);
 			boolean inRegister=CommandWebConsole.myInitializer.myConstraintsManager.isInRegisterForConstr(cons);
+			String registerTarget=null;
+			if(inRegister) registerTarget=CommandWebConsole.myInitializer.myConstraintsManager.getRegisterTargetForConstr(cons);
+			String pattern=null;	
+			pattern=CommandWebConsole.myInitializer.myConstraintsManager.getPatternForConstr(cons);
 			//System.out.println("Language: "+language);
 			/**
 			 * We build and record the corresponding form validator
@@ -158,7 +179,8 @@ public abstract class AbstractEditPage  extends SuperPage {
 			if(isNumeric) validators.add(new IsNumericValidator(property));
 			if(onObject) validators.add(new IsURIValidator(property));
 			if(options!=null) validators.add(new OptionValidator(property,options));
-			if(inRegister) validators.add(new InRegisterValidator(property));
+			if(inRegister) validators.add(new InRegisterValidator(property,registerTarget));
+			if(pattern!=null) validators.add(new PatternValidator(property,pattern));
 			
 			/*
 			 * How many form objects for this property ?
@@ -366,7 +388,12 @@ public abstract class AbstractEditPage  extends SuperPage {
 								}
 								prop=f.propValue.getObject();
 							}
-							
+							try{
+								URL test2=new URL(f.value.getObject());
+							} catch (Exception e) {
+								getSession().error("Invalid URL for a object property target: "+f.value.getObject());
+								return;
+							}
 							newStatememts.add(ResourceFactory.createStatement(
 									ResourceFactory.createResource(getURIOfEntity()),
 									ResourceFactory.createProperty(prop),
@@ -461,11 +488,11 @@ public abstract class AbstractEditPage  extends SuperPage {
 				try {
 					if(isEdit) {
 						// Entity exists...
-						CommandWebConsole.myInitializer.myTerminologyManager.sobstituteEntityInformation(urlToEdit, newStatememts.add(extraStatements), CommandWebConsole.myInitializer.getDefaultUserURI(), getDescription());
+						CommandWebConsole.myInitializer.myTerminologyManager.sobstituteEntityInformation(urlToEdit, newStatememts.add(extraStatements.getObject()), CommandWebConsole.myInitializer.getDefaultUserURI(), getDescription());
 					}
 					if(isNew) {
-						if(isSet) CommandWebConsole.myInitializer.myTerminologyManager.addSubRegister(urlToEdit, uriOfContainer, newStatememts.add(extraStatements), userURI, getDescription(), true);
-						if(isIndividual) CommandWebConsole.myInitializer.myTerminologyManager.addTermToRegister(urlToEdit, uriOfContainer, newStatememts.add(extraStatements), userURI, getDescription(), true);
+						if(isSet) CommandWebConsole.myInitializer.myTerminologyManager.addSubRegister(urlToEdit, uriOfContainer, newStatememts.add(extraStatements.getObject()), userURI, getDescription(), true);
+						if(isIndividual) CommandWebConsole.myInitializer.myTerminologyManager.addTermToRegister(urlToEdit, uriOfContainer, newStatememts.add(extraStatements.getObject()), userURI, getDescription(), true);
 					}
 				} catch (AuthException e) {
 					getSession().error("Auth error");
@@ -475,6 +502,12 @@ public abstract class AbstractEditPage  extends SuperPage {
 					e.printStackTrace();
 				} catch (RegistryAccessException e) {
 					getSession().error("Reg error");
+					e.printStackTrace();
+				} catch (ModelException e) {
+					getSession().error("Model consistency error");
+					e.printStackTrace();
+				} catch (ImporterException e) {
+					getSession().error("Importer error!");
 					e.printStackTrace();
 				}
 				

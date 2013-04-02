@@ -2,8 +2,8 @@ package net.metarelate.terminology.management;
 
 public class ConstraintsManagerConfig {
 	//TODO maybe we should move all prefixes to a more general config
-	public static final String coreTypesPrefix="http://metarelate.net/core/types/";
-	public static final String configPrefix="http://metarelate.net/core/config/";
+	//public static final String coreTypesPrefix="http://metarelate.net/core/types/";
+	public static final String configPrefix="http://metarelate.net/config/";
 	
 	public static final String regValidationConstraintType=configPrefix+"RegisterValidationConstraint";
 	public static final String regValidationCommandType= configPrefix+"RegisterValidationCommand";
@@ -23,7 +23,9 @@ public class ConstraintsManagerConfig {
 	public static final String hasValidationCommand=configPrefix+"validationCommand";
 	public static final String clearCommand= configPrefix+"clear";
 	public static final String inRegister = configPrefix+"inRegister";
+	public static final String pattern = configPrefix+"pattern";
 	public static String hasType=configPrefix+"hasType";
+	public static final String allRegisters = configPrefix+"allRegisters";
 
 
 }

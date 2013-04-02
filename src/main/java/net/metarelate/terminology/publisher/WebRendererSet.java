@@ -34,6 +34,7 @@ import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.coreModel.TerminologyIndividual;
 import net.metarelate.terminology.coreModel.TerminologySet;
+import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.utils.CodeComparator;
 import net.metarelate.terminology.utils.SSLogger;
 import net.metarelate.terminology.utils.SimpleQueriesProcessor;
@@ -138,7 +139,7 @@ public class WebRendererSet extends WebRendererItem {
 	}
 	*/
 	@Override
-	public String getNavigationPanel(String version, String language) {
+	public String getNavigationPanel(String version, String language) throws ModelException {
 		
 		Set<TerminologySet>myContainersSet=myCollection.getContainers(version);
 		String result1="<section id=\"second\">";

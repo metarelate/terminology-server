@@ -33,4 +33,5 @@ public class UtilityDebugger {
 			SSLogger.log("\t"+stat.getSubject()+"\n"+"\t"+stat.getPredicate()+"\t"+stat.getObject()+"\n",SSLogger.DEBUG);
 		}
 	}
+
 }

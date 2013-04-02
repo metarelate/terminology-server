@@ -26,6 +26,7 @@ import net.metarelate.terminology.coreModel.TerminologyFactory;
 import net.metarelate.terminology.coreModel.TerminologyIndividual;
 import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.AuthException;
+import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
 /**
  * Manages permissions to operate on the Registry Manager.
@@ -52,22 +53,23 @@ public  class AuthRegistryManager {
 	 * @param server the authority server (that follows an Open World assumption)
 	 * @param factory (the terminology factory). This knows about the containment of registers.
 	 * @return true if the operation is authorized, false otherwise.
+	 * @throws ModelException 
 	 */
 	public boolean can(String agent,
-			String action, String entity) throws RegistryAccessException {
+			String action, String entity) throws RegistryAccessException, ModelException {
 		System.out.println("Asking auth for: "+agent+" "+action+" "+entity);
-		if(agent==null) agent=AuthConfig.allURI;
-		if(action==null) action=AuthConfig.allURI;
-		if(entity==null) entity=AuthConfig.allURI;
+		if(agent==null) agent=AuthConfig.allActors;
+		if(action==null) action=AuthConfig.allActions;
+		if(entity==null) entity=AuthConfig.allEntities;
 		
 		if(myAuthServer.contains(agent,action,entity) ||
-				myAuthServer.contains(agent,action,AuthConfig.allURI)	||
-				myAuthServer.contains(agent,AuthConfig.allURI,entity)	||
-				myAuthServer.contains(agent,AuthConfig.allURI,AuthConfig.allURI)	||
-				myAuthServer.contains(AuthConfig.allURI,action,entity)	||
-				myAuthServer.contains(AuthConfig.allURI,action,AuthConfig.allURI)	||
-				myAuthServer.contains(AuthConfig.allURI,AuthConfig.allURI,entity)	||
-				myAuthServer.contains(AuthConfig.allURI,AuthConfig.allURI,AuthConfig.allURI)	
+				myAuthServer.contains(agent,action,AuthConfig.allEntities)	||
+				myAuthServer.contains(agent,AuthConfig.allActions,entity)	||
+				myAuthServer.contains(agent,AuthConfig.allActions,AuthConfig.allEntities)	||
+				myAuthServer.contains(AuthConfig.allActors,action,entity)	||
+				myAuthServer.contains(AuthConfig.allActors,action,AuthConfig.allEntities)	||
+				myAuthServer.contains(AuthConfig.allActors,AuthConfig.allActions,entity)	||
+				myAuthServer.contains(AuthConfig.allActors,AuthConfig.allActions,AuthConfig.allEntities)	
 				
 				) {
 			
@@ -76,16 +78,16 @@ public  class AuthRegistryManager {
 		
 		}
 		else {
-			if(entity.equals(AuthConfig.allURI))
+			if(entity.equals(AuthConfig.allEntities))
 				return false;
 			boolean answer=false;
 			Set<TerminologySet> containers;
 			if(myFactory.terminologyIndividualExist(entity)) {
-				TerminologyIndividual myInd=myFactory.getOrCreateTerminologyIndividual(entity);
+				TerminologyIndividual myInd=myFactory.getUncheckedTerminologyIndividual(entity);
 				containers=myInd.getContainers(myInd.getLastVersion());
 			}
 			else if(myFactory.terminologySetExist(entity)) {
-				TerminologySet mySet=myFactory.getOrCreateTerminologySet(entity);
+				TerminologySet mySet=myFactory.getUncheckedTerminologySet(entity);
 				containers=mySet.getContainers(mySet.getLastVersion());
 			}
 			else throw new RegistryAccessException("Unknown: "+entity);

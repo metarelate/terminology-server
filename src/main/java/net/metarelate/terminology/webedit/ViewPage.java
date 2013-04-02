@@ -12,6 +12,7 @@ import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.ImpossibleOperationException;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
+import net.metarelate.terminology.exceptions.UnknownURIException;
 import net.metarelate.terminology.management.RegistryPolicyManager;
 import net.metarelate.terminology.utils.FunctionExecutor;
 import net.metarelate.terminology.utils.StatementsOrganizer;
@@ -63,7 +64,7 @@ public class ViewPage extends SuperPage {
 	};
 	
 	protected String pageStateMessage="no message";// A message representing the "state" of the page
-	public ViewPage(final PageParameters parameters) throws RegistryAccessException {
+	public ViewPage(final PageParameters parameters) throws RegistryAccessException, ModelException {
 		super(parameters);
 		urlToAction=parameters.get("entity").toString();
 		urlSuperseder=parameters.get("superseder").toString();
@@ -75,12 +76,9 @@ public class ViewPage extends SuperPage {
 		
 		if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(urlToAction)) {
 			TerminologyEntityWrapper=new LoadableDetachableModel<TerminologyEntity>() {
-				//TerminologyEntity entity=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToAction);
-
 				@Override
 				protected TerminologyEntity load() {
-					return CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToAction);
-					
+					return CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologySet(urlToAction);
 				}
 			};
 			//entity=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToAction);
@@ -93,8 +91,7 @@ public class ViewPage extends SuperPage {
 
 				@Override
 				protected TerminologyEntity load() {
-					return CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlToAction);
-					
+					return CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologyIndividual(urlToAction);
 				}
 			};
 			//entity=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlToAction);
@@ -257,7 +254,7 @@ public class ViewPage extends SuperPage {
 		if(CommandWebConsole.myInitializer.myFactory.terminologyIndividualExist(urlToAction)) {
 			if(!CommandWebConsole.myInitializer.myRegistryPolicyManager.isViableOperationOnCode(
 					RegistryPolicyManager.actionUpdateURI, 
-					CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlToAction).getStateURI(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlToAction).getLastVersion()), 
+					CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologyIndividual(urlToAction).getStateURI(CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologyIndividual(urlToAction).getLastVersion()), 
 					null, 
 					null, 
 					null))
@@ -266,7 +263,7 @@ public class ViewPage extends SuperPage {
 		if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(urlToAction)) {
 			if(!CommandWebConsole.myInitializer.myRegistryPolicyManager.isViableOperationOnReg(
 					RegistryPolicyManager.actionUpdateURI, 
-					CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToAction).getStateURI(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToAction).getLastVersion()), 
+					CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologySet(urlToAction).getStateURI(CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologySet(urlToAction).getLastVersion()), 
 					null, 
 					null, 
 					null))
@@ -312,7 +309,7 @@ public class ViewPage extends SuperPage {
 		if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(urlToAction)) {
 			if(!CommandWebConsole.myInitializer.myRegistryPolicyManager.isViableOperationOnReg(
 					RegistryPolicyManager.actionAddURI, 
-					CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToAction).getStateURI(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToAction).getLastVersion()), 
+					CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologySet(urlToAction).getStateURI(CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologySet(urlToAction).getLastVersion()), 
 					null, 
 					null, 
 					null))
@@ -346,7 +343,7 @@ public class ViewPage extends SuperPage {
 		if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(urlToAction)) {
 			if(!CommandWebConsole.myInitializer.myRegistryPolicyManager.isViableOperationOnReg(
 					RegistryPolicyManager.actionAddURI, 
-					CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToAction).getStateURI(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToAction).getLastVersion()), 
+					CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologySet(urlToAction).getStateURI(CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologySet(urlToAction).getLastVersion()), 
 					null, 
 					null, 
 					null))
@@ -388,7 +385,7 @@ public class ViewPage extends SuperPage {
 		if(CommandWebConsole.myInitializer.myFactory.terminologyIndividualExist(urlToAction)) {
 			if(!CommandWebConsole.myInitializer.myRegistryPolicyManager.isViableOperationOnCode(
 					RegistryPolicyManager.actionObsoleteURI, 
-					CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlToAction).getStateURI(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlToAction).getLastVersion()), 
+					CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologyIndividual(urlToAction).getStateURI(CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologyIndividual(urlToAction).getLastVersion()), 
 					null, 
 					null, 
 					null))
@@ -397,7 +394,7 @@ public class ViewPage extends SuperPage {
 		if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(urlToAction)) {
 			if(!CommandWebConsole.myInitializer.myRegistryPolicyManager.isViableOperationOnReg(
 					RegistryPolicyManager.actionObsoleteURI, 
-					CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToAction).getStateURI(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToAction).getLastVersion()), 
+					CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologySet(urlToAction).getStateURI(CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologySet(urlToAction).getLastVersion()), 
 					null, 
 					null, 
 					null))
@@ -435,10 +432,10 @@ public class ViewPage extends SuperPage {
 			if(CommandWebConsole.myInitializer.myFactory.terminologyIndividualExist(urlToAction)) {
 				if(!CommandWebConsole.myInitializer.myRegistryPolicyManager.isViableOperationOnCode(
 						RegistryPolicyManager.actionSupersedURI, 
-						CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlToAction).getStateURI(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlToAction).getLastVersion()), 
+						CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologyIndividual(urlToAction).getStateURI(CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologyIndividual(urlToAction).getLastVersion()), 
 						null,
 						null,
-						CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlSuperseder).getStateURI(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlSuperseder).getLastVersion()) 
+						CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologyIndividual(urlSuperseder).getStateURI(CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologyIndividual(urlSuperseder).getLastVersion()) 
 						))
 					supersedEnabled=false;
 				System.out.println("Supersed: non viable operation 1");
@@ -453,7 +450,7 @@ public class ViewPage extends SuperPage {
 			if(CommandWebConsole.myInitializer.myFactory.terminologyIndividualExist(urlToAction)) {
 				if(!CommandWebConsole.myInitializer.myRegistryPolicyManager.isViableOperationOnCode(
 						RegistryPolicyManager.actionSupersedURI, 
-						CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlToAction).getStateURI(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlToAction).getLastVersion()), 
+						CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologyIndividual(urlToAction).getStateURI(CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologyIndividual(urlToAction).getLastVersion()), 
 						null,
 						null,
 						null
@@ -509,6 +506,10 @@ public class ViewPage extends SuperPage {
 									getSession().error("Impossible to perform action "+actionLabel+" on "+urlToAction+" (operation not possible)");
 									if(CommandWebConsole.myInitializer.debugMode) getSession().error(e.getMessage());
 									e.printStackTrace(); // TODO route to logger
+								} catch (ModelException e) {
+									getSession().error("Impossible to perform action "+actionLabel+" on "+urlToAction+" (inconsistent terminology)");
+									if(CommandWebConsole.myInitializer.debugMode) getSession().error(e.getMessage());
+									e.printStackTrace(); // TODO route to logger
 								}
 							
 								//obsoleteConfirmPanelWindow.close(target);
@@ -527,8 +528,10 @@ public class ViewPage extends SuperPage {
 				try {
 					if(CommandWebConsole.myInitializer.myAuthManager.can(CommandWebConsole.myInitializer.getDefaultUserURI(), actionURI, urlToAction))
 						isActive=true;
-					
 				} catch (RegistryAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ModelException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
@@ -536,20 +539,22 @@ public class ViewPage extends SuperPage {
 				if(CommandWebConsole.myInitializer.myFactory.terminologyIndividualExist(urlToAction)) {
 					if(!CommandWebConsole.myInitializer.myRegistryPolicyManager.isViableOperationOnCode(
 							actionURI, 
-							CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlToAction).getStateURI(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlToAction).getLastVersion()), 
+							CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologyIndividual(urlToAction).getStateURI(CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologyIndividual(urlToAction).getLastVersion()), 
 							null, 
 							null, 
 							null))
-						isActive=false;	
+						isActive=false;
+					
 				}
 				if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(urlToAction)) {
 					if(!CommandWebConsole.myInitializer.myRegistryPolicyManager.isViableOperationOnReg(
 							actionURI, 
-							CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToAction).getStateURI(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToAction).getLastVersion()), 
+							CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologySet(urlToAction).getStateURI(CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologySet(urlToAction).getLastVersion()), 
 							null, 
 							null, 
 							null))
-						isActive=false;	
+					isActive=false;
+					
 				}
 				///
 				extraActionButton.setEnabled(isActive);
@@ -640,7 +645,7 @@ public class ViewPage extends SuperPage {
 		pageParameters.add("superseding", urlToAction);
 		setResponsePage(SearchPage.class,pageParameters);
 	}
-	public void supersedRouteToAdd(AjaxRequestTarget target) {
+	public void supersedRouteToAdd(AjaxRequestTarget target) throws ModelException {
 		PageParameters pageParameters = new PageParameters();
 		if(isSet) {
 			pageParameters.add("type","Set");

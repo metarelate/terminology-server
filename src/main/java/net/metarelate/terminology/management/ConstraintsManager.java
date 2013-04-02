@@ -6,12 +6,16 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.ConfigurationException;
+import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.PropertyConstraintException;
+import net.metarelate.terminology.exceptions.UnknownURIException;
 import net.metarelate.terminology.instanceManager.Initializer;
 import net.metarelate.terminology.utils.SSLogger;
 
@@ -90,9 +94,9 @@ public class ConstraintsManager {
 	}
 	
 	
-	public String[] getSortedConstraintsForReg(String uri) throws ConfigurationException {
+	public String[] getSortedConstraintsForReg(String uri) throws ConfigurationException, UnknownURIException, ModelException {
 		ArrayList<Resource> results=new ArrayList<Resource>();
-		TerminologyEntity entity=myInitializer.myFactory.getExistingTerminologyEntity(uri);
+		TerminologyEntity entity=myInitializer.myFactory.getCheckedTerminologyEntity(uri);
 		Set<TerminologySet> containers=entity.getContainers(entity.getLastVersion());
 		getConstraintsForEntityRecursively(
 				entity.getResource(),
@@ -104,9 +108,9 @@ public class ConstraintsManager {
 		return makeSortedProperties(results);
 		
 	}
-	public String[] getSortedConstraintsForCode(String uri) throws ConfigurationException {
+	public String[] getSortedConstraintsForCode(String uri) throws ConfigurationException, UnknownURIException, ModelException {
 		ArrayList<Resource> results=new ArrayList<Resource>();
-		TerminologyEntity entity=myInitializer.myFactory.getExistingTerminologyEntity(uri);
+		TerminologyEntity entity=myInitializer.myFactory.getCheckedTerminologyEntity(uri);
 		Set<TerminologySet> containers=entity.getContainers(entity.getLastVersion());
 		getConstraintsForEntityRecursively(
 				entity.getResource(),
@@ -117,9 +121,9 @@ public class ConstraintsManager {
 		SSLogger.log("For edit code found #rules: "+results.size(),SSLogger.DEBUG);
 		return makeSortedProperties(results);
 	}
-	public String[] getSortedConstraintsForNewReg(String baseRegURI) throws ConfigurationException {
+	public String[] getSortedConstraintsForNewReg(String baseRegURI) throws ConfigurationException, UnknownURIException, ModelException {
 		ArrayList<Resource> results=new ArrayList<Resource>();
-		TerminologyEntity entity=myInitializer.myFactory.getExistingTerminologyEntity(baseRegURI);
+		TerminologyEntity entity=myInitializer.myFactory.getCheckedTerminologyEntity(baseRegURI);
 		getConstraintsForEntityRecursively(
 				entity.getResource(),
 				results, 
@@ -129,9 +133,9 @@ public class ConstraintsManager {
 		SSLogger.log("For new regsiter found #rules: "+results.size(),SSLogger.DEBUG);
 		return makeSortedProperties(results);
 	}
-	public String[] getSortedConstraintsForNewCode(String baseRegURI) throws ConfigurationException {
+	public String[] getSortedConstraintsForNewCode(String baseRegURI) throws ConfigurationException, UnknownURIException, ModelException {
 		ArrayList<Resource> results=new ArrayList<Resource>();
-		TerminologyEntity entity=myInitializer.myFactory.getExistingTerminologyEntity(baseRegURI);
+		TerminologyEntity entity=myInitializer.myFactory.getCheckedTerminologyEntity(baseRegURI);
 		getConstraintsForEntityRecursively(
 				entity.getResource(),
 				results, 
@@ -176,7 +180,7 @@ public class ConstraintsManager {
 	}
 
 
-	private void getConstraintsForEntityRecursively(Resource entity,ArrayList<Resource>currentResult, Set<Resource> defaultConstraints, Map<String,Set<Resource>> specificConstraints,String breakCommand) {
+	private void getConstraintsForEntityRecursively(Resource entity,ArrayList<Resource>currentResult, Set<Resource> defaultConstraints, Map<String,Set<Resource>> specificConstraints,String breakCommand) throws UnknownURIException, ModelException {
 		Set<TerminologySet>roots=myInitializer.myFactory.getRootsForURI(entity.getURI());
 		System.out.println("Resolving for "+entity.getURI());
 		if(specificConstraints.containsKey(entity.getURI())) {
@@ -363,6 +367,63 @@ public class ConstraintsManager {
 		}
 		if(values.size()>0) return values.toArray(new String[0]);
 		else return null;
+	}
+
+	/**
+	 * Only ask if a regsiter constraint is detected, or it will rise an exception if no register constraint is present
+	 * @param cons
+	 * @return
+	 * @throws PropertyConstraintException
+	 * @throws ConfigurationException
+	 */
+	public String getRegisterTargetForConstr(String cons) throws PropertyConstraintException, ConfigurationException {
+		// TODO Auto-generated method stub
+		NodeIterator possibleResultsIter=null;
+		if(isObjectConstraint(cons)) 
+			possibleResultsIter=inputConfig.listObjectsOfProperty(ResourceFactory.createResource(cons), ResourceFactory.createProperty(ConstraintsManagerConfig.inRegister));
+		else throw new PropertyConstraintException("Register constraint not defined for an object property in: "+cons);
+		while(possibleResultsIter.hasNext()) {
+			RDFNode tentativeResult=possibleResultsIter.nextNode();
+			if(tentativeResult.isResource()) return tentativeResult.asResource().getURI();
+		}
+		throw new ConfigurationException("Unable to find targer for inRegister restriction for constraint: "+cons);
+		
+		////
+		//return null;
+	}
+
+	/**
+	 * We return null if no valid pattern constraint is specified
+	 * @param cons
+	 * @return
+	 * @throws ConfigurationException 
+	 */
+	public String getPatternForConstr(String cons) throws ConfigurationException {
+		String result=null;
+		NodeIterator possibleResultsIter=null;
+		if(isDataConstraint(cons)) {
+			possibleResultsIter=inputConfig.listObjectsOfProperty(ResourceFactory.createResource(cons), ResourceFactory.createProperty(ConstraintsManagerConfig.pattern));
+			while(possibleResultsIter.hasNext()) {
+				RDFNode tentativeResult=possibleResultsIter.nextNode();
+				if(tentativeResult.isLiteral()) {
+					result=tentativeResult.asLiteral().getValue().toString();
+					try {
+						Pattern.compile(result);
+					} catch (PatternSyntaxException e) {
+						throw new ConfigurationException("Invalid pattern syntax in constraint : "+cons);
+					}
+					return result;
+				}
+				
+			}
+		}
+			
+		
+		
+		
+		
+		// TODO Auto-generated method stub
+		return result;
 	}
 
 

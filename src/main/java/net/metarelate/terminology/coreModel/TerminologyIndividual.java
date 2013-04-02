@@ -21,6 +21,8 @@ package net.metarelate.terminology.coreModel;
 
 import java.util.Set;
 
+import net.metarelate.terminology.exceptions.ModelException;
+
 public interface TerminologyIndividual extends TerminologyEntity{
 	/**
 	 * remove this individuals from the list of individuals known by the collection at the given version
@@ -43,7 +45,8 @@ public interface TerminologyIndividual extends TerminologyEntity{
 	 * While the system is designed so that an individual can have more than one containment,
 	 * rendering and authority assume that a code is defined in only one register.
 	 * @return
+	 * @throws ModelException 
 	 */
-	public  Set<TerminologySet> getContainers() ;
+	public  Set<TerminologySet> getContainers() throws ModelException ;
 	
 }

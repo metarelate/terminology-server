@@ -6,8 +6,10 @@ import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.AuthException;
 import net.metarelate.terminology.exceptions.ConfigurationException;
 import net.metarelate.terminology.exceptions.InvalidProcessException;
+import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.PropertyConstraintException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
+import net.metarelate.terminology.exceptions.UnknownURIException;
 import net.metarelate.terminology.exceptions.WebSystemException;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -34,7 +36,7 @@ public class NewPage  extends AbstractEditPage {
 	private String type=null;
 	AjaxyTextArea uriField=null;
 	Label uriStatus=null;
-	public NewPage(final PageParameters parameters) throws WebSystemException, ConfigurationException, PropertyConstraintException {
+	public NewPage(final PageParameters parameters) throws WebSystemException, ConfigurationException, PropertyConstraintException, UnknownURIException, ModelException {
 		super(parameters);
 		//uriOfEntity=parameters.get("entity").toString();
 		uriToSupersed=parameters.get("superseding").toString();

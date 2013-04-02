@@ -18,6 +18,10 @@
 */
 
 package net.metarelate.terminology.auth;
+
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
+
 /**
  * A collection of static configuration fields
  * @author andreasplendiani
@@ -30,6 +34,11 @@ public class AuthConfig {
 	 * This is used to specify general authorizations: e.g.: agent-action-all.
 	 * 
 	 */
-	public static String allURI="http://metoffice.gov.uk/terminology/auth/all";
+	public static String allEntities="http://metarelate.net/config/allEntities";
+	public static String allActions="http://metarelate.net/config/allActions";
+	public static String allActors="http://metarelate.net/config/allActors";
+	
+	public static final String authConfigURI="http://metarelate.net/config/hasAuthConfigType";
+	public static final Property authConfigProperty=ResourceFactory.createProperty(authConfigURI);
 
 }

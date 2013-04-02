@@ -152,6 +152,15 @@ public class Versioner {
 	 */
 	public static String createNextVersion(String version) {
 		SSLogger.log("Generating next version for "+version,SSLogger.DEBUG);
+		int currentVersionNumber=-1;
+		try {
+			currentVersionNumber=Integer.parseInt(version);
+		} catch (NumberFormatException e) {};
+		if(currentVersionNumber>=0) {
+			currentVersionNumber++;
+			return new Integer(currentVersionNumber).toString();
+		}
+		//If we are here, version was not an int, and we fall back to the previous approach
 		Matcher m=versionNumberPattern.matcher(version);
 		if(!m.matches()) {
 			SSLogger.log("Unable to match "+version);

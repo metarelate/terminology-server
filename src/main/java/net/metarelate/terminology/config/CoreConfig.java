@@ -19,14 +19,22 @@
 
 package net.metarelate.terminology.config;
 
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
+
 import net.metarelate.terminology.management.TerminologyManagerConfig;
+import net.metarelate.terminology.utils.SimpleQueriesProcessor;
 
 
 public class CoreConfig {
-	public static final String INIT_VERSION = "v0";
+	public static final String VERSION_INIT = "0";
+	public static final String VERSION_DEFUALT = "0";
 	
-	public static String VERSION_NUMBER="0.8.0";
-	public static String VERSION_CODENAME="wicketIntegration";
+	public static String VERSION_NUMBER="0.9.0";
+	public static String VERSION_CODENAME="de-WMOized";
 	
 	public static String UNDEFINED_LABEL="undefined";
 	
@@ -37,9 +45,14 @@ public class CoreConfig {
 	public static String DEFAULT_FROM_RDF_DESCRIPTION="imported from table";
 
 	
+	public static final String globalModel="http://metarelate.net/graph/globalMetaGraph";
+	public static final String labelModel="http://metarelate.net/graph/labels";
+	public static final String extraModel="http://metarelate.net/graph/backgroundKnowledge";
+	
 
-	public static final String DEAFULT_FROM_RDF_IMPORT_ACTION = "http://metoffice.gov.uk/action/importFromTables";
-
+	public static final String DEAFULT_FROM_RDF_IMPORT_ACTION = "http://metarelate.net/actions/batchImport";
+	public static final String DEAFULT_FROM_RDF_REIMPORT_ACTION = "http://metarelate.net/actions/batchImportOverride";
+	
 	public static final String DEFAULT_IMPORT_STATUS = TerminologyManagerConfig.defaultStateURI;
 
 	public static final String DEFAULT_LANGUAGE = "en";
@@ -60,7 +73,75 @@ public class CoreConfig {
 
 	public static String baseDiskDir="web";
 	
-	public static final String hasInstanceIdentifierURI="http://metarelate.net/configuration/hasInstanceIdentifier";
-	public static final String selfURI="http://thisInstance.org";
+	public static final String hasInstanceIdentifierURI="http://metarelate.net/config/hasInstanceIdentifier";
+	public static final String selfURI="http://metarelate.net/config/selfInstance";
+	
+	/*
+	 * Here we have all generic properties that can be overloaded (state/transition systems has a different mechanism)
+	 */
+	public static void parseConfiguration(Model configuration) {
+		StmtIterator statsIterator=configuration.listStatements(null,MetaLanguage.overridesProperty,(Resource)null);
+		while(statsIterator.hasNext()) {
+			Statement currentStat=statsIterator.nextStatement();
+			Resource overrider=currentStat.getSubject();
+			Resource overridden=currentStat.getObject().asResource();
+			
+			if(overridden!=null) {
+				if(overridden.getURI().equals(MetaLanguage.labelProperty.getURI())) {
+					MetaLanguage.labelProperty=ResourceFactory.createProperty(overrider.getURI());
+				}
+				if(overridden.getURI().equals(MetaLanguage.definedInProperty.getURI())) {
+					MetaLanguage.definedInProperty=ResourceFactory.createProperty(overrider.getURI());
+				}
+				if(overridden.getURI().equals(MetaLanguage.definesProperty.getURI())) {
+					MetaLanguage.definesProperty=ResourceFactory.createProperty(overrider.getURI());
+				}
+				if(overridden.getURI().equals(MetaLanguage.commentProperty.getURI())) {
+					MetaLanguage.commentProperty=ResourceFactory.createProperty(overrider.getURI());
+				}
+				if(overridden.getURI().equals(MetaLanguage.hasStatusProperty.getURI())) {
+					MetaLanguage.hasStatusProperty=ResourceFactory.createProperty(overrider.getURI());
+				}
+				if(overridden.getURI().equals(MetaLanguage.notationProperty.getURI())) {
+					MetaLanguage.notationProperty=ResourceFactory.createProperty(overrider.getURI());
+				}
+				
+				if(overridden.getURI().equals(MetaLanguage.versionActionDateProperty.getURI())) {
+					MetaLanguage.versionActionDateProperty=ResourceFactory.createProperty(overrider.getURI());
+				}
+				if(overridden.getURI().equals(MetaLanguage.versionActionProperty.getURI())) {
+					MetaLanguage.versionActionProperty=ResourceFactory.createProperty(overrider.getURI());
+				}
+				if(overridden.getURI().equals(MetaLanguage.versionActorProperty.getURI())) {
+					MetaLanguage.versionActorProperty=ResourceFactory.createProperty(overrider.getURI());
+				}
+				if(overridden.getURI().equals(MetaLanguage.versionActionDescription.getURI())) {
+					MetaLanguage.versionActionDescription=ResourceFactory.createProperty(overrider.getURI());
+				}
+				if(overridden.getURI().equals(MetaLanguage.hasPreviousVersionProperty.getURI())) {
+					MetaLanguage.hasPreviousVersionProperty=ResourceFactory.createProperty(overrider.getURI());
+				}
+				
+				if(overridden.getURI().equals(MetaLanguage.hasManagerProperty.getURI())) {
+					MetaLanguage.hasManagerProperty=ResourceFactory.createProperty(overrider.getURI());
+				}
+				
+				if(overridden.getURI().equals(MetaLanguage.hasVersionProperty.getURI())) {
+					MetaLanguage.hasVersionProperty=ResourceFactory.createProperty(overrider.getURI());
+				}
+				
+				if(overridden.getURI().equals(MetaLanguage.superseeds.getURI())) {
+					MetaLanguage.superseeds=ResourceFactory.createProperty(overrider.getURI());
+				}
+				if(overridden.getURI().equals(MetaLanguage.superseededBy.getURI())) {
+					MetaLanguage.superseededBy=ResourceFactory.createProperty(overrider.getURI());
+				}
+				
+			}
+		}
+		
+		
+	}
+	
 	
 }

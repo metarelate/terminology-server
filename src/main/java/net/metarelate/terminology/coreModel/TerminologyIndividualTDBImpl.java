@@ -21,6 +21,9 @@ package net.metarelate.terminology.coreModel;
 
 import java.util.Set;
 
+import net.metarelate.terminology.exceptions.ModelException;
+import net.metarelate.terminology.exceptions.UnknownURIException;
+
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -91,9 +94,10 @@ public class TerminologyIndividualTDBImpl extends TerminologyEntityTDBImpl imple
 	/**
 	 * This method is independent of this individual being backed by TDB.
 	 * It could be abstracted, if different implementations are designed.
+	 * @throws ModelException 
 	 */
-	public Set<TerminologySet> getContainers() {
-		return getContainers(getDefaultVersion());
+	public Set<TerminologySet> getContainers() throws ModelException {
+		return getContainers(getLastVersion());
 	}
 
 	

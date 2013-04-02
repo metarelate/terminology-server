@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.metarelate.terminology.coreModel.TerminologySet;
+import net.metarelate.terminology.exceptions.ModelException;
 
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
@@ -14,7 +15,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 public class HomePage extends SuperPage {
 	private static final long serialVersionUID = 1L;
 
-	public HomePage(PageParameters parameters) {
+	public HomePage(PageParameters parameters) throws ModelException {
 		super(parameters);
 		
 		

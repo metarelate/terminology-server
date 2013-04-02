@@ -5,8 +5,10 @@ import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.exceptions.AuthException;
 import net.metarelate.terminology.exceptions.ConfigurationException;
 import net.metarelate.terminology.exceptions.InvalidProcessException;
+import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.PropertyConstraintException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
+import net.metarelate.terminology.exceptions.UnknownURIException;
 import net.metarelate.terminology.exceptions.WebSystemException;
 
 import org.apache.wicket.markup.html.basic.Label;
@@ -28,7 +30,7 @@ import com.hp.hpl.jena.rdf.model.Statement;
 public class EditPage  extends AbstractEditPage {
 	private static final long serialVersionUID = 1L;
 	private String urlToEdit=null;
-	public EditPage(final PageParameters parameters) throws WebSystemException, ConfigurationException, PropertyConstraintException {
+	public EditPage(final PageParameters parameters) throws WebSystemException, ConfigurationException, PropertyConstraintException, UnknownURIException, ModelException {
 		super(parameters);
 		/*
 		 * URL is fixed, we just show it.
@@ -57,17 +59,23 @@ public class EditPage  extends AbstractEditPage {
 		}
 		else {
 			// TODO nothing was found, which is impossible. But let's add some fall back action here anyway...
+			//TODO we should set an error page here
+			return;
 		}
 		
 		terminologyEntityWrapper=new LoadableDetachableModel<TerminologyEntity>() {
 			@Override
 			protected TerminologyEntity load() {
-				if(isSet) return CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(urlToEdit);
-				else if(isIndividual) return CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(urlToEdit);
-				else return null; //TODO this should not happen
+				if(isSet) return CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologySet(urlToEdit);
+				else if(isIndividual) return CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologyIndividual(urlToEdit);
+				else {
+					//TODO we should set an error here
+					//this should not happen
+					return null;
+				}
 			}
-			
 		};
+		
 		
 		
 		buildForm();

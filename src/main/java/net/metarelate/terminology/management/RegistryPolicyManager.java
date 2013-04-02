@@ -76,7 +76,7 @@ public class RegistryPolicyManager {
 	
 	
 	//TODO Action without state transition! (but with permissions... where should it go?)
-	public static String tagAction=MetaLanguage.tagAction.getURI();
+	public static String tagAction=TerminologyManagerConfig.tagAction.getURI();
 	
 	
 	
@@ -273,6 +273,7 @@ public class RegistryPolicyManager {
 		
 		if(!anyTransitions.containsKey(actionURI)) return false;
 		ArrayList<String[]> transitionsForAction=anyTransitions.get(actionURI);
+		//SSLogger.showDebug(true); //TODO to remove!
 		SSLogger.log("Checking for viability of action: "+actionURI,SSLogger.DEBUG);
 		SSLogger.log("Pre_this: "+thisState,SSLogger.DEBUG);
 		SSLogger.log("Pre_up: "+upState,SSLogger.DEBUG);

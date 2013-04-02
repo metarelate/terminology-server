@@ -30,7 +30,10 @@ import java.util.TreeMap;
 
 import net.metarelate.terminology.config.CoreConfig;
 import net.metarelate.terminology.config.MetaLanguage;
+import net.metarelate.terminology.exceptions.ModelException;
+import net.metarelate.terminology.exceptions.UnknownURIException;
 import net.metarelate.terminology.utils.CodeComparator;
+import net.metarelate.terminology.utils.SimpleQueriesProcessor;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Literal;
@@ -50,8 +53,8 @@ public class TerminologyEntityTDBImpl implements TerminologyEntity{
 	private String uri=null; 							//This is the uri of the entity. 
 	protected Resource myRes=null; 						//A resource representation of the entity.
 	
-	private String defaultVersion=null;
-	private String localNamespace=null;					//This is in memory only! see get/set for an explanation.
+	//private String defaultVersion=null;
+	//private String localNamespace=null;					//This is in memory only! see get/set for an explanation.
 	
 	private Versioner versioner=null;
 	
@@ -74,7 +77,7 @@ public class TerminologyEntityTDBImpl implements TerminologyEntity{
 		myRes=ResourceFactory.createResource(uri);
 		versioner=new Versioner(this);
 		myDataset=factory.getDataset();
-		globalGraph=myDataset.getNamedModel(TDBModelsCoreConfig.globalModel);		
+		globalGraph=myDataset.getNamedModel(CoreConfig.globalModel);		
 	}
 	
 	public String getURI() {
@@ -106,7 +109,10 @@ public class TerminologyEntityTDBImpl implements TerminologyEntity{
 	 * TODO it would be better if the namespace was persisted as an endurant information. 
 	 */
 	public void setLocalNamespace(String lns) {
-		this.localNamespace=lns;
+		StmtIterator toRemove=globalGraph.listStatements(myRes,MetaLanguage.nameSpaceProperty,(Resource)null);
+		globalGraph.remove(toRemove);
+		globalGraph.add(globalGraph.createStatement(myRes,MetaLanguage.nameSpaceProperty,ResourceFactory.createPlainLiteral(lns)));
+		TDB.sync(globalGraph);
 	}
 	
 	/**
@@ -122,13 +128,13 @@ public class TerminologyEntityTDBImpl implements TerminologyEntity{
 	 * @see {@link TerminologyEntityTDBImpl#setLocalNamespace}
 	 */
 	public String getLocalNamespace() {
-		String result="";
+		//TODO note: we always only consider the last version for the namespace, perhaps this shouldn't be in the version graph!
+		String localNamespace=SimpleQueriesProcessor.getOptionalLiteralValueAsString(myRes, MetaLanguage.nameSpaceProperty, globalGraph);
 		if(localNamespace==null) {
 			String uri=myRes.getURI();
-			result=uri.substring(uri.lastIndexOf('/')+1);
+			localNamespace=uri.substring(uri.lastIndexOf('/')+1);
 		}
-		else result=localNamespace;
-		return result;
+		return localNamespace;
 	}
 	
 	/**
@@ -147,13 +153,18 @@ public class TerminologyEntityTDBImpl implements TerminologyEntity{
 
 	}
 	
-	public Set<TerminologySet> getContainers(String version) {
+	public Set<TerminologySet> getContainers(String version) throws ModelException  {
 		Set<TerminologySet>answer=new HashSet<TerminologySet>();
 		NodeIterator superRegIter=getStatements(version).listObjectsOfProperty(myRes,TDBModelsCoreConfig.definedInRegister);
 		while(superRegIter.hasNext()) {
 			RDFNode currSupReg=superRegIter.nextNode();
 			if(currSupReg.isResource())
-				answer.add(((TerminologyFactoryTDBImpl)myFactory).getOrCreateTerminologySet(currSupReg.asResource().getURI()));
+				try {
+					answer.add(((TerminologyFactoryTDBImpl)myFactory).getCheckedTerminologySet(currSupReg.asResource().getURI()));
+				} catch (UnknownURIException e) {
+					e.printStackTrace();
+					throw new ModelException("Inconsistent container: "+currSupReg.asResource().getURI()+" for "+getURI());
+				}
 		}
 		return answer;
 	}
@@ -172,14 +183,14 @@ public class TerminologyEntityTDBImpl implements TerminologyEntity{
 	}
 
 	public void setOwnerURI(String uri) {
-		StmtIterator toRemove=globalGraph.listStatements(myRes,TDBModelsCoreConfig.hasOwnerProperty,(Resource)null);
+		StmtIterator toRemove=globalGraph.listStatements(myRes,MetaLanguage.hasManagerProperty,(Resource)null);
 		globalGraph.remove(toRemove);
-		globalGraph.add(globalGraph.createStatement(myRes, TDBModelsCoreConfig.hasOwnerProperty, globalGraph.createResource(uri)));
+		globalGraph.add(globalGraph.createStatement(myRes, MetaLanguage.hasManagerProperty, globalGraph.createResource(uri)));
 	}
 	
 	public String getOwnerURI() {
 		//Note there's only one!
-		NodeIterator ownerIter=globalGraph.listObjectsOfProperty(myRes, TDBModelsCoreConfig.hasOwnerProperty);
+		NodeIterator ownerIter=globalGraph.listObjectsOfProperty(myRes, MetaLanguage.hasManagerProperty);
 		if(ownerIter.hasNext())
 			return ownerIter.next().asResource().getURI();
 		return null;
@@ -259,18 +270,18 @@ public class TerminologyEntityTDBImpl implements TerminologyEntity{
 		return descRes;
 	}
 
-	public void setDefaultVersion(String version) {
-		this.defaultVersion=version;
-	}
+	//public void setDefaultVersion(String version) {
+	//	this.defaultVersion=version;
+	//}
 	
-	public String getDefaultVersion() {
-		return this.defaultVersion;
-	}
+	//public String getDefaultVersion() {
+	//	return this.defaultVersion;
+	//}
 
 	public void setIsVersioned(boolean isVersioned) {
-		StmtIterator toRemove=globalGraph.listStatements(myRes,TDBModelsCoreConfig.hasOwnerProperty,(Resource)null);
+		StmtIterator toRemove=globalGraph.listStatements(myRes,TDBModelsCoreConfig.isVersionedProperty,(Resource)null);
 		globalGraph.remove(toRemove);
-		globalGraph.add(globalGraph.createStatement(myRes, TDBModelsCoreConfig.isVersionedProperty, globalGraph.createLiteral("TRUE")));
+		if(isVersioned) globalGraph.add(globalGraph.createStatement(myRes, TDBModelsCoreConfig.isVersionedProperty, globalGraph.createLiteral("TRUE")));
 
 	}
 
@@ -290,7 +301,7 @@ public class TerminologyEntityTDBImpl implements TerminologyEntity{
 		while(versModelIter.hasNext()) {
 			RDFNode tempValue=versModelIter.nextNode();
 			if(tempValue.isResource()) {
-				NodeIterator versionLabelIter=globalGraph.listObjectsOfProperty(tempValue.asResource(), TDBModelsCoreConfig.hasVersionName);
+				NodeIterator versionLabelIter=globalGraph.listObjectsOfProperty(tempValue.asResource(), MetaLanguage.hasVersionProperty);
 				while(versionLabelIter.hasNext()) {
 					RDFNode tempValue2=versionLabelIter.nextNode();
 					if(tempValue2.isLiteral()) tempVersions.add(tempValue2.asLiteral().getValue().toString());
@@ -332,7 +343,7 @@ public class TerminologyEntityTDBImpl implements TerminologyEntity{
 
 	public void registerVersion(String version) {
 		globalGraph.add(globalGraph.createStatement(myRes, TDBModelsCoreConfig.hasVersionURIProperty, globalGraph.createResource(getVersionURI(version))));
-		globalGraph.add(globalGraph.createStatement(globalGraph.createResource(getVersionURI(version)), TDBModelsCoreConfig.hasVersionName, globalGraph.createLiteral(version)));
+		globalGraph.add(globalGraph.createStatement(globalGraph.createResource(getVersionURI(version)), MetaLanguage.hasVersionProperty, globalGraph.createLiteral(version)));
 
 	}
 	
@@ -348,7 +359,7 @@ public class TerminologyEntityTDBImpl implements TerminologyEntity{
 		while(preVersions.hasNext()) {
 			RDFNode ver=preVersions.nextNode();
 			if(ver.isResource()) {
-				NodeIterator verValue=globalGraph.listObjectsOfProperty(ver.asResource(),TDBModelsCoreConfig.hasVersionName);
+				NodeIterator verValue=globalGraph.listObjectsOfProperty(ver.asResource(),MetaLanguage.hasVersionProperty);
 				if(verValue.hasNext()) {
 					RDFNode name=verValue.nextNode();
 					if(name.isLiteral()) return name.asLiteral().getValue().toString();
@@ -365,7 +376,7 @@ public class TerminologyEntityTDBImpl implements TerminologyEntity{
 		ResIterator nextVersions=globalGraph.listSubjectsWithProperty(TDBModelsCoreConfig.hasPreviousVersionProperty,globalGraph.createResource(getVersionURI(version)));
 		while(nextVersions.hasNext()) {
 			Resource ver=nextVersions.nextResource();
-			NodeIterator verValue=globalGraph.listObjectsOfProperty(ver.asResource(),TDBModelsCoreConfig.hasVersionName);
+			NodeIterator verValue=globalGraph.listObjectsOfProperty(ver.asResource(),MetaLanguage.hasVersionProperty);
 			if(verValue.hasNext()) {
 				RDFNode name=verValue.nextNode();
 					if(name.isLiteral()) return name.asLiteral().getValue().toString();

@@ -1,5 +1,8 @@
 package net.metarelate.terminology.webedit;
 
+import net.metarelate.terminology.exceptions.ModelException;
+import net.metarelate.terminology.utils.SSLogger;
+
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
@@ -40,7 +43,12 @@ public class SupersedPanel1 extends Panel
 			@Override
 			public void onClick(AjaxRequestTarget target) {
 				viewPage.supersedPanelWindow.close(target);
-				viewPage.supersedRouteToAdd(target);
+				try {
+					viewPage.supersedRouteToAdd(target);
+				} catch (ModelException e) {
+					SSLogger.log(e.getMessage(),SSLogger.DEBUG);
+					e.printStackTrace();
+				}
 				// TODO Auto-generated method stub
 				
 			}

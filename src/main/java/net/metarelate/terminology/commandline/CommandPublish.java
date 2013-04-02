@@ -3,6 +3,7 @@ package net.metarelate.terminology.commandline;
 import java.util.ArrayList;
 
 import net.metarelate.terminology.coreModel.TerminologySet;
+import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.instanceManager.Initializer;
 import net.metarelate.terminology.publisher.WebWriter;
 import net.metarelate.terminology.utils.SSLogger;
@@ -11,10 +12,11 @@ public class CommandPublish extends TsCommand {
 	boolean overwrite=false;
 	String selectedURI=null;
 	String rootPath=null;
-	public CommandPublish(Initializer myInitializer,String[] args) {
-		super(myInitializer,args);
+	public CommandPublish(Initializer myInitializer,String[] args, boolean debug) {
+		super(myInitializer,args,debug);
 		boolean nextIsURI=false;
 		boolean nextIsRootPath=false;
+		
 		for(String arg:args) {
 			if(arg.equalsIgnoreCase("-ow") || arg.equalsIgnoreCase("-overwrite")) {
 				overwrite=true;
@@ -39,7 +41,7 @@ public class CommandPublish extends TsCommand {
 	}
 
 	@Override
-	public void localExecute() {
+	public void localExecute() throws ModelException {
 		//SSLogger.log("ModelFactory knows "+myInitializer.myFactory.getAllSets().size()+ " sets",SSLogger.DEBUG);
 		//SSLogger.log("ModelFactory knows "+myInitializer.myFactory.getAllIndividuals().size()+ " individuals",SSLogger.DEBUG);
 		TerminologySet[] roots=myInitializer.myFactory.getRootCollections();
@@ -83,7 +85,20 @@ public class CommandPublish extends TsCommand {
 			
 		
 	}
-
+	@Override
+	public String getLocalHelpMessage() {
+		return getStaticLocalHelpMessage();
+	}
+	public static String getStaticLocalHelpMessage() {
+		return "ts publish [under refactoring!]";
 	
+		
+	}
+
+	@Override
+	public boolean validate() {
+		// TODO Depends on refactoring
+		return false;
+	}
 
 }

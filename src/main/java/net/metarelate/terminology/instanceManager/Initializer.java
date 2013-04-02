@@ -43,6 +43,7 @@ import net.metarelate.terminology.exceptions.NonConformantRDFException;
 import net.metarelate.terminology.management.ConstraintsManager;
 import net.metarelate.terminology.management.RegistryPolicyManager;
 import net.metarelate.terminology.management.TerminologyManager;
+import net.metarelate.terminology.publisher.PublisherConfig;
 import net.metarelate.terminology.utils.SSLogger;
 import net.metarelate.terminology.utils.SimpleQueriesProcessor;
 
@@ -71,6 +72,7 @@ public class Initializer {
 	private static String seedFileAbsoluteString=null;
 	private static String prefixFileAbsoluteString=null;
 	public static String defaultUserName=null;
+	private String rootDirectoryString=null;
 	
 	private  AuthServer myAuthServer=null;
 	public  AuthRegistryManager myAuthManager=null;
@@ -93,25 +95,35 @@ public class Initializer {
 		construct();
 	}
 	
+	public Initializer(String sysDir, boolean debug) throws ConfigurationException {
+		debugMode=debug;
+		construct();
+	}
+
 	public void construct() throws ConfigurationException{
 		prepareConfigurationLayout();
 		prepareDefaultFiles();
 		buildSystemComponents();
 	}
 	
+	public String getRootDirectory() {
+		return rootDirectoryString;
+	}
+	
 	//TODO Inits could be made more modular
 	public void prepareConfigurationLayout() throws ConfigurationException {
 		if(userHomeString==null) userHomeString = System.getProperty( "user.home" );
 		SSLogger.log("User Home: "+ userHomeString);
-		System.out.println("User Home: "+ userHomeString);
+		//System.out.println("User Home: "+ userHomeString);
 		File rootDirectory=new File(userHomeString,rootDirString);
 		checkOrCreateDirectory(rootDirectory);
+		rootDirectoryString=rootDirectory.getAbsolutePath();
 		// Note: we don't allow overriding of host or server name. This may be changed.
 		try {
 			InetAddress myAddress=InetAddress.getLocalHost();
 			serverAddress=myAddress.getHostAddress();
 			serverName=myAddress.getHostName();
-			defaultUserName=System.clearProperty("user.name");
+			defaultUserName=System.getProperty("user.name");
 		} catch (UnknownHostException e) {
 			serverAddress="Unknown";
 			serverName="Unknown";
@@ -183,7 +195,7 @@ public class Initializer {
 			e.printStackTrace();
 			System.exit(-1);
 		}
-		String tdbPath=SimpleQueriesProcessor.getOptionalConfigurationParameterSingleValue(configuration, MetaLanguage.tdbPrefixProperty);
+		String tdbPath=SimpleQueriesProcessor.getOptionalConfigurationParameterSingleValue(configuration, InitializerConfig.tdbPrefixProperty);
 	
 		//TODO for the time being only tdb is supported!
 		if(tdbPath==null) {
@@ -191,7 +203,7 @@ public class Initializer {
 			SSLogger.log("Unable to find a TDB directory");
 			System.exit(-1);
 		}
-		
+		CoreConfig.parseConfiguration(configuration);
 		myFactory=new TerminologyFactoryTDBImpl(tdbPath);
 		myAuthServer=AuthServerFactory.createServerFromConfig(getConfigurationGraph());
 		myRegistryPolicyManager=new RegistryPolicyManager(getConfigurationGraph());
@@ -269,30 +281,29 @@ public class Initializer {
 		File confDir=new File(confDirAbsoluteString);
 		if(confDir.listFiles().length>0) return;
 			
-		String defServerStatements="<http://thisInstance.org> <"+MetaLanguage.tdbPrefixProperty+"> "+"\""+dbDirAbsoluteString+"\"^^<http://www.w3.org/2001/XMLSchema#string> ;\n.\n";
-		defServerStatements+="<http://thisInstance.org> <"+MetaLanguage.authConfigURI +"> "+"<"+AuthConfig.isConfigFileString+"> ;\n.\n";
+		String defServerStatements= "<"+CoreConfig.selfURI+"> <"+InitializerConfig.tdbPrefixProperty+"> "+"\""+dbDirAbsoluteString+"\"^^<http://www.w3.org/2001/XMLSchema#string> ;\n.\n";
+		defServerStatements+="<"+CoreConfig.selfURI+"> <"+AuthConfig.authConfigURI +"> "+"<"+AuthConfig.isConfigFileString+"> ;\n.\n";
 		String baseURL=getServerName()+"/web";
 		File diskPrefixFile=new File(getWorkingDirectory(),CoreConfig.baseDiskDir);
 		String diskPrefix=diskPrefixFile.getAbsolutePath();
-		defServerStatements+="<http://thisInstance.org> <"+MetaLanguage.baseURLProperty +"> "+"\"http://"+baseURL+"\" ;\n.\n";
-		defServerStatements+="<http://thisInstance.org> <"+MetaLanguage.diskPrefixProperty +"> "+"\""+diskPrefix+"\" ;\n.\n";
+		defServerStatements+="<"+CoreConfig.selfURI+"> <"+PublisherConfig.baseURLProperty +"> "+"\"http://"+baseURL+"\" ;\n.\n";
+		defServerStatements+="<"+CoreConfig.selfURI+"> <"+PublisherConfig.diskPrefixProperty +"> "+"\""+diskPrefix+"\" ;\n.\n";
 		
 		createFileAndFillWithString(confDirAbsoluteString,"defaultServerConfig.ttl",defServerStatements);
 		
 		// TODO this is : me what I can on what. Arguably this should start with me can create anything at the top register (empty register?)
 		// However, as a conf option, one could be granted access to everything.
-		String defAuthStatements="<"+getDefaultUserURI()+"> <"+AuthConfig.allURI+"> "+"<"+AuthConfig.allURI+"> ;\n.\n";
+		String defAuthStatements="<"+getDefaultUserURI()+"> <"+AuthConfig.allActions+"> "+"<"+AuthConfig.allEntities+"> ;\n.\n";
 		createFileAndFillWithString(authDirAbsoluteString,"defaultAuthConfig.ttl",defAuthStatements);
 		
 		
 		String defProcessStatements=
-				"@prefix core:		<http://metarelate.net/core/types/>	.\n" +
-				"@prefix states: 	<http://metarelate.net/core/states/> .\n" +
-				"@prefix actions:	<http://metarelate.net/core/actions/> .\n" +
-				"@prefix config:		<http://metarelate.net/core/config/> .\n" +
+				"@prefix config:	<http://metarelate.net/config/>	.\n" +
+				"@prefix states: 	<http://metarelate.net/states/> .\n" +
+				"@prefix actions:	<http://metarelate.net/actions/> .\n" +
 				"@prefix default:	<http://metarelate.net/default/config/> .\n" +
 				"@prefix rdfs:		<http://www.w3.org/2000/01/rdf-schema#> .\n" +
-				"actions:update a core:action;\n" +
+				"actions:update a config:Action;\n" +
 				"rdfs:label	\"Update\"@en;\n" +
 				"config:overrides actions:update;\n" +
 				"config:hasEffectOnCode default:actionUpdate1;\n" +
@@ -300,15 +311,15 @@ public class Initializer {
 				"config:hasEffectOnReg default:actionUpdate1;\n" +
 				"config:hasEffectOnReg default:actionUpdate2;\n" +
 				".\n" +
-				"default:actionUpdate1 a core:actionRole;\n" +
+				"default:actionUpdate1 a config:Role;\n" +
 				"config:preThis states:default;\n" +
 				"config:postThis states:default;\n" +
 				".\n" +
-				"default:actionUpdate2 a core:actionRole;\n" +
+				"default:actionUpdate2 a config:Role;\n" +
 				"config:preThis states:valid;\n" +
 				"config:postThis	states:valid;\n" +
 				".\n" +
-				"actions:obsolete a core:action;\n" +
+				"actions:obsolete a config:Role;\n" +
 				"rdfs:label	\"Obsolete\"@en;\n" +
 				"config:overrides actions:obsolete;\n" +
 				"config:hasEffectOnCode default:actionObsolete1;\n" +
@@ -316,71 +327,70 @@ public class Initializer {
 				"config:hasEffectOnReg default:actionObsolete1;\n" +
 				"config:hasEffectOnReg default:actionObsolete2;\n" +
 				".\n" +
-				"default:actionObsolete1 a core:actionRole;\n" +
+				"default:actionObsolete1 a config:Role;\n" +
 				"config:preThis states:default;\n" +
 				"config:postThis states:obsoleted;\n" +
 				".\n" +
-				"default:actionObsolete2 a core:actionRole;\n" +
+				"default:actionObsolete2 a config:Role;\n" +
 				"config:preThis states:valid;\n" +
 				"config:postThis states:obsoleted;\n" +
 				".\n" +
-				"actions:supersed a core:action;\n" +
+				"actions:supersed a config:Action;\n" +
 				"rdfs:label	\"Supersed\"@en;\n" +
 				"config:overrides actions:supersed;\n" +
 				"config:hasEffectOnCode default:actionSupersed1 ;\n" +
 				".\n" +
-				"default:actionSupersed1 a core:actionRole;\n	" +
+				"default:actionSupersed1 a config:Role;\n	" +
 				"config:preThis	states:valid;\n" +
 				"config:preAux	states:valid;\n" +
 				"config:postThis	states:superseded;\n" +
 				"config:postAux	states:valid;\n" +
 				".\n" +
-				"actions:add	a core:action;\n" +
+				"actions:add	a config:Action;\n" +
 				"rdfs:label	\"Add\"@en;\n" +
 				"config:overrides actions:add;\n" +
 				"config:hasEffectOnReg default:addAction1 ;\n" +
 				"config:hasEffectOnReg default:addAction2 ;\n" +
 				".\n" +
-				"default:addAction1 a core:actionRole;\n" +
+				"default:addAction1 a config:Role;\n" +
 				"config:preThis	states:valid;\n" +
 				"config:postThis	states:default;	\n" +
 				".\n" +
-				"default:addAction2 a core:actionRole;\n" +
+				"default:addAction2 a config:Role;\n" +
 				"config:preThis	states:default;\n" +
 				"config:postThis	states:default;	\n" +
 				".\n" +
-				"actions:validate	a core:action;\n" +
+				"actions:validate	a config:Action;\n" +
 				"rdfs:label	\"Validate\"@en;	\n" +
 				"config:hasEffectOnReg default:validateAction1 ;\n" +
 				"config:hasEffectOnCode default:validateAction1 ;\n" +
 				".\n" +
-				"default:validateAction1  a core:actionRole; \n" +
+				"default:validateAction1  a config:Role; \n" +
 				"config:preThis states:default;\n" +
 				"config:postThis states:valid;\n" +
 				".\n" +
-				"states:obsoleted a core:state;\n" +
+				"states:obsoleted a config:State;\n" +
 				"rdfs:label	\"Obsoleted\"@en;\n" +
 				"config:overrides states:obsoleted;\n" +
 				".\n" +
-				"states:superseded a core:state;\n" +
+				"states:superseded a config:State;\n" +
 				"rdfs:label	\"Superseded\"@en;\n" +
 				"config:overrides states:superseded;\n" +
 				".\n" +
-				"states:default a core:state;\n" +
+				"states:default a config:State;\n" +
 				"rdfs:label	\"Default\"@en;\n" +
 				"config:overrides states:default;\n" +
 				".\n" +
-				"states:valid a core:state;\n" +
+				"states:valid a config:State;\n" +
 				"rdfs:label	\"Valid\"@en;\n" +
 				".\n";
 
 		createFileAndFillWithString(confDirAbsoluteString,"defaultProcessConfig.ttl",defProcessStatements);
 	
 		String validationStatements=
-				"@prefix core:		<http://metarelate.net/core/types/>	.\n"+
-				"@prefix states: 	<http://metarelate.net/core/states/> .\n"+
-				"@prefix actions:	<http://metarelate.net/core/actions/> .\n"+
-				"@prefix config:		<http://metarelate.net/core/config/> .\n"+
+				"@prefix states: 	<http://metarelate.net/states/> .\n"+
+				"@prefix actions:	<http://metarelate.net/actions/> .\n"+
+				"@prefix config:	<http://metarelate.net/config/> .\n"+
 				"@prefix default:	<http://metarelate.net/default/config/> .\n"+
 				"@prefix rdfs:		<http://www.w3.org/2000/01/rdf-schema#> .\n"+
 				"@prefix rdf:		<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n"+
@@ -470,6 +480,31 @@ public class Initializer {
 				
 			
 		createFileAndFillWithString(confDirAbsoluteString,"defaultValidationRules.ttl",validationStatements);
+		
+		String defPropStatements=
+				"@prefix states: 	<http://metarelate.net/states/> .\n"+
+				"@prefix actions:	<http://metarelate.net/actions/> .\n"+
+				"@prefix config:	<http://metarelate.net/config/> .\n"+
+				"@prefix default:	<http://metarelate.net/default/config/> .\n"+
+				"@prefix rdfs:		<http://www.w3.org/2000/01/rdf-schema#> .\n"+
+				"@prefix rdf:		<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n"+
+				"@prefix skos:		<http://www.w3.org/2004/02/skos/core#> .\n"+
+				"\n"+
+				"<"+MetaLanguage.rdfsLabelPropertyString+"> <"+MetaLanguage.overridesPropertyString+"> <"+MetaLanguage.labelProperty.getURI()+">;\n"+
+				".\n"+
+				"<"+MetaLanguage.rdfsCommentPropertyString+"> <"+MetaLanguage.overridesPropertyString+"> <"+MetaLanguage.commentProperty.getURI()+">;\n"+
+				".\n"+
+				"<"+MetaLanguage.skosNotationPropertyString+"> <"+MetaLanguage.overridesPropertyString+"> <"+MetaLanguage.notationProperty.getURI()+">;\n"+
+				".\n"+
+				"<"+MetaLanguage.dcReplacesString +"> <"+MetaLanguage.overridesPropertyString+"> <"+MetaLanguage.hasPreviousVersionProperty.getURI()+">;\n"+
+				".\n"+
+				"<"+MetaLanguage.dcReplacesString +"> <"+MetaLanguage.overridesPropertyString+"> <"+MetaLanguage.superseeds.getURI()+">;\n"+
+				".\n"+
+				"<"+MetaLanguage.dcReplacedByString +"> <"+MetaLanguage.overridesPropertyString+"> <"+MetaLanguage.superseededBy.getURI()+">;\n"+
+				".\n"+
+				"	\n";
+		
+		createFileAndFillWithString(confDirAbsoluteString,"defaultPropertiesConfig.ttl",defPropStatements);
 	}
 	
 

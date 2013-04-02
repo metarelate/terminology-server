@@ -11,6 +11,9 @@ import net.metarelate.terminology.coreModel.LabelManager;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.coreModel.TerminologyIndividual;
 import net.metarelate.terminology.coreModel.TerminologySet;
+import net.metarelate.terminology.exceptions.ModelException;
+import net.metarelate.terminology.exceptions.UnknownURIException;
+import net.metarelate.terminology.exceptions.WebSystemException;
 import net.metarelate.terminology.utils.SimpleQueriesProcessor;
 
 import org.apache.wicket.Component;
@@ -75,18 +78,18 @@ public class SearchPage extends SuperPage {
 		                if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(elementURI)) {
 		                	item.add(new Label("resultType","Set"));
 		                	// TODO we coould have something more personalized here (Collection, Register..) or use an image...
-		                	String lastVersion=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(elementURI).getLastVersion();
-		                	String idLabel=SimpleQueriesProcessor.getOptionalLiteralValueAsString(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(elementURI).getResource(), MetaLanguage.notationProperty, CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(elementURI).getStatements(lastVersion));
+		                	String lastVersion=CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologySet(elementURI).getLastVersion();
+		                	String idLabel=SimpleQueriesProcessor.getOptionalLiteralValueAsString(CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologySet(elementURI).getResource(), MetaLanguage.notationProperty, CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologySet(elementURI).getStatements(lastVersion));
 		                	
 		                	
-		                	String lastStatusURI=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(elementURI)
+		                	String lastStatusURI=CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologySet(elementURI)
 		                	.getGenericVersionSpecificURIObject(MetaLanguage.hasStatusProperty,lastVersion);
 		                	
 		                	String lastStatus=CommandWebConsole.myInitializer.myFactory.getLabelManager().getLabelForURI(lastStatusURI, LabelManager.URI_IF_NULL);
 		                	if(idLabel==null) idLabel="undefined";
 		                	if(lastStatus==null) lastStatus="undefined";
 		                	item.add(new Label("resultID",idLabel));
-		                	item.add(new Label("resultDescription",CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(elementURI).getLabel(lastVersion)));
+		                	item.add(new Label("resultDescription",CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologySet(elementURI).getLabel(lastVersion)));
 		                	BookmarkablePageLink pageLink=new BookmarkablePageLink("resultURI",ViewPage.class);
 		                	if(hasSuperseder) {
 		                		System.out.println("has: "+elementURI);
@@ -107,10 +110,10 @@ public class SearchPage extends SuperPage {
 		                else if(CommandWebConsole.myInitializer.myFactory.terminologyIndividualExist(elementURI)) {
 		                	item.add(new Label("resultType","Individual"));
 		                	// TODO same note as above
-		                	String lastVersion=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(elementURI).getLastVersion();
-		                	String idLabel=SimpleQueriesProcessor.getOptionalLiteralValueAsString(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(elementURI).getResource(), MetaLanguage.notationProperty, CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(elementURI).getStatements(lastVersion));
+		                	String lastVersion=CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologyIndividual(elementURI).getLastVersion();
+		                	String idLabel=SimpleQueriesProcessor.getOptionalLiteralValueAsString(CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologyIndividual(elementURI).getResource(), MetaLanguage.notationProperty, CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologyIndividual(elementURI).getStatements(lastVersion));
 		                	
-		                	String lastStatusURI=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(elementURI)
+		                	String lastStatusURI=CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologyIndividual(elementURI)
 				                	.getGenericVersionSpecificURIObject(MetaLanguage.hasStatusProperty,lastVersion);
 				                	
 				            String lastStatus=CommandWebConsole.myInitializer.myFactory.getLabelManager().getLabelForURI(lastStatusURI, LabelManager.URI_IF_NULL);
@@ -119,7 +122,7 @@ public class SearchPage extends SuperPage {
 		                	if(idLabel==null) idLabel="undefined";
 		                	if(lastStatus==null) lastStatus="undefined";
 		                	item.add(new Label("resultID",idLabel));
-		                	item.add(new Label("resultDescription",CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologyIndividual(elementURI).getLabel(lastVersion)));
+		                	item.add(new Label("resultDescription",CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologyIndividual(elementURI).getLabel(lastVersion)));
 		                	BookmarkablePageLink pageLink=new BookmarkablePageLink("resultURI",ViewPage.class);
 		                	if(hasSuperseder) {
 		                		System.out.println("has: "+elementURI);
@@ -301,7 +304,14 @@ public class SearchPage extends SuperPage {
 				   		        String res[]=null;
 				   		        if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(selectedSetURI)) {
 				   		        	//TODO check consistency of defaults (versions)
-				   		        	Set<TerminologyIndividual> childrenSet=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(selectedSetURI).getIndividuals(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(selectedSetURI).getLastVersion());
+				   		        	Set<TerminologyIndividual> childrenSet;
+									try {
+										childrenSet = CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologySet(selectedSetURI).getIndividuals(CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologySet(selectedSetURI).getLastVersion());
+									} catch (ModelException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+										return;
+									}
 				   		        	res=new String[childrenSet.size()+1];
 				   		        	res[0]=selectedSetURI;
 				   		        	Iterator<TerminologyIndividual> childrenIter=childrenSet.iterator();
@@ -330,7 +340,7 @@ public class SearchPage extends SuperPage {
 									IModel model) {
 								String myLabel=model.getObject().toString();
 								if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(myLabel))
-									myLabel=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(myLabel).getLabel(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(myLabel).getLastVersion());
+									myLabel=CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologySet(myLabel).getLabel(CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologySet(myLabel).getLastVersion());
 									//TODO terrible!!!!! Must be cleaned up a bit
 								return new Label("label",myLabel);
 							}
@@ -362,6 +372,11 @@ public class SearchPage extends SuperPage {
 	private ITreeProvider<String> createRegRootModel() {
 		return new ITreeProvider<String>(){
 
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
 			public void detach() {
 				// TODO Auto-generated method stub
 				
@@ -370,18 +385,34 @@ public class SearchPage extends SuperPage {
 			public Iterator<String> getChildren(String collection) {
 				ArrayList<String> resultList=new ArrayList<String>();
 				//System.out.println("Collectoon: "+collection+"version: "+CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(collection).getLastVersion());
-				if(CommandWebConsole.myInitializer.myFactory.terminologySetExist(collection)) {
-					Set<TerminologySet> children=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(collection).getCollections(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(collection).getLastVersion());
-					Iterator<TerminologySet> setIter=children.iterator();
-					while(setIter.hasNext()) {
-						resultList.add(setIter.next().getURI())
-;					}
+				Set<TerminologySet> children=null;
+				try {
+					children = CommandWebConsole.myInitializer.myFactory.getCheckedTerminologySet(collection).getCollections(CommandWebConsole.myInitializer.myFactory.getCheckedTerminologySet(collection).getLastVersion());
+				} catch (UnknownURIException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ModelException e) {
+					//This shouldn't happen
+					e.printStackTrace();
+					return null;
 				}
+				Iterator<TerminologySet> setIter=children.iterator();
+				while(setIter.hasNext()) {
+					resultList.add(setIter.next().getURI())
+;					}
 				return resultList.iterator();
+						
+				
 			}
 
 			public Iterator<String> getRoots() {
-				TerminologySet[] roots=CommandWebConsole.myInitializer.myFactory.getRootCollections();
+				TerminologySet[] roots;
+				try {
+					roots = CommandWebConsole.myInitializer.myFactory.getRootCollections();
+				} catch (ModelException e) {
+					e.printStackTrace();
+					return null; //TODO let it fail...
+				}
 				ArrayList<String> rootList=new ArrayList<String>();
 				for(int i=0;i<roots.length;i++) {
 					rootList.add(roots[i].getURI());
@@ -390,10 +421,21 @@ public class SearchPage extends SuperPage {
 			}
 
 			public boolean hasChildren(String collection) {
-				if(!CommandWebConsole.myInitializer.myFactory.terminologySetExist(collection)) return false;
-				Set<TerminologySet> children=CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(collection).getCollections(CommandWebConsole.myInitializer.myFactory.getOrCreateTerminologySet(collection).getLastVersion());
+				Set<TerminologySet> children;
+				try {
+					children = CommandWebConsole.myInitializer.myFactory.getCheckedTerminologySet(collection).getCollections(CommandWebConsole.myInitializer.myFactory.getCheckedTerminologySet(collection).getLastVersion());
+				} catch (UnknownURIException e) {
+					e.printStackTrace();
+					return false;
+				} catch (ModelException e) {
+					e.printStackTrace();
+					return false;
+				}
 				if(children.size()>0) return true;
 				else return false;
+				
+				
+				
 			}
 
 			public IModel<String> model(String arg) {

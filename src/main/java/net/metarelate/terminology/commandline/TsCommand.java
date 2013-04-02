@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
+import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.instanceManager.Initializer;
 import net.metarelate.terminology.utils.SSLogger;
 
@@ -14,16 +15,19 @@ public abstract class TsCommand {
 	public Initializer myInitializer=null;
 	protected boolean debugOn=false;
 	protected String message="";
-	public TsCommand(Initializer myInitializer,String[] args) {
+	public TsCommand(Initializer myInitializer,String[] args,boolean debug) {
 		super();
 		this.myInitializer = myInitializer;
 		boolean isMessage=false;
+		this.debugOn=debug;
 		for(String arg : args) {
+			/*
 			if(arg.equalsIgnoreCase("-d") || arg.equalsIgnoreCase("-debug")) {
 				debugOn=true;
 				SSLogger.showDebug(true);
 			}
-			else if(arg.equalsIgnoreCase("-m") || arg.equalsIgnoreCase("-message")) {
+			*/
+			if(arg.equalsIgnoreCase("-m") || arg.equalsIgnoreCase("-message")) {
 				isMessage=true;
 			}
 			else if(isMessage==true) {
@@ -36,11 +40,22 @@ public abstract class TsCommand {
 
 	
 	
-	public void execute() {
-		localExecute();
-		myInitializer.myFactory.synch();
+	public void execute() throws ModelException {
+		if(!validate()) {
+			
+			System.out.println("Wrong usage:");
+			System.out.println(getLocalHelpMessage());
+		}
+		else {
+			localExecute();
+			myInitializer.myFactory.synch();
+		}
 	}
-	public abstract void localExecute();
+	public abstract void localExecute() throws ModelException;
+	public abstract boolean validate();
+	//No abstract static in Java! Must be a design error...
+	
+	public abstract String getLocalHelpMessage();
 	
 	protected Model readIntoModel(ArrayList<String> files) {
 		Model inputModel=ModelFactory.createDefaultModel();

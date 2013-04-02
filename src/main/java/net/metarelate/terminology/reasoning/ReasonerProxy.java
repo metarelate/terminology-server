@@ -60,7 +60,7 @@ public class ReasonerProxy {
 	}
 	
 	private static void computeSymmetric(Model rdfToInferOn) {
-		StmtIterator myStats=rdfToInferOn.listStatements(null,MetaLanguage.symmetricProperty,(Resource)null);
+		StmtIterator myStats=rdfToInferOn.listStatements(null,ReasonerProxyConfig.symmetricProperty,(Resource)null);
 		Hashtable<Property,Property> symProps=new Hashtable<Property,Property>();
 		while(myStats.hasNext()) {
 			Statement stat=myStats.next();
@@ -88,7 +88,8 @@ public class ReasonerProxy {
 	}
 	
 	private static void computeGenerates(Model rdfToInferOn) {
-		StmtIterator myStats=rdfToInferOn.listStatements(null,MetaLanguage.generatesProperty,(Resource)null);
+		SSLogger.log("Looking for generative properties",SSLogger.DEBUG);
+		StmtIterator myStats=rdfToInferOn.listStatements(null,ReasonerProxyConfig.generatesPropertyProperty,(Resource)null);
 		Hashtable<Property,Set<Property>> genProps=new Hashtable<Property,Set<Property>>();
 		while(myStats.hasNext()) {
 			Statement stat=myStats.next();
@@ -107,8 +108,7 @@ public class ReasonerProxy {
 		Model inferred=ModelFactory.createDefaultModel();
 		// This could be done better, checking only the statements we know are symmetric
 		Iterator<Property> toInfer=genProps.keySet().iterator();
-		while(toInfer.hasNext()) {
-			
+		while(toInfer.hasNext()) {	
 			Property tempProp=toInfer.next();
 			SSLogger.log("Checking statements for: "+tempProp.getURI());
 			Iterator<Statement> tempStats=rdfToInferOn.listStatements(null,tempProp,(Resource)null);
@@ -124,8 +124,51 @@ public class ReasonerProxy {
 				}
 				
 			}
-			rdfToInferOn.add(inferred);
+			
 		}
+		
+		///
+		
+		StmtIterator myStats2=rdfToInferOn.listStatements(null,ReasonerProxyConfig.generatesTypeProperty,(Resource)null);
+		Hashtable<Resource,Set<Resource>> genTypes=new Hashtable<Resource,Set<Resource>>();
+		while(myStats2.hasNext()) {
+			Statement stat=myStats2.next();
+			Resource type1=ResourceFactory.createProperty(stat.getSubject().getURI());
+			Resource type2=ResourceFactory.createProperty(stat.getObject().asResource().getURI());
+			if(!genTypes.containsKey(type1)) {
+				Set<Resource> newSet=new HashSet<Resource>();
+				genTypes.put(type1,newSet);
+				newSet.add(type2);
+			}
+			else {
+				genTypes.get(type1).add(type2);
+			}
+			SSLogger.log("Generative types : "+type1.getURI()+" yields "+type2.getURI());
+		}
+		Model inferred2=ModelFactory.createDefaultModel();
+		// This could be done better, checking only the statements we know are symmetric
+		Iterator<Resource> toInfer2=genTypes.keySet().iterator();
+		while(toInfer2.hasNext()) {	
+			Resource tempType=toInfer2.next();
+			SSLogger.log("Checking statements for: "+tempType.getURI());
+			Iterator<Statement> tempStats=rdfToInferOn.listStatements(null,MetaLanguage.typeProperty,tempType);
+			while(tempStats.hasNext()) {
+				Statement tempStat=tempStats.next();
+				Set<Resource> genSet=genTypes.get(tempType);
+				Iterator<Resource> typesToAssert=genSet.iterator();
+				while(typesToAssert.hasNext()) {
+					Resource typeToAssert=typesToAssert.next();
+					Statement newStatement=ResourceFactory.createStatement(tempStat.getSubject().asResource(), MetaLanguage.typeProperty, typeToAssert);
+					inferred2.add(newStatement);
+					SSLogger.log("Inferred statement: "+newStatement.toString());
+				}
+				
+			}
+			
+		}
+		rdfToInferOn.add(inferred);
+		rdfToInferOn.add(inferred2);
+		
 	}
 	
 	

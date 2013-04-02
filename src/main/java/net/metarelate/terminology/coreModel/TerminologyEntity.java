@@ -20,6 +20,10 @@
 package net.metarelate.terminology.coreModel;
 
 import java.util.Set;
+
+import net.metarelate.terminology.exceptions.ModelException;
+import net.metarelate.terminology.exceptions.UnknownURIException;
+
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -111,9 +115,10 @@ public interface TerminologyEntity {
 	 * While multiple containers are possible in the terminology design, the behavior of the system respect to rendering and permission management is undefined
 	 * if more than one parent container are present.
 	 * @param version
-	 * @return
+	 * @return 
+	 * @throws ModelException 
 	 */
-	public abstract Set<TerminologySet> getContainers(String version);
+	public abstract Set<TerminologySet> getContainers(String version) throws ModelException;
 	
 	
 
@@ -215,7 +220,7 @@ public interface TerminologyEntity {
 	 * TODO what if it doesn't exist ?
 	 * @param version
 	 */
-	public void setDefaultVersion(String version) ;
+	//public void setDefaultVersion(String version) ;
 	
 	/**
 	 * Gets the "default" version for this entity, that is the version set as such!
@@ -225,7 +230,7 @@ public interface TerminologyEntity {
 	 * 
 	 * @return
 	 */
-	public String getDefaultVersion() ;
+	//public String getDefaultVersion() ;
 	
 	/**
 	 * Activates versioning for this entity. The system is designed so that entities are either under versioning or not.

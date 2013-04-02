@@ -38,6 +38,8 @@ import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.coreModel.TerminologyIndividual;
 import net.metarelate.terminology.coreModel.TerminologySet;
+import net.metarelate.terminology.exceptions.ModelException;
+import net.metarelate.terminology.exceptions.WebSystemException;
 import net.metarelate.terminology.exceptions.WebWriterException;
 import net.metarelate.terminology.utils.SSLogger;
 import net.metarelate.terminology.utils.SimpleQueriesProcessor;
@@ -96,7 +98,7 @@ public class WebWriter {
 		this.prefixMap=map;
 	}
 	
-	public void write() throws WebWriterException, IOException {
+	public void write() throws WebWriterException, IOException, ModelException, WebSystemException {
 		Iterator<String> psm= prefixMap.keySet().iterator();
 		while(psm.hasNext()) {
 			String pi=psm.next();
@@ -117,20 +119,20 @@ public class WebWriter {
 		//if(!node.isLiteral()) throw new WebWriterException("Unable to find a literal for site prefix");
 		//sitePrefix=((Literal) node).getValue().toString();
 		
-		NodeIterator  myIter=extraTriplesInInput.listObjectsOfProperty(MetaLanguage.diskPrefixProperty);
+		NodeIterator  myIter=extraTriplesInInput.listObjectsOfProperty(PublisherConfig.diskPrefixProperty);
 		if(!myIter.hasNext()) throw new WebWriterException("Unable to find a site prefix");
 		RDFNode node=myIter.nextNode();
 		if(!node.isLiteral()) throw new WebWriterException("Unable to find a literal for site prefix");
 		diskPrefix=((Literal) node).getValue().toString();
 		
-		myIter=extraTriplesInInput.listObjectsOfProperty(MetaLanguage.baseURLProperty);
+		myIter=extraTriplesInInput.listObjectsOfProperty(PublisherConfig.baseURLProperty);
 		if(!myIter.hasNext()) SSLogger.log("No base URL specified, going for /",SSLogger.DEBUG);
 		node=myIter.nextNode();
 		if(!node.isLiteral()) throw new WebWriterException("baseURL should be a literal!");
 		baseURL=((Literal) node).getValue().toString();
 		
 		//TODO Obsolete
-		myIter=extraTriplesInInput.listObjectsOfProperty(MetaLanguage.cssAddressProperty);
+		myIter=extraTriplesInInput.listObjectsOfProperty(PublisherConfig.cssAddressProperty);
 		if(myIter.hasNext()) {
 			node=myIter.nextNode();
 			if(node.isLiteral()){ 
@@ -156,7 +158,7 @@ public class WebWriter {
 		writeSetToWeb(rootCollection);
 	}
 	
-	public void write(String rootPath, String rootURL) throws WebWriterException, IOException {
+	public void write(String rootPath, String rootURL) throws WebWriterException, IOException, ModelException, WebSystemException {
 		Iterator<String> psm= prefixMap.keySet().iterator();
 		while(psm.hasNext()) {
 			String pi=psm.next();
@@ -185,13 +187,13 @@ public class WebWriter {
 	}
 	
 	
-	private void preComputeReferences(TerminologySet collection,String urlPrefix, String diskPrefix) {
+	private void preComputeReferences(TerminologySet collection,String urlPrefix, String diskPrefix) throws ModelException {
 		//System.out.println(">>>>Precomputing references for: "+collection.getURI());
 		//Here we check for overrides
 		String myNSBit=collection.getLocalNamespace();
 
-		Literal basePath=SimpleQueriesProcessor.getOptionalLiteral(collection.getResource(), MetaLanguage.overrideBasePathProperty, extraTriplesInInput);
-		Literal baseNamespace=SimpleQueriesProcessor.getOptionalLiteral(collection.getResource(), MetaLanguage.overrideBaseSiteProperty, extraTriplesInInput);
+		Literal basePath=SimpleQueriesProcessor.getOptionalLiteral(collection.getResource(), PublisherConfig.overrideBasePathProperty, extraTriplesInInput);
+		Literal baseNamespace=SimpleQueriesProcessor.getOptionalLiteral(collection.getResource(), PublisherConfig.overrideBaseSiteProperty, extraTriplesInInput);
 		String collectionURL=urlPrefix+"/"+myNSBit;
 		// if we have an override directive, we re-define it
 		if(baseNamespace!=null) {
@@ -241,11 +243,13 @@ public class WebWriter {
 	 * @param pathAccumulatedPrefix
 	 * @throws WebWriterException
 	 * @throws IOException
+	 * @throws ModelException 
+	 * @throws WebSystemException 
 	 * @throws ConfigFileException
 	 */
 	//TODO no need to propagate namespace anymore, and also directory could be pre-computed.
 
-	private void writeSetToWeb(TerminologySet collection) throws WebWriterException, IOException {
+	private void writeSetToWeb(TerminologySet collection) throws WebWriterException, IOException, ModelException, WebSystemException {
 		WebRendererSet myRenderer=new WebRendererSet(collection,uri2Url.get(collection.getURI()));
 		myRenderer.registerUrlMap(uri2Url);
 		// TODO these two values could be overridden to write a sub-tree of the file system
@@ -329,7 +333,7 @@ public class WebWriter {
 		modelToWrite.add(MetaLanguage.filterForData(collection.getStatements(collection.getLastVersion())));
 
 		if(collection.isVersioned()) {
-			triplifyVersion( (TerminologySet)collection, modelToWrite,((TerminologySet)collection).getDefaultVersion());
+			triplifyVersion( (TerminologySet)collection, modelToWrite,lastVersion);
 		}
 		
 		
@@ -536,14 +540,14 @@ public class WebWriter {
 		Iterator<TerminologySet> myCollIter=childrenSet.iterator();
 		while(myCollIter.hasNext()) {
 			TerminologySet myColl=myCollIter.next();
-			modelToWrite.add(ResourceFactory.createStatement(collectionResource,MetaLanguage.hasSubRegisterProperty,ResourceFactory.createResource(myColl.getURI())));
+			modelToWrite.add(ResourceFactory.createStatement(collectionResource,MetaLanguage.definesProperty,ResourceFactory.createResource(myColl.getURI())));
 		}
 	
 		Iterator<TerminologyIndividual> myIndIter=indSet.iterator();
 		while(myIndIter.hasNext()) {
 			TerminologyIndividual myInd=myIndIter.next();
 			
-			modelToWrite.add(ResourceFactory.createStatement(collectionResource,MetaLanguage.hasRegisterItemProperty,ResourceFactory.createResource(myInd.getURI())));
+			modelToWrite.add(ResourceFactory.createStatement(collectionResource,MetaLanguage.definesProperty,ResourceFactory.createResource(myInd.getURI())));
 			
 		}
 		
@@ -592,7 +596,7 @@ public class WebWriter {
 	
 	
 	//TODO no need to propagate namespace anymore, and also directory could be pre-computed.
-	private void writeIndividualToWeb(TerminologyIndividual term) throws IOException, WebWriterException {
+	private void writeIndividualToWeb(TerminologyIndividual term) throws IOException, WebWriterException, WebSystemException, ModelException {
 		WebRendererIndividual myRenderer=new WebRendererIndividual(term,uri2Url.get(term.getURI()));
 		myRenderer.registerUrlMap(uri2Url);
 		String termDirectoryPath=uri2Path.get(term.getURI()); 	// the directory path
@@ -623,7 +627,7 @@ public class WebWriter {
 		
 		// TODO obsolete ?
 		//Resource termResource=ResourceFactory.createResource(term.getURI());
-		NodeIterator myIter=extraTriplesInInput.listObjectsOfProperty(term.getResource(),MetaLanguage.localIdProperty);
+		NodeIterator myIter=extraTriplesInInput.listObjectsOfProperty(term.getResource(),MetaLanguage.nameSpaceProperty);
 		String myID="";
 		if(myIter.hasNext()) {
 			RDFNode node=myIter.nextNode();
@@ -698,7 +702,7 @@ public class WebWriter {
 		triplifyTermLinks(term,modelToWrite);
 
 		if(term.isVersioned()) {
-			triplifyVersion( term, modelToWrite,term.getDefaultVersion());
+			triplifyVersion( term, modelToWrite,term.getLastVersion());
 		}
 		
 		writeModel(modelToWrite,termIndexRDF,termIndexTTL,termIndexJSON);
