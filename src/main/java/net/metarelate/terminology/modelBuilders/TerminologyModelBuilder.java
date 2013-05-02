@@ -370,6 +370,7 @@ public class TerminologyModelBuilder {
 		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		Date date = new Date();
 		e.setActionDate(dateFormat.format(date),version);
+		e.setOwnerURI(myInitializer.getDefaultUserURI()); // TODO this should be changed if we have to move to a more complex login system
 	}
 	
 	private void fillMetadataForReimportEntity (TerminologyEntity e,String version) {

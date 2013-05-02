@@ -52,6 +52,7 @@ import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
 import net.metarelate.terminology.exceptions.UnknownURIException;
 import net.metarelate.terminology.instanceManager.Initializer;
+import net.metarelate.terminology.utils.SSLogger;
 import net.metarelate.terminology.utils.SimpleQueriesProcessor;
 
 public class TerminologyManager {
@@ -284,7 +285,10 @@ public class TerminologyManager {
 			e.printStackTrace();
 		}
 		TerminologySet[] roots=myInitializer.myFactory.getRootCollections();
-		for(int i=0;i<roots.length;i++) myTag(roots[i],tag);
+		for(TerminologySet root: roots) {
+			SSLogger.log("Tagging root "+root,SSLogger.DEBUG);
+			myTag(root,tag);
+		}
 		//TODO we may want to register infos on tags somewhere.
 		
 	}

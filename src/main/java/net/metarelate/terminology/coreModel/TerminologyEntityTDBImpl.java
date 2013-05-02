@@ -134,6 +134,8 @@ public class TerminologyEntityTDBImpl implements TerminologyEntity{
 			String uri=myRes.getURI();
 			localNamespace=uri.substring(uri.lastIndexOf('/')+1);
 		}
+		// TODO debug
+		System.out.println("for "+getURI()+" namespace was "+localNamespace);
 		return localNamespace;
 	}
 	
