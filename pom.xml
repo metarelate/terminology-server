@@ -3,7 +3,6 @@
   	<modelVersion>4.0.0</modelVersion>
   	<groupId>net.metarelate.terminology</groupId>
   	<artifactId>terminologySever</artifactId>
-  	<packaging>jar</packaging>
   	<version>0.1.0</version>
   	<name>terminologySever</name>
   	<url>http://github.com/metarelate/terminology-server</url>
@@ -59,13 +58,6 @@
 	</repositories> 
  	<build>
 		<resources>
-		
-       
-            <!-- resource>
-                <directory>src/main/webapp</directory>
-           </resource -->
-        
-
 			<resource>
 				<filtering>false</filtering>
 				<directory>src/main/resources</directory>

@@ -75,7 +75,15 @@ public class WebCommand extends TsCommand {
 	        //String webDir = this.getClass().getResource("/").toExternalForm();
 	        
 	        //TODO make what's below system-independent 
+	        
+	        //TODO below it's just a test
 	        bb.setWar(myInitializer.getRootDirectory() +"/web");
+	        try {
+				System.out.println(Class.forName("net.metarelate.terminology.commandline.WebCommand").getProtectionDomain());
+			} catch (ClassNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 
 	        // START JMX SERVER
 	        // MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
