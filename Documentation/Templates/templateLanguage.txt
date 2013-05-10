@@ -1,0 +1,15 @@
+A brief description of the template language
+
+<!-- tmtOpen>
+<tmtClose -->
+What is found between these two comments is "parsed" by the template manager 
+(i.e.: what is not between a pair of such tags is rendered verbatim).
+
+<<tmtPageTitle>> Expands to the page title (usually in <head></head>)
+<<tmtPageDescription>>	The description for a page (code or set)
+<<tmtPageAuthor>>		The "author" for a page (code or set): should this be the owner ?
+<<tmtGlobalTitle>>		The title for a complete terminology collection
+<<tmtGlobalAuthor>>		The author(s) for a complete terminology collection
+
+
+	

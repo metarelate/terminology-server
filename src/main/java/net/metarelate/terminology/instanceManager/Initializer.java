@@ -36,6 +36,8 @@ import net.metarelate.terminology.auth.AuthServer;
 import net.metarelate.terminology.auth.AuthServerFactory;
 import net.metarelate.terminology.config.CoreConfig;
 import net.metarelate.terminology.config.MetaLanguage;
+import net.metarelate.terminology.coreModel.CacheManager;
+import net.metarelate.terminology.coreModel.CacheManagerTDBImpl;
 import net.metarelate.terminology.coreModel.TerminologyFactory;
 import net.metarelate.terminology.coreModel.TerminologyFactoryTDBImpl;
 import net.metarelate.terminology.exceptions.ConfigurationException;
@@ -44,6 +46,7 @@ import net.metarelate.terminology.management.ConstraintsManager;
 import net.metarelate.terminology.management.RegistryPolicyManager;
 import net.metarelate.terminology.management.TerminologyManager;
 import net.metarelate.terminology.publisher.PublisherConfig;
+import net.metarelate.terminology.publisher.PublisherManager;
 import net.metarelate.terminology.utils.SSLogger;
 import net.metarelate.terminology.utils.SimpleQueriesProcessor;
 
@@ -67,6 +70,7 @@ public class Initializer {
 	private static String userHomeString=null;
 	private static String gitDirAbsoluteString=null;
 	private static String dbDirAbsoluteString=null;
+	private static String cacheDirAbsoluteString=null;
 	private static String confDirAbsoluteString=null;
 	private static String authDirAbsoluteString=null;
 	private static String seedFileAbsoluteString=null;
@@ -80,6 +84,8 @@ public class Initializer {
 	public  TerminologyFactory myFactory=null;
 	public ConstraintsManager myConstraintsManager=null;
 	public RegistryPolicyManager myRegistryPolicyManager=null;
+	public CacheManager myCache=null;
+	public PublisherManager myPublisherManager=null;
 	public boolean debugMode=true;	// TODO this shold come from the configuration file
 	
 	protected String rootDirString=CoreConfig.rootDirString;
@@ -145,7 +151,15 @@ public class Initializer {
 			dbDir=new File(rootDirectory.getAbsolutePath(),CoreConfig.dbDirString);
 			dbDirAbsoluteString=dbDir.getAbsolutePath();	
 		}
-		checkOrCreateDirectory(dbDir);
+		checkOrCreateDirectory(dbDir);		
+		
+		File cacheDir;
+		if(cacheDirAbsoluteString!=null) cacheDir=new File(cacheDirAbsoluteString);
+		else{
+			cacheDir=new File(rootDirectory.getAbsolutePath(),CoreConfig.cacheDirString);
+			cacheDirAbsoluteString=cacheDir.getAbsolutePath();	
+		}
+		checkOrCreateDirectory(cacheDir);
 		
 		File confDir;
 		if(confDirAbsoluteString!=null) confDir=new File(confDirAbsoluteString);
@@ -210,6 +224,8 @@ public class Initializer {
 		myConstraintsManager=new ConstraintsManager(this);
 		myAuthManager=new AuthRegistryManager(myAuthServer,myFactory);
 		myTerminologyManager=new TerminologyManager(this);
+		myCache=new CacheManagerTDBImpl(this);
+		myPublisherManager=new PublisherManager(this);
 		
 	}
 

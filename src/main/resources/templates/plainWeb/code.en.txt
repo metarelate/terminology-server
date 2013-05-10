@@ -1,0 +1,48 @@
+<html lang="en">
+<head>
+	<title>
+	<!-- tmtOpen>
+		<<tmtPageTitle>>
+	<tmtClose -->
+	</title>
+	<!-- tmtOpen>
+	<meta name="description" content="<<tmtPageDescription>>" />
+	<meta name="author" content="<<tmtPageAuthor>>" />
+	<tmtClose -->
+</head>
+<body>
+
+</body>	
+</html>	
+
+			
+				
+String result2=getBredCrumbs(version,language,baseURL);
+
+String result3=	"<div id=\"content\">\n" +
+						"<article>\n";
+String result4=getHGroup( version,  language);
+
+String result5="<section id=\"main\">";
+
+String result6=getHeadBlock(language,version,dataLangMap);
+
+String result7=getMetaTable( version,  language, versionPage);
+
+String result71=getStatementsBlock(MetaLanguage.filterForWeb(entity.getStatements(version)),language);
+
+String result75="";
+		if(entity.isVersioned()) {
+			result75=getVersionBlock(version,language,baseURL);
+		}
+		//String result8="</section><section id=\"second\">";
+
+String result8="</section>";
+
+String result9=getNavigationPanel(version,language) ;// Statements
+		
+String result11=getClosing(language,langMap);
+		
+				
+		String resultLast="";
+		return result1+result2+result3+result4+result5+result6+result7+result71+result75+result8+result9+result11;		

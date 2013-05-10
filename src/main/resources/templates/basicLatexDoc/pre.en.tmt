@@ -1,0 +1,13 @@
+\documentclass{book}
+\usepackage{graphicx}
+\usepackage{makeidx}
+\makeindex
+
+\begin{document}
+<!-- tmtOpen>
+\title{<<globalTitle>>}
+\author{<<globalAuthor>>}
+<tmtClose -->
+\maketitle
+
+\tableofcontents

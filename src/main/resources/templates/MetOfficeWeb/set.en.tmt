@@ -1,0 +1,44 @@
+<!DOCTYPE html><html lang="en">
+<head>
+	<title>
+	<!-- tmtOpen>
+		<<tmtPageTitle>>
+	<tmtClose -->
+	</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width; initial-scale=1.0" />
+	<meta name="robots" content="nofollow" />
+	<link rel="shortcut icon" href="http://www.metoffice.gov.uk/favicon.ico" />
+	<link rel="stylesheet" type="text/css" href="http://reference.metoffice.gov.uk/data/wmo/web/css/normalize.css" />
+	<link rel="stylesheet" type="text/css" href="http://reference.metoffice.gov.uk/data/wmo/web/css/default.css" />
+	<!--[if lt IE 9]>
+		<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<!-- Replace favicon.ico & apple-touch-icon.png in the root of your domain and delete these references -->
+	<style type="text/css"></style>
+</head>
+<body>
+	<div id="sizer">
+	<!-- begin head -->
+	<header> 
+		<a id="skip" accesskey="S" href="#moContent">Skip Navigation</a>
+		<div class="moNavTabs">
+			<ul class="fc">
+				<li id="primary0" class="active"><a href="http://reference.metoffice.gov.uk/data/wmo/tdcf/">WMO codes</a></li>
+				<li id="primary1"><a href="http://reference.metoffice.gov.uk/data/wmo/docs/">Documentation</a></li>
+				<li id="primary2"><a href="http://reference.metoffice.gov.uk:8080/wmo/">Trac</a></li>
+			</ul>
+		</div>
+		<div class="logoBar fc"> 
+			<a id="topLogo" href="http://www.metoffice.gov.uk/" title="Go to Met Office home page"><img src="http://reference.metoffice.gov.uk/data/wmo/web/img/head-mo-logo.png" alt="Met Office" /></a>
+			<h1>Search</h1>
+			<form action="http://search.metoffice.gov.uk/kb5/metoffice/metoffice/results.page" method="get" id="fsrch">
+				<label for="searchInput">Search</label>
+				<input type="text" name="qt" id="searchInput" value="" maxlength="1000" accesskey="4">
+				<button type="submit" name="button" id="button" class="button" value="Search">Search</button>
+			</form>
+		</div>
+	</header>
+	<!-- end head -->
+	
+	
