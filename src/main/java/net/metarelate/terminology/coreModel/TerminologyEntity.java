@@ -28,9 +28,9 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 
-public interface TerminologyEntity {
-	final int INDIVIDUAL_TYPE = 1;
-	final int SET_TYPE=2;
+public interface TerminologyEntity extends Visitee {
+	//final int INDIVIDUAL_TYPE = 1;	// Note: these are not meant to be set! they are only constants to be used...
+	//final int SET_TYPE=2;			// TODO  the design should be changed to avoid confusion
 	/**
 	 * Returns the URI representing the entity
 	 * @return the URI string (not null and not by design)
@@ -399,5 +399,9 @@ public interface TerminologyEntity {
 
 	public abstract void synch();
 
+	
+	public boolean isSet();
+	
+	public boolean isIndividual();
 	
 }

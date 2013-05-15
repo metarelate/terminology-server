@@ -2,12 +2,16 @@ package net.metarelate.terminology.commandline;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
+import net.metarelate.terminology.exceptions.ConfigurationException;
 import net.metarelate.terminology.exceptions.ModelException;
+import net.metarelate.terminology.exceptions.UnknownURIException;
+import net.metarelate.terminology.exceptions.WebWriterException;
 import net.metarelate.terminology.instanceManager.Initializer;
 import net.metarelate.terminology.utils.SSLogger;
 
@@ -40,7 +44,7 @@ public abstract class TsCommand {
 
 	
 	
-	public void execute() throws ModelException {
+	public void execute() throws Exception {
 		if(!validate()) {
 			
 			System.out.println("Wrong usage:");
@@ -51,7 +55,7 @@ public abstract class TsCommand {
 			myInitializer.myFactory.synch();
 		}
 	}
-	public abstract void localExecute() throws ModelException;
+	public abstract void localExecute() throws ModelException, UnknownURIException, ConfigurationException, WebWriterException, IOException, Exception;
 	public abstract boolean validate();
 	//No abstract static in Java! Must be a design error...
 	

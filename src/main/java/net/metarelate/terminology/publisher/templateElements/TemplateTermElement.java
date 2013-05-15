@@ -4,7 +4,7 @@ import net.metarelate.terminology.coreModel.TerminologyEntity;
 
 public abstract class TemplateTermElement extends TemplateElement {
 
-	public abstract String render(TerminologyEntity e, String version);
+	public abstract String render(TerminologyEntity e, String version, int level);
 
 	@Override
 	public boolean isFixed() {

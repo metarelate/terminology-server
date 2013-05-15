@@ -65,11 +65,11 @@ public class TemplateManager {
 		}
 	}
 	
-	public String getPageForLang(String language, TerminologySet set, String version) throws ConfigurationException {
-		return expandTermTemplate(setTemplates,language,set,version);
+	public String getPageForLang(String language, TerminologySet set, String version, int level) throws ConfigurationException {
+		return expandTermTemplate(setTemplates,language,set,version, level);
 	}
-	public String getPageForLang(String language, TerminologyIndividual ind, String version) throws ConfigurationException {
-		return expandTermTemplate(indTemplates,language,ind,version);
+	public String getPageForLang(String language, TerminologyIndividual ind, String version, int level) throws ConfigurationException {
+		return expandTermTemplate(indTemplates,language,ind,version,level); 	// TODO we don't care about levels here
 	}
 	public String getIntroForLang(String language,String tag) throws ConfigurationException {
 		return expandFixedTemplate(preTemplates,language,tag);
@@ -81,13 +81,13 @@ public class TemplateManager {
 	
 
 
-	private String expandTermTemplate(Map<String,ArrayList<TemplateElement>> templateMap, String language, TerminologyEntity entity, String version) throws ConfigurationException {
+	private String expandTermTemplate(Map<String,ArrayList<TemplateElement>> templateMap, String language, TerminologyEntity entity, String version, int level) throws ConfigurationException {
 		if(templateMap.get(language)==null) {
 			language=CoreConfig.DEFAULT_LANGUAGE;
 			if(templateMap.get(language)==null) throw new ConfigurationException("No suitable template defined for "+entity.getURI());
 		}
 		StringBuilder answer=new StringBuilder();
-		for(TemplateElement t:templateMap.get(language)) answer.append(((TemplateTermElement)t).render(entity, version));
+		for(TemplateElement t:templateMap.get(language)) answer.append(((TemplateTermElement)t).render(entity, version, level));
 		return answer.toString();
 	}
 	
@@ -105,16 +105,21 @@ public class TemplateManager {
 		ArrayList<TemplateElement> bits=new ArrayList<TemplateElement>();
 		String templateString=readFileAsString(templateFile);
 		int runningIndex=0;
+		System.out.println(templateString); //TODO test
 		while(runningIndex<templateString.length()) {
+			System.out.println("Running index: "+runningIndex);
 			int firstBit=templateString.indexOf(openTag,runningIndex);
 			int secondBit=templateString.indexOf(closeTag,runningIndex);
+			System.out.println("First bit: "+firstBit); //TODO test
+			System.out.println("Second bit: "+secondBit); //TODO test
 			if(firstBit<0) {
 				bits.add(new StringTemplateElement(templateString.substring(runningIndex)));
 				runningIndex=templateString.length()+1;
+				break;
 			}
 			if(firstBit>runningIndex) bits.add(new StringTemplateElement(templateString.substring(runningIndex,firstBit)));
 			//TODO here we should parse the real block
-			bits.add(new DummyTemplateElement(templateString.substring(firstBit+openTag.length(),secondBit)));
+			if(firstBit>0 && secondBit>0) bits.add(new DummyTemplateElement(templateString.substring(firstBit+openTag.length(),secondBit)));
 			runningIndex=secondBit+openTag.length();
 			
 		}
@@ -133,6 +138,10 @@ public class TemplateManager {
 	    }
 	    reader.close();
 	    return stringBuilder.toString();
+	}
+
+	public String[] getLanguages() {
+		return indTemplates.keySet().toArray(new String [0]);
 	}
 	
 	

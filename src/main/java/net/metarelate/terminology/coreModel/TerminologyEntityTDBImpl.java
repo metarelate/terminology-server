@@ -32,6 +32,7 @@ import net.metarelate.terminology.config.CoreConfig;
 import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.UnknownURIException;
+import net.metarelate.terminology.publisher.PublisherVisitor;
 import net.metarelate.terminology.utils.CodeComparator;
 import net.metarelate.terminology.utils.SimpleQueriesProcessor;
 
@@ -48,7 +49,7 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.tdb.TDB;
 
-public class TerminologyEntityTDBImpl implements TerminologyEntity{
+public abstract class TerminologyEntityTDBImpl implements TerminologyEntity {
 	protected TerminologyFactory myFactory=null;	//The factory responsible for the construction of this entity
 	private String uri=null; 							//This is the uri of the entity. 
 	protected Resource myRes=null; 						//A resource representation of the entity.
@@ -508,6 +509,8 @@ public class TerminologyEntityTDBImpl implements TerminologyEntity{
 		}
 		return versions.toArray(new String[0]);
 	}
+
+
 
 
 	

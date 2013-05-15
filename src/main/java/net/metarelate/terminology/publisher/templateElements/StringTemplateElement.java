@@ -7,6 +7,7 @@ public class StringTemplateElement extends TemplateFixedElement {
 	public StringTemplateElement(String stringToRender) {
 		super();
 		this.stringToRender = stringToRender;
+		System.out.println("String block: "+stringToRender); //TODO test
 	}
 	
 	@Override

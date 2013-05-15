@@ -60,6 +60,9 @@ public class TerminologyManager {
 	private static final int MODE_ADD = 2;
 	private static final int MODE_REMOVE = 3;
 	private static final int MODE_SOBSTITUTE = 4;
+	
+	private final int INDIVIDUAL_TYPE = 10;	// Note: these are not meant to be set! they are only constants to be used...
+	private final int SET_TYPE=11;			// TODO  the design should be changed to avoid confusion
 
 	Initializer myInitializer=null;
 	//TerminologyFactory myFactory;
@@ -84,10 +87,10 @@ public class TerminologyManager {
 	}
 	
 	public void addTermToRegister(String codeURI, String registerURI, Model defaultEntityModel,String actionAuthor, String description, boolean isVersioned ) throws AuthException, RegistryAccessException, InvalidProcessException, ModelException, ImporterException {
-		addEntityToRegister( codeURI,  registerURI,  defaultEntityModel, actionAuthor,  description,  isVersioned, TerminologyEntity.INDIVIDUAL_TYPE);
+		addEntityToRegister( codeURI,  registerURI,  defaultEntityModel, actionAuthor,  description,  isVersioned, INDIVIDUAL_TYPE);
 	}
 	public void addSubRegister(String codeURI, String registerURI, Model defaultEntityModel,String actionAuthor, String description, boolean isVersioned ) throws AuthException, RegistryAccessException, InvalidProcessException, ModelException, ImporterException {
-		addEntityToRegister( codeURI,  registerURI,  defaultEntityModel, actionAuthor,  description,  isVersioned, TerminologyEntity.SET_TYPE);
+		addEntityToRegister( codeURI,  registerURI,  defaultEntityModel, actionAuthor,  description,  isVersioned, SET_TYPE);
 
 	}
 			//TODO we start refactoring from this!
@@ -122,12 +125,12 @@ public class TerminologyManager {
 			//Now we create the entity
 			TerminologyEntity newTerm=null;
 			//TODO dirty use of a type system!!!! should be a bit re-designed (e.g.: use entity more!)
-			if(entityType==TerminologyEntity.INDIVIDUAL_TYPE) {
+			if(entityType==INDIVIDUAL_TYPE) {
 				if(myInitializer.myFactory.terminologyEntityExist(codeURI)) throw new RegistryAccessException("Impossible to add individual "+codeURI+" as an entity with the same URI already exists");
 				if(isVersioned) newTerm=myInitializer.myFactory.createNewVersionedTerminologyIndividual(codeURI);
 				else newTerm=myInitializer.myFactory.createNewUnversionedTerminologyIndividual(codeURI);
 			}
-			else if(entityType==TerminologyEntity.SET_TYPE) {
+			else if(entityType==SET_TYPE) {
 				if(myInitializer.myFactory.terminologyEntityExist(codeURI)) throw new RegistryAccessException("Impossible to add set "+codeURI+" as an entity with the same URI already exists");
 				if(isVersioned) newTerm=myInitializer.myFactory.createNewVersionedTerminologySet(codeURI);
 				else newTerm=myInitializer.myFactory.createNewUnversionedTerminologySet(codeURI);
@@ -151,9 +154,9 @@ public class TerminologyManager {
 			myRegister.getStatements(newRegisterVersion).add((myRegister.getStatements(lastRegisterVersion)));
 			
 			//TODO dirty use of a type system!!!! should be a bit re-designed (e.g.: use entity more!)
-			if(entityType==TerminologyEntity.INDIVIDUAL_TYPE)
+			if(entityType==INDIVIDUAL_TYPE)
 				myRegister.registerContainedIndividual((TerminologyIndividual)newTerm, newRegisterVersion, newTerm.getLastVersion());
-			else if(entityType==TerminologyEntity.SET_TYPE)
+			else if(entityType==SET_TYPE)
 				myRegister.registerContainedCollection((TerminologySet)newTerm, newRegisterVersion, newTerm.getLastVersion());	
 			else System.out.println("This is a private method, should never be invoked like that!");
 			if(postRegisterStatus!=null) myRegister.setStateURI(postRegisterStatus, newRegisterVersion);

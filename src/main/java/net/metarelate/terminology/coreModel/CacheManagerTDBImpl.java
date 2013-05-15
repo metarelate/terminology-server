@@ -7,6 +7,7 @@ import net.metarelate.terminology.config.CoreConfig;
 import net.metarelate.terminology.instanceManager.Initializer;
 
 import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.NodeIterator;
@@ -15,6 +16,7 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.tdb.TDB;
 import com.hp.hpl.jena.tdb.TDBFactory;
 
 public class CacheManagerTDBImpl implements CacheManager {
@@ -72,5 +74,15 @@ public class CacheManagerTDBImpl implements CacheManager {
 		cleanValueFor(resource,property);
 		recordValue(resource,property,value);
 	}
+	public void forceCleanProp(String propertyURI) {
+		Model toRemove=ModelFactory.createDefaultModel();
+		StmtIterator toRemItemIter=cacheGraph.listStatements(null,ResourceFactory.createProperty(propertyURI),(RDFNode)null);
+		while(toRemItemIter.hasNext()) toRemove.add(toRemItemIter.nextStatement());
+		toRemItemIter=cacheGraph.listStatements(null,ResourceFactory.createProperty(propertyURI),(Literal)null);
+		while(toRemItemIter.hasNext()) toRemove.add(toRemItemIter.nextStatement());
+		cacheGraph.remove(toRemove);
+		TDB.sync(cacheGraph);
+	}
+
 	
 }

@@ -1,11 +1,15 @@
 package net.metarelate.terminology.commandline;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import com.hp.hpl.jena.rdf.model.Model;
 
 import net.metarelate.terminology.coreModel.TerminologySet;
+import net.metarelate.terminology.exceptions.ConfigurationException;
 import net.metarelate.terminology.exceptions.ModelException;
+import net.metarelate.terminology.exceptions.UnknownURIException;
+import net.metarelate.terminology.exceptions.WebWriterException;
 import net.metarelate.terminology.instanceManager.Initializer;
 import net.metarelate.terminology.publisher.PublisherManager;
 import net.metarelate.terminology.publisher.WebWriter;
@@ -16,7 +20,10 @@ public class CommandPublish extends TsCommand {
 	boolean cleanCache=false;				//default
 	String selectedURI=null;
 	String template="plain";				//default
-	String port="80";						//default
+	int port=80;						//default
+	String language="en";				//TODO default settings should be factorized
+	String tag=null;
+	String outFile=null;
 	int mode=PublisherManager.WEB_FILES; 	//default
 	private ArrayList<String> files=new ArrayList<String>();
 	public CommandPublish(Initializer myInitializer,String[] args, boolean debug) {
@@ -25,6 +32,9 @@ public class CommandPublish extends TsCommand {
 		boolean nextIsTemplate=false;
 		boolean nextIsPort=false;
 		boolean nextAreFiles=false;
+		boolean nextIsTag=false;
+		boolean nextIsOutFile=false;
+		boolean nextIsLanguage=false;
 		
 		for(String arg:args) {
 			if(arg.equalsIgnoreCase("-ow") || arg.equalsIgnoreCase("-overwrite")) {
@@ -41,6 +51,15 @@ public class CommandPublish extends TsCommand {
 			}
 			else if(arg.equalsIgnoreCase("-port") || arg.equalsIgnoreCase("-p")) {
 				nextIsPort=true;
+			}
+			else if(arg.equalsIgnoreCase("-tag") || arg.equalsIgnoreCase("-t")) {
+				nextIsTag=true;
+			}
+			else if(arg.equalsIgnoreCase("-out") || arg.equalsIgnoreCase("-o")) {
+				nextIsOutFile=true;
+			}
+			else if(arg.equalsIgnoreCase("-lang") || arg.equalsIgnoreCase("-l")) {
+				nextIsLanguage=true;
 			}
 			else if(arg.equalsIgnoreCase("-online") ) {
 				mode=PublisherManager.ONLINE;
@@ -66,15 +85,27 @@ public class CommandPublish extends TsCommand {
 				nextIsTemplate=false;
 			}
 			else if(nextIsPort==true) {
-				port=arg;
+				port=Integer.parseInt(arg);
 				nextIsPort=false;
+			}
+			else if(nextIsTag==true) {
+				tag=arg;
+				nextIsTag=false;
+			}
+			else if(nextIsOutFile==true) {
+				outFile=arg;
+				nextIsOutFile=false;
+			}
+			else if(nextIsLanguage==true) {
+				language=arg;
+				nextIsLanguage=false;
 			}
 			
 		}
 	}
 
 	@Override
-	public void localExecute() throws ModelException {
+	public void localExecute() throws Exception {
 		SSLogger.log("Publishing resources",SSLogger.DEBUG);
 		SSLogger.log("Mode is: "+mode,SSLogger.DEBUG);
 		if(mode==PublisherManager.WEB_FILES) SSLogger.log("Web file with template "+template,SSLogger.DEBUG);
@@ -94,26 +125,25 @@ public class CommandPublish extends TsCommand {
 		myInitializer.myPublisherManager.setTemplateLocation(template);
 		
 		if(mode==PublisherManager.WEB_FILES || mode==PublisherManager.ONLINE) {
-			if(cleanCache) myInitializer.myPublisherManager.forceClean();
+			if(cleanCache) myInitializer.myPublisherManager.cleanCache();
 		}
 		
 		if(mode==PublisherManager.WEB_FILES) {
-			if(selectedURI!=null) myInitializer.myWebManager.publishWeb();
+			if(selectedURI!=null) myInitializer.myPublisherManager.publishWebFiles(selectedURI,globalInput);
 			else {
-				TerminologySet[] roots=myInitializer.myFactory.getRootCollections(selectedRoot);
+				TerminologySet[] roots=myInitializer.myFactory.getRootCollections();
 				if(roots==null) {
 					System.out.println("Cannot finde roots! (something went wrong...)");
 					System.exit(0);
 				}
-				for(TerminologySet root: roots) myInitializer.myWebManager.publishWeb(root.getURI());
+				for(TerminologySet root: roots) myInitializer.myPublisherManager.publishWebFiles(root.getURI(),globalInput);
 			}
 		}
 		if(mode==PublisherManager.DOC_FILE)	{
-			if(tag!=null) complain;
-			else  myInitializer.myWebManager.publishWeb(tag);
+			myInitializer.myPublisherManager.publishDoc(tag, language, outFile);
 		}
 		if(mode==PublisherManager.ONLINE) {
-			myInitializer.myWebManager.publishOnline();
+			myInitializer.myPublisherManager.publishOnline(globalInput,port);
 		}
 		
 		/**
@@ -159,7 +189,11 @@ public class CommandPublish extends TsCommand {
 
 	@Override
 	public boolean validate() {
-		// We really need to start the publisher first
+		// TODO to complete with a check of which parameters are needed for each modality
+		if(mode==PublisherManager.DOC_FILE)	{
+			if(tag==null) return false;
+			if(outFile==null) return false;
+		}
 		return true;
 	}
 

@@ -9,6 +9,11 @@ public class PublisherConfig {
 	 * these properties don't enter the data model
 	 * TODO namespace property is currently stored in the data model (it doesn't appear in view, but it should regarded as homogenuos to the other metadata)
 	 */
+	
+	public static final String uriHasUrl="http://metarelate.net/internal/cache/uriHasUrl"; // TODO maybe we should move this somewhere else
+	public static final String uriHasDisk="http://metarelate.net/internal/cache/uriHasDisk"; // TODO maybe we should move this somewhere else
+	
+	
 	// The root of the website
 	//public static final Property sitePrefixProperty=ResourceFactory.createProperty("http://metarelate.net/config/sitePrefix");
 	// The root of the disk location

@@ -19,12 +19,16 @@
 	
 package net.metarelate.terminology.coreModel;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
 import net.metarelate.terminology.config.MetaLanguage;
+import net.metarelate.terminology.exceptions.ConfigurationException;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.UnknownURIException;
+import net.metarelate.terminology.exceptions.WebWriterException;
+import net.metarelate.terminology.publisher.PublisherVisitor;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.NodeIterator;
@@ -230,6 +234,19 @@ public class TerminologySetTDBImpl extends
 		return getStatements(version).contains(myRes, MetaLanguage.definesProperty,myTerm.getResource());
 		
 		
+	}
+
+	public void accept(PublisherVisitor v) throws WebWriterException, IOException, ConfigurationException {
+		v.visit(this);
+		
+	}
+
+	public boolean isSet() {
+		return true;
+	}
+
+	public boolean isIndividual() {
+		return false;
 	}
 
 }

@@ -19,10 +19,14 @@
 	
 package net.metarelate.terminology.coreModel;
 
+import java.io.IOException;
 import java.util.Set;
 
+import net.metarelate.terminology.exceptions.ConfigurationException;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.UnknownURIException;
+import net.metarelate.terminology.exceptions.WebWriterException;
+import net.metarelate.terminology.publisher.PublisherVisitor;
 
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
@@ -98,6 +102,19 @@ public class TerminologyIndividualTDBImpl extends TerminologyEntityTDBImpl imple
 	 */
 	public Set<TerminologySet> getContainers() throws ModelException {
 		return getContainers(getLastVersion());
+	}
+
+	public void accept(PublisherVisitor v) throws WebWriterException, IOException, ConfigurationException {
+		v.visit(this);
+		
+	}
+
+	public boolean isSet() {
+		return false;
+	}
+
+	public boolean isIndividual() {
+		return true;
 	}
 
 	

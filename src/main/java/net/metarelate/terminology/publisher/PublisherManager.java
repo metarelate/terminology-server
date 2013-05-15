@@ -5,6 +5,14 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.AbstractHandler;
+
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
@@ -25,8 +33,7 @@ public class PublisherManager {
 	public static final int DOC_FILE=1;
 	public static final int ONLINE=2;
 	
-	public static final String uriHasUrl="http://metarelate.net/internal/cache/uriHasUrl"; // TODO maybe we should move this somewhere else
-	public static final String uriHasDisk="http://metarelate.net/internal/cache/uriHasDisk"; // TODO maybe we should move this somewhere else
+	
 	
 	private String templateLocation=null;
 	
@@ -51,7 +58,7 @@ public class PublisherManager {
 		}
 	}
 	*/
-	private void publishWebFiles(String rootURI, Model extraInputGraph) throws ModelException, ConfigurationException, WebWriterException, UnknownURIException, IOException {
+	public void publishWebFiles(String rootURI, Model extraInputGraph) throws ModelException, ConfigurationException, WebWriterException, UnknownURIException, IOException {
 		SSLogger.log("Publishing the terminology under "+rootURI+" as a set of web-files");
 		String baseURL=null;
 		String baseDisk=null;
@@ -69,8 +76,8 @@ public class PublisherManager {
 				if(uberRoots.size()==0) throw new WebWriterException(rootURI+" is not active in its last version. Try to publish an super-register");
 				else if(uberRoots.size()>1) throw new ModelException(rootURI+ " in multiple containers");
 				else uberRoot=uberRoots.iterator().next();
-				baseURL=myInitializer.myCache.getValueFor(uberRoot.getURI(), uriHasUrl);
-				baseDisk=myInitializer.myCache.getValueFor(uberRoot.getURI(), uriHasDisk);
+				baseURL=myInitializer.myCache.getValueFor(uberRoot.getURI(), PublisherConfig.uriHasUrl);
+				baseDisk=myInitializer.myCache.getValueFor(uberRoot.getURI(), PublisherConfig.uriHasDisk);
 				SSLogger.log("From cache: For "+rootURI+" found URL: "+baseURL+" , Disk: "+baseDisk,SSLogger.DEBUG);
 				if(baseURL==null || baseDisk==null) throw new WebWriterException("You attempted to publish a register never published before, roots should be published first! ("+rootURI+")");
 			}
@@ -80,7 +87,7 @@ public class PublisherManager {
 		cleanCacheTree(rootURI);
 		buildURLMapAndCache(baseURL,baseDisk,rootURI,extraInputGraph);
 		TemplateManager myTm=new TemplateManager(templateLocation);
-		PublisherVisitor vis=new WebFileVisitor(myTm);
+		WebFilesVisitor vis=new WebFilesVisitor(myInitializer,myTm);
 		vis.crawl(root);
 		// build Visitor
 		// cycle over passing visitor (visitor print files)
@@ -88,36 +95,60 @@ public class PublisherManager {
 		
 	}
 	
-	private void publishDoc(String rootURI) {
-		//TODO we allow only upper level printing. Check needed!
-
-		// initialize TemplateManager
-		// build Visitor
-		// cycle over passing visitor 
-		// visitor.print
+	public void publishDoc(String tag, String language, String fileName) throws ConfigurationException, IOException, ModelException, WebWriterException {
+		SSLogger.log("Publishing the terminology as a document for tag "+tag+" in language "+language);
+		TemplateManager myTm=new TemplateManager(templateLocation); //TODO just in case we need a different design
+		DocumentVisitor vis=new DocumentVisitor(myInitializer,myTm);
+		vis.bind(tag, language);
+		vis.writeToFile(fileName);
+		// Optional latex bits ?
 		
 	}
 	
-	private void publishOnline(String rootURI) throws ModelException {
-		// 1) Do we know it already ? >> get/clean/compute
+	public void publishOnline(Model extraTriplesGraph, int port) throws Exception {
+		String baseURL=SimpleQueriesProcessor.getOptionalConfigurationParameterSingleValue(myInitializer.getConfigurationGraph(), PublisherConfig.baseURLProperty);
+		SSLogger.log("From configuration files found base URL:  "+baseURL,SSLogger.DEBUG);
+		cleanCache();
+		TerminologySet[] roots=myInitializer.myFactory.getRootCollections();
+		for (TerminologySet root:roots) {
+			try {
+				buildURLMapAndCacheSimple(baseURL,root.getURI(),extraTriplesGraph);
+			} catch (UnknownURIException e) {
+				e.printStackTrace();
+				throw new ConfigurationException(root.getURI()+" is a root, but it's unknown!");
+			} catch (ConfigurationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		TemplateManager myTm=new TemplateManager(templateLocation);
+		Server server = new Server(port);
+	    server.setHandler(new SimpleServer());
+	    server.start();
+	    server.join();
+	    
+		
+		
+			// 1) Do we know it already ? >> get/clean/compute
 		// 2) Unknown: is it a root ? >> compute (must find params or error)
 		// 3) Unknwon, not roor: error. Need to compute root first.
-		cleanCacheTree(rootURI);
+		
 		// find baseURI/URL
 		// resolve URI/URLs
 		// initialize termplateManager
 		// start server
 	}
-	
+	// TODO, this should be better designed, properties cleaned should be implicit.
 	private void cleanCacheTree(String rootURI) throws ModelException {
-		myInitializer.myCache.cleanValueFor(rootURI,uriHasUrl);
-		SSLogger.log("Cleaning uriHasUrl chache for "+rootURI,SSLogger.DEBUG);
-		if(myInitializer.myFactory.terminologyEntityExist(rootURI)) {
-			Collection<TerminologySet> sets=myInitializer.myFactory.getAllSets();
+		myInitializer.myCache.cleanValueFor(rootURI,PublisherConfig.uriHasUrl);
+		myInitializer.myCache.cleanValueFor(rootURI,PublisherConfig.uriHasDisk);
+		SSLogger.log("Cleaning uriHasUrl and uriHasDisk chache for "+rootURI,SSLogger.DEBUG);
+		if(myInitializer.myFactory.terminologySetExist(rootURI)) {
+			Collection<TerminologySet> sets=myInitializer.myFactory.getUncheckedTerminologySet(rootURI).getCollections();
 			for (TerminologySet set:sets ) {
 				cleanCacheTree(set.getURI());
 			}
-			Collection<TerminologyIndividual> inds=myInitializer.myFactory.getAllIndividuals();
+			Collection<TerminologyIndividual> inds=myInitializer.myFactory.getUncheckedTerminologySet(rootURI).getAllKnownContainedInviduals();
 			for (TerminologyIndividual ind:inds) {
 				cleanCacheTree(ind.getURI());
 			}
@@ -148,8 +179,8 @@ public class PublisherManager {
 		}
 		String collectionDisk=baseDisk+"/"+myNSBit;
 		
-		myInitializer.myCache.recordValue(rootURI, uriHasUrl, collectionURL);
-		myInitializer.myCache.recordValue(rootURI, uriHasDisk, collectionDisk);
+		myInitializer.myCache.recordValue(rootURI, PublisherConfig.uriHasUrl, collectionURL);
+		myInitializer.myCache.recordValue(rootURI, PublisherConfig.uriHasDisk, collectionDisk);
 		
 		// Now going for individuals
 		Iterator<TerminologyIndividual> myIndIter=currentSet.getAllKnownContainedInviduals().iterator();
@@ -159,8 +190,8 @@ public class PublisherManager {
 			String indNs=ind.getLocalNamespace();
 			String indURL=collectionURL+"/"+indNs;
 			String indPath=collectionDisk+"/"+indNs;
-			myInitializer.myCache.recordValue(ind.getURI(),uriHasUrl,indURL);
-			myInitializer.myCache.recordValue(ind.getURI(),uriHasDisk,indPath);
+			myInitializer.myCache.recordValue(ind.getURI(),PublisherConfig.uriHasUrl,indURL);
+			myInitializer.myCache.recordValue(ind.getURI(),PublisherConfig.uriHasDisk,indPath);
 		}
 				
 		Iterator<TerminologySet> childrenEnum=currentSet.getAllKnownContainedCollections().iterator();
@@ -168,6 +199,66 @@ public class PublisherManager {
 			buildURLMapAndCache(collectionURL,collectionDisk,childrenEnum.next().getURI(),extraParametersGraph);
 		}
 		
+	}
+
+	private void buildURLMapAndCacheSimple(String baseURL,String rootURI, Model extraParametersGraph) throws ModelException, UnknownURIException, ConfigurationException {
+		TerminologySet currentSet=myInitializer.myFactory.getCheckedTerminologySet(rootURI);
+		String myNSBit=currentSet.getLocalNamespace();	//TODO this needs a fix for trailing "/"
+		
+		// We still allow override of URLs
+		Literal overrideBaseURL=SimpleQueriesProcessor.getOptionalLiteral(currentSet.getResource(), PublisherConfig.overrideBaseSiteProperty, extraParametersGraph);
+		if(overrideBaseURL!=null) {
+			if(overrideBaseURL.isLiteral()) {
+				baseURL=overrideBaseURL.getValue().toString();
+			}
+			else throw new ConfigurationException("Override for "+rootURI+" does not have a valid literal :"+overrideBaseURL);
+		}
+		String collectionURL=baseURL+"/"+myNSBit;
+		
+		
+		
+		myInitializer.myCache.recordValue(rootURI, PublisherConfig.uriHasUrl, collectionURL);
+		
+		// Now going for individuals
+		Iterator<TerminologyIndividual> myIndIter=currentSet.getAllKnownContainedInviduals().iterator();
+		//System.out.println(">>>>For: "+collection.getURI()+" Total number of terms: "+collection.getAllKnownContainedInviduals().size());
+		while(myIndIter.hasNext()) {
+			TerminologyIndividual ind=myIndIter.next();
+			String indNs=ind.getLocalNamespace();
+			String indURL=collectionURL+"/"+indNs;
+			myInitializer.myCache.recordValue(ind.getURI(),PublisherConfig.uriHasUrl,indURL);
+		}
+				
+		Iterator<TerminologySet> childrenEnum=currentSet.getAllKnownContainedCollections().iterator();
+		while(childrenEnum.hasNext()) {
+			buildURLMapAndCacheSimple(collectionURL,childrenEnum.next().getURI(),extraParametersGraph);
+		}
+		
+	}
+	
+	
+	public void cleanCache() {
+		myInitializer.myCache.forceCleanProp(PublisherConfig.uriHasUrl);	
+		myInitializer.myCache.forceCleanProp(PublisherConfig.uriHasDisk);	
+	}
+	
+	
+	private class SimpleServer extends AbstractHandler
+	{
+	    public void handle(String target,
+	                       Request baseRequest,
+	                       HttpServletRequest request,
+	                       HttpServletResponse response) 
+	        throws IOException, ServletException
+	    {
+	        System.out.println("base was type: "+baseRequest.getContentType()+" URI: "+baseRequest.getRequestURI());
+	    	System.out.println("request was type: "+request.getRequestURI());
+	        //TODO here we need to do the proper thing!
+	    	response.setContentType("text/html;charset=utf-8");
+	        response.setStatus(HttpServletResponse.SC_OK);
+	        baseRequest.setHandled(true);
+	        response.getWriter().println("<h1>Hello World</h1>");
+	    }
 	}
 
 }
