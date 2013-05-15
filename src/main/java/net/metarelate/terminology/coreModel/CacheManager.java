@@ -14,4 +14,6 @@ public interface CacheManager {
 
 	public void forceCleanProp(String propertyURI);
 
+	public void synch();
+
 }

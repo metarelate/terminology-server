@@ -24,9 +24,9 @@ public class CacheManagerTDBImpl implements CacheManager {
 	private Dataset auxDataset=null;
 	private Model cacheGraph=null;
 
-	public CacheManagerTDBImpl(Initializer initializer) {
+	public CacheManagerTDBImpl(Initializer initializer, String cacheLocation) { //TODO we could only only pass the initializer with a multi-staged init sequence
 		this.myInitializer=myInitializer;
-		auxDataset = TDBFactory.createDataset();
+		auxDataset = TDBFactory.createDataset(cacheLocation);
 		cacheGraph=auxDataset.getNamedModel(CoreConfig.cacheGraph);
 	}
 	/* (non-Javadoc)
@@ -82,6 +82,10 @@ public class CacheManagerTDBImpl implements CacheManager {
 		while(toRemItemIter.hasNext()) toRemove.add(toRemItemIter.nextStatement());
 		cacheGraph.remove(toRemove);
 		TDB.sync(cacheGraph);
+	}
+	public void synch() {
+		TDB.sync(cacheGraph);
+		
 	}
 
 	

@@ -224,7 +224,7 @@ public class Initializer {
 		myConstraintsManager=new ConstraintsManager(this);
 		myAuthManager=new AuthRegistryManager(myAuthServer,myFactory);
 		myTerminologyManager=new TerminologyManager(this);
-		myCache=new CacheManagerTDBImpl(this);
+		myCache=new CacheManagerTDBImpl(this,cacheDirAbsoluteString);
 		myPublisherManager=new PublisherManager(this);
 		
 	}

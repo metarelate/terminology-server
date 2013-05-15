@@ -133,6 +133,7 @@ public abstract class TerminologyEntityTDBImpl implements TerminologyEntity {
 		String localNamespace=SimpleQueriesProcessor.getOptionalLiteralValueAsString(myRes, MetaLanguage.nameSpaceProperty, globalGraph);
 		if(localNamespace==null) {
 			String uri=myRes.getURI();
+			if(uri.endsWith("/")) uri=uri.substring(0, uri.length()-1);
 			localNamespace=uri.substring(uri.lastIndexOf('/')+1);
 		}
 		// TODO debug

@@ -46,18 +46,6 @@ public class PublisherManager {
 		
 	}
 	
-	/*
-	public void publish(String rootURI,int publishingType) throws ModelException {
-		switch (publishingType) {
-			case WEB_FILES: webFileRender(rootURI);
-			break;
-			case DOC_FILE: docRender(rootURI);
-			break;
-			case ONLINE: onlineRender(rootURI);
-			break;
-		}
-	}
-	*/
 	public void publishWebFiles(String rootURI, Model extraInputGraph) throws ModelException, ConfigurationException, WebWriterException, UnknownURIException, IOException {
 		SSLogger.log("Publishing the terminology under "+rootURI+" as a set of web-files");
 		String baseURL=null;
@@ -89,6 +77,9 @@ public class PublisherManager {
 		TemplateManager myTm=new TemplateManager(templateLocation);
 		WebFilesVisitor vis=new WebFilesVisitor(myInitializer,myTm);
 		vis.crawl(root);
+		
+		//TODO should be hidden by design.
+		myInitializer.myCache.synch();
 		// build Visitor
 		// cycle over passing visitor (visitor print files)
 		//TerminologyEntity entity=myInitializer.myFactory.getCheckedTerminologyEntity(rootURI);
@@ -122,6 +113,10 @@ public class PublisherManager {
 			}
 		}
 		TemplateManager myTm=new TemplateManager(templateLocation);
+		
+		//TODO should be hidden by design.
+		myInitializer.myCache.synch();
+		
 		Server server = new Server(port);
 	    server.setHandler(new SimpleServer());
 	    server.start();
@@ -156,8 +151,8 @@ public class PublisherManager {
 		
 	}
 	
-	private void buildURLMapAndCache(String baseURL,String baseDisk,String rootURI, Model extraParametersGraph) throws ModelException, UnknownURIException, ConfigurationException {
-		TerminologySet currentSet=myInitializer.myFactory.getCheckedTerminologySet(rootURI);
+	private void buildURLMapAndCache(String baseURL,String baseDisk,String entityURI, Model extraParametersGraph) throws ModelException, UnknownURIException, ConfigurationException {
+		TerminologySet currentSet=myInitializer.myFactory.getCheckedTerminologySet(entityURI);
 		String myNSBit=currentSet.getLocalNamespace();	//TODO this needs a fix for trailing "/"
 		
 		// We still allow override of URLs
@@ -167,7 +162,7 @@ public class PublisherManager {
 			if(overrideBaseURL.isLiteral()) {
 				baseURL=overrideBaseURL.getValue().toString();
 			}
-			else throw new ConfigurationException("Override for "+rootURI+" does not have a valid literal :"+overrideBaseURL);
+			else throw new ConfigurationException("Override for "+entityURI+" does not have a valid literal :"+overrideBaseURL);
 		}
 		String collectionURL=baseURL+"/"+myNSBit;
 		
@@ -175,12 +170,12 @@ public class PublisherManager {
 			if(overrideBaseDisk.isLiteral()) {
 				baseDisk=overrideBaseDisk.getValue().toString();
 			}
-			else throw new ConfigurationException("Override for "+rootURI+" does not have a valid literal :"+overrideBaseDisk);
+			else throw new ConfigurationException("Override for "+entityURI+" does not have a valid literal :"+overrideBaseDisk);
 		}
 		String collectionDisk=baseDisk+"/"+myNSBit;
 		
-		myInitializer.myCache.recordValue(rootURI, PublisherConfig.uriHasUrl, collectionURL);
-		myInitializer.myCache.recordValue(rootURI, PublisherConfig.uriHasDisk, collectionDisk);
+		myInitializer.myCache.recordValue(entityURI, PublisherConfig.uriHasUrl, collectionURL);
+		myInitializer.myCache.recordValue(entityURI, PublisherConfig.uriHasDisk, collectionDisk);
 		
 		// Now going for individuals
 		Iterator<TerminologyIndividual> myIndIter=currentSet.getAllKnownContainedInviduals().iterator();

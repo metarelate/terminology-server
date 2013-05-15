@@ -53,8 +53,8 @@ public class WebFilesVisitor extends PublisherVisitor {
 	public void visit (TerminologySet set) throws WebWriterException, IOException, ConfigurationException {
 		String type="register";
 		String version=set.getLastVersion();
-		String collectionDirectoryPath=myInitializer.myCache.getValueFor(set.getURI(), PublisherConfig.uriHasUrl);
-		String collectionBaseURL=myInitializer.myCache.getValueFor(set.getURI(), PublisherConfig.uriHasDisk);
+		String collectionDirectoryPath=myInitializer.myCache.getValueFor(set.getURI(), PublisherConfig.uriHasDisk);
+		String collectionBaseURL=myInitializer.myCache.getValueFor(set.getURI(), PublisherConfig.uriHasUrl);
 		if(collectionDirectoryPath==null || collectionBaseURL==null) throw new WebWriterException("Unable to find disk or base URL for "+set.getURI());
 		makeFiles(set,type,collectionDirectoryPath,collectionBaseURL,version);
 		if(set.isVersioned()) {
