@@ -46,7 +46,7 @@ public class PublisherManager {
 		
 	}
 	
-	public void publishWebFiles(String rootURI, Model extraInputGraph) throws ModelException, ConfigurationException, WebWriterException, UnknownURIException, IOException {
+	public void publishWebFiles(String rootURI, Model extraInputGraph,boolean overwrite) throws ModelException, ConfigurationException, WebWriterException, UnknownURIException, IOException {
 		SSLogger.log("Publishing the terminology under "+rootURI+" as a set of web-files");
 		String baseURL=null;
 		String baseDisk=null;
@@ -74,12 +74,15 @@ public class PublisherManager {
 		SSLogger.log("Cleaning cache for "+rootURI);
 		cleanCacheTree(rootURI);
 		buildURLMapAndCache(baseURL,baseDisk,rootURI,extraInputGraph);
-		TemplateManager myTm=new TemplateManager(templateLocation);
-		WebFilesVisitor vis=new WebFilesVisitor(myInitializer,myTm);
-		vis.crawl(root);
-		
 		//TODO should be hidden by design.
 		myInitializer.myCache.synch();
+		TemplateManager myTm=new TemplateManager(templateLocation);
+		WebFilesVisitor vis=new WebFilesVisitor(myInitializer,myTm);
+		vis.setOverwriteFiles(overwrite);
+		vis.crawl(root);
+		
+		
+		
 		// build Visitor
 		// cycle over passing visitor (visitor print files)
 		//TerminologyEntity entity=myInitializer.myFactory.getCheckedTerminologyEntity(rootURI);
@@ -100,6 +103,8 @@ public class PublisherManager {
 		String baseURL=SimpleQueriesProcessor.getOptionalConfigurationParameterSingleValue(myInitializer.getConfigurationGraph(), PublisherConfig.baseURLProperty);
 		SSLogger.log("From configuration files found base URL:  "+baseURL,SSLogger.DEBUG);
 		cleanCache();
+		//TODO should be hidden by design.
+		myInitializer.myCache.synch();
 		TerminologySet[] roots=myInitializer.myFactory.getRootCollections();
 		for (TerminologySet root:roots) {
 			try {
@@ -112,6 +117,8 @@ public class PublisherManager {
 				e.printStackTrace();
 			}
 		}
+		//TODO should be hidden by design.
+		myInitializer.myCache.synch();
 		TemplateManager myTm=new TemplateManager(templateLocation);
 		
 		//TODO should be hidden by design.

@@ -129,14 +129,14 @@ public class CommandPublish extends TsCommand {
 		}
 		
 		if(mode==PublisherManager.WEB_FILES) {
-			if(selectedURI!=null) myInitializer.myPublisherManager.publishWebFiles(selectedURI,globalInput);
+			if(selectedURI!=null) myInitializer.myPublisherManager.publishWebFiles(selectedURI,globalInput,overwrite);
 			else {
 				TerminologySet[] roots=myInitializer.myFactory.getRootCollections();
 				if(roots==null) {
 					System.out.println("Cannot finde roots! (something went wrong...)");
 					System.exit(0);
 				}
-				for(TerminologySet root: roots) myInitializer.myPublisherManager.publishWebFiles(root.getURI(),globalInput);
+				for(TerminologySet root: roots) myInitializer.myPublisherManager.publishWebFiles(root.getURI(),globalInput,overwrite);
 			}
 		}
 		if(mode==PublisherManager.DOC_FILE)	{
