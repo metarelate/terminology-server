@@ -31,18 +31,19 @@ public class DocumentVisitor extends PublisherVisitor {
 	public void bind(String tag, String language) throws ConfigurationException, ModelException, WebWriterException, IOException {
 		this.language=language;
 		this.tag=tag;
-		myDoc.append(tm.getIntroForLang(language, tag));
+		myDoc.append(tm.getIntroForLang(language, tag,myInitializer.myFactory));
 		TerminologySet[] roots=myInitializer.myFactory.getRootCollections(); //TODO note, we need some sorting here!
 		Set<TerminologySet> rootsSet= new HashSet<TerminologySet>();		//TODO we should homogenize collections and have only Sets returned, where that's the semantics (no repetitions, no guaranteed order)
 		for(TerminologySet root:roots) rootsSet.add(root);
 		crawl(rootsSet,tag,language);
+		myDoc.append(tm.getClosingForLang(language, tag,myInitializer.myFactory));
 		
 	}
 
 	public void crawl(Set<TerminologySet> currentSent, String tag, String language) throws ConfigurationException, ModelException, WebWriterException, IOException {
 		for(TerminologySet set:currentSent) {
 			String[] versions=set.getVersionsForTag(tag);
-			if(versions.length>0) {	//TODO to check. If a node is not tagged, we don't go through the subtree. Seems plausible.
+			if(versions!=null && versions.length>0) {	//TODO to check. If a node is not tagged, we don't go through the subtree. Seems plausible.
 				set.accept(this);
 				level+=1;
 				Set<TerminologySet> childrenToConsider=new HashSet<TerminologySet>();

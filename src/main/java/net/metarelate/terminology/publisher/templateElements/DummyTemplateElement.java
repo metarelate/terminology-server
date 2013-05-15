@@ -1,8 +1,10 @@
 package net.metarelate.terminology.publisher.templateElements;
 
 import net.metarelate.terminology.coreModel.TerminologyEntity;
+import net.metarelate.terminology.coreModel.TerminologyFactory;
+import net.metarelate.terminology.exceptions.ModelException;
 
-public class DummyTemplateElement implements TemplateTermElement {
+public class DummyTemplateElement implements TemplateTermElement,TemplateGlobalElement {
 	private String stringToRender=null;
 	public DummyTemplateElement(String stringToRender) {
 		super();
@@ -18,5 +20,9 @@ public class DummyTemplateElement implements TemplateTermElement {
 	}
 	public boolean isPerTerm() {
 		return true;
+	}
+
+	public String render(TerminologyFactory factory) throws ModelException {
+		return "Dummy element for factory with  "+factory.getAllSets().size()+" sets, "+stringToRender;
 	}
 }

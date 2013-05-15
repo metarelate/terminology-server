@@ -255,7 +255,10 @@ public class PublisherManager {
 	    {
 	        System.out.println("base was type: "+baseRequest.getContentType()+" URI: "+baseRequest.getRequestURI());
 	    	System.out.println("request was type: "+request.getRequestURI());
-	        //TODO here we need to do the proper thing!
+	    	System.out.println("ServerName: "+request.getServerName());
+	    	System.out.println("Content type:"+request.getContentType());
+	    	System.out.println("Content type:"+baseRequest.getHeader("Accept"));
+	    	//TODO here we need to do the proper thing!
 	    	response.setContentType("text/html;charset=utf-8");
 	        response.setStatus(HttpServletResponse.SC_OK);
 	        baseRequest.setHandled(true);

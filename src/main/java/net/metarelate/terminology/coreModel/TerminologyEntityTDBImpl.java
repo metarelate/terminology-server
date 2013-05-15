@@ -326,8 +326,18 @@ public abstract class TerminologyEntityTDBImpl implements TerminologyEntity {
 	}
 
 	public String[] getVersionsForTag(String tag) {
-		// TODO Auto-generated method stub
-		return null;
+		////
+		Set<String> versions=new HashSet<String>();
+		ResIterator subIter=globalGraph.listSubjectsWithProperty(MetaLanguage.hasTag,globalGraph.createLiteral(tag));
+		while(subIter.hasNext()) {
+			Resource sub=subIter.nextResource();
+			NodeIterator versLitIter=globalGraph.listObjectsOfProperty(sub, MetaLanguage.hasVersionProperty);
+			RDFNode obj=versLitIter.nextNode(); // There should be only one!
+			if(obj.isLiteral()) versions.add(obj.asLiteral().getValue().toString());
+			
+		}
+		return versions.toArray(new String[0]);
+	
 	}
 	
 	public String[] getTagsForVersion(String version) {

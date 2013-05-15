@@ -12,14 +12,17 @@ import java.util.Map;
 
 import net.metarelate.terminology.config.CoreConfig;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
+import net.metarelate.terminology.coreModel.TerminologyFactory;
 import net.metarelate.terminology.coreModel.TerminologyIndividual;
 import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.ConfigurationException;
+import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.publisher.templateElements.DummyTemplateElement;
 import net.metarelate.terminology.publisher.templateElements.StringTemplateElement;
 import net.metarelate.terminology.publisher.templateElements.TemplateElement;
 import net.metarelate.terminology.publisher.templateElements.TemplateTermElement;
 import net.metarelate.terminology.publisher.templateElements.TemplateFixedElement;
+import net.metarelate.terminology.publisher.templateElements.TemplateGlobalElement;
 
 import net.metarelate.terminology.utils.SSLogger;
 
@@ -71,11 +74,11 @@ public class TemplateManager {
 	public String getPageForLang(String language, TerminologyIndividual ind, String version, int level) throws ConfigurationException {
 		return expandTermTemplate(indTemplates,language,ind,version,level); 	// TODO we don't care about levels here
 	}
-	public String getIntroForLang(String language,String tag) throws ConfigurationException {
-		return expandFixedTemplate(preTemplates,language,tag);
+	public String getIntroForLang(String language,String tag,TerminologyFactory tf) throws ConfigurationException, ModelException {
+		return expandFixedTemplate(preTemplates,language,tag,tf);
 	}
-	public String getClosingForLang(String language,String tag) throws ConfigurationException {
-		return expandFixedTemplate(postTemplates,language,tag);
+	public String getClosingForLang(String language,String tag,TerminologyFactory tf) throws ConfigurationException, ModelException {
+		return expandFixedTemplate(postTemplates,language,tag,tf);
 	}
 	
 	
@@ -91,13 +94,14 @@ public class TemplateManager {
 		return answer.toString();
 	}
 	
-	private String expandFixedTemplate(Map<String,ArrayList<TemplateElement>> templateMap, String language, String tag) throws ConfigurationException {
+	private String expandFixedTemplate(Map<String,ArrayList<TemplateElement>> templateMap, String language, String tag, TerminologyFactory tf) throws ConfigurationException, ModelException {
+		System.out.println("Fixed template expansion for language: "+language);
 		if(templateMap.get(language)==null) {
 			language=CoreConfig.DEFAULT_LANGUAGE;
 			if(templateMap.get(language)==null) throw new ConfigurationException("No suitable template defined for pre or post block");
 		}
 		StringBuilder answer=new StringBuilder();
-		for(TemplateElement t:templateMap.get(language)) answer.append(((TemplateFixedElement)t).render(tag));
+		for(TemplateElement t:templateMap.get(language)) answer.append(((TemplateGlobalElement)t).render(tf));
 		return answer.toString();
 	}
 	

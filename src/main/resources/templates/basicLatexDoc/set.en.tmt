@@ -1,0 +1,19 @@
+<!-- tmtOpen>
+<!-- tmtSwitch>onLevel:0,\chapter;1\section;2\subsection<tmtSwitch -->{<<tmtSetLabel>>}
+\index{<<tmtSetLabel>>} <<tmtDescription>>
+<tmtClose -->
+
+
+\begin{table}[htdp]
+<!-- tmtOpen>
+\caption{<<tmtDescription>>}
+<tmtClose -->
+\begin{center}
+<!--tmtOpen>
+\begin{tabular}{|<!-- tmtRepeat>for:propNumber;c|<tmtRepeat -->}
+<!-- tmtExpandProps>sep:&;end:\\<tmtExpandProps -->
+<tmtClose -->
+\end{tabular}
+\end{center}
+\label{default}
+\end{table}

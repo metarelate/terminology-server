@@ -1,8 +1,9 @@
 package net.metarelate.terminology.publisher.templateElements;
 
 import net.metarelate.terminology.coreModel.TerminologyEntity;
+import net.metarelate.terminology.coreModel.TerminologyFactory;
 
-public class StringTemplateElement implements TemplateFixedElement, TemplateTermElement {
+public class StringTemplateElement implements TemplateFixedElement, TemplateTermElement, TemplateGlobalElement {
 	private String stringToRender=null;
 	public StringTemplateElement(String stringToRender) {
 		super();
@@ -24,6 +25,11 @@ public class StringTemplateElement implements TemplateFixedElement, TemplateTerm
 	}
 
 	public String render(TerminologyEntity e, String version, int level) {
+		return stringToRender;
+	}
+
+
+	public String render(TerminologyFactory factory) {
 		return stringToRender;
 	}
 }
