@@ -104,7 +104,7 @@ public class TerminologyIndividualTDBImpl extends TerminologyEntityTDBImpl imple
 		return getContainers(getLastVersion());
 	}
 
-	public void accept(PublisherVisitor v) throws WebWriterException, IOException, ConfigurationException {
+	public void accept(PublisherVisitor v) throws WebWriterException, IOException, ConfigurationException, ModelException {
 		v.visit(this);
 		
 	}

@@ -403,5 +403,7 @@ public interface TerminologyEntity extends Visitee {
 	public boolean isSet();
 	
 	public boolean isIndividual();
+
+	public Set<Resource> getGenericVersionSpecificURIObjects(Property typeProperty, String version);
 	
 }

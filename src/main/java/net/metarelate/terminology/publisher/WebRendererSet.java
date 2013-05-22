@@ -87,57 +87,7 @@ public class WebRendererSet extends WebRendererItem {
 	
 	
 	
-	/*
-	@Override
-	public String getVersionHeader(SortedMap<String,String> formatsMap, String version) {
-		//Writing collection header
-		System.out.println(">>>Collection header for version "+version);
-		String code=myCollection.getGenericVersionSpecificStringValueObject(MetaLanguage.notationProperty, version);
-		String comment=myCollection.getGenericVersionSpecificStringValueObject(MetaLanguage.commentProperty,version);
-		
-		//TODO this may be removed
-		String[] types=SimpleQueriesProcessor.getArrayObjectsResourcesAsURIs(myCollection.getResource(), MetaLanguage.typeProperty, myCollection.getStatements(version));
-
-		String result1="<div class=\"collectionHeader\">\n";
-		String result2="";
-		if(code!=null) result2="<div class=\"code\">["+code+"]</div><br/>";
 	
-		String result3="<div class=\"EntityName\">"+myCollection.getLabel(version)+"</div><br/>";
-		String result4="<div class=\"uri\">"+myCollection.getURI()+"</div><br/>";
-		//if comment
-		String result5="";
-		if(types!=null) {
-			result5+="<div class=\"type\"><b>Type(s): </b> ";
-			for(int i=0;i<types.length;i++) {
-				// TODO maybe we should have a more ad-hoc label processor
-				result5+=SimpleQueriesProcessor.getLabelorURIForURI(types[i],labelsModel)+" ";
-			}
-			result5+="</div><br/>";
-		}
-		String explString="";
-		if(type==STYLE_SET_SKOS_SCHEME) explString="This is register following iso19135 standard whose elements are organised in a SKOS scheme";
-		if(type==STYLE_SET_SKOS_COLLECTION) explString="This is a register following iso19135 standard whose elements are all SKOS concepts";
-		String result6="<div class=\"comments\">"+explString+"</div><br/>";
-		String result7="";
-		if(comment!=null) result7="<div class=\"comments\">("+comment+")</div><br/>";
-		
-		String result8="<div class=\"formats\">Also available in\n";
-		Iterator<String> standards=formatsMap.keySet().iterator();
-		while(standards.hasNext()) {
-			String std=standards.next();
-			result8+="<a href=\""+formatsMap.get(std)+"\">"+std+"</a> ";
-		}
-		
-		result8+="</div>";
-		String result9="<div class=\"languages\">\n"+
-		"<input type=\"button\" value=\"uk\" onclick=\"alert(\'Yet to be implemented!\')\" /> "+
-		" <input type=\"button\" value=\"it\" onclick=\"alert(\'Yet to be implemented!\')\" /> "+
-		"</div>"+
-		"</div>";
-		
-		return result1+result2+result3+result4+result5+result6+result7+result8+result9;
-	}
-	*/
 	@Override
 	public String getNavigationPanel(String version, String language) throws ModelException {
 		

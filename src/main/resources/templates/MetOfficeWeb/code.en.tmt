@@ -1,17 +1,9 @@
-String titleStr="";
-		String label=entity.getLabel(version,language);
-		if(label==null) label=entity.getLabel(version,CoreConfig.DEFAULT_LANGUAGE);
-		
-		if(entity.isVersioned()) titleStr=label + " v. "+version;
-		else titleStr=entity.getLabel(version);
-		String descriptionStr="";
-		String authorStr="";
-		
-<!DOCTYPE html><html lang="en">
+		<!DOCTYPE html><html lang="en">
+<!-- begin block 1 -->
 <head>
 	<title>
-	<!-- tmtOpen>
-		<<tmtPageTitle>>
+	<!-- tmtOpen>$str+$
+		<<tmtLabel>> v. <<tmtVersion>>
 	<tmtClose -->
 	</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -49,34 +41,124 @@ String titleStr="";
 		</div>
 	</header>
 	<!-- end head -->
-			
+<!-- end block 1 -->
+
+
+
+
+<!-- begin block 2 -->			
+<nav id=\"breadcrumb\"><p>
+<!-- tmtOpen>$bcrumbs$spacing:: &gt ||<tmtClose -->	
+</p></nav>				
+<!-- end block 2 -->
+
+
 				
-String result2=getBredCrumbs(version,language,baseURL);
+<div id="content">
+<article>
 
-String result3=	"<div id=\"content\">\n" +
-						"<article>\n";
-String result4=getHGroup( version,  language);
+<!-- begin block 4 -->
+<hgroup>$str+$
+<h1><<tmtCode>></h1>
+<h2 id="labelAndType"><<tmtLabel>> : a <<tmtTypes>></h2>
+</hgroup>
+<!-- end block 4 -->
 
-String result5="<section id=\"main\">";
+<section id="main">;
 
+<!-- begin block 6 -->
 String result6=getHeadBlock(language,version,dataLangMap);
+<!-- end block 6 -->
 
+
+
+<!-- begin block 7 -->
 String result7=getMetaTable( version,  language, versionPage);
+<!-- end block 7 -->
 
+
+
+<!-- begin block 71 -->
 String result71=getStatementsBlock(MetaLanguage.filterForWeb(entity.getStatements(version)),language);
+<!-- end block 71 -->
 
+
+
+<!-- begin block 75 -->
 String result75="";
 		if(entity.isVersioned()) {
 			result75=getVersionBlock(version,language,baseURL);
 		}
-		//String result8="</section><section id=\"second\">";
+<!-- end block 75 -->
 
-String result8="</section>";
 
-String result9=getNavigationPanel(version,language) ;// Statements
 		
-String result11=getClosing(language,langMap);
+
+</section>
+
+
+<!-- begin block 9 -->
+String result9=getNavigationPanel(version,language) ;// Statements
+<!-- end block 9 -->
+
+
+
+
+<!-- begin block 11 -->		
+</article>
+<div id="pageLang">
+<div id="langSelector"> Also available in:
+	<div id="langContainer">
+	<!-- tmtOpen-->$langMap$spacing:: ||label::en-english||label::it-italian||label::fr-french||
+	<tmtClose -->
+	</div></div></div></div>
+	<!-- begin base -->
+	<footer>
+	<div id="footerlogoBar"><img id="footerLogo" src="http://reference.metoffice.gov.uk/data/wmo/web/img/head-mo-logo.png" alt="Met Office" /> </div>
+	<div id="footerContents">
+	<ul id="footerLeft">
+	<li class="first"><a href="http://www.metoffice.gov.uk/about-us/legal" accesskey="8">Legal</a></li>
+	<li><a href="http://www.metoffice.gov.uk/about-us/legal/privacy-and-cookie">Privacy and cookies</a></li>
+	</ul>
+	<ul id="footerRight">
+	<li class="first"><a href="http://www.metoffice.gov.uk/about-us/legal#licences">� Crown copyright</a></li>
+	<li><a href="http://www.metoffice.gov.uk/">www.metoffice.gov.uk</a></li>
+	</ul>
+	</div>
+	</footer>
+	<!-- end base -->
+	</div>
+	<script src="http://reference.metoffice.gov.uk/data/wmo/web/js/common_bottom.min.js" type="text/javascript"></script>
+	<!-- START OF SmartSource Data Collector TAG -->
+	<!-- Copyright (c) 1996-2011 Webtrends Inc.  All rights reserved. -->
+	<!-- Version: 9.4.0 -->
+	<!-- Tag Builder Version: 3.2  -->
+	<!-- Created: 8/1/2011 3:15:41 PM -->
+	<script src="http://reference.metoffice.gov.uk/data/wmo/web/js/webtrends.min.js" type="text/javascript"></script>
+	<!-- Warning: The two script blocks below must remain inline. Moving them to an external -->
+	<!-- JavaScript include file can cause serious problems with cross-domain tracking.      -->
+	<script type="text/javascript">
+				//<![CDATA[
+				var _tag=new WebTrends();
+				_tag.dcsGetId();
+				//]]>
+				</script>
+				<script type=\"text/javascript\">
+				//<![CDATA[
+				_tag.dcsCustom=function(){
+				// Add custom parameters here.
+				//_tag.DCSext.param_name=param_value;
+				}
+				_tag.dcsCollect();
+				//]]>
+	</script>
+	<noscript>
+	<div><img alt="" id="DCSIMG" width="1" height="1" src="http://statse.webtrendslive.com/dcshckprv00000spazrt5ckdq_6d2t/njs.gif?dcsuri=/nojavascript&amp;WT.js=No&amp;WT.tv=9.4.0&amp;dcssip=www.metoffice.gov.uk" /></div>
+	</noscript>
+	<!-- END OF SmartSource Data Collector TAG -->
+	</body>
+	</html>
+	
+<!-- end block 11 -->
 		
 				
-		String resultLast="";
-		return result1+result2+result3+result4+result5+result6+result7+result71+result75+result8+result9+result11;		

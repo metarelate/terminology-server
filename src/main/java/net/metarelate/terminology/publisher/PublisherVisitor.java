@@ -11,6 +11,6 @@ import net.metarelate.terminology.exceptions.WebWriterException;
 
 public abstract class PublisherVisitor {
 	//public abstract void crawl(TerminologySet root) throws WebWriterException, ModelException, IOException, ConfigurationException;
-	public abstract void visit(TerminologySet set) throws WebWriterException, IOException, ConfigurationException;
-	public abstract void visit(TerminologyIndividual ind) throws WebWriterException, IOException, ConfigurationException;
+	public abstract void visit(TerminologySet set) throws WebWriterException, IOException, ConfigurationException, ModelException;
+	public abstract void visit(TerminologyIndividual ind) throws WebWriterException, IOException, ConfigurationException, ModelException;
 }

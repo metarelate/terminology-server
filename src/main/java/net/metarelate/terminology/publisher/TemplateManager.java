@@ -11,13 +11,19 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import net.metarelate.terminology.config.CoreConfig;
+import net.metarelate.terminology.coreModel.BackgroundKnowledgeManager;
+import net.metarelate.terminology.coreModel.CacheManager;
+import net.metarelate.terminology.coreModel.LabelManager;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.coreModel.TerminologyFactory;
 import net.metarelate.terminology.coreModel.TerminologyIndividual;
 import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.ConfigurationException;
 import net.metarelate.terminology.exceptions.ModelException;
+import net.metarelate.terminology.publisher.templateElements.BreadCrumbsTemplate;
 import net.metarelate.terminology.publisher.templateElements.DummyTemplateElement;
+import net.metarelate.terminology.publisher.templateElements.LangMapTemplate;
+import net.metarelate.terminology.publisher.templateElements.ParamStringTemplateElement;
 import net.metarelate.terminology.publisher.templateElements.StringTemplateElement;
 import net.metarelate.terminology.publisher.templateElements.TemplateElement;
 import net.metarelate.terminology.publisher.templateElements.TemplateTermElement;
@@ -29,6 +35,9 @@ import net.metarelate.terminology.utils.SSLogger;
 public class TemplateManager {
 	private final String openTag="<!-- tmtOpen>";
 	private final String closeTag="<tmtClose -->";
+	private final String strPlusHeader="$str+$";
+	private final String strBreadcrumbsHeader="$bcrumbs$";
+	
 	
 	private File templateFile=null;
 	Map<String,ArrayList<TemplateElement>> indTemplates=new Hashtable<String,ArrayList<TemplateElement>>();
@@ -68,11 +77,11 @@ public class TemplateManager {
 		}
 	}
 	
-	public String getPageForLang(String language, TerminologySet set, String version, int level) throws ConfigurationException {
-		return expandTermTemplate(setTemplates,language,set,version, level);
+	public String getPageForLang(String language, TerminologySet set, String version, int level,String baseURL,CacheManager cacheManager,LabelManager lm, BackgroundKnowledgeManager bkm) throws ConfigurationException, ModelException {
+		return expandTermTemplate(setTemplates,language,set,version, level,baseURL,cacheManager,lm,bkm);
 	}
-	public String getPageForLang(String language, TerminologyIndividual ind, String version, int level) throws ConfigurationException {
-		return expandTermTemplate(indTemplates,language,ind,version,level); 	// TODO we don't care about levels here
+	public String getPageForLang(String language, TerminologyIndividual ind, String version, int level,String baseURL,CacheManager cacheManager,LabelManager lm, BackgroundKnowledgeManager bkm) throws ConfigurationException, ModelException {
+		return expandTermTemplate(indTemplates,language,ind,version,level,baseURL,cacheManager,lm,bkm); 	// TODO we don't care about levels here
 	}
 	public String getIntroForLang(String language,String tag,TerminologyFactory tf) throws ConfigurationException, ModelException {
 		return expandFixedTemplate(preTemplates,language,tag,tf);
@@ -84,13 +93,13 @@ public class TemplateManager {
 	
 
 
-	private String expandTermTemplate(Map<String,ArrayList<TemplateElement>> templateMap, String language, TerminologyEntity entity, String version, int level) throws ConfigurationException {
+	private String expandTermTemplate(Map<String,ArrayList<TemplateElement>> templateMap, String language, TerminologyEntity entity, String version, int level,String baseURL,CacheManager cacheManager,LabelManager lm, BackgroundKnowledgeManager bkm) throws ConfigurationException, ModelException {
 		if(templateMap.get(language)==null) {
 			language=CoreConfig.DEFAULT_LANGUAGE;
 			if(templateMap.get(language)==null) throw new ConfigurationException("No suitable template defined for "+entity.getURI());
 		}
 		StringBuilder answer=new StringBuilder();
-		for(TemplateElement t:templateMap.get(language)) answer.append(((TemplateTermElement)t).render(entity, version, level));
+		for(TemplateElement t:templateMap.get(language)) answer.append(((TemplateTermElement)t).render(entity, version, level,language,baseURL,cacheManager,lm,bkm));
 		return answer.toString();
 	}
 	
@@ -123,7 +132,7 @@ public class TemplateManager {
 			}
 			if(firstBit>runningIndex) bits.add(new StringTemplateElement(templateString.substring(runningIndex,firstBit)));
 			//TODO here we should parse the real block
-			if(firstBit>0 && secondBit>0) bits.add(new DummyTemplateElement(templateString.substring(firstBit+openTag.length(),secondBit)));
+			if(firstBit>0 && secondBit>0) bits.add(parseElement(templateString.substring(firstBit+openTag.length(),secondBit)));
 			runningIndex=secondBit+openTag.length();
 			
 		}
@@ -148,8 +157,12 @@ public class TemplateManager {
 		return indTemplates.keySet().toArray(new String [0]);
 	}
 	
-	
-
+	private TemplateElement parseElement(String elemString) {
+		if(elemString.startsWith(ParamStringTemplateElement.strPlusHeader)) return new ParamStringTemplateElement(elemString.substring(ParamStringTemplateElement.strPlusHeader.length()));
+		else if (elemString.startsWith(BreadCrumbsTemplate.bcrumbsHeader)) return new BreadCrumbsTemplate(elemString.substring(BreadCrumbsTemplate.bcrumbsHeader.length()));
+		else if (elemString.startsWith(LangMapTemplate.langMapHeader)) return new LangMapTemplate(elemString.substring(LangMapTemplate.langMapHeader.length()),getLanguages());
+		else return new StringTemplateElement(elemString);
+	}
 	
 
 }

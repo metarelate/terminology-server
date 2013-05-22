@@ -480,6 +480,18 @@ public abstract class TerminologyEntityTDBImpl implements TerminologyEntity {
 		}
 		return result;
 	}
+	//TODO should be clear on when we return Strings and when resources. Something for multi-core refactoring.
+	public Set<Resource> getGenericVersionSpecificURIObjects(Property property, String version) {
+		Set<Resource> results=new HashSet<Resource>();
+		NodeIterator myResults= myDataset.getNamedModel(getVersionURI(version)).listObjectsOfProperty(getResource(), property);
+		if(myResults.hasNext()) {
+			RDFNode myRes=myResults.nextNode();
+			if(myRes.isURIResource()) results.add(myRes.asResource());
+		}
+		return results;
+	}
+	
+	
 	
 	//TODO why is this forced to be public if in the interface it is public within the package ?
 	public String getGenericEndurantStringValueObject(Property property) {

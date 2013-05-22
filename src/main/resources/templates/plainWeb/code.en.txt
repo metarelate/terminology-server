@@ -1,16 +1,20 @@
 <html lang="en">
 <head>
 	<title>
-	<!-- tmtOpen>
-		<<tmtPageTitle>>
+	<!-- tmtOpen>$str+$
+		<<tmtLabel>> v. <<tmtVersion>>
 	<tmtClose -->
 	</title>
-	<!-- tmtOpen>
-	<meta name="description" content="<<tmtPageDescription>>" />
-	<meta name="author" content="<<tmtPageAuthor>>" />
+	<!-- tmtOpen>$str+$
+	<meta name="description" content="<<tmtDescription>>" />
+	<meta name="author" content="<<tmtAuthors>>" />
 	<tmtClose -->
 </head>
 <body>
+breadcrumbs: <br/>
+
+Also available in: <br/>
+
 
 </body>	
 </html>	

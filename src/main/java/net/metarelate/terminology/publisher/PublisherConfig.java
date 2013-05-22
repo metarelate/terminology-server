@@ -29,7 +29,9 @@ public class PublisherConfig {
 
 	public static final Property baseURLProperty = ResourceFactory.createProperty("http://metarelate.net/config/baseURL");	
 	
-	public static final Property overrideBaseSiteProperty=ResourceFactory.createProperty("http://metarelate.net/config/overrideSitePrefix");	
+	public static final Property overrideBaseSiteProperty=ResourceFactory.createProperty("http://metarelate.net/config/overrideSitePrefix");
+	public static String registerStemString="register";	
+	public static String codeStemString="code";
 	
 	//public static final Property localIdProperty=ResourceFactory.createProperty("http://reference.metoffice.gov.uk/data/wmo/meta/mapping#localID");	
 

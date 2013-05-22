@@ -5,6 +5,13 @@ A brief description of the template language
 What is found between these two comments is "parsed" by the template manager 
 (i.e.: what is not between a pair of such tags is rendered verbatim).
 
+$str+$ block: a string, where content in << >> is replaced according to the following table:
+
+
+<<tmtLabel>>
+<<tmtDescription>>
+<<tmtAuthors>>
+
 <<tmtPageTitle>> Expands to the page title (usually in <head></head>)
 <<tmtPageDescription>>	The description for a page (code or set)
 <<tmtPageAuthor>>		The "author" for a page (code or set): should this be the owner ?

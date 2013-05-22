@@ -50,8 +50,8 @@ public class WebFilesVisitor extends PublisherVisitor {
 	}
 
 	
-	public void visit (TerminologySet set) throws WebWriterException, IOException, ConfigurationException {
-		String type="register";
+	public void visit (TerminologySet set) throws WebWriterException, IOException, ConfigurationException, ModelException {
+		String type=PublisherConfig.registerStemString;
 		String version=set.getLastVersion();
 		String collectionDirectoryPath=myInitializer.myCache.getValueFor(set.getURI(), PublisherConfig.uriHasDisk);
 		String collectionBaseURL=myInitializer.myCache.getValueFor(set.getURI(), PublisherConfig.uriHasUrl);
@@ -67,8 +67,8 @@ public class WebFilesVisitor extends PublisherVisitor {
 		}
 	}
 	
-	public void visit(TerminologyIndividual ind) throws WebWriterException, IOException, ConfigurationException {
-		String type="code";
+	public void visit(TerminologyIndividual ind) throws WebWriterException, IOException, ConfigurationException, ModelException {
+		String type=PublisherConfig.codeStemString; //TODO better name for stems (they are sort of types...)
 		String version=ind.getLastVersion();
 		String individualDirectoryPath=myInitializer.myCache.getValueFor(ind.getURI(), PublisherConfig.uriHasDisk);
 		String indidvidualBaseURL=myInitializer.myCache.getValueFor(ind.getURI(), PublisherConfig.uriHasUrl);
@@ -85,7 +85,7 @@ public class WebFilesVisitor extends PublisherVisitor {
 	}
 	
 	
-	private void makeFiles(TerminologyEntity entity, String type, String collectionDirectoryPath, String collectionBaseURL, String version) throws IOException, WebWriterException, ConfigurationException {
+	private void makeFiles(TerminologyEntity entity, String type, String collectionDirectoryPath, String collectionBaseURL, String version) throws IOException, WebWriterException, ConfigurationException, ModelException {
 		SSLogger.log(">>Writing "+entity.getURI()+" to "+collectionDirectoryPath, SSLogger.DEBUG);
 		
 		String[] languages=tm.getLanguages();
@@ -124,8 +124,8 @@ public class WebFilesVisitor extends PublisherVisitor {
 		
 		//TODO a bit ugly, but on the other hand this is a private method to factorize a bit of procedural code
 		for(i=0;i<languages.length;i++) {
-			if(entity.isSet()) writeToFile(languageFilesPaths[i],tm.getPageForLang(languages[i],(TerminologySet)entity,version,0)); //TODO we may need to pass more infos to the template!
-			if(entity.isIndividual()) writeToFile(languageFilesPaths[i],tm.getPageForLang(languages[i],(TerminologyIndividual)entity,version,0));
+			if(entity.isSet()) writeToFile(languageFilesPaths[i],tm.getPageForLang(languages[i],(TerminologySet)entity,version,0,collectionBaseURL,myInitializer.myCache,myInitializer.myFactory.getLabelManager(),myInitializer.myFactory.getBackgroundKnowledgeManager())); //TODO we may need to pass more infos to the template!
+			if(entity.isIndividual()) writeToFile(languageFilesPaths[i],tm.getPageForLang(languages[i],(TerminologyIndividual)entity,version,0,collectionBaseURL,myInitializer.myCache,myInitializer.myFactory.getLabelManager(),myInitializer.myFactory.getBackgroundKnowledgeManager()));
 		}
 		
 		Model modelToWrite=RDFrenderer.prepareModel(entity, version);

@@ -61,19 +61,19 @@ public class DocumentVisitor extends PublisherVisitor {
 	
 	@Override
 	public void visit(TerminologySet set) throws WebWriterException,
-			IOException, ConfigurationException {
+			IOException, ConfigurationException, ModelException {
 			String[] versions=set.getVersionsForTag(tag);
 			for(String version:versions) {
-				myDoc.append(tm.getPageForLang(language, set, version, level));
+				myDoc.append(tm.getPageForLang(language, set, version, level,"",myInitializer.myCache,myInitializer.myFactory.getLabelManager(),myInitializer.myFactory.getBackgroundKnowledgeManager())); //TODO some of these argumnents (baseURL, cache) don't matter for docs. This should be implied by design.
 			}
 	}
 
 	@Override
 	public void visit(TerminologyIndividual ind) throws WebWriterException,
-			IOException, ConfigurationException {
+			IOException, ConfigurationException, ModelException {
 		String[] versions=ind.getVersionsForTag(tag);
 		for(String version:versions) {
-			myDoc.append(tm.getPageForLang(language, ind, version, level));
+			myDoc.append(tm.getPageForLang(language, ind, version, level,"",myInitializer.myCache,myInitializer.myFactory.getLabelManager(),myInitializer.myFactory.getBackgroundKnowledgeManager())); //TODO some of these argumnents (baseURL, cache) don't matter for docs. This should be implied by design.
 		}
 
 	}

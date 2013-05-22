@@ -236,7 +236,7 @@ public class TerminologySetTDBImpl extends
 		
 	}
 
-	public void accept(PublisherVisitor v) throws WebWriterException, IOException, ConfigurationException {
+	public void accept(PublisherVisitor v) throws WebWriterException, IOException, ConfigurationException, ModelException {
 		v.visit(this);
 		
 	}
