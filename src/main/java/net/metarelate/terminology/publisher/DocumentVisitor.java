@@ -64,7 +64,7 @@ public class DocumentVisitor extends PublisherVisitor {
 			IOException, ConfigurationException, ModelException {
 			String[] versions=set.getVersionsForTag(tag);
 			for(String version:versions) {
-				myDoc.append(tm.getPageForLang(language, set, version, level,"",myInitializer.myCache,myInitializer.myFactory.getLabelManager(),myInitializer.myFactory.getBackgroundKnowledgeManager())); //TODO some of these argumnents (baseURL, cache) don't matter for docs. This should be implied by design.
+				myDoc.append(tm.getPageForLang(language, set, version, level,"",myInitializer.myCache,myInitializer.myFactory.getLabelManager(),myInitializer.myFactory.getBackgroundKnowledgeManager(), "")); //TODO some of these argumnents (baseURL, cache) don't matter for docs. This should be implied by design.
 			}
 	}
 
@@ -73,7 +73,7 @@ public class DocumentVisitor extends PublisherVisitor {
 			IOException, ConfigurationException, ModelException {
 		String[] versions=ind.getVersionsForTag(tag);
 		for(String version:versions) {
-			myDoc.append(tm.getPageForLang(language, ind, version, level,"",myInitializer.myCache,myInitializer.myFactory.getLabelManager(),myInitializer.myFactory.getBackgroundKnowledgeManager())); //TODO some of these argumnents (baseURL, cache) don't matter for docs. This should be implied by design.
+			myDoc.append(tm.getPageForLang(language, ind, version, level,"",myInitializer.myCache,myInitializer.myFactory.getLabelManager(),myInitializer.myFactory.getBackgroundKnowledgeManager(), "")); //TODO some of these argumnents (baseURL, cache) don't matter for docs. This should be implied by design.
 		}
 
 	}

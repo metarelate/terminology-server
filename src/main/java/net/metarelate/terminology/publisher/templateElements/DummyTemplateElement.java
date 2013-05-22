@@ -15,7 +15,7 @@ public class DummyTemplateElement implements TemplateTermElement,TemplateGlobalE
 		System.out.println("Dummy block: "+stringToRender); //TODO test
 	}
 	
-	public String render(TerminologyEntity e, String version, int level,String language,String baseURL, CacheManager cacheManager, LabelManager lm, BackgroundKnowledgeManager bkm) {
+	public String render(TerminologyEntity e, String version, int level,String language,String baseURL, CacheManager cacheManager, LabelManager lm, BackgroundKnowledgeManager bkm,String registryBaseURL) {
 		return "Dummy element for entity "+e.getURI()+" , should expand accoring to "+stringToRender;
 	}
 	public boolean isFixed() {

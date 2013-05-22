@@ -27,7 +27,7 @@ public class StringTemplateElement implements TemplateFixedElement, TemplateTerm
 		return false;
 	}
 
-	public String render(TerminologyEntity e, String version, int level,String language,String baseURL, CacheManager cacheManager, LabelManager lm, BackgroundKnowledgeManager bkm) {
+	public String render(TerminologyEntity e, String version, int level,String language,String baseURL, CacheManager cacheManager, LabelManager lm, BackgroundKnowledgeManager bkm,String registryBaseURL) {
 		return stringToRender;
 	}
 

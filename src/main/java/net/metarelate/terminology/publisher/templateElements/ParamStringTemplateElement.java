@@ -28,9 +28,10 @@ public class ParamStringTemplateElement implements TemplateTermElement{
 		return true;
 	}
 
-	public String render(TerminologyEntity e, String version,int level,String language,String baseURL, CacheManager cacheManager, LabelManager lm, BackgroundKnowledgeManager bkm) {
-		rawString.replaceAll("<<tmtLabel>>",e.getLabel(version, language));
-		rawString.replaceAll("<<tmtVersion>>", version);
+	public String render(TerminologyEntity e, String version,int level,String language,String baseURL, CacheManager cacheManager, LabelManager lm, BackgroundKnowledgeManager bkm,String registryBaseURL) {
+		String resultString=rawString;
+		resultString=resultString.replaceAll("<<tmtLabel>>",e.getLabel(version, language));
+		resultString=resultString.replaceAll("<<tmtVersion>>", version);
 		String description=e.getGenericVersionSpecificStringValueObjectByLanguage(MetaLanguage.commentProperty,version, language);
 		if(description==null) description=e.getGenericVersionSpecificStringValueObjectByLanguage(MetaLanguage.commentProperty,version, CoreConfig.DEFAULT_LANGUAGE);
 		else description="";
@@ -40,11 +41,11 @@ public class ParamStringTemplateElement implements TemplateTermElement{
 		for(Resource type:typesSet) {
 			types+=" "+lm.getLabelForURI(type.getURI(), language, LabelManager.LANG_DEF_SHORTURI); // TODO needs better separator management
 		}
-		rawString.replaceAll("<<tmtDescription>>", description);
+		resultString=resultString.replaceAll("<<tmtDescription>>", description);
 		//rawString.replaceAll("<<tmtAuthors>>", replacement);
-		rawString.replaceAll("<<tmtTypes>>",types);
+		resultString=resultString.replaceAll("<<tmtTypes>>",types);
 		
-		return rawString;
+		return resultString;
 	}
 
 

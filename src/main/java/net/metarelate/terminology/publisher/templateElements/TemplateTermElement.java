@@ -8,7 +8,7 @@ import net.metarelate.terminology.exceptions.ModelException;
 
 public interface  TemplateTermElement extends TemplateElement {
 
-	public abstract String render(TerminologyEntity e, String version, int level, String language, String baseURL, CacheManager cacheManager, LabelManager lm, BackgroundKnowledgeManager bkm) throws ModelException;
+	public abstract String render(TerminologyEntity e, String version, int level, String language, String baseURL, CacheManager cacheManager, LabelManager lm, BackgroundKnowledgeManager bkm, String registryBaseURL) throws ModelException;
 
 
 

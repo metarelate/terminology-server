@@ -109,7 +109,7 @@ String result9=getNavigationPanel(version,language) ;// Statements
 <div id="pageLang">
 <div id="langSelector"> Also available in:
 	<div id="langContainer">
-	<!-- tmtOpen-->$langMap$spacing:: ||label::en-english||label::it-italian||label::fr-french||
+	<!-- tmtOpen>$LangMap$spacing:: ||label::en-english||label::it-italian||label::fr-french||
 	<tmtClose -->
 	</div></div></div></div>
 	<!-- begin base -->

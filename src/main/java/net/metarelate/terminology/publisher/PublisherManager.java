@@ -77,7 +77,7 @@ public class PublisherManager {
 		//TODO should be hidden by design.
 		myInitializer.myCache.synch();
 		TemplateManager myTm=new TemplateManager(templateLocation);
-		WebFilesVisitor vis=new WebFilesVisitor(myInitializer,myTm);
+		WebFilesVisitor vis=new WebFilesVisitor(myInitializer,myTm,baseURL);
 		vis.setOverwriteFiles(overwrite);
 		vis.crawl(root);
 		

@@ -26,7 +26,7 @@ public class BreadCrumbsTemplate extends TemplateParametricClass implements Temp
 		return true;
 	}
 
-	public String render(TerminologyEntity e, String version, int level,String language, String baseURL, CacheManager cacheManager, LabelManager lm, BackgroundKnowledgeManager bkm) throws ModelException {
+	public String render(TerminologyEntity e, String version, int level,String language, String baseURL, CacheManager cacheManager, LabelManager lm, BackgroundKnowledgeManager bkm,String registryBaseURL) throws ModelException {
 		StringBuilder result=new StringBuilder();
 		result.insert(0,"<a href=\""+e.getURI()+"\">"+getBestLabel(e, version, language)+"</a> "+spacingStringValue);
 		Collection<TerminologySet>fathers=e.getContainers(version);
@@ -41,7 +41,7 @@ public class BreadCrumbsTemplate extends TemplateParametricClass implements Temp
 			fathers=father.getContainers(father.getLastVersion());
 		}
 		
-		return " <a href=\""+baseURL+"\">Home</a> &gt; "+result.toString()+" </p></nav>";
+		return " <a href=\""+registryBaseURL+"\">Home</a> &gt; "+result.toString()+" </p></nav>";
 	}
 
 		

@@ -32,9 +32,11 @@ public class WebFilesVisitor extends PublisherVisitor {
 	TemplateManager tm=null;
 	Initializer myInitializer=null;
 	boolean overwriteFiles=false;
-	public WebFilesVisitor(Initializer initializer,TemplateManager myTm) {
+	private String registryBaseURL=null;
+	public WebFilesVisitor(Initializer initializer,TemplateManager myTm, String baseURL) {
 		tm=myTm;
 		myInitializer=initializer;
+		this.registryBaseURL=baseURL;
 	}
 	public void setOverwriteFiles(boolean ow) {
 		overwriteFiles=ow;
@@ -71,14 +73,14 @@ public class WebFilesVisitor extends PublisherVisitor {
 		String type=PublisherConfig.codeStemString; //TODO better name for stems (they are sort of types...)
 		String version=ind.getLastVersion();
 		String individualDirectoryPath=myInitializer.myCache.getValueFor(ind.getURI(), PublisherConfig.uriHasDisk);
-		String indidvidualBaseURL=myInitializer.myCache.getValueFor(ind.getURI(), PublisherConfig.uriHasUrl);
-		if(individualDirectoryPath==null || indidvidualBaseURL==null) throw new WebWriterException("Unable to find disk or base URL for "+ind.getURI());
-		makeFiles(ind,type,individualDirectoryPath,indidvidualBaseURL,version);
+		String indidvidualURL=myInitializer.myCache.getValueFor(ind.getURI(), PublisherConfig.uriHasUrl);
+		if(individualDirectoryPath==null || indidvidualURL==null) throw new WebWriterException("Unable to find disk or base URL for "+ind.getURI());
+		makeFiles(ind,type,individualDirectoryPath,indidvidualURL,version);
 		if(ind.isVersioned()) {
 			String[] versions=ind.getVersions();
 			for(String subVersion:versions) {
 				String basePath=individualDirectoryPath+"/"+subVersion+"/";
-				String baseURL=indidvidualBaseURL+"/"+subVersion+"/";
+				String baseURL=indidvidualURL+"/"+subVersion+"/";
 				makeFiles(ind,type,basePath,baseURL,subVersion);
 			}
 		}
@@ -124,8 +126,8 @@ public class WebFilesVisitor extends PublisherVisitor {
 		
 		//TODO a bit ugly, but on the other hand this is a private method to factorize a bit of procedural code
 		for(i=0;i<languages.length;i++) {
-			if(entity.isSet()) writeToFile(languageFilesPaths[i],tm.getPageForLang(languages[i],(TerminologySet)entity,version,0,collectionBaseURL,myInitializer.myCache,myInitializer.myFactory.getLabelManager(),myInitializer.myFactory.getBackgroundKnowledgeManager())); //TODO we may need to pass more infos to the template!
-			if(entity.isIndividual()) writeToFile(languageFilesPaths[i],tm.getPageForLang(languages[i],(TerminologyIndividual)entity,version,0,collectionBaseURL,myInitializer.myCache,myInitializer.myFactory.getLabelManager(),myInitializer.myFactory.getBackgroundKnowledgeManager()));
+			if(entity.isSet()) writeToFile(languageFilesPaths[i],tm.getPageForLang(languages[i],(TerminologySet)entity,version,0,collectionBaseURL,myInitializer.myCache,myInitializer.myFactory.getLabelManager(),myInitializer.myFactory.getBackgroundKnowledgeManager(),registryBaseURL)); //TODO we may need to pass more infos to the template!
+			if(entity.isIndividual()) writeToFile(languageFilesPaths[i],tm.getPageForLang(languages[i],(TerminologyIndividual)entity,version,0,collectionBaseURL,myInitializer.myCache,myInitializer.myFactory.getLabelManager(),myInitializer.myFactory.getBackgroundKnowledgeManager(),registryBaseURL));
 		}
 		
 		Model modelToWrite=RDFrenderer.prepareModel(entity, version);
