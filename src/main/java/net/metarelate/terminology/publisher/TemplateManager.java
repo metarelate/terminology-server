@@ -24,11 +24,14 @@ import net.metarelate.terminology.publisher.templateElements.BreadCrumbsTemplate
 import net.metarelate.terminology.publisher.templateElements.DummyTemplateElement;
 import net.metarelate.terminology.publisher.templateElements.LangMapTemplate;
 import net.metarelate.terminology.publisher.templateElements.ParamStringTemplateElement;
+import net.metarelate.terminology.publisher.templateElements.StatementsTemplateElement;
 import net.metarelate.terminology.publisher.templateElements.StringTemplateElement;
+import net.metarelate.terminology.publisher.templateElements.TagsTemplate;
 import net.metarelate.terminology.publisher.templateElements.TemplateElement;
 import net.metarelate.terminology.publisher.templateElements.TemplateTermElement;
 import net.metarelate.terminology.publisher.templateElements.TemplateFixedElement;
 import net.metarelate.terminology.publisher.templateElements.TemplateGlobalElement;
+import net.metarelate.terminology.publisher.templateElements.VersionTemplate;
 
 import net.metarelate.terminology.utils.SSLogger;
 
@@ -161,6 +164,9 @@ public class TemplateManager {
 		if(elemString.startsWith(ParamStringTemplateElement.strPlusHeader)) return new ParamStringTemplateElement(elemString.substring(ParamStringTemplateElement.strPlusHeader.length()));
 		else if (elemString.startsWith(BreadCrumbsTemplate.bcrumbsHeader)) return new BreadCrumbsTemplate(elemString.substring(BreadCrumbsTemplate.bcrumbsHeader.length()));
 		else if (elemString.startsWith(LangMapTemplate.langMapHeader)) return new LangMapTemplate(elemString.substring(LangMapTemplate.langMapHeader.length()),this);
+		else if (elemString.startsWith(TagsTemplate.tagsHeader)) return new TagsTemplate(elemString.substring(TagsTemplate.tagsHeader.length()));
+		else if (elemString.startsWith(VersionTemplate.versionHeade)) return new VersionTemplate(elemString.substring(VersionTemplate.versionHeade.length()));
+		else if (elemString.startsWith(StatementsTemplateElement.statHeader)) return new StatementsTemplateElement(elemString.substring(StatementsTemplateElement.statHeader.length()));
 		else return new StringTemplateElement(elemString);
 	}
 	

@@ -58,37 +58,99 @@
 <article>
 
 <!-- begin block 4 -->
-<hgroup>$str+$
+<hgroup>
+<!-- tmtOpen>$str+$
 <h1><<tmtCode>></h1>
 <h2 id="labelAndType"><<tmtLabel>> : a <<tmtTypes>></h2>
+<tmtClose -->
 </hgroup>
 <!-- end block 4 -->
 
 <section id="main">;
 
 <!-- begin block 6 -->
-String result6=getHeadBlock(language,version,dataLangMap);
+<!-- tmtOpen>$str+$
+<p><<tmtDescription>></p>
+<dl>
+<dt>URI:</dt>
+<dd><a href="<<tmtURI>>"><<tmtURI>></a></dd>
+<dt>Also available as: </dt>
+<dd><a href="<<tmtRDFLink>>">RDF/XML</a></dd>
+<dd><a href="<<tmtTurtleLink>>">Turtle</a></dd>
+</dl>			
+<tmtClose -->
+
 <!-- end block 6 -->
 
 
 
 <!-- begin block 7 -->
-String result7=getMetaTable( version,  language, versionPage);
+<!-- tmtOpen>$str+$
+<table><caption id="metaInformationValue">Code register metadata</caption>
+<tr><th scope="row" id="metaStatusCol">Status</th><td id="metaStatusValue"><<tmtStatus>></td></tr>
+<tr><th scope="row" id="metaOwnerCol">Owner</th><td><<tmtOwner>></td></tr>
+<tmtClose -->		
+<tr><th scope="row">in tags</th><td>
+<!-- tmtOpen>$tags$spacing::&nbsp;||
+<tmtClose -->
+</td></tr>
+<!-- tmtOpen>$str+$
+<tr><th scope="row" id="metaGenerationDateCol">Date of generation</th><td id="metaGenerationDateValue"><time datetime="<<tmtGenerationDate>>"><<tmtGenerationDate>></time></td></tr>					
+<tmtClose -->
+<!-- tmtOpen>$str+$versionScope::version||
+<tr><th scope="row" id="metaLastUpdateCol">version date</th><td id="metaLastUpdateValue"><time datetime="<<tmtActionDate>>"><<tmtActionDate>></time></td></tr>
+<tmtClose -->
+<!-- tmtOpen>$str+$versionScope::nonversion||
+<tr><th scope="row" id="metaLastUpdateCol">last update</th><td id="metaLastUpdateValue"><time datetime="<<tmtLastUpdate>>"><<tmtLastUpdate>></time></td></tr>
+<tmtClose -->
+<!-- tmtOpen>$str+$versionScope::version||			
+<tr><th scope="row" id="metaVersionCol">version</th><td><span id="metaVersionValue"><<tmtVersion>></span></td></tr>
+<tr><th scope="row" id="metaVersionCol">version state</th><td><span id="metaVersionValue"><<tmtNewerVersion>></span></td></tr>
+<tmtClose -->
+</table>
 <!-- end block 7 -->
 
 
 
 <!-- begin block 71 -->
-String result71=getStatementsBlock(MetaLanguage.filterForWeb(entity.getStatements(version)),language);
+<table>
+<caption>Properties</caption>
+<tr><th scope="col"></th><th scope="col" id="propAttributeCol">Property</th><th scope="col" id="propValueCol">Value</th></tr>
+<!-- tmtOpen>$statBlock$mode::html||codeLabel::code attributes||conceptLabl::concept attributes::otherLabel:: ||
+
+<tmtClose -->
+</table>
 <!-- end block 71 -->
 
 
 
 <!-- begin block 75 -->
-String result75="";
-		if(entity.isVersioned()) {
-			result75=getVersionBlock(version,language,baseURL);
-		}
+<!-- tmtOpen>$str+$versionScope::version||
+<table>
+	<caption>
+		<span id="strVersionHistory">Version history</span></caption>
+			<tr>
+				<th scope="col"><span id="versionColTitle">Version</span></th>
+				<th scope="col"><span id="dateColTitle">Date</span></th>
+				<th scope="col"><span id="actionColTitle">Action</span></th>
+				<th scope="col"><span id="actorColTitle">By</span></th>
+				<th scope="col"><span id="descColTitle">Description</span></th>
+			</tr>
+<tmtClose -->
+<!-- tmtOpen>$version$
+	<tr>
+	<td><a href="<<tmtVersionLink>>"><<tmtVersion>></a></td>
+	<td><time datetime="<<tmtVersionDate>>"><<tmtVersionDate>></time></td>
+	<td><<tmtVersionAction>></td>";
+	<td><<tmtVersionActionAuthor>></td>";
+	<td><<tmtVersionActionDescription>></td>;
+	</tr>
+<tmtClose -->
+<!-- tmtOpen>$str+$versionScope::version||
+</table>
+<tmtClose -->
+
+
 <!-- end block 75 -->
 
 
@@ -98,7 +160,15 @@ String result75="";
 
 
 <!-- begin block 9 -->
-String result9=getNavigationPanel(version,language) ;// Statements
+<section id="second">
+<h2 id="definedInRegStr">Defined in register</h2>
+<ul>
+<!-- tmtOpen>$str+$
+<li><a href="<<tmtFatherURI>>"  class="moreb" ><<tmtFatherLabel>></a></li>
+<tmtClose -->
+</ul><br/>
+</section>
+		
 <!-- end block 9 -->
 
 
