@@ -78,9 +78,9 @@ public class StatementsTemplateElement extends TemplateParametricClass
 		Collection<Statement> orderedStatMapOther=StatementSorter.orderStatementsByLiteralObject(statSetUndef,e.getFactory());
 		
 		if(statementsBlockMode.equalsIgnoreCase("html")) {
-			result.append(buildSubBlock(orderedStatMapConcept, counterCode, statementsBlockCodeLabel, language, lm));
+			result.append(buildSubBlock(orderedStatMapConcept, counterConcept, statementsBlockCodeLabel, language, lm));
 			result.append(buildSubBlock(orderedStatMapCode, counterCode, statementsBlockConceptLabel, language, lm));
-			result.append(buildSubBlock(orderedStatMapOther, counterCode, statementsBlockOtherLabel, language, lm));
+			result.append(buildSubBlock(orderedStatMapOther, counterUndef, statementsBlockOtherLabel, language, lm));
 		}
 		
 		return result.toString();

@@ -1,4 +1,4 @@
-		<!DOCTYPE html><html lang="en">
+<!DOCTYPE html><html lang="en">
 <!-- begin block 1 -->
 <head>
 	<title>
@@ -66,7 +66,7 @@
 </hgroup>
 <!-- end block 4 -->
 
-<section id="main">;
+<section id="main">
 
 <!-- begin block 6 -->
 <!-- tmtOpen>$str+$
@@ -141,9 +141,9 @@
 	<tr>
 	<td><a href="<<tmtVersionLink>>"><<tmtVersion>></a></td>
 	<td><time datetime="<<tmtVersionDate>>"><<tmtVersionDate>></time></td>
-	<td><<tmtVersionAction>></td>";
-	<td><<tmtVersionActionAuthor>></td>";
-	<td><<tmtVersionActionDescription>></td>;
+	<td><<tmtVersionAction>></td>
+	<td><<tmtVersionActionAuthor>></td>
+	<td><<tmtVersionActionDescription>></td>
 	</tr>
 <tmtClose -->
 <!-- tmtOpen>$str+$versionScope::version||
