@@ -21,11 +21,13 @@ import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.ConfigurationException;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.publisher.templateElements.BreadCrumbsTemplate;
+import net.metarelate.terminology.publisher.templateElements.ContainedCodesTemplate;
 import net.metarelate.terminology.publisher.templateElements.DummyTemplateElement;
 import net.metarelate.terminology.publisher.templateElements.LangMapTemplate;
 import net.metarelate.terminology.publisher.templateElements.ParamStringTemplateElement;
 import net.metarelate.terminology.publisher.templateElements.StatementsTemplateElement;
 import net.metarelate.terminology.publisher.templateElements.StringTemplateElement;
+import net.metarelate.terminology.publisher.templateElements.SubRegistersTemplateElement;
 import net.metarelate.terminology.publisher.templateElements.TagsTemplate;
 import net.metarelate.terminology.publisher.templateElements.TemplateElement;
 import net.metarelate.terminology.publisher.templateElements.TemplateTermElement;
@@ -167,6 +169,8 @@ public class TemplateManager {
 		else if (elemString.startsWith(TagsTemplate.tagsHeader)) return new TagsTemplate(elemString.substring(TagsTemplate.tagsHeader.length()));
 		else if (elemString.startsWith(VersionTemplate.versionHeade)) return new VersionTemplate(elemString.substring(VersionTemplate.versionHeade.length()));
 		else if (elemString.startsWith(StatementsTemplateElement.statHeader)) return new StatementsTemplateElement(elemString.substring(StatementsTemplateElement.statHeader.length()));
+		else if (elemString.startsWith(SubRegistersTemplateElement.subRegHeader)) return new SubRegistersTemplateElement(elemString.substring(SubRegistersTemplateElement.subRegHeader.length()));
+		else if (elemString.startsWith(ContainedCodesTemplate.ccodeHeader )) return new ContainedCodesTemplate(elemString.substring(ContainedCodesTemplate.ccodeHeader.length()));
 		else return new StringTemplateElement(elemString);
 	}
 	

@@ -92,18 +92,16 @@ public class ParamStringTemplateElement extends TemplateParametricClass implemen
 		resultString=resultString.replaceAll("<<tmtNewerVersion>>", versionStr);
 		
 		Iterator<TerminologySet> containers= e.getContainers(version).iterator();
-		String containerURI="";
+		String containerURL="";
 		String containerLabel="";
 		if(containers.hasNext()) { //TODO note that we expect only one container! This maybe should be made implicit by design, or this template should be changed.
 			TerminologySet container=containers.next();
-			containerURI=container.getURI();
+			containerURL=cacheManager.getValueFor(container.getURI(),PublisherConfig.uriHasUrl);
 			containerLabel=container.getLabel(container.getLastVersion(),language);
+			
 		}
-	
-
 		
-		
-		resultString=resultString.replaceAll("<<tmtFatherURI>>",cacheManager.getValueFor(containerURI,PublisherConfig.uriHasUrl) );
+		resultString=resultString.replaceAll("<<tmtFatherURI>>",containerURL );
 		resultString=resultString.replaceAll("<<tmtFatherLabel>>", containerLabel);
 		
 		

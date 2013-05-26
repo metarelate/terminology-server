@@ -24,7 +24,7 @@ import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.publisher.WebRendererStrings;
 import net.metarelate.terminology.utils.CodeComparator;
-import net.metarelate.terminology.utils.StatementSorter;
+import net.metarelate.terminology.utils.StatementsOrganizer;
 
 public class StatementsTemplateElement extends TemplateParametricClass
 		implements TemplateTermElement {
@@ -73,9 +73,9 @@ public class StatementsTemplateElement extends TemplateParametricClass
 			}
 		}
 		
-		Collection<Statement> orderedStatMapConcept=StatementSorter.orderStatementsByLiteralObject(statSetConcept,e.getFactory());
-		Collection<Statement> orderedStatMapCode=StatementSorter.orderStatementsByLiteralObject(statSetCode,e.getFactory());
-		Collection<Statement> orderedStatMapOther=StatementSorter.orderStatementsByLiteralObject(statSetUndef,e.getFactory());
+		Collection<Statement> orderedStatMapConcept=StatementsOrganizer.orderStatementsByLiteralObject(statSetConcept,e.getFactory());
+		Collection<Statement> orderedStatMapCode=StatementsOrganizer.orderStatementsByLiteralObject(statSetCode,e.getFactory());
+		Collection<Statement> orderedStatMapOther=StatementsOrganizer.orderStatementsByLiteralObject(statSetUndef,e.getFactory());
 		
 		if(statementsBlockMode.equalsIgnoreCase("html")) {
 			result.append(buildSubBlock(orderedStatMapConcept, counterConcept, statementsBlockCodeLabel, language, lm));

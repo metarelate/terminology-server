@@ -2,12 +2,16 @@ package net.metarelate.terminology.utils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeMap;
 
 import net.metarelate.terminology.config.MetaLanguage;
+import net.metarelate.terminology.coreModel.TerminologyEntity;
+import net.metarelate.terminology.coreModel.TerminologyFactory;
 import net.metarelate.terminology.instanceManager.Initializer;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -83,6 +87,40 @@ public class StatementsOrganizer {
 			}
 			return orderedStatementsList;
 			
+	}
+	
+	public static  Collection<Statement> orderStatementsByLiteralObject(Set<Statement> statSet, TerminologyFactory tf) {
+		int counter=0;
+		Comparator<String> codeComparator= new CodeComparator();
+		TreeMap<String,Statement> orderedCodeStatements=new TreeMap<String,Statement>(codeComparator);
+		for(Statement stat:statSet) {
+			RDFNode object=stat.getObject();
+			String seed=null;
+			if(object.isURIResource()) {
+				TerminologyEntity objectEntity=null;
+				if(tf.terminologyIndividualExist(object.asResource().getURI())) {
+					objectEntity=tf.getUncheckedTerminologyIndividual(object.asResource().getURI());
+					seed=objectEntity.getNotation(objectEntity.getLastVersion());
+				}
+					
+			}
+			if(seed!=null) {
+				if(orderedCodeStatements.containsKey(seed)) {
+					orderedCodeStatements.put(seed+counter, stat);
+					counter=counter+1;
+				}
+				else {
+					orderedCodeStatements.put(seed, stat);
+				}
+					
+				
+			}
+			else orderedCodeStatements.put(stat.getPredicate().getURI()+counter,stat );
+			counter+=1;
+		}
+		return orderedCodeStatements.values();
+		
+		
 	}
 
 }
