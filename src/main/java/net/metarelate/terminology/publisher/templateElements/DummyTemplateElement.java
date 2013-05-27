@@ -25,7 +25,7 @@ public class DummyTemplateElement implements TemplateTermElement,TemplateGlobalE
 		return true;
 	}
 
-	public String render(TerminologyFactory factory) throws ModelException {
+	public String render(TerminologyFactory factory, String tag) throws ModelException {
 		return "Dummy element for factory with  "+factory.getAllSets().size()+" sets, "+stringToRender;
 	}
 

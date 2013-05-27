@@ -1,12 +1,14 @@
 \documentclass{book}
 \usepackage{graphicx}
 \usepackage{makeidx}
+\usepackage{longtable}
+\usepackage{lscape}
 \makeindex
 
 \begin{document}
-<!-- tmtOpen>
-\title{<<globalTitle>>}
-\author{<<globalAuthor>>}
+<!-- tmtOpen>$str+$
+\title{Codes for <<tmtRoots>>, tag: <<tmtTag>>}
+\author{<<tmtOwner>>}
 <tmtClose -->
 \maketitle
 

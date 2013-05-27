@@ -4,5 +4,5 @@ import net.metarelate.terminology.coreModel.TerminologyFactory;
 import net.metarelate.terminology.exceptions.ModelException;
 
 public interface TemplateGlobalElement extends TemplateElement {
-	public  String render(TerminologyFactory factory) throws ModelException;
+	public  String render(TerminologyFactory factory, String tag) throws ModelException;
 }

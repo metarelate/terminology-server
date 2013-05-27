@@ -32,7 +32,7 @@ public class StringTemplateElement implements TemplateFixedElement, TemplateTerm
 	}
 
 
-	public String render(TerminologyFactory factory) {
+	public String render(TerminologyFactory factory, String tag) {
 		return stringToRender;
 	}
 

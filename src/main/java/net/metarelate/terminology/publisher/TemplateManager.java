@@ -25,6 +25,7 @@ import net.metarelate.terminology.publisher.templateElements.ContainedCodesTempl
 import net.metarelate.terminology.publisher.templateElements.DummyTemplateElement;
 import net.metarelate.terminology.publisher.templateElements.LangMapTemplate;
 import net.metarelate.terminology.publisher.templateElements.ParamStringTemplateElement;
+import net.metarelate.terminology.publisher.templateElements.SetCodeValuesTemplate;
 import net.metarelate.terminology.publisher.templateElements.StatementsTemplateElement;
 import net.metarelate.terminology.publisher.templateElements.StringTemplateElement;
 import net.metarelate.terminology.publisher.templateElements.SubRegistersTemplateElement;
@@ -115,7 +116,7 @@ public class TemplateManager {
 			if(templateMap.get(language)==null) throw new ConfigurationException("No suitable template defined for pre or post block");
 		}
 		StringBuilder answer=new StringBuilder();
-		for(TemplateElement t:templateMap.get(language)) answer.append(((TemplateGlobalElement)t).render(tf));
+		for(TemplateElement t:templateMap.get(language)) answer.append(((TemplateGlobalElement)t).render(tf,tag));
 		return answer.toString();
 	}
 	
@@ -171,6 +172,8 @@ public class TemplateManager {
 		else if (elemString.startsWith(StatementsTemplateElement.statHeader)) return new StatementsTemplateElement(elemString.substring(StatementsTemplateElement.statHeader.length()));
 		else if (elemString.startsWith(SubRegistersTemplateElement.subRegHeader)) return new SubRegistersTemplateElement(elemString.substring(SubRegistersTemplateElement.subRegHeader.length()));
 		else if (elemString.startsWith(ContainedCodesTemplate.ccodeHeader )) return new ContainedCodesTemplate(elemString.substring(ContainedCodesTemplate.ccodeHeader.length()));
+		else if (elemString.startsWith(SetCodeValuesTemplate.setCodeValHeader )) return new SetCodeValuesTemplate(elemString.substring(SetCodeValuesTemplate.setCodeValHeader.length()));
+
 		else return new StringTemplateElement(elemString);
 	}
 	

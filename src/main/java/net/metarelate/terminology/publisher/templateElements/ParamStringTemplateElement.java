@@ -13,6 +13,7 @@ import net.metarelate.terminology.coreModel.BackgroundKnowledgeManager;
 import net.metarelate.terminology.coreModel.CacheManager;
 import net.metarelate.terminology.coreModel.LabelManager;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
+import net.metarelate.terminology.coreModel.TerminologyFactory;
 import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.WebSystemException;
@@ -20,7 +21,7 @@ import net.metarelate.terminology.publisher.PublisherConfig;
 import net.metarelate.terminology.publisher.WebRendererStrings;
 import net.metarelate.terminology.utils.SSLogger;
 
-public class ParamStringTemplateElement extends TemplateParametricClass implements TemplateTermElement{
+public class ParamStringTemplateElement extends TemplateParametricClass implements TemplateTermElement,TemplateGlobalElement{
 	public static final String strPlusHeader="$str+$";
 	
 	
@@ -41,8 +42,8 @@ public class ParamStringTemplateElement extends TemplateParametricClass implemen
 		if(e.isVersioned() && (! printIfVersioned)) return "";
 		if(!e.isVersioned() && (! printIfUnVersioned)) return "";
 		String resultString=rawString;
-		resultString=resultString.replaceAll("<<tmtLabel>>",e.getLabel(version, language));
-		resultString=resultString.replaceAll("<<tmtVersion>>", version);
+		resultString=resultString.replace("<<tmtLabel>>",e.getLabel(version, language));
+		resultString=resultString.replace("<<tmtVersion>>", version);
 		String description=e.getGenericVersionSpecificStringValueObjectByLanguage(MetaLanguage.commentProperty,version, language);
 		if(description==null) description=e.getGenericVersionSpecificStringValueObjectByLanguage(MetaLanguage.commentProperty,version, CoreConfig.DEFAULT_LANGUAGE);
 		if(description==null) description="";
@@ -52,34 +53,34 @@ public class ParamStringTemplateElement extends TemplateParametricClass implemen
 		for(Resource type:typesSet) {
 			types+=" "+lm.getLabelForURI(type.getURI(), language, LabelManager.LANG_DEF_SHORTURI); // TODO needs better separator management
 		}
-		resultString=resultString.replaceAll("<<tmtDescription>>", description);
+		resultString=resultString.replace("<<tmtDescription>>", description);
 		//rawString.replaceAll("<<tmtAuthors>>", replacement);
-		resultString=resultString.replaceAll("<<tmtTypes>>",types);
-		resultString=resultString.replaceAll("<<tmtURI>>",e.getURI());
+		resultString=resultString.replace("<<tmtTypes>>",types);
+		resultString=resultString.replace("<<tmtURI>>",e.getURI());
 		String code=e.getGenericVersionSpecificStringValueObject(MetaLanguage.notationProperty, version);
 		if(code==null) code=e.getResource().getLocalName();
-		resultString=resultString.replaceAll("<<tmtCode>>",code);
+		resultString=resultString.replace("<<tmtCode>>",code);
 
 		String stem="";
 		if(e.isSet()) stem=PublisherConfig.registerStemString;
 		if(e.isIndividual()) stem=PublisherConfig.codeStemString;
-		resultString=resultString.replaceAll("<<tmtRDFLink>>",cacheManager.getValueFor(e.getURI(), PublisherConfig.uriHasUrl)+"/"+stem+".rdf");
-		resultString=resultString.replaceAll("<<tmtTurtleLink>>",cacheManager.getValueFor(e.getURI(), PublisherConfig.uriHasUrl)+"/"+stem+".ttl");
+		resultString=resultString.replace("<<tmtRDFLink>>",cacheManager.getValueFor(e.getURI(), PublisherConfig.uriHasUrl)+"/"+stem+".rdf");
+		resultString=resultString.replace("<<tmtTurtleLink>>",cacheManager.getValueFor(e.getURI(), PublisherConfig.uriHasUrl)+"/"+stem+".ttl");
 		
 		String statusStr=null; 
 		if(e.getStateURI(version)!=null) statusStr=lm.getLabelForURI(e.getStateURI(version),language,lm.LANG_DEF_URI);
 		if(statusStr==null) statusStr=WebRendererStrings.getValueFor(WebRendererStrings.UNDEFINED, language);
-		resultString=resultString.replaceAll("<<tmtStatus>>",statusStr);
+		resultString=resultString.replace("<<tmtStatus>>",statusStr);
 		
 		String ownerStr="";
 		if(e.getOwnerURI()!=null) ownerStr=lm.getLabelForURI(e.getOwnerURI(),language, lm.LANG_DEF_URI);
 	
-		resultString=resultString.replaceAll("<<tmtOwner>>",ownerStr);
+		resultString=resultString.replace("<<tmtOwner>>",ownerStr);
 		
 		
-		resultString=resultString.replaceAll("<<tmtLastUpdate>>", e.getLastUpdateDate());
-		resultString=resultString.replaceAll("<<tmtGenerationDate>>", e.getGenerationDate());
-		resultString=resultString.replaceAll("<<tmtActionDate>>", e.getActionDate(version));
+		resultString=resultString.replace("<<tmtLastUpdate>>", e.getLastUpdateDate());
+		resultString=resultString.replace("<<tmtGenerationDate>>", e.getGenerationDate());
+		resultString=resultString.replace("<<tmtActionDate>>", e.getActionDate(version));
 		
 		
 		String versionStr=version;
@@ -89,7 +90,7 @@ public class ParamStringTemplateElement extends TemplateParametricClass implemen
 			versionStr+=" ("+WebRendererStrings.getValueFor(WebRendererStrings.IS_LATEST_VERSION, language)+")";
 		}
 		else versionStr+=" ("+WebRendererStrings.getValueFor(WebRendererStrings.HAS_LATEST_VERSION,language)+" <a href=\""+cacheManager.getValueFor(e.getURI(), PublisherConfig.uriHasUrl)+"/"+e.getLastVersion()+"\">"+e.getLastVersion()+"</a>)";		
-		resultString=resultString.replaceAll("<<tmtNewerVersion>>", versionStr);
+		resultString=resultString.replace("<<tmtNewerVersion>>", versionStr);
 		
 		Iterator<TerminologySet> containers= e.getContainers(version).iterator();
 		String containerURL="";
@@ -101,11 +102,25 @@ public class ParamStringTemplateElement extends TemplateParametricClass implemen
 			
 		}
 		
-		resultString=resultString.replaceAll("<<tmtFatherURI>>",containerURL );
-		resultString=resultString.replaceAll("<<tmtFatherLabel>>", containerLabel);
+		resultString=resultString.replace("<<tmtFatherURI>>",containerURL );
+		resultString=resultString.replace("<<tmtFatherLabel>>", containerLabel);
 		
 		
 		
+		return resultString;
+	}
+
+	public String render(TerminologyFactory factory, String tag) throws ModelException {
+		String resultString=rawString;
+		resultString=resultString.replace("<<tmtTag>>", tag);
+		resultString=resultString.replace("<<tmtOwner>>", "Author is not implemented");
+		String roots="";
+		for(TerminologySet s:factory.getRootCollections()) {
+			if(s.getVersionsForTag(tag).length>0)
+				roots+=s.getLabel(s.getVersionsForTag(tag)[0])+" ";
+			else roots+=s.getLabel(s.getLastVersion())+" ";
+		}
+		resultString=resultString.replace("<<tmtRoots>>", roots);
 		return resultString;
 	}
 

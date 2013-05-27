@@ -27,7 +27,7 @@ public class LangMapTemplate extends TemplateParametricClass implements Template
 		return true;
 	}
 
-	public String render(TerminologyFactory factory) throws ModelException {
+	public String render(TerminologyFactory factory, String tag) throws ModelException {
 		// TODO Auto-generated method stub
 		return null;
 	}
