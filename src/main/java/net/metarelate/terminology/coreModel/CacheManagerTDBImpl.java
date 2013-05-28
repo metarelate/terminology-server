@@ -13,6 +13,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
@@ -85,6 +86,18 @@ public class CacheManagerTDBImpl implements CacheManager {
 	}
 	public void synch() {
 		TDB.sync(cacheGraph);
+		
+	}
+	//TODO note that we assume there's only one URI for a url...
+	public String getSubjectForValue(String urlRequested, String property) {
+		Literal objectRes=ResourceFactory.createPlainLiteral(urlRequested);
+		Property proRes=ResourceFactory.createProperty(property);
+		ResIterator currentValues=cacheGraph.listSubjectsWithProperty(proRes,objectRes);
+		if(currentValues.hasNext()) {
+			return currentValues.nextResource().getURI().toString();	
+		}
+		return null;
+		
 		
 	}
 

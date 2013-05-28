@@ -17,6 +17,8 @@ import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
+import net.metarelate.terminology.config.CoreConfig;
+import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.coreModel.TerminologyIndividual;
 import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.ConfigurationException;
@@ -125,7 +127,7 @@ public class PublisherManager {
 		myInitializer.myCache.synch();
 		
 		Server server = new Server(port);
-	    server.setHandler(new SimpleServer());
+	    server.setHandler(new SimpleServer(myTm,baseURL));
 	    server.start();
 	    server.join();
 	    
@@ -245,25 +247,224 @@ public class PublisherManager {
 	}
 	
 	
-	private class SimpleServer extends AbstractHandler
-	{
-	    public void handle(String target,
+	private class SimpleServer extends AbstractHandler {
+		private static final int RDFXMLOUT=1;
+		private static final int TTLOUT=2;
+		private static final int HTMLOUT=3;
+		private String langOut=CoreConfig.DEFAULT_LANGUAGE;
+		private int modeOut=HTMLOUT;
+		private TemplateManager tm;
+		private String baseURL="";
+	    public SimpleServer(TemplateManager myTm, String baseURL) {
+	    		super();
+			tm=myTm;
+			this.baseURL=baseURL;
+		}
+		public void handle(String target,
 	                       Request baseRequest,
 	                       HttpServletRequest request,
 	                       HttpServletResponse response) 
-	        throws IOException, ServletException
-	    {
-	        System.out.println("base was type: "+baseRequest.getContentType()+" URI: "+baseRequest.getRequestURI());
-	    	System.out.println("request was type: "+request.getRequestURI());
-	    	System.out.println("ServerName: "+request.getServerName());
-	    	System.out.println("Content type:"+request.getContentType());
-	    	System.out.println("Content type:"+baseRequest.getHeader("Accept"));
-	    	//TODO here we need to do the proper thing!
-	    	response.setContentType("text/html;charset=utf-8");
-	        response.setStatus(HttpServletResponse.SC_OK);
-	        baseRequest.setHandled(true);
-	        response.getWriter().println("<h1>Hello World</h1>");
-	    }
+	        throws IOException, ServletException {
+	    		//TODO finding the requested url should be cleaner!
+	    		String portBit="";
+	    		int port=request.getServerPort();
+	    		if(port!=80) portBit=new Integer(port).toString();
+	    		portBit=":"+portBit;
+	    		String urlRequested="http://"+request.getServerName()+portBit+baseRequest.getRequestURI();
+	    		String uri="";
+	    		String version=null;
+	    		String language=CoreConfig.DEFAULT_LANGUAGE;
+	    		SSLogger.log("Request for: "+urlRequested,SSLogger.DEBUG);
+	    		if(urlRequested.endsWith(".rdf")) {
+	    			urlRequested=urlRequested.replace(".rdf", "");
+	    			if(urlRequested.endsWith(PublisherConfig.codeStemString))
+	    				urlRequested=urlRequested.replace(PublisherConfig.codeStemString, "");
+	    			if(urlRequested.endsWith(PublisherConfig.registerStemString))
+	    				urlRequested=urlRequested.replace(PublisherConfig.registerStemString, "");
+	    			String[] res=getURIFromURL(urlRequested);
+	    			uri=res[0];
+	    			version=res[1];
+	    			if(uri==null) {
+	    				unknownURIError(baseRequest,response,urlRequested);
+	    			}
+	    			else {
+	    				modeOut=RDFXMLOUT;
+	    			}
+	    		}
+	    		else if(urlRequested.endsWith(".ttl")) {
+	    			urlRequested=urlRequested.replace(".ttl", "");
+	    			if(urlRequested.endsWith(PublisherConfig.codeStemString))
+	    				urlRequested=urlRequested.replace(PublisherConfig.codeStemString, "");
+	    			if(urlRequested.endsWith(PublisherConfig.registerStemString))
+	    				urlRequested=urlRequested.replace(PublisherConfig.registerStemString, "");
+	    			String[] res=getURIFromURL(urlRequested);
+	    			uri=res[0];
+	    			version=res[1];
+	    			if(uri==null) {
+	    				unknownURIError(baseRequest,response,urlRequested);
+	    			}
+	    			else {
+	    				modeOut=TTLOUT;
+	    			}
+	    		}
+	    		else if(urlRequested.endsWith(".html")) {
+	    			urlRequested=urlRequested.replace(".html", "");
+	    			int lastIndexOfDot=urlRequested.lastIndexOf(".");
+	    			if(lastIndexOfDot>0) {
+	    				language=urlRequested.substring(lastIndexOfDot+1);
+	    				urlRequested=urlRequested.substring(0,lastIndexOfDot);
+	    			} 
+	    			if(urlRequested.endsWith(PublisherConfig.codeStemString))
+	    				urlRequested=urlRequested.replace(PublisherConfig.codeStemString, "");
+	    			if(urlRequested.endsWith(PublisherConfig.registerStemString))
+	    				urlRequested=urlRequested.replace(PublisherConfig.registerStemString, "");
+	    			String[] res=getURIFromURL(urlRequested);
+	    			uri=res[0];
+	    			version=res[1];
+	    			if(uri==null) {
+	    				unknownURIError(baseRequest,response,urlRequested);
+	    			}	
+	    			else {
+	    				modeOut=HTMLOUT;
+	    			}
+	    		}	
+	    		else {
+	    			String[] res=getURIFromURL(urlRequested);
+	    			uri=res[0];
+	    			version=res[1];
+	    			if(uri==null) {
+	    				unknownURIError(baseRequest,response,urlRequested);
+	    			}
+	    			else {
+	    				//TODO perhaps we could implement a better content negotation!
+	    				modeOut=HTMLOUT;
+	    				String acceptHeader=baseRequest.getHeader("Accept");
+	    				if(acceptHeader.contains("application/rdf+xml")) modeOut=RDFXMLOUT;
+	    				if(acceptHeader.contains("text/turtle")) modeOut=TTLOUT;
+	    				if(acceptHeader.contains("text/html")) modeOut=HTMLOUT;
+	    			}
+	    		}
+	    		//	System.out.println("base was type: "+baseRequest.getContentType()+" URI: "+baseRequest.getRequestURI());
+	    		//System.out.println("request was type: "+request.getRequestURI());
+	    		//System.out.println("ServerName: "+request.getServerName());
+	    		//System.out.println("Content type:"+request.getContentType());
+	    		//System.out.println("Content type:"+baseRequest.getHeader("Accept"));
+	    		//TODO here we need to do the proper thing!
+	    		SSLogger.log("URI: "+uri);
+	    		SSLogger.log("Version: "+version);
+	    		SSLogger.log("lnaguage: "+langOut);
+	    		SSLogger.log("mode"+modeOut);
+	    		if(modeOut==HTMLOUT) {
+	    			response.setContentType("text/html;charset=utf-8");
+	    			response.setStatus(HttpServletResponse.SC_OK);
+	    			baseRequest.setHandled(true);
+	    			String result="";
+	    			try {
+	    				if(myInitializer.myFactory.terminologyIndividualExist(uri)) {
+	    					TerminologyIndividual ind=myInitializer.myFactory.getUncheckedTerminologyIndividual(uri);
+	    					if(version==null) version=ind.getLastVersion();
+	    					result=tm.getPageForLang(language, ind, version, 0, myInitializer.myCache.getValueFor(uri, PublisherConfig.uriHasUrl), myInitializer.myCache,  myInitializer.myFactory.getLabelManager(), myInitializer.myFactory.getBackgroundKnowledgeManager(), baseURL);
+
+	    				}
+	    				else if (myInitializer.myFactory.terminologySetExist(uri)) {
+	    					TerminologySet set=myInitializer.myFactory.getUncheckedTerminologySet(uri);
+	    					if(version==null) version=set.getLastVersion();
+	    					result=tm.getPageForLang(language, set, version, 0,  myInitializer.myCache.getValueFor(uri, PublisherConfig.uriHasUrl), myInitializer.myCache, myInitializer.myFactory.getLabelManager(), myInitializer.myFactory.getBackgroundKnowledgeManager(), baseURL);
+
+	    				}
+	    				else {
+	    					result="Sorry, I'm terribly confused!";
+	    					// This shouldn't happen! TODO classes and typing are to be re-designed: too many types checks!
+	    				}
+	    			} catch (Exception e){
+	    				e.printStackTrace();
+	    			}; //TODO we should add something here.
+	    			
+	    			response.getWriter().println(result);
+	    		}
+	    		else if(modeOut==RDFXMLOUT) {
+	    			response.setContentType("application/rdfxml;charset=utf-8");
+	    			response.setStatus(HttpServletResponse.SC_OK);
+	    			baseRequest.setHandled(true);
+	    			TerminologyEntity entity=myInitializer.myFactory.getUncheckedTerminologyEntity(uri);
+	    			if(version==null) version=entity.getLastVersion();
+	    			Model modelToWrite=RDFrenderer.prepareModel(entity, version);
+	    			modelToWrite.setNsPrefixes(myInitializer.getPrefixMap());
+	    			modelToWrite.write(response.getWriter(),"RDF/XML-ABBREV");
+	    			
+	    		}
+	    		else if(modeOut==TTLOUT) {
+	    			response.setContentType("text/turtle;charset=utf-8");
+	    			response.setStatus(HttpServletResponse.SC_OK);
+	    			baseRequest.setHandled(true);
+	    			TerminologyEntity entity=myInitializer.myFactory.getUncheckedTerminologyEntity(uri);
+	    			if(version==null) version=entity.getLastVersion();
+	    			Model modelToWrite=RDFrenderer.prepareModel(entity, version);
+	    			modelToWrite.setNsPrefixes(myInitializer.getPrefixMap());
+	    			modelToWrite.write(response.getWriter(),"TURTLE");
+	    		}
+		}
+		private String[] getURIFromURL(String urlRequested) {
+			String uri=null;
+			String[] result=new String[2];
+			SSLogger.log("Looking for URI for URL: "+urlRequested);
+			uri=myInitializer.myCache.getSubjectForValue(urlRequested, PublisherConfig.uriHasUrl);
+			if(uri!=null) {
+				SSLogger.log("Found URI: "+uri);
+				result[0]=uri;
+				result[1]=null;
+				return result;
+			}
+			//URI not found, does the URL ends with "/" ? We can check without
+			if(urlRequested.endsWith("/")) urlRequested=urlRequested.substring(0,urlRequested.length()-1);
+			uri=myInitializer.myCache.getSubjectForValue(urlRequested, PublisherConfig.uriHasUrl);
+			if(uri!=null) {
+				SSLogger.log("Found URI: "+uri);
+				result[0]=uri;
+				result[1]=null;
+				return result;
+			}
+			//Maybe the URI has a trailing version number (we already removed the last "/")
+			int indexOfSlash=urlRequested.lastIndexOf("/");
+			String putativeURL=urlRequested.substring(0,indexOfSlash);
+			String putativeURL2=putativeURL+"/";
+			String putativeVersion=urlRequested.substring(indexOfSlash+1);
+			uri=myInitializer.myCache.getSubjectForValue(putativeURL, PublisherConfig.uriHasUrl);
+			if(uri==null) uri=myInitializer.myCache.getSubjectForValue(putativeURL2, PublisherConfig.uriHasUrl);
+			if(uri!=null) {
+				// TODO in theory we should check if this is valid version...
+				String[] versions=myInitializer.myFactory.getUncheckedTerminologyEntity(uri).getVersions();
+				boolean found=false;
+				for(String version:versions)
+					if(version.equals(putativeVersion))
+						found=true;
+				if(found) {
+					result[0]=uri;
+					result[1]=putativeVersion;
+					return result;
+				}
+			}
+			result[0]=null;
+			result[1]=null;
+			return result;
+			
+		}
 	}
+	
+	private void unknownURIError(Request baseRequest,HttpServletResponse response, String url) throws IOException {
+		response.setContentType("text/html;charset=utf-8");
+        response.setStatus(HttpServletResponse.SC_OK);
+        baseRequest.setHandled(true);
+        response.getWriter().println("<h1>Sorry!</h1>");
+        response.getWriter().println("I cannot recover any enity from URL : "+url);
+    }
+	
+	private void unknownVersionError(Request baseRequest,HttpServletResponse response, String url,String version) throws IOException {
+		response.setContentType("text/html;charset=utf-8");
+        response.setStatus(HttpServletResponse.SC_OK);
+        baseRequest.setHandled(true);
+        response.getWriter().println("<h1>Sorry!</h1>");
+        response.getWriter().println("Cannot find anything for URL: "+url+" at version "+version);
+    }
 
 }

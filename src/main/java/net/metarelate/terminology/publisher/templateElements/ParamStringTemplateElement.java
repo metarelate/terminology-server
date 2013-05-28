@@ -42,6 +42,9 @@ public class ParamStringTemplateElement extends TemplateParametricClass implemen
 		if(e.isVersioned() && (! printIfVersioned)) return "";
 		if(!e.isVersioned() && (! printIfUnVersioned)) return "";
 		String resultString=rawString;
+		String label=e.getLabel(version, language);
+		//if(label==null) label=e.getLabel(version, CoreConfig.DEFAULT_LANGUAGE);
+		//if(label==null) label="No label for "+e.getURI();
 		resultString=resultString.replace("<<tmtLabel>>",e.getLabel(version, language));
 		resultString=resultString.replace("<<tmtVersion>>", version);
 		String description=e.getGenericVersionSpecificStringValueObjectByLanguage(MetaLanguage.commentProperty,version, language);

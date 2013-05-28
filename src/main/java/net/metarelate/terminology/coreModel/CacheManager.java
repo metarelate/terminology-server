@@ -16,4 +16,6 @@ public interface CacheManager {
 
 	public void synch();
 
+	public String getSubjectForValue(String urlRequested, String property);
+
 }

@@ -12,7 +12,6 @@ import net.metarelate.terminology.exceptions.UnknownURIException;
 import net.metarelate.terminology.exceptions.WebWriterException;
 import net.metarelate.terminology.instanceManager.Initializer;
 import net.metarelate.terminology.publisher.PublisherManager;
-import net.metarelate.terminology.publisher.WebWriter;
 import net.metarelate.terminology.utils.SSLogger;
 
 public class CommandPublish extends TsCommand {
