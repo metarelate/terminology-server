@@ -1,8 +1,28 @@
+/* 
+ (C) British Crown Copyright 2011 - 2013, Met Office
+
+ This file is part of terminology-server.
+
+ terminology-server is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ terminology-server is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public License
+ along with terminology-server. If not, see <http://www.gnu.org/licenses/>.
+*/
+
 package net.metarelate.terminology.commandline;
 
 import net.metarelate.terminology.exceptions.AuthException;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.instanceManager.Initializer;
+import net.metarelate.terminology.utils.Loggers;
 
 public class TagCommand extends TsCommand {
 	Initializer myInitializer=null;
@@ -37,11 +57,9 @@ public class TagCommand extends TsCommand {
 		try {
 			myInitializer.myTerminologyManager.tagRelease(authorURI, tag, message);
 		} catch (AuthException e) {
-			System.out.println("Sorry, could not do it.");
+			Loggers.commandLogger.fatal("Sorry, could not do it.");
 			if(debugOn) e.printStackTrace();
 		}
-		// TODO Auto-generated method stub
-		
 	}
 	
 	@Override

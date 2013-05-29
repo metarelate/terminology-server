@@ -1,5 +1,5 @@
 /* 
- (C) British Crown Copyright 2011 - 2012, Met Office
+ (C) British Crown Copyright 2011 - 2013, Met Office
 
  This file is part of terminology-server.
 
@@ -25,7 +25,6 @@ import java.util.Set;
 import net.metarelate.terminology.coreModel.TerminologyFactory;
 import net.metarelate.terminology.coreModel.TerminologyIndividual;
 import net.metarelate.terminology.coreModel.TerminologySet;
-import net.metarelate.terminology.exceptions.AuthException;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
 /**

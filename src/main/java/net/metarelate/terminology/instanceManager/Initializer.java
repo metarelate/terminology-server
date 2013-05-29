@@ -30,6 +30,7 @@ import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.UUID;
 
+
 import net.metarelate.terminology.auth.AuthConfig;
 import net.metarelate.terminology.auth.AuthRegistryManager;
 import net.metarelate.terminology.auth.AuthServer;
@@ -47,7 +48,7 @@ import net.metarelate.terminology.management.RegistryPolicyManager;
 import net.metarelate.terminology.management.TerminologyManager;
 import net.metarelate.terminology.publisher.PublisherConfig;
 import net.metarelate.terminology.publisher.PublisherManager;
-import net.metarelate.terminology.utils.SSLogger;
+import net.metarelate.terminology.utils.Loggers;
 import net.metarelate.terminology.utils.SimpleQueriesProcessor;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -107,11 +108,18 @@ public class Initializer {
 	}
 
 	public void construct() throws ConfigurationException{
+		initLoggers();
 		prepareConfigurationLayout();
 		prepareDefaultFiles();
 		buildSystemComponents();
 	}
 	
+	private void initLoggers() {
+		Loggers.init();
+		if(debugMode) Loggers.debugOn();	// TODO maybe this should go somewhere else
+		Loggers.coreLogger.trace("Loggers initialized");
+	}
+
 	public String getRootDirectory() {
 		return rootDirectoryString;
 	}
@@ -119,7 +127,7 @@ public class Initializer {
 	//TODO Inits could be made more modular
 	public void prepareConfigurationLayout() throws ConfigurationException {
 		if(userHomeString==null) userHomeString = System.getProperty( "user.home" );
-		SSLogger.log("User Home: "+ userHomeString);
+		Loggers.coreLogger.info("User Home: "+ userHomeString);
 		//System.out.println("User Home: "+ userHomeString);
 		File rootDirectory=new File(userHomeString,rootDirString);
 		checkOrCreateDirectory(rootDirectory);
@@ -205,7 +213,7 @@ public class Initializer {
 		try {
 			configuration = getConfigurationGraph();
 		} catch (ConfigurationException e) {
-			SSLogger.log("Problems in reading configuration files");
+			Loggers.coreLogger.fatal("Problems in reading configuration files");
 			e.printStackTrace();
 			System.exit(-1);
 		}
@@ -214,7 +222,7 @@ public class Initializer {
 		//TODO for the time being only tdb is supported!
 		if(tdbPath==null) {
 			//throw new ConfigurationException("Unable to find a TDB directory");
-			SSLogger.log("Unable to find a TDB directory");
+			Loggers.coreLogger.fatal("Unable to find a TDB directory");
 			System.exit(-1);
 		}
 		CoreConfig.parseConfiguration(configuration);

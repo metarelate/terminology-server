@@ -1,3 +1,22 @@
+/* 
+ (C) British Crown Copyright 2011 - 2013, Met Office
+
+ This file is part of terminology-server.
+
+ terminology-server is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ terminology-server is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public License
+ along with terminology-server. If not, see <http://www.gnu.org/licenses/>.
+*/
+
 package net.metarelate.terminology.publisher;
 
 import java.io.BufferedWriter;
@@ -53,7 +72,7 @@ public class WebFilesVisitor extends PublisherVisitor {
 
 	
 	public void visit (TerminologySet set) throws WebWriterException, IOException, ConfigurationException, ModelException {
-		String type=PublisherConfig.registerStemString;
+		String type=PublisherConfig.setStemString;
 		String version=set.getLastVersion();
 		String collectionDirectoryPath=myInitializer.myCache.getValueFor(set.getURI(), PublisherConfig.uriHasDisk);
 		String collectionBaseURL=myInitializer.myCache.getValueFor(set.getURI(), PublisherConfig.uriHasUrl);
@@ -70,7 +89,7 @@ public class WebFilesVisitor extends PublisherVisitor {
 	}
 	
 	public void visit(TerminologyIndividual ind) throws WebWriterException, IOException, ConfigurationException, ModelException {
-		String type=PublisherConfig.codeStemString; //TODO better name for stems (they are sort of types...)
+		String type=PublisherConfig.individualStemString; //TODO better name for stems (they are sort of types...)
 		String version=ind.getLastVersion();
 		String individualDirectoryPath=myInitializer.myCache.getValueFor(ind.getURI(), PublisherConfig.uriHasDisk);
 		String indidvidualURL=myInitializer.myCache.getValueFor(ind.getURI(), PublisherConfig.uriHasUrl);

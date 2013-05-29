@@ -1,5 +1,5 @@
 /* 
- (C) British Crown Copyright 2011 - 2012, Met Office
+ (C) British Crown Copyright 2011 - 2013, Met Office
 
  This file is part of terminology-server.
 
@@ -16,7 +16,10 @@
  You should have received a copy of the GNU Lesser General Public License
  along with terminology-server. If not, see <http://www.gnu.org/licenses/>.
 */
-	
+/**
+ * TODO This Class is only functional to @net.metarelate.terminology.commandline.MetOp
+ * It should be removed once that class is removed.	
+ */
 package net.metarelate.terminology.commandline;
 
 import net.metarelate.terminology.coreModel.TerminologyFactory;
@@ -24,7 +27,7 @@ import net.metarelate.terminology.coreModel.TerminologyFactoryTDBImpl;
 import net.metarelate.terminology.exceptions.ConfigurationException;
 import net.metarelate.terminology.exceptions.InvalidProcessException;
 import net.metarelate.terminology.instanceManager.Initializer;
-import net.metarelate.terminology.utils.SSLogger;
+import net.metarelate.terminology.utils.Loggers;
 /**
  * An abstract class that provides some basic structure to a command line program.
  * This class provides a method startCommand() that must be called by the implementing class.
@@ -40,7 +43,8 @@ import net.metarelate.terminology.utils.SSLogger;
  * @author andreasplendiani
  *
  */
-public abstract class CommandLineTool {
+
+public abstract class OLD_CommandLineTool {
 	protected String tdbLocation="";
 	protected TerminologyFactory myFactory=null;
 	private int indexOfTDB=-1;
@@ -52,7 +56,7 @@ public abstract class CommandLineTool {
 	public Initializer myInitializer=null;
 	
 	/**
-	 * See discussion in the class description {@link CommandLineTool}
+	 * See discussion in the class description {@link OLD_CommandLineTool}
 	 * @param args
 	 */
 	protected void startCommand(String[] args) {
@@ -89,12 +93,12 @@ public abstract class CommandLineTool {
 				System.exit(0);
 			}
 			if(args[i].equalsIgnoreCase("-d")) {
-				SSLogger.showDebug(true);
-				SSLogger.log("debug=true",SSLogger.DEBUG);
+				Loggers.debugOn();
+				Loggers.commandLogger.debug("debug=true");
 			}
 			if(args[i].equalsIgnoreCase("-w")) {
-				SSLogger.showWarning(true);
-				SSLogger.log("warning=true",SSLogger.DEBUG);
+				Loggers.warningOn();
+				Loggers.commandLogger.debug("warning=true");
 			}
 			if(args[i].equalsIgnoreCase("-tdb")) {
 				indexOfTDB=i;

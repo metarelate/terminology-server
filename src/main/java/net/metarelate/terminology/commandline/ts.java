@@ -1,18 +1,35 @@
-package net.metarelate.terminology.commandline;
+/* 
+ (C) British Crown Copyright 2011 - 2013, Met Office
 
-import java.util.Arrays;
+ This file is part of terminology-server.
+
+ terminology-server is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ terminology-server is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public License
+ along with terminology-server. If not, see <http://www.gnu.org/licenses/>.
+*/
+
+package net.metarelate.terminology.commandline;
 
 import net.metarelate.terminology.config.CoreConfig;
 import net.metarelate.terminology.exceptions.ConfigurationException;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.instanceManager.Initializer;
-import net.metarelate.terminology.utils.SSLogger;
+import net.metarelate.terminology.utils.Loggers;
 
 public class ts {
 	public static Initializer myInitializer=null;
 	
 	public static void main(String[] args) {
-		System.out.println("Starting tServer v."+CoreConfig.VERSION_NUMBER+" ("+CoreConfig.VERSION_CODENAME+")");
+		Loggers.commandLogger.info("Starting tServer v."+CoreConfig.VERSION_NUMBER+" ("+CoreConfig.VERSION_CODENAME+")");
 		String sysDir=null;
 		boolean debug=false;
 		if(args.length<1) {
@@ -38,7 +55,7 @@ public class ts {
 			}
 			else if(arg.equalsIgnoreCase("-d")) {
 				debug=true;
-				System.out.println("Debug mode On");
+				Loggers.commandLogger.debug("Debug mode On");
 			}
 			else if(nextIsSysDir) {
 				sysDir=arg;
@@ -69,26 +86,27 @@ public class ts {
 				System.out.println(CommandClean.getStaticLocalHelpMessage());
 			}
 			else if(helpFocus.equalsIgnoreCase("command")) {
-				System.out.println(CommandCommand.getStaticLocalHelpMessage());
+				System.out.println(OLD_CommandCommand.getStaticLocalHelpMessage());
 			}
 			else if(helpFocus.equalsIgnoreCase("tag")) {
 				System.out.println(TagCommand.getStaticLocalHelpMessage());
 			}
 			else if(helpFocus.equalsIgnoreCase("web")) {
 				System.out.println(WebCommand.getStaticLocalHelpMessage());
-			} 
+			}
+			
 				
 		}
 		if(helpOnly) System.exit(0);
 		/**
 		 * Building the initializer
 		 */
-		SSLogger.showDebug(debug);
+		if(debug) Loggers.debugOn();
 		try {
 			if(sysDir!=null) myInitializer=new Initializer(sysDir,debug);
 			else myInitializer=new Initializer();
 		} catch (ConfigurationException e) {
-			System.out.println("Sorry, could not start the system");
+			Loggers.commandLogger.fatal("Sorry, could not start the system");
 			e.printStackTrace();
 		}
 		
@@ -100,26 +118,29 @@ public class ts {
 		
 		TsCommand command=null;
 		if(argument.equalsIgnoreCase("ingest")) {
-			System.out.println("Command: Ingest");
-			command =new CommandIngest(myInitializer,args,debug); // TODO excpet the first two!
+			Loggers.commandLogger.debug("Command: Ingest");
+			command =new CommandIngest(myInitializer,args,debug); 
 		}
 		else if(argument.equalsIgnoreCase("publish")) {
-			command =new CommandPublish(myInitializer,args,debug); // TODO excpet the first two!
+			Loggers.commandLogger.debug("Command: Publish");
+			command =new CommandPublish(myInitializer,args,debug); 
 		}
-		else if(argument.equalsIgnoreCase("check")) {
-			command =new CommandCheck(myInitializer,args,debug); // TODO excpet the first two!
+		else if(argument.equalsIgnoreCase("check")) {	// TODO unimplemented
+			command =new CommandCheck(myInitializer,args,debug); 
 		}
-		else if(argument.equalsIgnoreCase("clean")) {
-			command =new CommandClean(myInitializer,args,debug); // TODO excpet the first two!
+		else if(argument.equalsIgnoreCase("clean")) {	// TODO unimplemented
+			command =new CommandClean(myInitializer,args,debug); 
 		}
-		else if(argument.equalsIgnoreCase("command")) {
-			command =new CommandCommand(myInitializer,args,debug); // TODO excpet the first two!
+		else if(argument.equalsIgnoreCase("command")) { // TODO unimplemented
+			command =new OLD_CommandCommand(myInitializer,args,debug); 
 		}
-		else if(argument.equalsIgnoreCase("tag")) {
-			command =new TagCommand(myInitializer,args,debug); // TODO excpet the first two!
+		else if(argument.equalsIgnoreCase("tag")) {		
+			Loggers.commandLogger.debug("Command: Tag");
+			command =new TagCommand(myInitializer,args,debug); 
 		}
-		else if(argument.equalsIgnoreCase("web")) {
-			command =new WebCommand(myInitializer,args,debug); // TODO excpet the first two!
+		else if(argument.equalsIgnoreCase("web")) {		
+			Loggers.commandLogger.debug("Command: Web");
+			command =new WebCommand(myInitializer,args,debug); 
 		}
 		else {
 			commandUnknownError();
@@ -143,7 +164,7 @@ public class ts {
 	}
 	
 	private static void commandUnknownError() {
-		System.out.println("Unknown command");
+		Loggers.commandLogger.error("Unknown command");
 		System.out.println(getGenericHelpMessage());
 	}
 	private static String getGenericHelpMessage() {
@@ -152,8 +173,7 @@ public class ts {
 				"       ts [-d] [help] check    [parameters]    (check for constraints)\n" +
 				"       ts [-d] [help] clean    [parameters]    (remove from terminology)\n"+
 				"       ts [-d] [help] command  [parameters]    (single term actions)\n"+
-				"       ts [-d] [help] tag      [parameters]    (tag the current terminology state)\n" +
-				"       ts [-d] [help] web      [parameters]    (start the edit interface on port 8080)";
+				"       ts [-d] [help] tag      [parameters]    (tag the current terminology state)\n" ;
 	}
 
 }

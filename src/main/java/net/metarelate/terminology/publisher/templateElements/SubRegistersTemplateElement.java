@@ -13,7 +13,6 @@ import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.publisher.PublisherConfig;
-import net.metarelate.terminology.publisher.WebRendererStrings;
 import net.metarelate.terminology.utils.CodeComparator;
 
 public class SubRegistersTemplateElement extends TemplateParametricClass

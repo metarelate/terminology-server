@@ -1,3 +1,25 @@
+/* 
+ (C) British Crown Copyright 2011 - 2013, Met Office
+
+ This file is part of terminology-server.
+
+ terminology-server is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ terminology-server is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public License
+ along with terminology-server. If not, see <http://www.gnu.org/licenses/>.
+*/
+
+/**
+ * TODO some residual from the previous code-base to be cleaned up.
+ */
 package net.metarelate.terminology.commandline;
 
 import java.util.ArrayList;
@@ -8,6 +30,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.instanceManager.Initializer;
 import net.metarelate.terminology.modelBuilders.TerminologyModelBuilder;
+import net.metarelate.terminology.utils.Loggers;
 import net.metarelate.terminology.utils.SSLogger;
 
 public class CommandIngest extends TsCommand {
@@ -38,17 +61,15 @@ public class CommandIngest extends TsCommand {
 	
 	@Override
 	public void localExecute() {
+		Loggers.commandLogger.debug("Starting execution");
+		Loggers.commandLogger.debug("Debug mode is: "+debugOn);
+		Loggers.commandLogger.debug("Message: "+message);
+		//if(debugOn) System.out.println("On");
+		//else System.out.println("Off");
 		
-		System.out.println("Starting execution");
-		System.out.print("Debug mode is: ");
-		System.out.println(debugOn);
-		if(debugOn) System.out.println("On");
-		else System.out.println("Off");
-		System.out.println("Message: "+message);
 		if(labelsOnly) System.out.println("Only fetching labels");
-		System.out.println("Going to read files:");
 		for (String file:files) {
-			System.out.println("\t"+file);
+			Loggers.commandLogger.trace("Reading file:"+file);
 		}
 		
 		try {
@@ -71,15 +92,15 @@ public class CommandIngest extends TsCommand {
 				
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("Problems in creating model from rdf files");
+			Loggers.commandLogger.fatal("Problems in creating model from rdf files");
 		}	
 		
 		
 		try {
-			SSLogger.log("Number of known sets "+myInitializer.myFactory.getAllSets().size(),SSLogger.DEBUG);
-			SSLogger.log("Number of known individuals "+myInitializer.myFactory.getAllIndividuals().size(),SSLogger.DEBUG);
+			Loggers.commandLogger.debug("Number of known sets "+myInitializer.myFactory.getAllSets().size());
+			Loggers.commandLogger.debug("Number of known individuals "+myInitializer.myFactory.getAllIndividuals().size());
 		} catch (ModelException e) {
-			SSLogger.log("Problems in message, unable to collect stats",SSLogger.DEBUG);
+			Loggers.commandLogger.fatal("Problems in message, unable to collect stats");
 			e.printStackTrace();
 		}
 		

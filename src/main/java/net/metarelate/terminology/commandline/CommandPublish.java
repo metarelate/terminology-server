@@ -1,18 +1,37 @@
+/* 
+ (C) British Crown Copyright 2011 - 2013, Met Office
+
+ This file is part of terminology-server.
+
+ terminology-server is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ terminology-server is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public License
+ along with terminology-server. If not, see <http://www.gnu.org/licenses/>.
+*/
+
+/**
+ * TODO check if System.out is coherently used vs Logger 
+ * (also across all comand line tools).
+ * TODO add help
+ */
 package net.metarelate.terminology.commandline;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
-import com.hp.hpl.jena.rdf.model.Model;
-
 import net.metarelate.terminology.coreModel.TerminologySet;
-import net.metarelate.terminology.exceptions.ConfigurationException;
-import net.metarelate.terminology.exceptions.ModelException;
-import net.metarelate.terminology.exceptions.UnknownURIException;
-import net.metarelate.terminology.exceptions.WebWriterException;
 import net.metarelate.terminology.instanceManager.Initializer;
 import net.metarelate.terminology.publisher.PublisherManager;
-import net.metarelate.terminology.utils.SSLogger;
+import net.metarelate.terminology.utils.Loggers;
+
+import com.hp.hpl.jena.rdf.model.Model;
 
 public class CommandPublish extends TsCommand {
 	boolean overwrite=false;				//default
@@ -105,18 +124,16 @@ public class CommandPublish extends TsCommand {
 
 	@Override
 	public void localExecute() throws Exception {
-		SSLogger.log("Publishing resources",SSLogger.DEBUG);
-		SSLogger.log("Mode is: "+mode,SSLogger.DEBUG);
-		if(mode==PublisherManager.WEB_FILES) SSLogger.log("Web file with template "+template,SSLogger.DEBUG);
-		if(mode==PublisherManager.ONLINE) SSLogger.log("Online file with template "+template+" on port "+port,SSLogger.DEBUG);
-		if(mode==PublisherManager.DOC_FILE) SSLogger.log("Doc files with template "+template,SSLogger.DEBUG);
-		if(selectedURI==null) SSLogger.log("Publishing all",SSLogger.DEBUG);
-		else SSLogger.log("Publishing "+selectedURI,SSLogger.DEBUG);
-		SSLogger.log("Overwrite: "+overwrite,SSLogger.DEBUG);
-		SSLogger.log("Cleancache: "+cleanCache,SSLogger.DEBUG);
+		Loggers.commandLogger.info("Publishing resources");
+		if(mode==PublisherManager.WEB_FILES) Loggers.commandLogger.debug("Web file with template "+template);
+		if(mode==PublisherManager.ONLINE) Loggers.commandLogger.debug("Online file with template "+template+" on port "+port);
+		if(mode==PublisherManager.DOC_FILE) Loggers.commandLogger.debug("Doc files with template "+template);
+		if(selectedURI==null) Loggers.commandLogger.info("Publishing all");
+		else Loggers.commandLogger.info("Publishing "+selectedURI);
+		Loggers.commandLogger.debug("Overwrite: "+overwrite);
+		Loggers.commandLogger.debug("Cleancache: "+cleanCache);
 		if(files.size()>0) {
-			SSLogger.log("Extra configuration supplied :",SSLogger.DEBUG);
-			for(String file:files) SSLogger.log("File: "+file,SSLogger.DEBUG);
+			for(String file:files) Loggers.commandLogger.debug("Extra configuration in file: "+file);
 		}
 		Model globalInput=readIntoModel(files);
 		
@@ -145,33 +162,6 @@ public class CommandPublish extends TsCommand {
 			myInitializer.myPublisherManager.publishOnline(globalInput,port);
 		}
 		
-		/**
-		 * TODO only a basic total publishing is implemented in the current model
-		 * (inherited from past design). All is going to change with the new publisher design.
-		 */
-		/*
-		TerminologySet[] roots=myInitializer.myFactory.getRootCollections();
-		if(roots==null) {
-			System.out.println("Cannot finde roots! (something went wrong...)");
-			System.exit(0);
-		}
-		//if(selectedURI==null) {
-		//SSLogger.log("No filters");
-			for(TerminologySet root: roots) {
-				try {
-					SSLogger.log("Generating web layout for: "+root.getURI());
-					WebWriter myWriter=new WebWriter(root,myInitializer.getConfigurationGraph(),overwrite);
-					myWriter.setPrefixMap(myInitializer.getPrefixMap());		// TODO verify consistency with publisher/builder/factory
-					myWriter.write();
-						
-				} catch (Exception e) {
-					e.printStackTrace();
-					System.out.println("Problems in writing to web");
-				}
-			}
-		//}
-		 
-		 */
 		
 			
 		
@@ -181,6 +171,7 @@ public class CommandPublish extends TsCommand {
 		return getStaticLocalHelpMessage();
 	}
 	public static String getStaticLocalHelpMessage() {
+		// TODO missing local help
 		return "ts publish [under refactoring!]";
 	
 		
@@ -189,6 +180,7 @@ public class CommandPublish extends TsCommand {
 	@Override
 	public boolean validate() {
 		// TODO to complete with a check of which parameters are needed for each modality
+		// e.g. templates in doc...
 		if(mode==PublisherManager.DOC_FILE)	{
 			if(tag==null) return false;
 			if(outFile==null) return false;

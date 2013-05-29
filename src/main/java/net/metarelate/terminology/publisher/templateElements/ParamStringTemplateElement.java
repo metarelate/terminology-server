@@ -65,8 +65,8 @@ public class ParamStringTemplateElement extends TemplateParametricClass implemen
 		resultString=resultString.replace("<<tmtCode>>",code);
 
 		String stem="";
-		if(e.isSet()) stem=PublisherConfig.registerStemString;
-		if(e.isIndividual()) stem=PublisherConfig.codeStemString;
+		if(e.isSet()) stem=PublisherConfig.setStemString;
+		if(e.isIndividual()) stem=PublisherConfig.individualStemString;
 		resultString=resultString.replace("<<tmtRDFLink>>",cacheManager.getValueFor(e.getURI(), PublisherConfig.uriHasUrl)+"/"+stem+".rdf");
 		resultString=resultString.replace("<<tmtTurtleLink>>",cacheManager.getValueFor(e.getURI(), PublisherConfig.uriHasUrl)+"/"+stem+".ttl");
 		
