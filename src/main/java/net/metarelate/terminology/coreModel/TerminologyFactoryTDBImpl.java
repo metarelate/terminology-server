@@ -22,7 +22,6 @@ package net.metarelate.terminology.coreModel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -31,12 +30,11 @@ import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.exceptions.ImporterException;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.UnknownURIException;
+import net.metarelate.terminology.utils.Loggers;
 
 import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -125,40 +123,10 @@ public class TerminologyFactoryTDBImpl implements TerminologyFactory {
 
 	}
 
-	/*
-	public TerminologySet getOrCreateTerminologySet(String uri, String version) {
-		TerminologySet result=null;
-		if(alreadyCreatedSets.containsKey(uri)) {
-			result= alreadyCreatedSets.get(uri);
-			result.registerVersion(version);
-			//result.setDefaultVersion(version);
-			return result;
-		}
-		result= new TerminologySetTDBImpl(uri, this);
-		result.registerVersion(version);
-		//result.setDefaultVersion(version);
-		globalGraph.add(ResourceFactory.createStatement(ResourceFactory.createResource(uri), TDBModelsCoreConfig.hasTypeProperty, TDBModelsCoreConfig.TerminologySetType));
-		alreadyCreatedSets.put(uri, result);
-		result.setIsVersioned(true);
-		return result;
-	}
-	*/
+	
 
 	
-	/*
-	public TerminologyIndividual getOrCreateUnversionedTerminologyIndividual(String uri) {
-		if(alreadyCreatedIndividuals.containsKey(uri)) return alreadyCreatedIndividuals.get(uri);
-		TerminologyIndividualTDBImpl result=null;
-		result= new TerminologyIndividualTDBImpl(uri, this);
-		result.setIsVersioned(false);
-		if(result.getNumberOfVersions()==0) result.registerVersion(CoreConfig.VERSION_DEFUALT);
-		//result.setDefaultVersion(result.getLastVersion());
-		globalGraph.add(ResourceFactory.createStatement(ResourceFactory.createResource(uri), TDBModelsCoreConfig.hasTypeProperty, TDBModelsCoreConfig.TerminologyIndividualType));
-		alreadyCreatedIndividuals.put(uri, result);
-		return result;
 	
-	}
-	*/
 	
 	/**
 	 * Creates a new TerminologySet (versioned), initialized at init-version. 
@@ -210,26 +178,7 @@ public class TerminologyFactoryTDBImpl implements TerminologyFactory {
 
 	}
 	
-	/*
-	public TerminologyIndividual getOrCreateTerminologyIndividual(String uri,
-			String version) {
-		TerminologyIndividual result=null;;
-		if(alreadyCreatedIndividuals.containsKey(uri)) {
-			result= alreadyCreatedIndividuals.get(uri);
-			result.registerVersion(version);
-			//result.setDefaultVersion(version);
-			return result;
-		}
-		result= new TerminologyIndividualTDBImpl(uri, this);
-		result.registerVersion(version);
-		//result.setDefaultVersion(version);
-		globalGraph.add(ResourceFactory.createStatement(ResourceFactory.createResource(uri), TDBModelsCoreConfig.hasTypeProperty, TDBModelsCoreConfig.TerminologyIndividualType));
-		alreadyCreatedIndividuals.put(uri, result);
-		result.setIsVersioned(true);
-		return result;
-
-	}
-	*/
+	
 
 	public Collection<TerminologySet> getAllSets() {
 		ResIterator setNodes=globalGraph.listSubjectsWithProperty(TDBModelsCoreConfig.hasTypeProperty,TDBModelsCoreConfig.TerminologySetType);
@@ -254,16 +203,14 @@ public class TerminologyFactoryTDBImpl implements TerminologyFactory {
 	}
 
 	public TerminologySet[] getRootCollections() throws ModelException {
-		System.out.println("Finding root collections");
+		Loggers.coreLogger.trace("Finding root collections");
 		ArrayList<TerminologySet> myRoots=new ArrayList<TerminologySet>();
 		Collection<TerminologySet> mySets= getAllSets();
 		Iterator<TerminologySet> mySetsIter=mySets.iterator();
 		while(mySetsIter.hasNext()) {
 			TerminologySet mySet=mySetsIter.next();
-			System.out.println("Testing "+mySet.getURI());
 			if(mySet.isRoot()) {
 				myRoots.add(mySet);
-				System.out.println("Root");
 			}
 		}
 		return myRoots.toArray(new TerminologySet[myRoots.size()]);
@@ -298,8 +245,7 @@ public class TerminologyFactoryTDBImpl implements TerminologyFactory {
     			"graph ?g {?s ?p ?l .\n"+ 
     			"filter regex(?l,\""+constraint+"\")}\n"+
     			"}";
-    	System.out.println("Query:");
-    	System.out.println(queryString);
+    Loggers.coreLogger.debug("Query: "+queryString);
     	QueryExecution queryExec=QueryExecutionFactory.create(queryString,myDataset);
     	ResultSet results = queryExec.execSelect();
     	Set<String> uriResult=new HashSet<String>();

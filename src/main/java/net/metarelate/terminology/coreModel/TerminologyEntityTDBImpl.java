@@ -1,5 +1,5 @@
 /* 
- (C) British Crown Copyright 2011 - 2012, Met Office
+ (C) British Crown Copyright 2011 - 2013, Met Office
 
  This file is part of terminology-server.
 
@@ -20,20 +20,14 @@
 package net.metarelate.terminology.coreModel;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import net.metarelate.terminology.config.CoreConfig;
 import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.UnknownURIException;
-import net.metarelate.terminology.publisher.PublisherVisitor;
-import net.metarelate.terminology.utils.CodeComparator;
+import net.metarelate.terminology.utils.Loggers;
 import net.metarelate.terminology.utils.SimpleQueriesProcessor;
 
 import com.hp.hpl.jena.query.Dataset;
@@ -45,7 +39,6 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.tdb.TDB;
 
@@ -137,7 +130,7 @@ public abstract class TerminologyEntityTDBImpl implements TerminologyEntity {
 			localNamespace=uri.substring(uri.lastIndexOf('/')+1);
 		}
 		// TODO debug
-		System.out.println("for "+getURI()+" namespace was "+localNamespace);
+		Loggers.coreLogger.trace("for "+getURI()+" namespace was "+localNamespace);
 		return localNamespace;
 	}
 	

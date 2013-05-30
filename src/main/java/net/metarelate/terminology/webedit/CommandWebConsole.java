@@ -1,18 +1,11 @@
 package net.metarelate.terminology.webedit;
 
-import net.metarelate.terminology.config.MetaLanguage;
-import net.metarelate.terminology.coreModel.TerminologyFactory;
-import net.metarelate.terminology.coreModel.TerminologyFactoryTDBImpl;
 import net.metarelate.terminology.exceptions.ConfigurationException;
 import net.metarelate.terminology.instanceManager.Initializer;
-import net.metarelate.terminology.management.TerminologyManager;
-import net.metarelate.terminology.utils.SSLogger;
-import net.metarelate.terminology.utils.SimpleQueriesProcessor;
+import net.metarelate.terminology.utils.Loggers;
 
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.protocol.http.WebApplication;
-
-import com.hp.hpl.jena.rdf.model.Model;
 
 /**
  * Application object for your web application. If you want to run this application without deploying, run the Start class.
@@ -46,7 +39,7 @@ public class CommandWebConsole extends WebApplication
 		try {
 			myInitializer=new Initializer();
 		} catch (ConfigurationException e1) {
-			SSLogger.log("Initalization fatal problem");
+			Loggers.webAdminLogger.fatal("Initalization fatal problem");
 			e1.printStackTrace();
 			System.exit(-1);
 		}

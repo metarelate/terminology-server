@@ -25,7 +25,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.metarelate.terminology.utils.SSLogger;
+import net.metarelate.terminology.utils.Loggers;
+
 
 /**
  * Provides services relative to versioning. 
@@ -151,7 +152,7 @@ public class Versioner {
 	 * @return the string for the next version (e.g.: v1)
 	 */
 	public static String createNextVersion(String version) {
-		SSLogger.log("Generating next version for "+version,SSLogger.DEBUG);
+		Loggers.coreLogger.trace("Generating next version for "+version);
 		int currentVersionNumber=-1;
 		try {
 			currentVersionNumber=Integer.parseInt(version);
@@ -163,7 +164,7 @@ public class Versioner {
 		//If we are here, version was not an int, and we fall back to the previous approach
 		Matcher m=versionNumberPattern.matcher(version);
 		if(!m.matches()) {
-			SSLogger.log("Unable to match "+version);
+			Loggers.coreLogger.error("Unable to understand version String "+version);
 		}
 		String root=m.group(1);
 		String no=m.group(2);

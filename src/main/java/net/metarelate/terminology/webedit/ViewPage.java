@@ -3,18 +3,15 @@ package net.metarelate.terminology.webedit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
-import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.coreModel.LabelManager;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
-import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.ImpossibleOperationException;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
-import net.metarelate.terminology.exceptions.UnknownURIException;
 import net.metarelate.terminology.management.RegistryPolicyManager;
 import net.metarelate.terminology.utils.FunctionExecutor;
+import net.metarelate.terminology.utils.Loggers;
 import net.metarelate.terminology.utils.StatementsOrganizer;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -282,7 +279,7 @@ public class ViewPage extends SuperPage {
 		Button newCodeButton=new Button("newCodeButton") {
 			@Override
 			public void onSubmit() {
-				System.out.println("Action:NEWCODE");
+				Loggers.webAdminLogger.debug("Action:NEWCODE");
 				/////
 				PageParameters pageParameters = new PageParameters();
 				pageParameters.add("type","Individual");
@@ -326,7 +323,7 @@ public class ViewPage extends SuperPage {
 		Button newRegisterButton=new Button("newRegisterButton"){
 			@Override
 			public void onSubmit() {
-				System.out.println("Action:NEWREGISTER");
+				Loggers.webAdminLogger.debug("Action:NEWREGISTER");
 				PageParameters pageParameters = new PageParameters();
 				pageParameters.add("type","Set");
 				
@@ -415,7 +412,7 @@ public class ViewPage extends SuperPage {
 			private static final long serialVersionUID = 2663696796017307696L;
 			@Override
 			public void onSubmit(AjaxRequestTarget target,Form form) {
-				System.out.println("Action:SUPERSED");
+				Loggers.webAdminLogger.debug("Action:SUPERSED");
 				target.add(feedbackPanel);	// TODO clarify the role of target
 				supersedPanelWindow.show(target);
 			}
@@ -438,11 +435,11 @@ public class ViewPage extends SuperPage {
 						CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologyIndividual(urlSuperseder).getStateURI(CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologyIndividual(urlSuperseder).getLastVersion()) 
 						))
 					supersedEnabled=false;
-				System.out.println("Supersed: non viable operation 1");
+				Loggers.webAdminLogger.debug("Supersed: non viable operation 1");
 			}
 			else {
 				supersedEnabled=false;
-				System.out.println("Supersed: unknown URL 1");
+				Loggers.webAdminLogger.debug("Supersed: unknown URL 1");
 			}
 			
 		}
@@ -456,11 +453,11 @@ public class ViewPage extends SuperPage {
 						null
 						))
 					supersedEnabled=false;	
-					System.out.println("Supersed: non viable operation 2");
+				Loggers.webAdminLogger.debug("Supersed: non viable operation 2");
 			}
 			else {
 				supersedEnabled=false;
-				System.out.println("Supersed: unknown URL 2");
+				Loggers.webAdminLogger.debug("Supersed: unknown URL 2");
 			}
 		}
 		
@@ -489,7 +486,7 @@ public class ViewPage extends SuperPage {
 				AjaxButton extraActionButton=new AjaxButton("extraButton"){
 					@Override
 					public void onSubmit(AjaxRequestTarget target,Form form) {
-						System.out.println("Action: "+actionURI);
+						Loggers.webAdminLogger.debug("Action: "+actionURI);
 						target.add(feedbackPanel);	// TODO clarify the role of target
 						obsoleteConfirmPanelContent.setMessage("Do you really want to proceed with action "+actionLabel+" ?");
 						obsoleteConfirmPanelContent.setExecutor(new FunctionExecutor(){
@@ -606,7 +603,7 @@ public class ViewPage extends SuperPage {
 	 ********************************************************************/
 	public void proceedObsolete(AjaxRequestTarget target) {
 		// TODO Auto-generated method stub
-		System.out.println("proceedObsolete");
+		Loggers.webAdminLogger.debug("proceedObsolete");
 		String description=obsoleteConfirmPanelContent.getDescription(); // TODO add support to get description
 		try {
 			CommandWebConsole.myInitializer.myTerminologyManager.delTerm(
@@ -661,7 +658,7 @@ public class ViewPage extends SuperPage {
 	}
 	
 	public void proceedSupersed(AjaxRequestTarget target) {
-		System.out.println("ACTION: supersed");
+		Loggers.webAdminLogger.debug("ACTION: supersed");
 		String description=supersedPanelContent2.getDescription(); // TODO add support to get description
 		try {
 			CommandWebConsole.myInitializer.myTerminologyManager.superseedTerm(urlToAction, 

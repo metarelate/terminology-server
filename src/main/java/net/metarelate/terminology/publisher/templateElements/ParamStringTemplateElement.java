@@ -19,7 +19,7 @@ import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.WebSystemException;
 import net.metarelate.terminology.publisher.PublisherConfig;
 import net.metarelate.terminology.publisher.WebRendererStrings;
-import net.metarelate.terminology.utils.SSLogger;
+import net.metarelate.terminology.utils.Loggers;
 
 public class ParamStringTemplateElement extends TemplateParametricClass implements TemplateTermElement,TemplateGlobalElement{
 	public static final String strPlusHeader="$str+$";

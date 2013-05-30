@@ -31,7 +31,6 @@ import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.instanceManager.Initializer;
 import net.metarelate.terminology.modelBuilders.TerminologyModelBuilder;
 import net.metarelate.terminology.utils.Loggers;
-import net.metarelate.terminology.utils.SSLogger;
 
 public class CommandIngest extends TsCommand {
 	private boolean labelsOnly=false;

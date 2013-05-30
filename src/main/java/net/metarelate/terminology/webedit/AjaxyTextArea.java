@@ -1,5 +1,7 @@
 package net.metarelate.terminology.webedit;
 
+import net.metarelate.terminology.utils.Loggers;
+
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.form.TextArea;
@@ -15,7 +17,7 @@ public class AjaxyTextArea extends TextArea {
 	        add(new AjaxFormComponentUpdatingBehavior("onchange"){ 
 
 	            protected void onUpdate(AjaxRequestTarget target) { 
-	                System.out.println("text: " + text); 
+	            	Loggers.webAdminLogger.debug("text: " + text); 
 	            } 
 	        }); 
 	    } 

@@ -45,7 +45,7 @@ import net.metarelate.terminology.exceptions.ConfigurationException;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.WebWriterException;
 import net.metarelate.terminology.instanceManager.Initializer;
-import net.metarelate.terminology.utils.SSLogger;
+import net.metarelate.terminology.utils.Loggers;
 
 public class WebFilesVisitor extends PublisherVisitor {
 	TemplateManager tm=null;
@@ -107,7 +107,7 @@ public class WebFilesVisitor extends PublisherVisitor {
 	
 	
 	private void makeFiles(TerminologyEntity entity, String type, String collectionDirectoryPath, String collectionBaseURL, String version) throws IOException, WebWriterException, ConfigurationException, ModelException {
-		SSLogger.log(">>Writing "+entity.getURI()+" to "+collectionDirectoryPath, SSLogger.DEBUG);
+		Loggers.publishLogger.debug(">>Writing "+entity.getURI()+" to "+collectionDirectoryPath);
 		
 		String[] languages=tm.getLanguages();
 		String[] languageFilesPaths=new String[languages.length];
@@ -130,7 +130,7 @@ public class WebFilesVisitor extends PublisherVisitor {
 		String registerQRImageFile=collectionDirectoryPath+"/"+type+".gif";	//QR image
 		String registerQRImageLink=collectionDirectoryPath+"/"+type+".gif";
 		
-		System.out.println(">> version "+version);
+		Loggers.publishLogger.trace("version "+version);
 		
 		File directory=myCheckedMkDir(collectionDirectoryPath,overwriteFiles);
 		
@@ -177,7 +177,7 @@ public class WebFilesVisitor extends PublisherVisitor {
 		else {
 			boolean success = directory.mkdir();
 			if (success) 
-			  SSLogger.log("Created directory " + directortyPath,SSLogger.DEBUG);
+				Loggers.publishLogger.debug("Created directory " + directortyPath);
 			else throw new WebWriterException("Unable to create directory "+directortyPath);
 		}
 		return directory;

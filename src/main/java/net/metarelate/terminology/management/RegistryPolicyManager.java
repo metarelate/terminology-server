@@ -1,5 +1,5 @@
 /* 
- (C) British Crown Copyright 2011 - 2012, Met Office
+ (C) British Crown Copyright 2011 - 2013, Met Office
 
  This file is part of terminology-server.
 
@@ -33,7 +33,7 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.exceptions.InvalidProcessException;
-import net.metarelate.terminology.utils.SSLogger;
+import net.metarelate.terminology.utils.Loggers;
 import net.metarelate.terminology.utils.SimpleQueriesProcessor;
 
 public class RegistryPolicyManager {
@@ -91,13 +91,12 @@ public class RegistryPolicyManager {
 	
 	
 	public RegistryPolicyManager(Model allConfig) {
-		SSLogger.log("Looking for built in actions and transitions");
+		Loggers.policyLogger.debug("Looking for built in actions and transitions");
 		Set<Resource> actions=new HashSet<Resource>();
 		Set<Resource> states=new HashSet<Resource>();
 		/*
 		 * Looking for actions
 		 */
-		SSLogger.log("Looking for actions");
 		StmtIterator statsIterator=allConfig.listStatements(null,MetaLanguage.typeProperty,ResourceFactory.createResource(TerminologyManagerConfig.confActionType));
 		while(statsIterator.hasNext()) {
 			Statement currentStat=statsIterator.nextStatement();
@@ -122,15 +121,14 @@ public class RegistryPolicyManager {
 			allActions[i++]=act.getURI();
 		}
 		
-		SSLogger.log("Found actions: ",SSLogger.DEBUG);
 		for(String actionString:allActions) {
-			SSLogger.log(actionString,SSLogger.DEBUG);
+			Loggers.policyLogger.debug("Found action: "+actionString);
 		}
 		
 		/*
 		 * Looking for states
 		 */
-		SSLogger.log("Looking for states");
+		Loggers.policyLogger.debug("Looking for states");
 		StmtIterator statsIterator2=allConfig.listStatements(null,MetaLanguage.typeProperty,ResourceFactory.createResource(TerminologyManagerConfig.confStateType));
 		while(statsIterator2.hasNext()) {
 			Statement currentStat=statsIterator2.nextStatement();
@@ -153,9 +151,8 @@ public class RegistryPolicyManager {
 			allStates[i++]=stat.getURI();
 		}
 		
-		SSLogger.log("Found states: ",SSLogger.DEBUG);
 		for(String stateString:allStates) {
-			SSLogger.log(stateString,SSLogger.DEBUG);
+			Loggers.policyLogger.debug("Found state: "+stateString);
 		}
 		
 		
@@ -163,14 +160,14 @@ public class RegistryPolicyManager {
 		 * Reading transition map
 		 */
 		for(Resource action:actions) {
-			SSLogger.log("Reading transition map for: "+action.getURI());
-			SSLogger.log("Register transitions");
+			Loggers.policyLogger.debug("Reading transition map for: "+action.getURI());
+			Loggers.policyLogger.trace("Register transitions");
 			StmtIterator registerActionsIter=allConfig.listStatements(action,ResourceFactory.createProperty(TerminologyManagerConfig.confEffectOnReg),(Resource)null);
 			while(registerActionsIter.hasNext()) {
 				Statement effectStat=registerActionsIter.nextStatement();
 				if(effectStat.getObject().isResource()) {
 					//TODO note that we could check for the type being actionRole, but we keep less pedantic for the time being.
-					SSLogger.log("Found transition: "+effectStat.getObject().asResource().getURI(),SSLogger.DEBUG);
+					Loggers.policyLogger.debug("Found transition: "+effectStat.getObject().asResource().getURI());
 					String[] transitionBlock=new String[8];
 					transitionBlock[PRE_THIS]=SimpleQueriesProcessor.getOptionalResourceObjectAsString(effectStat.getObject().asResource(), ResourceFactory.createProperty(TerminologyManagerConfig.confPreThis), allConfig);
 					transitionBlock[PRE_UP]=SimpleQueriesProcessor.getOptionalResourceObjectAsString(effectStat.getObject().asResource(), ResourceFactory.createProperty(TerminologyManagerConfig.confPreUp), allConfig);
@@ -180,8 +177,7 @@ public class RegistryPolicyManager {
 					transitionBlock[POST_UP]=SimpleQueriesProcessor.getOptionalResourceObjectAsString(effectStat.getObject().asResource(), ResourceFactory.createProperty(TerminologyManagerConfig.confPostUp), allConfig);
 					transitionBlock[POST_DOWN]=SimpleQueriesProcessor.getOptionalResourceObjectAsString(effectStat.getObject().asResource(), ResourceFactory.createProperty(TerminologyManagerConfig.confPostDown), allConfig);
 					transitionBlock[POST_AUX]=SimpleQueriesProcessor.getOptionalResourceObjectAsString(effectStat.getObject().asResource(), ResourceFactory.createProperty(TerminologyManagerConfig.confPostAux), allConfig);
-					SSLogger.log("Map:"+SSLogger.DEBUG);
-					for(String val:transitionBlock) SSLogger.log(val,SSLogger.DEBUG);
+					for(String val:transitionBlock) Loggers.policyLogger.debug("Map: "+val);
 					
 					if(!registerTransitions.containsKey(action.getURI())) {
 						registerTransitions.put(action.getURI(),new ArrayList<String[]>());
@@ -191,14 +187,14 @@ public class RegistryPolicyManager {
 				
 				}
 			}
-			SSLogger.log("Code transitions");
+			Loggers.policyLogger.trace("Code transitions");
 			//TODO proceed for codes
 			StmtIterator codeActionsIter=allConfig.listStatements(action,ResourceFactory.createProperty(TerminologyManagerConfig.confEffectOnCode),(Resource)null);
 			while(codeActionsIter.hasNext()) {
 				Statement effectCode=codeActionsIter.nextStatement();
 				if(effectCode.getObject().isResource()) {
 					//TODO note that we could check for the type being actionRole, but we keep less pedantic for the time being.
-					SSLogger.log("Found transition: "+effectCode.getObject().asResource().getURI(),SSLogger.DEBUG);
+					Loggers.policyLogger.debug("Found transition: "+effectCode.getObject().asResource().getURI());
 					String[] transitionBlock=new String[8];
 					transitionBlock[PRE_THIS]=SimpleQueriesProcessor.getOptionalResourceObjectAsString(effectCode.getObject().asResource(), ResourceFactory.createProperty(TerminologyManagerConfig.confPreThis), allConfig);
 					transitionBlock[PRE_UP]=SimpleQueriesProcessor.getOptionalResourceObjectAsString(effectCode.getObject().asResource(), ResourceFactory.createProperty(TerminologyManagerConfig.confPreUp), allConfig);
@@ -208,8 +204,7 @@ public class RegistryPolicyManager {
 					transitionBlock[POST_UP]=SimpleQueriesProcessor.getOptionalResourceObjectAsString(effectCode.getObject().asResource(), ResourceFactory.createProperty(TerminologyManagerConfig.confPostUp), allConfig);
 					transitionBlock[POST_DOWN]=SimpleQueriesProcessor.getOptionalResourceObjectAsString(effectCode.getObject().asResource(), ResourceFactory.createProperty(TerminologyManagerConfig.confPostDown), allConfig);
 					transitionBlock[POST_AUX]=SimpleQueriesProcessor.getOptionalResourceObjectAsString(effectCode.getObject().asResource(), ResourceFactory.createProperty(TerminologyManagerConfig.confPostAux), allConfig);
-					SSLogger.log("Map:"+SSLogger.DEBUG);
-					for(String val:transitionBlock) SSLogger.log(val,SSLogger.DEBUG);
+					for(String val:transitionBlock) Loggers.policyLogger.debug("Map: "+val);
 					
 					if(!codeTransitions.containsKey(action.getURI())) {
 						codeTransitions.put(action.getURI(),new ArrayList<String[]>());
@@ -244,11 +239,9 @@ public class RegistryPolicyManager {
 			extraStates[i++]=state.getURI();
 		}
 		
-		SSLogger.log("Extra actions:",SSLogger.DEBUG);
-		for(String action:extraActions) SSLogger.log(action,SSLogger.DEBUG);
+		for(String action:extraActions) Loggers.policyLogger.debug("Extra action: "+action);
 		
-		SSLogger.log("Extra states:",SSLogger.DEBUG);
-		for(String state:extraStates) SSLogger.log(state,SSLogger.DEBUG);
+		for(String state:extraStates) Loggers.policyLogger.debug("Extra state: "+state);
 		
 		
 		
@@ -274,38 +267,38 @@ public class RegistryPolicyManager {
 		if(!anyTransitions.containsKey(actionURI)) return false;
 		ArrayList<String[]> transitionsForAction=anyTransitions.get(actionURI);
 		//SSLogger.showDebug(true); //TODO to remove!
-		SSLogger.log("Checking for viability of action: "+actionURI,SSLogger.DEBUG);
-		SSLogger.log("Pre_this: "+thisState,SSLogger.DEBUG);
-		SSLogger.log("Pre_up: "+upState,SSLogger.DEBUG);
-		SSLogger.log("Pre_down: "+downState,SSLogger.DEBUG);
-		SSLogger.log("Pre_aux: "+auxState,SSLogger.DEBUG);
+		Loggers.policyLogger.debug("Checking for viability of action: "+actionURI+"\n"+
+		"Pre_this: "+thisState+"\n"+
+		"Pre_up: "+upState+"\n"+
+		"Pre_down: "+downState+"\n"+
+		"Pre_aux: "+auxState);
 		for(String[] transitionForAction:transitionsForAction) {
 			boolean score=true;
 			if(transitionForAction[PRE_THIS]!=null)
 					if(thisState!=null)
 						if(!transitionForAction[PRE_THIS].equals(thisState)) {
 							score=false;
-							SSLogger.log("This violation: "+transitionForAction[PRE_THIS],SSLogger.DEBUG);
+							Loggers.policyLogger.debug("This violation: "+transitionForAction[PRE_THIS]);
 						}
 			if(transitionForAction[PRE_UP]!=null) 
 				if(upState!=null)
 					if(!transitionForAction[PRE_UP].equals(upState)) {
 						score=false;
-						SSLogger.log("Up violation: "+transitionForAction[PRE_UP],SSLogger.DEBUG);
+						Loggers.policyLogger.debug("Up violation: "+transitionForAction[PRE_UP]);
 
 					}
 			if(transitionForAction[PRE_DOWN]!=null) 
 				if(downState!=null)
 					if(!transitionForAction[PRE_DOWN].equals(downState)) {
 						score=false;
-						SSLogger.log("Down violation: "+transitionForAction[PRE_DOWN],SSLogger.DEBUG);
+						Loggers.policyLogger.debug("Down violation: "+transitionForAction[PRE_DOWN]);
 
 					}
 			if(transitionForAction[PRE_AUX]!=null) 
 				if(auxState!=null)
 					if(!transitionForAction[PRE_AUX].equals(auxState)) {
 						score=false;
-						SSLogger.log("Aux violation: "+transitionForAction[PRE_AUX],SSLogger.DEBUG);
+						Loggers.policyLogger.debug("Aux violation: "+transitionForAction[PRE_AUX]);
 
 					}
 			if(score==true) return true;
@@ -317,11 +310,11 @@ public class RegistryPolicyManager {
 	
 	
 	public String[] nextRegState(String actionURI, String thisState, String upState, String downState, String auxState) throws InvalidProcessException {
-		SSLogger.log("nextRegCall",SSLogger.DEBUG);
+		Loggers.policyLogger.trace("nextRegCall");
 		return nextAnyState(registerTransitions, actionURI,  thisState,  upState,  downState,  auxState);
 	}
 	public String[] nextCodeState(String actionURI, String thisState, String upState, String downState, String auxState) throws InvalidProcessException {
-		SSLogger.log("nextCodeCall",SSLogger.DEBUG);
+		Loggers.policyLogger.trace("nextCodeCall");
 		return nextAnyState(codeTransitions, actionURI,  thisState,  upState,  downState,  auxState);
 	}
 	
@@ -331,77 +324,70 @@ public class RegistryPolicyManager {
 		if(downState==null) downState="";
 		if(auxState==null) auxState="";
 		if(!anyTransitions.containsKey(actionURI)) {
-			SSLogger.log("Action not found in transition table: "+actionURI,SSLogger.DEBUG);
-			SSLogger.log("Transition table was: ",SSLogger.DEBUG);
-			for(String elem:anyTransitions.keySet()) SSLogger.log(elem,SSLogger.DEBUG);
+			Loggers.policyLogger.debug("Action not found in transition table (action URI): "+actionURI);
+			for(String elem:anyTransitions.keySet()) Loggers.policyLogger.debug("Trans. table "+elem);
 			throw new InvalidProcessException(actionURI,thisState,upState,downState,auxState);
 		}
 		ArrayList<String[]> transitionsForAction=anyTransitions.get(actionURI);
 		for(String[] transitionForAction:transitionsForAction) {
 			boolean score=true;
-			SSLogger.log("Checking next action for: "+actionURI,SSLogger.DEBUG);
+			Loggers.policyLogger.debug("Checking next action for: "+actionURI);
+			Loggers.policyLogger.trace("Checking THIS");
 			if(transitionForAction[PRE_THIS]!=null) {
-				SSLogger.log("Need to check THIS :"+transitionForAction[PRE_THIS],SSLogger.DEBUG);
-				SSLogger.log("Against :"+thisState,SSLogger.DEBUG);
 				if(thisState!=null) {
 					if(!transitionForAction[PRE_THIS].equals(thisState)) {
-						SSLogger.log("Failed",SSLogger.DEBUG);
+						Loggers.policyLogger.debug("Check THIS :"+transitionForAction[PRE_THIS]+" against :"+thisState+" Failed");
 						score=false;
 					}
 					else {
-						SSLogger.log("Passed",SSLogger.DEBUG);
+						Loggers.policyLogger.debug("Check THIS :"+transitionForAction[PRE_THIS]+" against :"+thisState+" Passed");
 					}
 				}
 			}
-				
+			Loggers.policyLogger.trace("Checking UP");	
 			if(transitionForAction[PRE_UP]!=null) {
-				SSLogger.log("Need to check UP :"+transitionForAction[PRE_UP],SSLogger.DEBUG);
-				SSLogger.log("Against :"+upState,SSLogger.DEBUG);
 				if(upState!=null) {
 					if(!transitionForAction[PRE_UP].equals(upState)) {
-						SSLogger.log("Failed",SSLogger.DEBUG);
+						Loggers.policyLogger.debug("Check UP "+transitionForAction[PRE_UP]+" against :"+upState+" Failed");
 						score=false;
 					}
 					else {
-						SSLogger.log("Passed",SSLogger.DEBUG);
+						Loggers.policyLogger.debug("Check UP "+transitionForAction[PRE_UP]+" against :"+upState+" Passed");
 					}
 				}
 			}
-				
+			Loggers.policyLogger.trace("Checking DOWN");	
 			if(transitionForAction[PRE_DOWN]!=null) {
-				SSLogger.log("Need to check DOWN :"+transitionForAction[PRE_DOWN],SSLogger.DEBUG);
-				SSLogger.log("Against :"+downState,SSLogger.DEBUG);
 				if(downState!=null) {
 					if(!transitionForAction[PRE_DOWN].equals(downState)) {
-						SSLogger.log("Failed",SSLogger.DEBUG);
+						Loggers.policyLogger.debug("Check DOWN :"+transitionForAction[PRE_DOWN]+" against :"+downState+" Failed");
 						score=false;
 					}
 					else {
-						SSLogger.log("Passed",SSLogger.DEBUG);
+						Loggers.policyLogger.debug("Check DOWN :"+transitionForAction[PRE_DOWN]+" against :"+downState+" Passed");
+
 					}
 				}
 			}
-				
+			Loggers.policyLogger.trace("Checking AUX");	
 			if(transitionForAction[PRE_AUX]!=null) {
-				SSLogger.log("Need to check AUX :"+transitionForAction[PRE_AUX],SSLogger.DEBUG);
-				SSLogger.log("Against :"+auxState,SSLogger.DEBUG);
 				if(auxState!=null) {
 					if(!transitionForAction[PRE_AUX].equals(auxState)) {
-						SSLogger.log("Failed",SSLogger.DEBUG);
+						Loggers.policyLogger.debug("Check AUX :"+transitionForAction[PRE_AUX]+" against :"+auxState+" Failed");
 						score=false;
 					}
 					else {
-						SSLogger.log("Passed",SSLogger.DEBUG);
+						Loggers.policyLogger.debug("Check AUX :"+transitionForAction[PRE_AUX]+" against :"+auxState+" Failed");
 					}
 				}
 			}
 				
 			if(score==true) {
-				SSLogger.log("Success!",SSLogger.DEBUG);
+				Loggers.policyLogger.debug("Success!");
 				return transitionForAction;
 			}
 		}
-		SSLogger.log("Failure!",SSLogger.DEBUG);
+		Loggers.policyLogger.error("Failure!");
 		throw new InvalidProcessException(actionURI,thisState,upState,downState,auxState);
 	}
 

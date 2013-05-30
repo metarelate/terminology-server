@@ -1,5 +1,7 @@
 package net.metarelate.terminology.webedit;
 
+import net.metarelate.terminology.utils.Loggers;
+
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
@@ -67,7 +69,7 @@ public class SupersedPanel2 extends Panel
     
     public String getDescription() {
     	String result=description.getText();
-    	System.out.println("Result: "+result);
+    	Loggers.webAdminLogger.debug("Result: "+result);
     	return result;
     }
    

@@ -17,6 +17,10 @@
  along with terminology-server. If not, see <http://www.gnu.org/licenses/>.
 */
 
+/**
+ * TODO this is to be re-designed following a new initialization procedure
+ */
+
 package net.metarelate.terminology.instanceManager;
 
 import java.io.BufferedWriter;
@@ -54,6 +58,7 @@ import net.metarelate.terminology.utils.SimpleQueriesProcessor;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
+
 
 //TODO Note the use of thisInstance.org as a bougs URL of namespace. Perhaps this could be linked to the instance seed (URL), although not necessary.
 

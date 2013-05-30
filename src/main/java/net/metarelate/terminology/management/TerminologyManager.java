@@ -1,5 +1,5 @@
 /* 
- (C) British Crown Copyright 2011 - 2012, Met Office
+ (C) British Crown Copyright 2011 - 2013, Met Office
 
  This file is part of terminology-server.
 
@@ -17,8 +17,12 @@
  along with terminology-server. If not, see <http://www.gnu.org/licenses/>.
 */
 
-//TODO Add synch calls throught! (or prblems if the server is killed!!!)
 
+/**
+ * TODO Check Synch calls
+ * TODO add log requests
+ * TODO perhaps a bit of refactoring ?
+ */
 package net.metarelate.terminology.management;
 
 import java.text.DateFormat;
@@ -27,20 +31,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
 
-import net.metarelate.terminology.auth.AuthRegistryManager;
-import net.metarelate.terminology.auth.AuthServer;
-
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.tdb.TDB;
-
-import net.metarelate.terminology.config.CoreConfig;
 import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
-import net.metarelate.terminology.coreModel.TerminologyFactory;
 import net.metarelate.terminology.coreModel.TerminologyIndividual;
 import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.coreModel.Versioner;
@@ -52,8 +44,13 @@ import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
 import net.metarelate.terminology.exceptions.UnknownURIException;
 import net.metarelate.terminology.instanceManager.Initializer;
-import net.metarelate.terminology.utils.SSLogger;
-import net.metarelate.terminology.utils.SimpleQueriesProcessor;
+import net.metarelate.terminology.utils.Loggers;
+
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 public class TerminologyManager {
 	public static final int MODE_REPLACE = 1;
@@ -135,7 +132,7 @@ public class TerminologyManager {
 				if(isVersioned) newTerm=myInitializer.myFactory.createNewVersionedTerminologySet(codeURI);
 				else newTerm=myInitializer.myFactory.createNewUnversionedTerminologySet(codeURI);
 			}
-			else System.out.println("This is a private method, should never be invoked like that!");
+			else Loggers.processLogger.error("This is a private method, should never be invoked like that!");
 			
 			//newTerm.setDefaultVersion(newTerm.getLastVersion());
 			//if(isVersioned) newTerm.setIsVersioned(true);	
@@ -158,7 +155,7 @@ public class TerminologyManager {
 				myRegister.registerContainedIndividual((TerminologyIndividual)newTerm, newRegisterVersion, newTerm.getLastVersion());
 			else if(entityType==SET_TYPE)
 				myRegister.registerContainedCollection((TerminologySet)newTerm, newRegisterVersion, newTerm.getLastVersion());	
-			else System.out.println("This is a private method, should never be invoked like that!");
+			else Loggers.processLogger.error("This is a private method, should never be invoked like that!");
 			if(postRegisterStatus!=null) myRegister.setStateURI(postRegisterStatus, newRegisterVersion);
 			//DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 			myRegister.setActionDate(dateFormat.format(date),newRegisterVersion);
@@ -289,7 +286,7 @@ public class TerminologyManager {
 		}
 		TerminologySet[] roots=myInitializer.myFactory.getRootCollections();
 		for(TerminologySet root: roots) {
-			SSLogger.log("Tagging root "+root,SSLogger.DEBUG);
+			Loggers.processLogger.info("Tagging root: "+root.getURI());
 			myTag(root,tag);
 		}
 		//TODO we may want to register infos on tags somewhere.
@@ -297,25 +294,7 @@ public class TerminologyManager {
 	}
 	
 
-	/*
-	private TerminologyEntity checkEntityExistance(String uri) {
-		if(myInitializer.myFactory.terminologySetExist(uri)) return myInitializer.myFactory.getOrCreateTerminologySet(uri);
-		if(myInitializer.myFactory.terminologyIndividualExist(uri)) return myInitializer.myFactory.getOrCreateTerminologyIndividual(uri);
-		return null;
-	}
-	*/
-	/*
-	private TerminologySet checkSetExistance(String uri) {
-		if(myInitializer.myFactory.terminologySetExist(uri)) return myInitializer.myFactory.getOrCreateTerminologySet(uri);
-		return null;
-	}
-	*/
-	/*
-	private TerminologyIndividual checkIndividualExistance(String uri) {
-		if(myInitializer.myFactory.terminologyIndividualExist(uri)) return myInitializer.myFactory.getOrCreateTerminologyIndividual(uri);
-		return null;
-	}
-	*/
+	
 	private void myTag(TerminologySet set, String tag) throws ModelException {
 		set.tagVersion(set.getLastVersion(),tag);
 		Set<TerminologyIndividual>terms=set.getIndividuals(set.getLastVersion());
@@ -421,8 +400,8 @@ public class TerminologyManager {
 	String postRegisterStatus=result[RegistryPolicyManager.POST_UP];
 	
 
-	System.out.println(">>>pre Term Status: "+preTermStatus);
-	System.out.println(">>>post Term Status: "+postTermStatus);
+	Loggers.processLogger.trace("pre Term Status: "+preTermStatus);
+	Loggers.processLogger.trace("post Term Status: "+postTermStatus);
 	DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 	Date date = new Date();
 	

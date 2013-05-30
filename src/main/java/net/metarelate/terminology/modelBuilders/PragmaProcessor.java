@@ -1,5 +1,5 @@
 /* 
- (C) British Crown Copyright 2011 - 2012, Met Office
+ (C) British Crown Copyright 2011 - 2013, Met Office
 
  This file is part of terminology-server.
 
@@ -25,7 +25,7 @@ import net.metarelate.terminology.coreModel.TerminologyFactory;
 import net.metarelate.terminology.exceptions.ImporterException;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.UnknownURIException;
-import net.metarelate.terminology.utils.SSLogger;
+import net.metarelate.terminology.utils.Loggers;
 
 public abstract class PragmaProcessor {
 	TerminologyFactory myFactory=null;
@@ -57,7 +57,7 @@ public abstract class PragmaProcessor {
 		}
 		//System.out.println("begin left : "+beginLeft);
 		if(beginLeft<0) {
-			SSLogger.log("Cannot find a number for "+uri,SSLogger.DEBUG);
+			Loggers.pragmaLogger.debug("Cannot find a number for "+uri);
 			return -1;
 		}
 		String numberS=uri.substring(beginLeft+1);
@@ -65,7 +65,7 @@ public abstract class PragmaProcessor {
 			result=Integer.parseInt(numberS);
 		}
 		catch(Exception e) {
-			SSLogger.log("!!!! Error in parsing "+numberS,SSLogger.DEBUG);
+			Loggers.pragmaLogger.debug("!!!! Error in parsing "+numberS);
 			return -1;
 		}
 		return result;

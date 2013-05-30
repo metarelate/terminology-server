@@ -3,7 +3,7 @@ package net.metarelate.terminology.webedit;
 import java.util.Arrays;
 
 import net.metarelate.terminology.coreModel.LabelManager;
-import net.metarelate.terminology.utils.SSLogger;
+import net.metarelate.terminology.utils.Loggers;
 import net.metarelate.terminology.webedit.AbstractEditPage.FormObject;
 
 import org.apache.wicket.markup.html.basic.Label;
@@ -28,7 +28,7 @@ public class FormComponentOptions extends Panel {
 			newOptions[i]=myObject.value.getObject();
 			myObject.options=newOptions;
 		}
-		SSLogger.log("Default option should be: "+myObject.value,SSLogger.DEBUG);
+		Loggers.webAdminLogger.debug("Default option should be: "+myObject.value);
 		DropDownChoice<String> fieldChoice = 
 		            new DropDownChoice<String>("fieldOptions",myObject.value,Arrays.asList(myObject.options));
 		        
