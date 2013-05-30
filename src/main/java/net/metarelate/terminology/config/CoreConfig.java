@@ -48,7 +48,7 @@ public class CoreConfig {
 	public static final String globalModel="http://metarelate.net/graph/globalMetaGraph";
 	public static final String labelModel="http://metarelate.net/graph/labels";
 	public static final String extraModel="http://metarelate.net/graph/backgroundKnowledge";
-	
+	public static final String cacheGraph="http://metarelate.net/graph/cache"; // TODO update docs and perhaps make this all backend specific later on
 
 	public static final String DEAFULT_FROM_RDF_IMPORT_ACTION = "http://metarelate.net/actions/batchImport";
 	public static final String DEAFULT_FROM_RDF_REIMPORT_ACTION = "http://metarelate.net/actions/batchImportOverride";
@@ -72,6 +72,7 @@ public class CoreConfig {
 	public static String prefixFileString="prefixFile.ttl";
 
 	public static String baseDiskDir="web";
+	public static String cacheDirString="cache";
 	
 	public static final String hasInstanceIdentifierURI="http://metarelate.net/config/hasInstanceIdentifier";
 	public static final String selfURI="http://metarelate.net/config/selfInstance";

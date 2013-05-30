@@ -147,28 +147,7 @@ public class TerminologyModelBuilder {
 		
 	}
 
-	//protected abstract void generateSet(Resource setRes,boolean updateMode) throws NonConformantRDFException;
-	//protected abstract void generateIndividual(Resource individualRes,boolean updateMode) throws NonConformantRDFException ;
 	
-	/*
-	protected  void fillEntities() {
-		Iterator<TerminologySet> collectionsEnum=myInitializer.myFactory.getAllSets().iterator(); 
-		Iterator<TerminologyIndividual> individualsEnum=myInitializer.myFactory.getAllIndividuals().iterator();
-		while(collectionsEnum.hasNext()) {
-			TerminologySet tempCollection=collectionsEnum.next();
-			fillEntity(tempCollection,tempCollection.getDefaultVersion());
-		}
-		while(individualsEnum.hasNext()) {
-			TerminologyIndividual myInd=individualsEnum.next();
-			fillEntity(myInd,myInd.getDefaultVersion());
-		}
-		
-	}
-	*/
-	//protected abstract void fillEntity(TerminologyEntity entity,String version);
-
-	
-	//protected abstract void processPragma();
 
 	protected void generateSets() throws ConfigurationException, ImporterException  {
 		SSLogger.log("Generating Code Sets",SSLogger.DEBUG);

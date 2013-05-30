@@ -1,0 +1,23 @@
+<html lang="en">
+<head>
+	<title>
+	<!-- tmtOpen>$str+$
+		<<tmtLabel>> v. <<tmtVersion>>
+	<tmtClose -->
+	</title>
+	<!-- tmtOpen>$str+$
+	<meta name="description" content="<<tmtDescription>>" />
+	<tmtClose -->
+</head>
+<body>
+<!-- tmtOpen>
+URI: <<tmtURI>> <br/>
+
+<tmtClose -->
+
+
+
+</body>	
+</html>	
+
+			

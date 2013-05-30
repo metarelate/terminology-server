@@ -32,6 +32,7 @@ import net.metarelate.terminology.config.CoreConfig;
 import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.UnknownURIException;
+import net.metarelate.terminology.publisher.PublisherVisitor;
 import net.metarelate.terminology.utils.CodeComparator;
 import net.metarelate.terminology.utils.SimpleQueriesProcessor;
 
@@ -48,7 +49,7 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.tdb.TDB;
 
-public class TerminologyEntityTDBImpl implements TerminologyEntity{
+public abstract class TerminologyEntityTDBImpl implements TerminologyEntity {
 	protected TerminologyFactory myFactory=null;	//The factory responsible for the construction of this entity
 	private String uri=null; 							//This is the uri of the entity. 
 	protected Resource myRes=null; 						//A resource representation of the entity.
@@ -132,6 +133,7 @@ public class TerminologyEntityTDBImpl implements TerminologyEntity{
 		String localNamespace=SimpleQueriesProcessor.getOptionalLiteralValueAsString(myRes, MetaLanguage.nameSpaceProperty, globalGraph);
 		if(localNamespace==null) {
 			String uri=myRes.getURI();
+			if(uri.endsWith("/")) uri=uri.substring(0, uri.length()-1);
 			localNamespace=uri.substring(uri.lastIndexOf('/')+1);
 		}
 		// TODO debug
@@ -324,8 +326,18 @@ public class TerminologyEntityTDBImpl implements TerminologyEntity{
 	}
 
 	public String[] getVersionsForTag(String tag) {
-		// TODO Auto-generated method stub
-		return null;
+		////
+		Set<String> versions=new HashSet<String>();
+		ResIterator subIter=globalGraph.listSubjectsWithProperty(MetaLanguage.hasTag,globalGraph.createLiteral(tag));
+		while(subIter.hasNext()) {
+			Resource sub=subIter.nextResource();
+			NodeIterator versLitIter=globalGraph.listObjectsOfProperty(sub, MetaLanguage.hasVersionProperty);
+			RDFNode obj=versLitIter.nextNode(); // There should be only one!
+			if(obj.isLiteral()) versions.add(obj.asLiteral().getValue().toString());
+			
+		}
+		return versions.toArray(new String[0]);
+	
 	}
 	
 	public String[] getTagsForVersion(String version) {
@@ -468,6 +480,18 @@ public class TerminologyEntityTDBImpl implements TerminologyEntity{
 		}
 		return result;
 	}
+	//TODO should be clear on when we return Strings and when resources. Something for multi-core refactoring.
+	public Set<Resource> getGenericVersionSpecificURIObjects(Property property, String version) {
+		Set<Resource> results=new HashSet<Resource>();
+		NodeIterator myResults= myDataset.getNamedModel(getVersionURI(version)).listObjectsOfProperty(getResource(), property);
+		if(myResults.hasNext()) {
+			RDFNode myRes=myResults.nextNode();
+			if(myRes.isURIResource()) results.add(myRes.asResource());
+		}
+		return results;
+	}
+	
+	
 	
 	//TODO why is this forced to be public if in the interface it is public within the package ?
 	public String getGenericEndurantStringValueObject(Property property) {
@@ -508,6 +532,8 @@ public class TerminologyEntityTDBImpl implements TerminologyEntity{
 		}
 		return versions.toArray(new String[0]);
 	}
+
+
 
 
 	
