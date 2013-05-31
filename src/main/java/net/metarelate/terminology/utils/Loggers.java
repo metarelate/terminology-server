@@ -37,4 +37,9 @@ public class Loggers {
 		setLevel(org.apache.log4j.Level.WARN);
 		
 	}
+	
+	public static void infoOn() {
+		setLevel(org.apache.log4j.Level.INFO);
+		
+	}
 }
