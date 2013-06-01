@@ -1,0 +1,95 @@
+<!-- this is a page -->
+<!-- extends superpage -->
+
+<!-- wicket variables: 
+	wicketVersion
+	locale
+	localAddress
+	-->
+<!-- css classes:
+	TBD
+	-->
+	
+
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org">
+	<head></head>
+	<body>
+		<wicket:extend>
+			<div id="mainPanel">
+				<article>
+					<!-- span wicket:id="resultLabel">See here your results...</span -->
+					<h1>Results</h1>
+					<div wicket:id="resultRenderer">
+							
+						<table cellspacing="0" class="dataview">
+    					<tr>
+        					<th class="narrowColumn">Type</th>
+        					<th class="narrowColumn">ID</th>
+        					<th class="wideColumn">Description</th>
+        					<th class="narrowColumn">Last vers.</th>
+        					<th class="narrowColumn">Status</th>
+        					<th class="uriColumn">URI</th>
+        					
+        					
+        					<!-- th>New comments</th>
+        					<th>Pull requests</th -->
+        
+    					</tr>
+    					<tr wicket:id="simpleResults">
+        					<td class="narrowColumn"><span wicket:id="resultType">e.g: register</span></td>
+        					<td class="narrowColumn"><span wicket:id="resultID">e.g: 1002</span> </td>
+        					<td class="wideColumn"><span wicket:id="resultDescription">e.g: this register contains...</span></td>
+    						<td class="narrowColumn"><span wicket:id="resultLastVersion">e.g: v3</span></td>
+    						<td class="narrowColumn"><span wicket:id="resultStatus">e.g: valid</span></td>
+    						<td class="uriColumn"><a href="#" wicket:id="resultURI"><span wicket:id="resultURILabel">e.g.: http://example.com/register</span></a></td>
+    						
+    						<!-- td></td>
+    						<td></td-->
+    					</tr>
+					</table>
+					</div>
+					<div wicket:id="feedback"></div>
+				</article>
+			</div>
+			<div id="sidePanel">
+				<aside>
+					<h2>Text or ID search</h2>
+					<p>
+						<form wicket:id="queryForm"> 
+							<input type="text" size="20" wicket:id="queryText" /><br/>
+							<input type="checkbox" name="entityType" value="individual" wicket:id="queryOnCode" checked />Code<br/>
+							<input type="checkbox" name="entityType" value="set" wicket:id="queryOnReg" />Register<br/>
+							<input type="submit" value="Search" wicket:id="search" />
+						</form>
+					</p>
+					<hr>
+					<h2>Register based access</h2>
+					<p>
+						<!-- form>
+							<input wicket:id="openRegButton" type="submit" value="Open registers" />
+						</form -->
+						<!-- div wicket:id="listPanel">
+						<ul>
+							<span wicket:id="registerList">
+								<li>
+								<a href="#" wicket:id="registerBackLink"><span wicket:id="registerBackLabel">...</span></a>&nbsp;
+								<a href="#" wicket:id="registerLink"><span wicket:id="registerLabel">...</span></a>&nbsp;
+								<a href="#" wicket:id="registerDownLink"><span wicket:id="registerDownLabel">...</span></a>
+								</li>
+							</span>
+						</ul>
+						</div -->
+						<!-- table style="border: 1px solid #eee"><tr><td -->
+        					<div wicket:id="registerTree" class="my-tree"></div>  
+    						<!-- /td></tr></table -->
+						
+					</p>
+	
+				</aside>
+			</div>
+			</wicket:extend>
+		
+		
+	</body>
+</html>

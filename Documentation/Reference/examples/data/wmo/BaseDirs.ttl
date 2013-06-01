@@ -1,0 +1,211 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix config: <http://metarelate.net/config/> .
+@prefix meta: <http://metarelate.net/core/meta/> .
+@prefix data: <http://metarelate.net/core/data/> .
+@prefix ns7: <http://reference.metoffice.gov.uk/data/wmo/def/met#> .
+
+ns7:hasVersion
+    a rdf:Property .
+
+meta:TerminologySet
+    a rdfs:Class .
+
+data:definedIn
+    a rdf:Property .
+
+config:nameSpace
+    a rdf:Property .
+
+config:pragma
+    a rdf:Property .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/bufr>
+    config:nameSpace "bufr" ;
+    a meta:TerminologySet ;
+    rdfs:comment "A collection of tables relative to the BUFR standards."@en, "Una collezione di tablelle relative allo standard BUFR."@it ;
+    rdfs:label "BUFR code tables"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/bufr/a>
+    data:definedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/bufr> ;
+    config:nameSpace "a" ;
+    config:pragma config:canonicalExpandDashSuppress ;
+    a meta:TerminologySet ;
+    rdfs:comment "data categories"@en ;
+    rdfs:label "Table A"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/bufr/b>
+    data:definedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/bufr> ;
+    config:nameSpace "b" ;
+    a meta:TerminologySet ;
+    rdfs:label "Table B"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/bufrcrex>
+	config:hasVersion "-1";
+    config:nameSpace "bufrcrex" ;
+    a meta:TerminologySet ;
+    rdfs:comment "A collection of tables common to the BUFR and CREX standards"@en ;
+    rdfs:label "BUFR and CREX tables"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/bufrcrex/codes+flags>
+    data:definedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/bufrcrex> ;
+    config:nameSpace "codes+flags" ;
+    a meta:TerminologySet ;
+    rdfs:comment "Codes used in combination with BUFR or CREX table B to identify object of properties. Flags are compressed sets of statements."@en ;
+    rdfs:label "BUFR and CREX Codes and Flags Table"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/common>
+	config:hasVersion "-1";
+    config:nameSpace "common" ;
+    a meta:TerminologySet ;
+    rdfs:comment "A collection of tables common to the BUFR, CREX and GRIB standards"@en, "Una collezione di tabelle relatie agli standards BUFR, CREX e GRIB"@it ;
+    rdfs:label "Common code tables"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-1>
+    data:definedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/common> ;
+    config:nameSpace "c-1" ;
+    a meta:TerminologySet ;
+    rdfs:comment "Originating center"@en ;
+    rdfs:label "Table C-1"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-11>
+    data:definedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/common> ;
+    config:nameSpace "c-11" ;
+    a meta:TerminologySet ;
+    rdfs:comment "Originating centers"@en ;
+    rdfs:label "Table C-11"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-12>
+    data:definedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/common> ;
+    config:nameSpace "c-12" ;
+    a meta:TerminologySet ;
+    rdfs:comment "Originating sub-centers"@en ;
+    rdfs:label "Table C-12"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-13>
+    data:definedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/common> ;
+    config:nameSpace "c-13" ;
+    a meta:TerminologySet ;
+    rdfs:comment "Data sub-categories"@en ;
+    rdfs:label "Table C-13" .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-6>
+    data:definedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/common> ;
+    config:nameSpace "c-6" ;
+    a meta:TerminologySet ;
+    rdfs:comment "Chemical elements"@en ;
+    rdfs:label "Table C-6"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/common/x-clouds>
+    config:hasVersion "-1";
+    data:definedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/common> ;
+    config:nameSpace "x-clouds" ;
+    a meta:TerminologySet ;
+    rdfs:label "(Sub) Cloud type"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/common/x-dataTypes>
+    data:definedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/common> ;
+    config:nameSpace "x-dataTypes" ;
+    a meta:TerminologySet ;
+    rdfs:label "Data types"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/common/x-dataUnits>
+    data:definedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/common> ;
+    config:nameSpace "x-dataUnits" ;
+    a meta:TerminologySet ;
+    rdfs:label "Data units"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/common/x-regions>
+    data:definedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/common> ;
+    config:nameSpace "x-regions" ;
+    a meta:TerminologySet ;
+    rdfs:label "Regions"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/common/x-temperatures>
+    data:definedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/common> ;
+    config:nameSpace "x-temperatures" ;
+    a meta:TerminologySet ;
+    rdfs:label "Temperatures"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/common/x-weather>
+    data:definedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/common> ;
+    config:nameSpace "x-weather" ;
+    a meta:TerminologySet ;
+    rdfs:label "(Present) Weather"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/crex>
+	config:hasVersion "-1";
+    config:nameSpace "crex" ;
+    a meta:TerminologySet ;
+    rdfs:comment "A collection of tables relative to the CREX standards."@en, "Una collezione di tablelle relative allo standard CREX."@it ;
+    rdfs:label "CREX code tables"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/crex/a>
+    data:definedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/crex> ;
+    config:nameSpace "a" ;
+    a meta:TerminologySet ;
+    rdfs:label "Table A"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/crex/b>
+    data:definedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/crex> ;
+    config:nameSpace "b" ;
+    a meta:TerminologySet ;
+    rdfs:label "Table B"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/grib>
+	config:hasVersion "-1";
+    config:nameSpace "grib" ;
+    a meta:TerminologySet ;
+    rdfs:comment "A collection of tables relative to the GRIB standard"@en, "Una collezione di tabelle relative allo standard GRIB"@it ;
+    rdfs:label "GRIB tables"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/grib/codes+flags>
+    data:definedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/grib> ;
+    config:nameSpace "codes+flags" ;
+    a meta:TerminologySet ;
+    rdfs:comment "GRIB Code and Flags table"@en ;
+    rdfs:label "Code and Flags" .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes>
+	config:hasVersion "-1";
+    config:nameSpace "schemes" ;
+    a meta:TerminologySet ;
+    rdfs:comment "A collection of standard independent schemes built on wmo codes"@en, "Una collezioni di schemi indipendenti da standards e derivati da codici wmo"@en ;
+    rdfs:label "Schemes"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes/clouds>
+    data:definedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes> ;
+    config:nameSpace "clouds" ;
+    a meta:TerminologySet ;
+    rdfs:label "(Sub) cloud types"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes/dataTypes>
+    data:definedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes> ;
+    config:nameSpace "dataTypes" ;
+    a meta:TerminologySet ;
+    rdfs:label "Data types"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes/dataUnits>
+    data:definedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes> ;
+    config:nameSpace "dataUnits" ;
+    a meta:TerminologySet ;
+    rdfs:label "Data units"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes/temperatures>
+    data:definedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes> ;
+    config:nameSpace "temperatures" ;
+    a meta:TerminologySet ;
+    rdfs:label "Temperatures"@en .
+
+<http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes/weather>
+    data:definedIn <http://reference.metoffice.gov.uk/data/wmo/tdcf/schemes> ;
+    config:nameSpace "weather" ;
+    a meta:TerminologySet ;
+    rdfs:label "(Present) Weather"@en .
+
+rdfs:comment
+    a rdf:Property .
+
+rdfs:label
+    a rdf:Property .
+

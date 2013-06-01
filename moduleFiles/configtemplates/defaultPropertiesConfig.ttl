@@ -1,0 +1,21 @@
+@prefix states: 	<http://metarelate.net/states/> .
+@prefix actions:	<http://metarelate.net/actions/> .
+@prefix config:	<http://metarelate.net/config/> .
+@prefix default:	<http://metarelate.net/default/config/> .
+@prefix rdfs:		<http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdf:		<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix skos:		<http://www.w3.org/2004/02/skos/core#> .
+
+<http://www.w3.org/2000/01/rdf-schema#label> <http://metarelate.net/config/overrides> <http://metarelate.net/core/data/label>;
+.
+<http://www.w3.org/2000/01/rdf-schema#comment> <http://metarelate.net/config/overrides> <http://metarelate.net/core/data/comment>;
+.
+<http://www.w3.org/2004/02/skos/core#notation> <http://metarelate.net/config/overrides> <http://metarelate.net/core/data/notation>;
+.
+<http://purl.org/dc/terms/replaces> <http://metarelate.net/config/overrides> <http://metarelate.net/code/structure/hasPreviousVersion>;
+.
+<http://purl.org/dc/terms/replaces> <http://metarelate.net/config/overrides> <http://metarelate.net/code/data/superseds>;
+.
+<http://purl.org/dc/terms/isReplacedBy> <http://metarelate.net/config/overrides> <http://metarelate.net/code/data/superseded>;
+.
+	

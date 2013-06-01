@@ -1,0 +1,8 @@
+<http://metarelate.net/config/selfInstance> <http://metarelate.net/config/tdbPrefix> "/Users/andreasplendiani/.tserver/db"^^<http://www.w3.org/2001/XMLSchema#string> ;
+.
+<http://metarelate.net/config/selfInstance> <http://metarelate.net/config/hasAuthConfigType> <http://metarelate.net/config/authIsInFile> ;
+.
+<http://metarelate.net/config/selfInstance> <http://metarelate.net/config/baseURL> "http://127.0.0.1:8888/MetOfficeNew" ;
+.
+<http://metarelate.net/config/selfInstance> <http://metarelate.net/config/diskPrefix> "/Users/andreasplendiani/Sites/MetOfficeNew" ;
+.

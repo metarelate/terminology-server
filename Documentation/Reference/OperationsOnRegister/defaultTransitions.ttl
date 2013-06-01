@@ -1,0 +1,96 @@
+@prefix config:	<http://metarelate.net/config/>	.
+@prefix states: 	<http://metarelate.net/states/> .
+@prefix actions:	<http://metarelate.net/actions/> .
+@prefix default:	<http://metarelate.net/default/config/> .
+@prefix rdfs:		<http://www.w3.org/2000/01/rdf-schema#> .
+
+actions:update a config:Action;
+	rdfs:label	"Update"@en;
+	config:overrides actions:update;
+	config:hasEffectOnCode default:actionUpdate1;
+	config:hasEffectOnCode default:actionUpdate2;
+	config:hasEffectOnReg default:actionUpdate1;
+	config:hasEffectOnReg default:actionUpdate2;
+.
+default:actionUpdate1 a config:Role;
+	config:preThis states:default;
+	config:postThis states:default;
+.
+default:actionUpdate2 a config:Role;
+	config:preThis states:valid;
+	config:postThis	states:valid;
+.
+actions:obsolete a config:Role;
+	rdfs:label	"Obsolete"@en;
+	config:overrides actions:obsolete;
+	config:hasEffectOnCode default:actionObsolete1;
+	config:hasEffectOnCode default:actionObsolete2;
+	config:hasEffectOnReg default:actionObsolete1;
+	config:hasEffectOnReg default:actionObsolete2;
+.
+	default:actionObsolete1 a config:Role;
+	config:preThis states:default;
+	config:postThis states:obsoleted;
+.
+default:actionObsolete2 a config:Role;
+	config:preThis states:valid;
+	config:postThis states:obsoleted;
+.
+
+actions:supersed a config:Action;
+	rdfs:label	"Supersed"@en;
+	config:overrides actions:supersed;
+	config:hasEffectOnCode default:actionSupersed1 ;
+.
+default:actionSupersed1 a config:Role;
+	config:preThis	states:valid;
+	config:preAux	states:valid;
+	config:postThis	states:superseded;
+	config:postAux	states:valid;
+.
+
+actions:add	a config:Action;
+	rdfs:label	"Add"@en;
+	config:overrides actions:add;
+	config:hasEffectOnReg default:addAction1 ;
+	config:hasEffectOnReg default:addAction2 ;
+.
+default:addAction1 a config:Role;
+	config:preThis	states:valid;
+	config:postThis	states:default;	
+.
+default:addAction2 a config:Role;
+	config:preThis	states:default;
+	config:postThis	states:default;	
+.
+
+actions:validate	a config:Action;
+	rdfs:label	"Validate"@en;	
+	config:hasEffectOnReg default:validateAction1 ;
+	config:hasEffectOnCode default:validateAction1 ;
+.
+default:validateAction1  a config:Role; 
+	config:preThis states:default;
+	config:postThis states:valid;
+.
+
+states:obsoleted a config:State;
+	rdfs:label	"Obsoleted"@en;
+	config:overrides states:obsoleted;
+.
+
+states:superseded a config:State;
+	rdfs:label	"Superseded"@en;
+	config:overrides states:superseded;
+.
+
+states:default a config:State;
+	rdfs:label	"Default"@en;
+	config:overrides states:default;
+.
+
+states:valid a config:State;
+	rdfs:label	"Valid"@en;
+.
+
+

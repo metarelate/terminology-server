@@ -1,0 +1,133 @@
+# A list of labels for URIs to be used throughout the system. More label list could be provided.
+@prefix metaMap: 	<http://reference.metoffice.gov.uk/data/wmo/meta/mapping#> .
+@prefix metModel:	<http://reference.metoffice.gov.uk/data/wmo/meta/model#> .
+@prefix metExtra:	<http://reference.metoffice.gov.uk/data/wmo/def/met#> .
+@prefix iso19135: 	<http://reference.metoffice.gov.uk/data/wmo/def/iso19135#> .
+@prefix wmo: 		<http://reference.metoffice.gov.uk/data/wmo/def/wmo#> .
+
+@prefix rdf:    	<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   	<http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:    	<http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: 		<http://www.w3.org/2004/02/skos/core#> .
+
+rdfs:description 	rdfs:label "Description"@en;
+					rdfs:label "Descrizione"@it;
+.
+
+rdfs:label 			rdfs:label 	"label"@en;
+					rdfs:label 	"etichetta"@it;
+.
+
+rdf:type 			rdfs:label 	"of type"@en;
+					rdfs:label 	"di tipo"@it;
+.
+
+skos:inScheme 		rdfs:label 	"in scheme (skos)"@en;
+					rdfs:label	"nello schema (skos)"@it;
+.
+
+skos:member			rdfs:label 	"has member (skos)"@en;
+					rdfs:label	"contiene concetto"@it;
+.
+
+skos:Concept 		rdfs:label 	"Concept"@en;
+					rdfs:label	"Concetto"@it;
+.
+
+skos:broader 		rdfs:label "has broader concept"@en;
+					rdfs:label "ha concetto piu' generico"@it;
+.
+
+skos:narrower 		rdfs:label "has narrower concept"@en;
+					rdfs:label "ha concetto piu' specifico"@it;
+.
+
+skos:exactMatch 	rdfs:label "has exact match (skos)"@en;
+					rdfs:label "stesso concetto di"@it;
+.
+
+iso19135:Registry 	rdfs:label "ISO registry"@en;
+					rdfs:label "Registro ISO"@it;
+.
+
+iso19135:subRegisterOf 	rdfs:label "defined in registry"@en;
+						rdfs:label "definito nel registro"@it;
+.
+
+iso19135:RegisterItem	rdfs:label "ISO registry item"@en;
+						rdfs:label "Elemento di un registro ISO"@it;	
+.
+
+iso19135:superseeds		rdfs:label "Superseds"@en;
+						rdfs:label "Sostituisce"@it;
+.
+
+# Note: this is now obsolete
+iso19135:Valid 	rdfs:label "valid status (ISO)"@en;
+				rdfs:label "stato valido (ISO)"@it;
+.
+
+#states
+
+wmo:Validation	rdfs:label	"validation"@en;
+				rdfs:label	"in validazione"@it;
+.
+
+wmo:Operational	rdfs:label	"operational"@en;
+				rdfs:label	"operativo"@it;
+.
+
+wmo:Superseeded	rdfs:label	"superseded"@en;
+				rdfs:label 	"sostituito"@it;
+.
+wmo:Retired		rdfs:label	"retired"@en;
+				rdfs:label	"ritirato"@it;
+.
+
+
+
+
+# Note: is this obsolete ?
+metExtra:refersToConcept 	rdfs:label 	"Encodes concept"@en;
+							rdfs:label	"Rappresenta concetto"@it;
+.
+
+
+
+<http://metoffice.gov.uk/wmo/> 	rdfs:label "Met Office (on behalf of WMO)"@en;
+								rdfs:label "Met Office (rappresentando WMO)"@it;
+.
+
+
+
+wmo:status 		rdfs:label 	"status (wmo)"@en;
+				rdfs:label	"stato (wmo)"@it;
+.
+
+wmo:Reserved 	rdfs:label "reserved"@en;
+				rdfs:label "riservato"@it;
+.
+
+metExtra:outOfRegistryStatus 	rdfs:label "undefined status"@en;
+								rdfs:label "stato non definito"@it;
+.
+
+wmo:codeFigure 	rdfs:label 	"wmo code figure"@en;
+				rdfs:label	"codice wmo"@it;
+.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,26 @@
+<!-- tmtOpen>$onLevel$::0\chapter||1::\section||2::subsection||\<<tmtOnLevel>><tmtClose --><!-- tmtOpen>$str+${<<tmtLabel>>}
+\index{<<tmtLabel>>}
+<<tmtDescription>>
+version: <<tmtVersion>>
+<tmtClose -->
+
+
+\begin{center}
+\begin{landscape}
+<!-- tmtOpen>$setCodesProps$sepLine:: & ||endLine:: \\||sepTableDesc::_UP_||colTableDesc::p{1cm}||headerRepBlockPre::\textsc{||headerRepBlockPost::}||sepHeader:: & ||endHeader:: \\||
+\begin{longtable}{<<colBlockLatexStyle>>}
+\multicolumn{<<tmtColNumber>>}{@{*}c@{*}}%
+{<<tmtDescription>>}\\
+<<headerRow>>
+\hline
+\endhead
+<<valuesRow>>
+<tmtClose -->
+
+
+\end{longtable}
+\end{landscape}
+\end{center}
+
+
+

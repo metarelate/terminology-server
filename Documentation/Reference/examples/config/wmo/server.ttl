@@ -1,0 +1,7 @@
+@prefix config: 	<http://metarelate.net/config/> .
+
+
+[] a config:publisherSpecs;
+	config:diskPrefix	"/vaw/www/html/data/wmo/tdcf";
+	config:baseURL		"http://reference.metoffice.gov.uk/data/wmo/tdcf";
+	.
