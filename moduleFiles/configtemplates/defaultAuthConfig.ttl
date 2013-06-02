@@ -1,2 +1,2 @@
-<http://2dbc20ac-dfce-4b8a-a00f-6aab7f8103c5/andreasplendiani> <http://metarelate.net/config/allActions> <http://metarelate.net/config/allEntities> ;
+<<userID>> <http://metarelate.net/config/allActions> <http://metarelate.net/config/allEntities> ;
 .

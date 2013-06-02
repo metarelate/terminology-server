@@ -1,1 +1,1 @@
-This package is pending refactoring.
+Code refactored. Pending cleaning.
