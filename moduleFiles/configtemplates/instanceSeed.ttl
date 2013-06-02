@@ -1,0 +1,2 @@
+<http://thisInstance.org> <http://metarelate.net/config/hasInstanceIdentifier> "<<instanceID>>";
+.
