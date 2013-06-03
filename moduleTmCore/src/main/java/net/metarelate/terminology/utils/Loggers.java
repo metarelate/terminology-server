@@ -30,24 +30,29 @@ public class Loggers {
 	public static final Logger webAdminLogger=Logger.getLogger("net.metarelate.webadmin");
 	public static final Logger jettyLogger=Logger.getLogger("org.eclipse.jetty");
 	public static final Logger jenaLogger=Logger.getLogger("com.hp.hpl.jena");
-	public static void debugOn() {
-		setLevel(org.apache.log4j.Level.DEBUG);
-		debugOn=true;
-	}
+	
 	public static void setLevel(Level level) {
 		topLogger.setLevel(level);
 	}
 	public static void warningOn() {
 		setLevel(org.apache.log4j.Level.WARN);
+		debugAuxOff();
 		debugOn=false;
 	}
 	
 	public static void infoOn() {
 		setLevel(org.apache.log4j.Level.INFO);
+		debugAuxOff();
 		debugOn=false;
+	}
+	public static void debugOn() {
+		setLevel(org.apache.log4j.Level.DEBUG);
+		debugAuxOff();
+		debugOn=true;
 	}
 	public static void traceOn() {
 		setLevel(org.apache.log4j.Level.TRACE);
+		debugAuxOn();
 		debugOn=true;
 		
 	}

@@ -108,10 +108,23 @@ public class TerminologyManager {
 			// TODO note that we assume one parent only, so we pick one at random.
 			String fatherState=null;
 			TerminologySet oneFather=null;
+			//System.out.println("Getting containers");
 			Set<TerminologySet>containers= myRegister.getContainers(lastRegisterVersion);
-			if(containers.size()>0)
-				oneFather=containers.iterator().next();
+			//System.out.println("Containers size: "+containers.size());
+			Loggers.processLogger.trace("Checking state on container");
+			
+			Iterator<TerminologySet> containersIter=containers.iterator();
+			System.out.println("Iterator has next: "+containersIter.hasNext());
+			if(containersIter.hasNext()) {
+				Loggers.processLogger.trace("Found: "+containers.size());
+				//System.out.println(codeURI);
+				//System.out.println(registerURI);
+				//System.out.println(containers.size());
+				oneFather=containersIter.next();
+				Loggers.processLogger.trace("father: "+oneFather.getURI());
+				Loggers.processLogger.trace("version: "+oneFather.getLastVersion());
 				fatherState=oneFather.getStateURI(oneFather.getLastVersion());
+			}
 			String results[]=null;
 			results=myInitializer.myRegistryPolicyManager.nextRegState(RegistryPolicyManager.actionAddURI, preRegisterStatus, fatherState, null, null);
 			String postRegisterStatus=results[RegistryPolicyManager.POST_THIS];

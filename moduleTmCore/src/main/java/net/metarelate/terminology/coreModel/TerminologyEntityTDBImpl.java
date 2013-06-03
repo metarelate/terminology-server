@@ -163,6 +163,7 @@ public abstract class TerminologyEntityTDBImpl implements TerminologyEntity {
 					throw new ModelException("Inconsistent container: "+currSupReg.asResource().getURI()+" for "+getURI());
 				}
 		}
+		//System.out.println("Call to getContainers returned "+answer.size()+" elements"); //TODO remove
 		return answer;
 	}
 	

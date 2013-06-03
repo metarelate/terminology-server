@@ -20,7 +20,9 @@
 package net.metarelate.terminology.coreModel;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import net.metarelate.terminology.config.MetaLanguage;
@@ -157,7 +159,7 @@ public class TerminologySetTDBImpl extends
 
 	
 	public Set<TerminologySet> getAllKnownContainedCollections() throws ModelException {
-		Set<TerminologySet>answer=new HashSet<TerminologySet>();
+		Map<String,TerminologySet>answer=new HashMap<String,TerminologySet>();
 		String[] myVersions=getVersions();
 		for(int i=0;i<myVersions.length;i++) {
 			NodeIterator subRegIter=getStatements(myVersions[i]).listObjectsOfProperty(myRes, MetaLanguage.definesProperty);
@@ -165,16 +167,17 @@ public class TerminologySetTDBImpl extends
 				RDFNode currSubReg=subRegIter.nextNode();
 				if(currSubReg.isResource())
 					if(myFactory.terminologySetExist(currSubReg.asResource().getURI()))
-						answer.add(myFactory.getUncheckedTerminologySet(currSubReg.asResource().getURI()));
+						answer.put(currSubReg.asResource().getURI(),myFactory.getUncheckedTerminologySet(currSubReg.asResource().getURI()));
 					
 			}
 		}
-		
-		return answer;
+		Set<TerminologySet> answer2=new HashSet<TerminologySet>();
+		for(TerminologySet set:answer.values()) answer2.add(set);
+		return answer2;
 	}
 
 	public Set<TerminologyIndividual> getAllKnownContainedInviduals() throws ModelException {
-		Set<TerminologyIndividual>answer=new HashSet<TerminologyIndividual>();
+		Map<String,TerminologyIndividual>answer=new HashMap<String,TerminologyIndividual>();
 		String[] myVersions=getVersions();
 		for(int i=0;i<myVersions.length;i++) {
 			NodeIterator regItemIter=getStatements(myVersions[i]).listObjectsOfProperty(myRes, MetaLanguage.definesProperty);
@@ -182,11 +185,14 @@ public class TerminologySetTDBImpl extends
 				RDFNode currRegItem=regItemIter.nextNode();
 				if(currRegItem.isResource())
 					if(myFactory.terminologyIndividualExist(currRegItem.asResource().getURI()))
-						answer.add(myFactory.getUncheckedTerminologyIndividual(currRegItem.asResource().getURI()));
+						answer.put(currRegItem.asResource().getURI(),myFactory.getUncheckedTerminologyIndividual(currRegItem.asResource().getURI()));
 					
 			}
+			//for(TerminologyIndividual ans:answer) System.out.println(ans.getURI()); 
 		}
-		return answer;
+		Set<TerminologyIndividual> answer2=new HashSet<TerminologyIndividual>();
+		for(TerminologyIndividual ind:answer.values()) answer2.add(ind);
+		return answer2;
 	}
 
 	public boolean containsEntity(TerminologyEntity myTerm) {
