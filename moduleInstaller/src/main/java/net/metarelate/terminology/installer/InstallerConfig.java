@@ -44,7 +44,7 @@ public class InstallerConfig {
 	public static String targetLibDirString="lib";
 	public static String targetCommandDirString="bin";
 	
-	public static String authFilePrefix="authFile";
+	public static String authFilePrefix="defaultAuth";
 	public static String prefixFileName="prefixFile.ttl"; //TODO this should be the same as in InitializerConfig, but it is left by convention.
 	public static String seedFileName="instanceSeed.ttl"; //TODO this should be the same as in InitializerConfig, but it is left by convention.
 	public static String commandName="tsc.bat";

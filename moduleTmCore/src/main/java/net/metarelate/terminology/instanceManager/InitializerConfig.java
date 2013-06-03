@@ -26,4 +26,5 @@ public class InitializerConfig {
 	public static final Property tdbPrefixProperty=ResourceFactory.createProperty("http://metarelate.net/config/tdbPrefix");
 	
 	public static final String confDirString="conf";	//TODO this in not linked in the installer
+
 }

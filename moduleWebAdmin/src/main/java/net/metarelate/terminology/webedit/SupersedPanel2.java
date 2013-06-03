@@ -22,7 +22,7 @@ public class SupersedPanel2 extends Panel
 	
     /**
      * @param id
-     * @param message
+     * @param nextIsMessage
      * @param container
      */
     public SupersedPanel2(String id, final ViewPage viewPage, final String urlToAction)

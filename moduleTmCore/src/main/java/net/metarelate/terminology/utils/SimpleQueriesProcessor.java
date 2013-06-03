@@ -182,6 +182,15 @@ public class SimpleQueriesProcessor {
 		return null;
 	}
 	
+	public static String getOptionalConfigurationParameterSingleValue(Model configuration, String parameter) {
+		NodeIterator nodeIter=configuration.listObjectsOfProperty(configuration.createProperty(parameter));
+		while (nodeIter.hasNext()) {
+			RDFNode node=nodeIter.nextNode();
+			if(node.isLiteral()) return node.asLiteral().getValue().toString();
+		}
+		return null;
+	}
+	
 	/**
 	 * Returns a URI from a configuration parameter, and null if no value is found. 
 	 * If more values for a parameter are given, a random one is returned.
@@ -194,6 +203,24 @@ public class SimpleQueriesProcessor {
 		while (nodeIter.hasNext()) {
 			RDFNode node=nodeIter.nextNode();
 			if(node.isResource()) return node.asResource();
+		}
+		return null;
+	}
+	
+	public static Resource getOptionalConfigurationParameterSingleResource(Model configuration, String parameterString) {
+		NodeIterator nodeIter=configuration.listObjectsOfProperty(configuration.createProperty(parameterString));
+		while (nodeIter.hasNext()) {
+			RDFNode node=nodeIter.nextNode();
+			if(node.isResource()) return node.asResource();
+		}
+		return null;
+	}
+	
+	public static String getOptionalConfigurationParameterSingleResourceString(Model configuration, String parameterString) {
+		NodeIterator nodeIter=configuration.listObjectsOfProperty(configuration.createProperty(parameterString));
+		while (nodeIter.hasNext()) {
+			RDFNode node=nodeIter.nextNode();
+			if(node.isResource()) return node.asResource().getURI().toString();
 		}
 		return null;
 	}

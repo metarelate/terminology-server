@@ -1,4 +1,4 @@
-<http://metarelate.net/config/selfInstance> <http://metarelate.net/config/tdbPrefix> "<<tdbDir>>"^^<http://www.w3.org/2001/XMLSchema#string> ;
+<http://metarelate.net/config/selfInstance> <http://metarelate.net/config/hasDBDir> "<<tdbDir>>"^^<http://www.w3.org/2001/XMLSchema#string> ;
 .
 <http://metarelate.net/config/selfInstance> <http://metarelate.net/config/hasAuthConfigType> <http://metarelate.net/config/authIsInFile> ;
 .
@@ -24,6 +24,16 @@
 <http://metarelate.net/config/selfInstance> <http://metarelate.net/config/hasWebPackageDir> "<<webDir>>" ;
 .
 
+<http://metarelate.net/config/selfInstance> <http://metarelate.net/config/hasGitDir> "<<gitDir>>" ;
+.		
 		
 		
-	
+<http://metarelate.net/config/selfInstance> <http://metarelate.net/config/hasPrefixFile> "<<prefixFile>>" ;
+.		
+
+<http://metarelate.net/config/selfInstance> <http://metarelate.net/config/hasSeedFile> "<<seedFile>>" ;
+.	
+		
+<http://metarelate.net/config/selfInstance> <http://metarelate.net/config/hasDefaultUserID> <<userID>> ;
+.	
+			

@@ -94,7 +94,7 @@ public class OLD_Initializer {
 	public PublisherManager myPublisherManager=null;
 	public boolean debugMode=true;	// TODO this shold come from the configuration file
 	
-	protected String rootDirString=CoreConfig.rootDirString;
+	protected String rootDirString=CoreConfig.systemRootDirString;
 	
 	private Map<String,String> nsPrefixMap=null;
 	

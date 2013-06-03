@@ -20,6 +20,7 @@
 package net.metarelate.terminology.config;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -62,8 +63,8 @@ public class CoreConfig {
 	//public static Resource labelsGraph=ResourceFactory.createResource("http://metoffice.gov.uk/terminology/tools/terminologyManager/labelsGraph");
 	//public static Resource extraGraph=ResourceFactory.createResource("http://metoffice.gov.uk/terminology/tools/terminologyManager/extraGraph");
 
-	public static final String rootDirString=".tserver";
-	public static final String gitDirString="git";
+	public static final String systemRootDirString=".tserver";
+	public static final String gitDirString="git";	//TODO this and lot of the following are unused... took over by Installer, but unconnected for packaging simplification
 	public static final String dbDirString="db";
 	public static final String confDirString="conf";
 	public static final String authDirString = "auth";
@@ -77,6 +78,17 @@ public class CoreConfig {
 	public static final String hasInstanceIdentifierURI="http://metarelate.net/config/hasInstanceIdentifier";
 	public static final String selfURI="http://metarelate.net/config/selfInstance";
 	
+	public static final String hasDBDirProperty="http://metarelate.net/config/hasDBDir";
+	public static final String hasCacheDirProperty="http://metarelate.net/config/hasCacheDir";
+
+	public static final String hasAuthDirProperty="http://metarelate.net/config/hasAuthDir";
+	public static final String hasGitDirProperty="http://metarelate.net/config/hasGitDir";
+	public static final String hasTemplatesDirProperty="http://metarelate.net/config/hasTemplatesDir";
+	public static final String hasWebDirProperty="http://metarelate.net/config/hasWebPackageDir";
+	
+	public static final String hasPrefixFileProperty="http://metarelate.net/config/hasPrefixFile";
+	public static final String hasSeedFileProperty="http://metarelate.net/config/hasSeedFile";
+	public static final String hasDefaultUserURIProperty = "http://metarelate.net/config/hasDefaultUserID";
 	/*
 	 * Here we have all generic properties that can be overloaded (state/transition systems has a different mechanism)
 	 */

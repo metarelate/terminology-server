@@ -20,7 +20,7 @@ public class GenericConfirmPanel extends Panel
 	
     /**
      * @param id
-     * @param message
+     * @param nextIsMessage
      * @param container
      */
     public GenericConfirmPanel(String id, final ViewPage viewPage, final String urlToAction)

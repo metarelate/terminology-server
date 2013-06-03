@@ -70,167 +70,188 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
  *
  */
 public class Initializer {
-	private static String instanceIdentifier=null; // This will be the unique identifier for this terminology server instance
-	private static String serverAddress=null;
-	private static String serverName=null;
-	private static String userHomeString=null;
-	private static String gitDirAbsoluteString=null;
+	private String rootDirectoryString=null;
+	private static String confDirAbsoluteString=null;
+	private Model globalConfigurationGraph=null;
 	private static String dbDirAbsoluteString=null;
 	private static String cacheDirAbsoluteString=null;
-	private static String confDirAbsoluteString=null;
 	private static String authDirAbsoluteString=null;
-	private static String seedFileAbsoluteString=null;
+	private static String gitDirAbsoluteString=null;
+	private static String templatesDirAbsoluteString=null;
+	private static String webDirAbsoluteString=null;
 	private static String prefixFileAbsoluteString=null;
-	public static String defaultUserName=null;
-	private String rootDirectoryString=null;
-	
-	private  AuthServer myAuthServer=null;
-	public  AuthRegistryManager myAuthManager=null;
-	public  TerminologyManager myTerminologyManager=null;
-	public  TerminologyFactory myFactory=null;
-	public ConstraintsManager myConstraintsManager=null;
-	public RegistryPolicyManager myRegistryPolicyManager=null;
-	public CacheManager myCache=null;
-	public PublisherManager myPublisherManager=null;
-	public boolean debugMode=true;	// TODO this shold come from the configuration file
-	
-	protected String rootDirString=CoreConfig.rootDirString;
-	
 	private Map<String,String> nsPrefixMap=null;
+	private static String seedFileAbsoluteString=null;
+	private static String instanceIdentifier=null; // This will be the unique identifier for this terminology server instance
+	private String defaultUserURI=null;
+	
+	private static String serverAddress=null;
+	private static String serverName=null;
+	
+	
+	
+	
+	private  	AuthServer myAuthServer=null;
+	public  		AuthRegistryManager myAuthManager=null;
+	public  		TerminologyManager myTerminologyManager=null;
+	public  		TerminologyFactory myFactory=null;
+	public 		ConstraintsManager myConstraintsManager=null;
+	public 		RegistryPolicyManager myRegistryPolicyManager=null;
+	public 		CacheManager myCache=null;
+	public 		PublisherManager myPublisherManager=null;
+	
+	//protected String rootDirString=CoreConfig.rootDirString;
+	
+	
 	
 	public Initializer(String confDir) throws ConfigurationException {
-		rootDirString=confDir;
+		if((new File(confDir)).isDirectory()) {
+			rootDirectoryString=confDir;
+			Loggers.coreLogger.debug("Root directory provided via command line: "+confDir);
+		}
+		else resolveConfDir();
 		construct();
 	}
 	
 	public Initializer() throws ConfigurationException {
+		resolveConfDir();
 		construct();
 	}
 	
-	public Initializer(String sysDir, boolean debug) throws ConfigurationException {
-		debugMode=debug;
-		construct();
-	}
+	private void resolveConfDir() throws ConfigurationException {
+		String dirFromSystemVar=System.getenv("TSHOME");
+		File defaultDirFile=new File(System.getProperty( "user.home" ),CoreConfig.systemRootDirString);
+		if(dirFromSystemVar!=null)  {
+			Loggers.coreLogger.trace("Trying system dir from system TSHOME :"+dirFromSystemVar);
+			if((new File(dirFromSystemVar)).isDirectory()) {
+				rootDirectoryString=dirFromSystemVar;
+				Loggers.coreLogger.debug("Root directory provided via system variable: "+rootDirectoryString);
+				return;
+			}
+		}
+		Loggers.coreLogger.trace("Trying default system dir :"+defaultDirFile);
+		if(defaultDirFile.isDirectory()) {
+			rootDirectoryString=defaultDirFile.getAbsolutePath();
+			Loggers.coreLogger.debug("Root directory is default: "+rootDirectoryString);
 
-	public void construct() throws ConfigurationException{
-		initLoggers();
-		prepareConfigurationLayout();
-		prepareDefaultFiles();
+		}
+		if(rootDirectoryString==null) throw new ConfigurationException("Unable to find valid root directory");
+		
+	}
+	
+	private void construct() throws ConfigurationException{
+		Loggers.coreLogger.debug("Initialization started");
+		checkAndRetrieveInformation();
+		Loggers.coreLogger.debug("Configuration check OK");
+		//prepareConfigurationLayout();
+		//prepareDefaultFiles();
+		Loggers.coreLogger.debug("Building System components");
 		buildSystemComponents();
+		Loggers.coreLogger.info("TServer is ready");
 	}
 	
-	private void initLoggers() {
-		Loggers.init();
-		if(debugMode) Loggers.debugOn();	// TODO maybe this should go somewhere else
-		Loggers.coreLogger.trace("Loggers initialized");
+	
+	private void checkAndRetrieveInformation() throws ConfigurationException {
+		confDirAbsoluteString=checkDirectory(rootDirectoryString,CoreConfig.confDirString);
+		Loggers.coreLogger.debug("Configuration directory found at: "+confDirAbsoluteString);
+		Loggers.coreLogger.trace("Loading configuration files");
+		globalConfigurationGraph=loadConfigurationGraph();
+		Loggers.coreLogger.debug("Configuration files found for a total of "+globalConfigurationGraph.size()+" statements");
+		
+		Loggers.coreLogger.debug("Checking systems diectories from configuration");
+		dbDirAbsoluteString=extractDirAndCheck("DB",CoreConfig.hasDBDirProperty);
+		cacheDirAbsoluteString=extractDirAndCheck("Cache",CoreConfig.hasCacheDirProperty);
+		authDirAbsoluteString=extractDirAndCheck("Auth",CoreConfig.hasAuthDirProperty);
+		gitDirAbsoluteString=extractDirAndCheck("Git",CoreConfig.hasGitDirProperty);	
+		templatesDirAbsoluteString=extractDirAndCheck("Templates",CoreConfig.hasTemplatesDirProperty);	
+		webDirAbsoluteString=extractDirAndCheck("WebApp",CoreConfig.hasWebDirProperty);	
+		
+		Loggers.coreLogger.debug("Checking systems files from configuration");
+		prefixFileAbsoluteString=extractFileAndCheck("Prefix",CoreConfig.hasPrefixFileProperty);
+		File prefixFile=new File(prefixFileAbsoluteString);
+		Model prefixModel=ModelFactory.createDefaultModel();
+		try {
+			prefixModel.read(new FileInputStream(prefixFileAbsoluteString),"http://thisInstance.org/configuration/","Turtle");
+			nsPrefixMap=prefixModel.getNsPrefixMap();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			throw new ConfigurationException("Problems in reading prefix file: "+prefixFileAbsoluteString);
+		}
+		Loggers.coreLogger.debug("Found map for "+nsPrefixMap.keySet().size()+" prefixes");	
+		
+		seedFileAbsoluteString=extractFileAndCheck("InstanceSeed",CoreConfig.hasSeedFileProperty);
+		instanceIdentifier=getSeedString(seedFileAbsoluteString);
+		Loggers.coreLogger.debug("Instance ID: "+instanceIdentifier);
+		
+		
+		Loggers.coreLogger.debug("Now recovering system information from configuration files");
+		defaultUserURI=SimpleQueriesProcessor.getOptionalConfigurationParameterSingleResourceString(globalConfigurationGraph, CoreConfig.hasDefaultUserURIProperty);
+		if(defaultUserURI==null) throw new ConfigurationException("Unable to find default user");
+		Loggers.coreLogger.debug("Default user : "+defaultUserURI);
+		
+		analyseSystemParameters();
+		/*
+		 * WORKING HERE
+		 */
 	}
 
-	public String getRootDirectory() {
-		return rootDirectoryString;
+	private String checkDirectory(String baseDir, String dir) throws ConfigurationException {
+		File dirToCheck=new File(baseDir,dir);
+		if(dirToCheck.isDirectory()) {
+			Loggers.coreLogger.debug("Found directory: "+dirToCheck.getAbsolutePath());
+			return dirToCheck.getAbsolutePath();
+		}
+		else {
+			Loggers.coreLogger.fatal("Directory not foound : "+dirToCheck);
+			throw new ConfigurationException("Unable to find directory: "+dirToCheck);
+		}
 	}
+	
+	private String extractDirAndCheck(String dirDisplayName,String dirProperty) throws ConfigurationException {
+		String tempDir=SimpleQueriesProcessor.getOptionalConfigurationParameterSingleValue(globalConfigurationGraph, dirProperty);
+		if(tempDir==null ||!((new File(tempDir)).isDirectory()))
+				throw new ConfigurationException("Unable to find Dir "+dirDisplayName+" at: "+tempDir);
+		Loggers.coreLogger.debug(dirDisplayName+" dir found at: "+tempDir);
+		return tempDir;
+	}
+	
+	private String extractFileAndCheck(String fileDisplayName,String fileProperty) throws ConfigurationException {
+		String tempFile=SimpleQueriesProcessor.getOptionalConfigurationParameterSingleValue(globalConfigurationGraph, fileProperty);
+		if(tempFile==null ||!((new File(tempFile)).isFile()))
+				throw new ConfigurationException("Unable to find File "+fileDisplayName+" at: "+tempFile);
+		Loggers.coreLogger.debug(fileDisplayName+" file found at: "+tempFile);
+		return tempFile;
+	}
+	
+	/*
+	 * REFACTOR LINE BELOW
+	 */
 	
 	//TODO Inits could be made more modular
-	public void prepareConfigurationLayout() throws ConfigurationException {
-		if(userHomeString==null) userHomeString = System.getProperty( "user.home" );
-		Loggers.coreLogger.info("User Home: "+ userHomeString);
-		//System.out.println("User Home: "+ userHomeString);
-		File rootDirectory=new File(userHomeString,rootDirString);
-		checkOrCreateDirectory(rootDirectory);
-		rootDirectoryString=rootDirectory.getAbsolutePath();
-		// Note: we don't allow overriding of host or server name. This may be changed.
+	private void analyseSystemParameters() throws ConfigurationException {
+		serverAddress="Unknown";
+		serverName="Unknown";
 		try {
 			InetAddress myAddress=InetAddress.getLocalHost();
 			serverAddress=myAddress.getHostAddress();
 			serverName=myAddress.getHostName();
-			defaultUserName=System.getProperty("user.name");
 		} catch (UnknownHostException e) {
-			serverAddress="Unknown";
-			serverName="Unknown";
-			defaultUserName="Unknown";
+			Loggers.coreLogger.warn("Unable to determine server properties");
 			e.printStackTrace();
 		}
-		
-		File gitDir;
-		if(gitDirAbsoluteString!=null) gitDir=new File(gitDirAbsoluteString);
-		else{
-			gitDir=new File(rootDirectory.getAbsolutePath(),CoreConfig.gitDirString);
-			gitDirAbsoluteString=gitDir.getAbsolutePath();
-		}
-		checkOrCreateDirectory(gitDir);
-		
-		File dbDir;
-		if(dbDirAbsoluteString!=null) dbDir=new File(dbDirAbsoluteString);
-		else{
-			dbDir=new File(rootDirectory.getAbsolutePath(),CoreConfig.dbDirString);
-			dbDirAbsoluteString=dbDir.getAbsolutePath();	
-		}
-		checkOrCreateDirectory(dbDir);		
-		
-		File cacheDir;
-		if(cacheDirAbsoluteString!=null) cacheDir=new File(cacheDirAbsoluteString);
-		else{
-			cacheDir=new File(rootDirectory.getAbsolutePath(),CoreConfig.cacheDirString);
-			cacheDirAbsoluteString=cacheDir.getAbsolutePath();	
-		}
-		checkOrCreateDirectory(cacheDir);
-		
-		File confDir;
-		if(confDirAbsoluteString!=null) confDir=new File(confDirAbsoluteString);
-		else{
-			confDir=new File(rootDirectory.getAbsolutePath(),CoreConfig.confDirString);
-			confDirAbsoluteString=confDir.getAbsolutePath();
-		}
-		checkOrCreateDirectory(confDir);
-		
-		File authDir;
-		if(authDirAbsoluteString!=null) authDir=new File(authDirAbsoluteString);
-		else{
-			authDir=new File(rootDirectory.getAbsolutePath(),CoreConfig.authDirString);
-			authDirAbsoluteString=authDir.getAbsolutePath();
-		}
-		checkOrCreateDirectory(authDir);
-		
-		File seedFile;
-		if(seedFileAbsoluteString!=null) seedFile=new File(seedFileAbsoluteString);
-		else{
-			seedFile=new File(rootDirectory.getAbsolutePath(),CoreConfig.seedFileString);
-			seedFileAbsoluteString=seedFile.getAbsolutePath();
-		}
-		checkOrCreateSeedFile();
-		
-		File prefixFile;
-		if(prefixFileAbsoluteString!=null) prefixFile=new File(prefixFileAbsoluteString);
-		else{
-			prefixFile=new File(rootDirectory.getAbsolutePath(),CoreConfig.prefixFileString);
-			prefixFileAbsoluteString=prefixFile.getAbsolutePath();
-		}
-		checkOrCreatePrefixFile();
-		
-
-		// TODO Note also that we should be sure time is in synch globally
+		Loggers.coreLogger.debug("Server address : "+serverAddress);
+		Loggers.coreLogger.debug("Server name : "+serverName);
 	}
 	
 
 
 
-	public void buildSystemComponents() throws ConfigurationException {
-	Model configuration=null;
-		try {
-			configuration = getConfigurationGraph();
-		} catch (ConfigurationException e) {
-			Loggers.coreLogger.fatal("Problems in reading configuration files");
-			e.printStackTrace();
-			System.exit(-1);
-		}
-		String tdbPath=SimpleQueriesProcessor.getOptionalConfigurationParameterSingleValue(configuration, InitializerConfig.tdbPrefixProperty);
+	private void buildSystemComponents() throws ConfigurationException {
+		// TODO maybe paramaters passed throughout the system could be a bit rationalized
+		
+		String tdbPath=dbDirAbsoluteString;
 	
-		//TODO for the time being only tdb is supported!
-		if(tdbPath==null) {
-			//throw new ConfigurationException("Unable to find a TDB directory");
-			Loggers.coreLogger.fatal("Unable to find a TDB directory");
-			System.exit(-1);
-		}
-		CoreConfig.parseConfiguration(configuration);
+		CoreConfig.parseConfiguration(getConfigurationGraph());
 		myFactory=new TerminologyFactoryTDBImpl(tdbPath);
 		myAuthServer=AuthServerFactory.createServerFromConfig(getConfigurationGraph());
 		myRegistryPolicyManager=new RegistryPolicyManager(getConfigurationGraph());
@@ -242,347 +263,58 @@ public class Initializer {
 		
 	}
 
-	
-	private void checkOrCreateSeedFile() throws ConfigurationException {
-		File seedFile=new File(seedFileAbsoluteString);
-		if(!seedFile.exists()) {
-			instanceIdentifier=UUID.randomUUID().toString();
-			String idStatement="<http://thisInstance.org> <"+CoreConfig.hasInstanceIdentifierURI+"> "+"\""+instanceIdentifier+"\";\n.";
-			writeInFile(seedFile,idStatement);
-		}
-		else {
-			Model seedModel=ModelFactory.createDefaultModel();
-			try {
-				seedModel.read(new FileInputStream(seedFileAbsoluteString),"http://thisInstance.org/configuration/","Turtle");
-			} catch (FileNotFoundException e1) {
-				e1.printStackTrace();
-				throw new ConfigurationException("Configuration file not found: "+seedFileAbsoluteString);
-			}
-			try {
-				instanceIdentifier=SimpleQueriesProcessor.getSingleMandatoryLiteral(ResourceFactory.createResource("http://thisInstance.org"), ResourceFactory.createProperty(CoreConfig.hasInstanceIdentifierURI), seedModel).getValue().toString();
-			} catch (NonConformantRDFException e) {
-				e.printStackTrace();
-				throw new ConfigurationException("Unable to read instance id from configuration file");
-			}
-			
-		}
-		
-	}
-	
-	private void checkOrCreatePrefixFile() throws ConfigurationException {
-		// TODO Auto-generated method stub
-		File prefixFile=new File(prefixFileAbsoluteString);
-		if(!prefixFile.exists()) {
-			String defaultContent=
-					"@prefix rdfs:   	<http://www.w3.org/2000/01/rdf-schema#> .\n"+
-					"@prefix rdf:    	<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n"+
-					"@prefix xsd:    	<http://www.w3.org/2001/XMLSchema#> .\n"+
-					"@prefix skos: 		<http://www.w3.org/2004/02/skos/core#> .\n"+
-					"[] a <http://bog.us/bougs> ;\n" +
-					".";
-			writeInFile(prefixFile,defaultContent);
-		}
-		else {
-			Model prefixModel=ModelFactory.createDefaultModel();
-			try {
-				prefixModel.read(new FileInputStream(prefixFileAbsoluteString),"http://thisInstance.org/configuration/","Turtle");
-				nsPrefixMap=prefixModel.getNsPrefixMap();
-			} catch (FileNotFoundException e1) {
-				e1.printStackTrace();
-				throw new ConfigurationException("Prefixes file not found: "+seedFileAbsoluteString);
-			}
-			
-		}
-		
-	}
-	
-	
-	private void checkOrCreateDirectory (File dir) throws ConfigurationException  {
-		if(dir.exists()) {
-			if(!dir.isDirectory()) throw new ConfigurationException("Unable to create directory "+dir+" as a file with the same path already exists");
-		}
-		else dir.mkdir();
-		
-	}
-	
-	private void prepareDefaultFiles() throws ConfigurationException {
-		//TODO we only do this is no config is found. If there is some config, it's up to the user to have it complete.
-		File confDir=new File(confDirAbsoluteString);
-		if(confDir.listFiles().length>0) return;
-			
-		String defServerStatements= "<"+CoreConfig.selfURI+"> <"+InitializerConfig.tdbPrefixProperty+"> "+"\""+dbDirAbsoluteString+"\"^^<http://www.w3.org/2001/XMLSchema#string> ;\n.\n";
-		defServerStatements+="<"+CoreConfig.selfURI+"> <"+AuthConfig.authConfigURI +"> "+"<"+AuthConfig.isConfigFileString+"> ;\n.\n";
-		String baseURL=getServerName()+"/web";
-		File diskPrefixFile=new File(getWorkingDirectory(),CoreConfig.baseDiskDir);
-		String diskPrefix=diskPrefixFile.getAbsolutePath();
-		defServerStatements+="<"+CoreConfig.selfURI+"> <"+PublisherConfig.baseURLProperty +"> "+"\"http://"+baseURL+"\" ;\n.\n";
-		defServerStatements+="<"+CoreConfig.selfURI+"> <"+PublisherConfig.diskPrefixProperty +"> "+"\""+diskPrefix+"\" ;\n.\n";
-		
-		createFileAndFillWithString(confDirAbsoluteString,"defaultServerConfig.ttl",defServerStatements);
-		
-		// TODO this is : me what I can on what. Arguably this should start with me can create anything at the top register (empty register?)
-		// However, as a conf option, one could be granted access to everything.
-		String defAuthStatements="<"+getDefaultUserURI()+"> <"+AuthConfig.allActions+"> "+"<"+AuthConfig.allEntities+"> ;\n.\n";
-		createFileAndFillWithString(authDirAbsoluteString,"defaultAuthConfig.ttl",defAuthStatements);
-		
-		
-		String defProcessStatements=
-				"@prefix config:	<http://metarelate.net/config/>	.\n" +
-				"@prefix states: 	<http://metarelate.net/states/> .\n" +
-				"@prefix actions:	<http://metarelate.net/actions/> .\n" +
-				"@prefix default:	<http://metarelate.net/default/config/> .\n" +
-				"@prefix rdfs:		<http://www.w3.org/2000/01/rdf-schema#> .\n" +
-				"actions:update a config:Action;\n" +
-				"rdfs:label	\"Update\"@en;\n" +
-				"config:overrides actions:update;\n" +
-				"config:hasEffectOnCode default:actionUpdate1;\n" +
-				"config:hasEffectOnCode default:actionUpdate2;\n" +
-				"config:hasEffectOnReg default:actionUpdate1;\n" +
-				"config:hasEffectOnReg default:actionUpdate2;\n" +
-				".\n" +
-				"default:actionUpdate1 a config:Role;\n" +
-				"config:preThis states:default;\n" +
-				"config:postThis states:default;\n" +
-				".\n" +
-				"default:actionUpdate2 a config:Role;\n" +
-				"config:preThis states:valid;\n" +
-				"config:postThis	states:valid;\n" +
-				".\n" +
-				"actions:obsolete a config:Role;\n" +
-				"rdfs:label	\"Obsolete\"@en;\n" +
-				"config:overrides actions:obsolete;\n" +
-				"config:hasEffectOnCode default:actionObsolete1;\n" +
-				"config:hasEffectOnCode default:actionObsolete2;\n" +
-				"config:hasEffectOnReg default:actionObsolete1;\n" +
-				"config:hasEffectOnReg default:actionObsolete2;\n" +
-				".\n" +
-				"default:actionObsolete1 a config:Role;\n" +
-				"config:preThis states:default;\n" +
-				"config:postThis states:obsoleted;\n" +
-				".\n" +
-				"default:actionObsolete2 a config:Role;\n" +
-				"config:preThis states:valid;\n" +
-				"config:postThis states:obsoleted;\n" +
-				".\n" +
-				"actions:supersed a config:Action;\n" +
-				"rdfs:label	\"Supersed\"@en;\n" +
-				"config:overrides actions:supersed;\n" +
-				"config:hasEffectOnCode default:actionSupersed1 ;\n" +
-				".\n" +
-				"default:actionSupersed1 a config:Role;\n	" +
-				"config:preThis	states:valid;\n" +
-				"config:preAux	states:valid;\n" +
-				"config:postThis	states:superseded;\n" +
-				"config:postAux	states:valid;\n" +
-				".\n" +
-				"actions:add	a config:Action;\n" +
-				"rdfs:label	\"Add\"@en;\n" +
-				"config:overrides actions:add;\n" +
-				"config:hasEffectOnReg default:addAction1 ;\n" +
-				"config:hasEffectOnReg default:addAction2 ;\n" +
-				".\n" +
-				"default:addAction1 a config:Role;\n" +
-				"config:preThis	states:valid;\n" +
-				"config:postThis	states:default;	\n" +
-				".\n" +
-				"default:addAction2 a config:Role;\n" +
-				"config:preThis	states:default;\n" +
-				"config:postThis	states:default;	\n" +
-				".\n" +
-				"actions:validate	a config:Action;\n" +
-				"rdfs:label	\"Validate\"@en;	\n" +
-				"config:hasEffectOnReg default:validateAction1 ;\n" +
-				"config:hasEffectOnCode default:validateAction1 ;\n" +
-				".\n" +
-				"default:validateAction1  a config:Role; \n" +
-				"config:preThis states:default;\n" +
-				"config:postThis states:valid;\n" +
-				".\n" +
-				"states:obsoleted a config:State;\n" +
-				"rdfs:label	\"Obsoleted\"@en;\n" +
-				"config:overrides states:obsoleted;\n" +
-				".\n" +
-				"states:superseded a config:State;\n" +
-				"rdfs:label	\"Superseded\"@en;\n" +
-				"config:overrides states:superseded;\n" +
-				".\n" +
-				"states:default a config:State;\n" +
-				"rdfs:label	\"Default\"@en;\n" +
-				"config:overrides states:default;\n" +
-				".\n" +
-				"states:valid a config:State;\n" +
-				"rdfs:label	\"Valid\"@en;\n" +
-				".\n";
-
-		createFileAndFillWithString(confDirAbsoluteString,"defaultProcessConfig.ttl",defProcessStatements);
-	
-		String validationStatements=
-				"@prefix states: 	<http://metarelate.net/states/> .\n"+
-				"@prefix actions:	<http://metarelate.net/actions/> .\n"+
-				"@prefix config:	<http://metarelate.net/config/> .\n"+
-				"@prefix default:	<http://metarelate.net/default/config/> .\n"+
-				"@prefix rdfs:		<http://www.w3.org/2000/01/rdf-schema#> .\n"+
-				"@prefix rdf:		<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n"+
-				"@prefix skos:		<http://www.w3.org/2004/02/skos/core#> .\n"+
-				"\n"+
-				"default:typesXRegisters a config:RegisterValidationConstraint;\n"+
-				"	config:onObjectProperty	rdf:type; \n"+
-				"	config:pseudoOrder 	\"A\";\n"+
-				"	config:minCardinality	\"1\";\n"+
-				"	config:oneOf	skos:Collection;\n"+
-				"	config:oneOf	skos:Scheme;\n"+
-				"	config:oneOf	default:GenericCollection;\n"+
-				"	.\n"+
-				"	\n"+
-				"default:labelXRegisters a config:RegisterValidationConstraint;\n"+
-				"	config:onDataProperty	rdfs:label; \n"+
-				"	config:pseudoOrder 	\"B\";\n"+
-				"	config:minCardinality	\"1\";\n"+
-				"	config:maxCardinality	\"1\";\n"+
-				"	config:language			\"en\";\n"+
-				"	.\n"+
-				"	\n"+
-				"default:notationXRegisters a config:RegisterValidationConstraint;\n"+
-				"	config:onDataProperty	skos:notation; \n"+
-				"	config:pseudoOrder 	\"C\";\n"+
-				"	config:minCardinality	\"1\";\n"+
-				"	config:maxCardinality	\"1\";\n"+
-				"	config:type			config:String;\n"+
-				"	.	\n"+
-				"	\n"+
-				"default:descriptionXRegistersEN a config:RegisterValidationConstraint;\n"+
-				"	config:onDataProperty	rdfs:description; \n"+
-				"	config:pseudoOrder 	\"D\";\n"+
-				"	config:minCardinality	\"1\";\n"+
-				"	config:maxCardinality	\"1\";\n"+
-				"	config:language			\"en\";\n"+
-				"	.\n"+
-				"	\n"+
-				"default:descriptionXRegistersIT a config:RegisterValidationConstraint;\n"+
-				"	config:onDataProperty	rdfs:description; \n"+
-				"	config:pseudoOrder 	\"E\";\n"+
-				"	config:minCardinality	\"0\";\n"+
-				"	config:maxCardinality	\"1\";\n"+
-				"	config:language			\"it\";\n"+
-				"	.\n"+
-				" \n"+
-				"default:typesXCodes a config:CodeValidationConstraint;\n"+
-				"	config:onObjectProperty	rdf:type; \n"+
-				"	config:pseudoOrder 	\"A\";\n"+
-				"	config:minCardinality	\"1\";\n"+
-				"	config:oneOf	skos:Concept;\n"+
-				"	config:oneOf	default:GenericConcept;\n"+
-				"	.\n"+
-				" \n"+
-				"default:labelXCodes a config:CodeValidationConstraint;\n"+
-				"	config:onDataProperty	rdfs:label; \n"+
-				"	config:pseudoOrder 	\"B\";\n"+
-				"	config:minCardinality	\"1\";\n"+
-				"	config:maxCardinality	\"1\";\n"+
-				"	config:language			\"en\";\n"+
-				"	.\n"+
-				"	\n"+
-				"default:notationXCodes a config:CodeValidationConstraint;\n"+
-				"	config:onDataProperty	skos:notation; \n"+
-				"	config:pseudoOrder 	\"C\";\n"+
-				"	config:minCardinality	\"1\";\n"+
-				"	config:maxCardinality	\"1\";\n"+
-				"	config:type			config:String;\n"+
-				"	.\n"+
-				"	\n"+
-				"default:descriptionXCodesEN a config:CodeValidationConstraint;\n"+
-				"	config:onDataProperty	rdfs:description; \n"+
-				"	config:pseudoOrder 	\"D\";\n"+
-				"	config:minCardinality	\"1\";\n"+
-				"	config:maxCardinality	\"1\";\n"+
-				"	config:language			\"en\";\n"+
-				"	.	\n"+
-				"	\n"+
-				"default:descriptionXCodesIT a config:CodeValidationConstraint;\n"+
-				"	config:onDataProperty	rdfs:description; \n"+
-				"	config:pseudoOrder 	\"E\";\n"+
-				"	config:minCardinality	\"0\";\n"+
-				"	config:maxCardinality	\"1\";\n"+
-				"	config:language			\"it\";\n"+
-				"	.	\n";
-				
-				
-			
-		createFileAndFillWithString(confDirAbsoluteString,"defaultValidationRules.ttl",validationStatements);
-		
-		String defPropStatements=
-				"@prefix states: 	<http://metarelate.net/states/> .\n"+
-				"@prefix actions:	<http://metarelate.net/actions/> .\n"+
-				"@prefix config:	<http://metarelate.net/config/> .\n"+
-				"@prefix default:	<http://metarelate.net/default/config/> .\n"+
-				"@prefix rdfs:		<http://www.w3.org/2000/01/rdf-schema#> .\n"+
-				"@prefix rdf:		<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n"+
-				"@prefix skos:		<http://www.w3.org/2004/02/skos/core#> .\n"+
-				"\n"+
-				"<"+MetaLanguage.rdfsLabelPropertyString+"> <"+MetaLanguage.overridesPropertyString+"> <"+MetaLanguage.labelProperty.getURI()+">;\n"+
-				".\n"+
-				"<"+MetaLanguage.rdfsCommentPropertyString+"> <"+MetaLanguage.overridesPropertyString+"> <"+MetaLanguage.commentProperty.getURI()+">;\n"+
-				".\n"+
-				"<"+MetaLanguage.skosNotationPropertyString+"> <"+MetaLanguage.overridesPropertyString+"> <"+MetaLanguage.notationProperty.getURI()+">;\n"+
-				".\n"+
-				"<"+MetaLanguage.dcReplacesString +"> <"+MetaLanguage.overridesPropertyString+"> <"+MetaLanguage.hasPreviousVersionProperty.getURI()+">;\n"+
-				".\n"+
-				"<"+MetaLanguage.dcReplacesString +"> <"+MetaLanguage.overridesPropertyString+"> <"+MetaLanguage.superseeds.getURI()+">;\n"+
-				".\n"+
-				"<"+MetaLanguage.dcReplacedByString +"> <"+MetaLanguage.overridesPropertyString+"> <"+MetaLanguage.superseededBy.getURI()+">;\n"+
-				".\n"+
-				"	\n";
-		
-		createFileAndFillWithString(confDirAbsoluteString,"defaultPropertiesConfig.ttl",defPropStatements);
-	}
-	
 
 	
-	public String getDefaultUserURI() {
-		//TODO this may need to be made machine independent
-		return "http://"+instanceIdentifier+"/"+defaultUserName;
-	}
-
-	private void createFileAndFillWithString(String dir, String fileName, String content) throws ConfigurationException {
-		//File confDir=new File(dir);
-		//if(confDir.listFiles().length==0) {
-			//We need at least to specify a default TDB.
-
-			try {
-				BufferedWriter defFile=new BufferedWriter(new FileWriter(new File(dir,fileName).getAbsolutePath()));
-				defFile.write(content);
-				defFile.flush(); // TODO Is this implied by close() ?
-				defFile.close();
-			} catch (IOException e) {
-				throw new ConfigurationException("Unable to initialize configuration file: "+fileName+" in "+confDirAbsoluteString);
-			}
-			
-		//}
-		
+	public String getServerName() {
+		return serverName;
 	}
 	
-	private void writeInFile(File file, String content) throws ConfigurationException  {
-		BufferedWriter defFile;
+	
+	private String getSeedString(String seedFileString) throws ConfigurationException {
+		String result=null;
+		Model seedModel=ModelFactory.createDefaultModel();
 		try {
-			defFile = new BufferedWriter(new FileWriter(file));
-			defFile.write(content);
-			defFile.flush(); // TODO Is this implied by close() ?
-			defFile.close();
-		} catch (IOException e) {
+			seedModel.read(new FileInputStream(seedFileString),"http://thisInstance.org/configuration/","Turtle");
+		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-			throw new ConfigurationException("Unable to write to : "+file.getAbsolutePath());
-			
+			throw new ConfigurationException("Problems in reading seed file : "+seedFileString);
 		}
-		
-		
+		try {
+			result=SimpleQueriesProcessor.getSingleMandatoryLiteral(ResourceFactory.createResource("http://thisInstance.org"), ResourceFactory.createProperty(CoreConfig.hasInstanceIdentifierURI), seedModel).getValue().toString();
+		} catch (NonConformantRDFException e) {
+			e.printStackTrace();
+			throw new ConfigurationException("Unable to read in seed from configuration file");
+		}
+		if(result==null) throw new ConfigurationException("Null seed");
+		return result;
+			
 	}
 	
-	// TODO we should cache this!!!
+	public String getWebDirectory() {
+		return webDirAbsoluteString;
+	}
+	public String getTemplatesDirectory() {
+		return templatesDirAbsoluteString;
+	}
+	
+	/*
+	public String getRootDirectory() {
+		return rootDirectoryString;
+	}
+	*/
+	public String getDefaultUserURI() {
+		return defaultUserURI;
+	}
+	
 	/**
 	 * The configuration graph is the union of all graphs in the configuration dir.
 	 * @throws ConfigurationException 
 	 */
 	public Model getConfigurationGraph() throws ConfigurationException {
+		return globalConfigurationGraph;
+	}
+
+	private Model loadConfigurationGraph() throws ConfigurationException {
 		Model configuration=ModelFactory.createDefaultModel();
 		File confDir=new File(confDirAbsoluteString);
 		for (File confFile : confDir.listFiles()) {
@@ -594,16 +326,13 @@ public class Initializer {
 		}
 		return configuration;
 	}
-
+	
+	
 	public static File[] getAuthFiles() {
 		File authConfDir=new File(authDirAbsoluteString);
 		return authConfDir.listFiles();
 	}
-
-	public String getServerName() {
-		return serverName;
-	}
-
+	
 	public boolean isRemote() {
 		// TODO Auto-generated method stub
 		return false;
@@ -613,13 +342,21 @@ public class Initializer {
 		// TODO Auto-generated method stub
 		return false;
 	}
-
+	
 	public String getWorkingDirectory() {
 		return System.getProperty("user.dir");
 	}
 	
 	public Map<String,String> getPrefixMap() {
 		return nsPrefixMap;
+	}
+
+	public String getWARFile() throws ConfigurationException {
+		File warDir=new File(getWebDirectory());
+		//Note that we should have already checked this is an ok dir;
+		File[] warFiles=warDir.listFiles();
+		if(warFiles.length==0) throw new ConfigurationException("Invalid WAR file");
+		return warFiles[0].getAbsolutePath();
 	}
 	
 	

@@ -375,7 +375,11 @@ public class Installer {
 		line=line.replace("<<cacheDir>>", targetCacheDir);
 		line=line.replace("<<templatesDir>>", targetTemplatesDir);
 		line=line.replace("<<webDir>>", targetWebDir);
+		line=line.replace("<<gitDir>>", targetGitDir);
+		line=line.replace("<<prefixFile>>", new File(targetDir,InstallerConfig.prefixFileName).getAbsolutePath());
+		line=line.replace("<<seedFile>>", new File(targetDir,InstallerConfig.seedFileName).getAbsolutePath());
 		line=line.replace("<<commandFile>>", new File(targetCommandDir,"ts.jar").getAbsolutePath());
+		
 		return line;
 	}
 	

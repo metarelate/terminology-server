@@ -496,15 +496,15 @@ public class ViewPage extends SuperPage {
 									CommandWebConsole.myInitializer.myTerminologyManager.performGenericAction(actionURI, urlToAction, CommandWebConsole.myInitializer.getDefaultUserURI(), obsoleteConfirmPanelContent.getDescription());
 								} catch (RegistryAccessException e) {
 									getSession().error("Impossible to perform action "+actionLabel+" on "+urlToAction+" (access denied)");
-									if(CommandWebConsole.myInitializer.debugMode) getSession().error(e.getMessage());
+									if(Loggers.isDebugOn()) getSession().error(e.getMessage());
 									e.printStackTrace(); // TODO route to logger
 								} catch (ImpossibleOperationException e) {
 									getSession().error("Impossible to perform action "+actionLabel+" on "+urlToAction+" (operation not possible)");
-									if(CommandWebConsole.myInitializer.debugMode) getSession().error(e.getMessage());
+									if(Loggers.isDebugOn()) getSession().error(e.getMessage());
 									e.printStackTrace(); // TODO route to logger
 								} catch (ModelException e) {
 									getSession().error("Impossible to perform action "+actionLabel+" on "+urlToAction+" (inconsistent terminology)");
-									if(CommandWebConsole.myInitializer.debugMode) getSession().error(e.getMessage());
+									if(Loggers.isDebugOn()) getSession().error(e.getMessage());
 									e.printStackTrace(); // TODO route to logger
 								}
 							
@@ -611,15 +611,15 @@ public class ViewPage extends SuperPage {
 					description);
 		} catch (ModelException e) {
 			getSession().error("Impossible to obsolete: "+urlToAction+" because of internal inconsistencies in the terminology model");
-			if(CommandWebConsole.myInitializer.debugMode) getSession().error(e.getMessage());
+			if(Loggers.isDebugOn()) getSession().error(e.getMessage());
 			e.printStackTrace(); // TODO route to logger
 		} catch (RegistryAccessException e) {
 			getSession().error("Impossible to obsolete: "+urlToAction+" (access denied)");
-			if(CommandWebConsole.myInitializer.debugMode) getSession().error(e.getMessage());
+			if(Loggers.isDebugOn()) getSession().error(e.getMessage());
 			e.printStackTrace(); // TODO route to logger
 		} catch (ImpossibleOperationException e) {
 			getSession().error("Impossible to obsolete: "+urlToAction+" (operation not possible)");
-			if(CommandWebConsole.myInitializer.debugMode) getSession().error(e.getMessage());
+			if(Loggers.isDebugOn()) getSession().error(e.getMessage());
 			e.printStackTrace(); // TODO route to logger
 		}
 		//obsoleteConfirmPanelWindow.close(target);
@@ -666,15 +666,15 @@ public class ViewPage extends SuperPage {
 					description);
 		} catch (ModelException e) {
 			getSession().error("Impossible to supersed: "+urlToAction+" with "+urlSuperseder+" because of internal inconsistencies in the terminology model");
-			if(CommandWebConsole.myInitializer.debugMode) getSession().error(e.getMessage());
+			if(Loggers.isDebugOn()) getSession().error(e.getMessage());
 			e.printStackTrace(); // TODO route to logger
 		} catch (RegistryAccessException e) {
 			getSession().error("Impossible to supersed: "+urlToAction+" with "+urlSuperseder+" (access denied)");
-			if(CommandWebConsole.myInitializer.debugMode) getSession().error(e.getMessage());
+			if(Loggers.isDebugOn()) getSession().error(e.getMessage());
 			e.printStackTrace(); // TODO route to logger
 		} catch (ImpossibleOperationException e) {
 			getSession().error("Impossible to supersed: "+urlToAction+" with "+urlSuperseder+" (operation not possible)");
-			if(CommandWebConsole.myInitializer.debugMode) getSession().error(e.getMessage());
+			if(Loggers.isDebugOn()) getSession().error(e.getMessage());
 			e.printStackTrace(); // TODO route to logger
 		}
 		
