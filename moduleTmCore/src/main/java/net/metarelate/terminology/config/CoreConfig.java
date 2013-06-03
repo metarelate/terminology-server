@@ -34,8 +34,8 @@ public class CoreConfig {
 	public static final String VERSION_INIT = "0";
 	public static final String VERSION_DEFUALT = "0";
 	
-	public static String VERSION_NUMBER="0.9.0";
-	public static String VERSION_CODENAME="de-WMOized";
+	public static String VERSION_NUMBER="0.10.0";
+	public static String VERSION_CODENAME="GenericRelease";
 	
 	public static String UNDEFINED_LABEL="undefined";
 	
@@ -74,6 +74,8 @@ public class CoreConfig {
 
 	public static String baseDiskDir="web";
 	public static String cacheDirString="cache";
+	public static int DEFAULT_ADMIN_PORT=8082;
+	public static int DEFAULT_PUBLISH_PORT=8080;
 	
 	public static final String hasInstanceIdentifierURI="http://metarelate.net/config/hasInstanceIdentifier";
 	public static final String selfURI="http://metarelate.net/config/selfInstance";
