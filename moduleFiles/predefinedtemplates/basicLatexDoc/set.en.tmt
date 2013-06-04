@@ -1,4 +1,4 @@
-<!-- tmtOpen>$onLevel$::0\chapter||1::\section||2::subsection||\<<tmtOnLevel>><tmtClose --><!-- tmtOpen>$str+${<<tmtLabel>>}
+<!-- tmtOpen>$onLevel$0::chapter||1::section||2::subsection||\<<tmtOnLevel>><tmtClose --><!-- tmtOpen>$str+${<<tmtLabel>>}
 \index{<<tmtLabel>>}
 <<tmtDescription>>
 version: <<tmtVersion>>

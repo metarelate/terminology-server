@@ -266,8 +266,11 @@ public class Installer {
 				outFile=new File(targetDir,confFile.getName());
 			else if(confFile.getName().equals(InstallerConfig.seedFileName))
 				outFile=new File(targetDir,confFile.getName());
-			else if(confFile.getName().equals(InstallerConfig.commandName))
+			else if(confFile.getName().equals(InstallerConfig.commandName)) {
 				outFile=new File(targetDir,confFile.getName());
+				outFile.setExecutable(true);
+			}
+				
 			else outFile=new File(targetConfDir,confFile.getName());
 			copyFilesResult=copyFilesResult&&expandCopyFile(confFile,outFile);
 			if(!copyFilesResult) {

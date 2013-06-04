@@ -39,9 +39,11 @@ import net.metarelate.terminology.coreModel.TerminologyIndividual;
 import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.ConfigurationException;
 import net.metarelate.terminology.exceptions.ModelException;
+import net.metarelate.terminology.exceptions.WebWriterException;
 import net.metarelate.terminology.publisher.templateElements.BreadCrumbsTemplate;
 import net.metarelate.terminology.publisher.templateElements.ContainedCodesTemplate;
 import net.metarelate.terminology.publisher.templateElements.DummyTemplateElement;
+import net.metarelate.terminology.publisher.templateElements.HeaderTemplate;
 import net.metarelate.terminology.publisher.templateElements.LangMapTemplate;
 import net.metarelate.terminology.publisher.templateElements.ParamStringTemplateElement;
 import net.metarelate.terminology.publisher.templateElements.SetCodeValuesTemplate;
@@ -60,8 +62,8 @@ import net.metarelate.terminology.utils.Loggers;
 public class TemplateManager {
 	private final String openTag="<!-- tmtOpen>";
 	private final String closeTag="<tmtClose -->";
-	private final String strPlusHeader="$str+$";
-	private final String strBreadcrumbsHeader="$bcrumbs$";
+	//private final String strPlusHeader="$str+$";
+	//private final String strBreadcrumbsHeader="$bcrumbs$";
 	
 	
 	private File templateFile=null;
@@ -102,11 +104,11 @@ public class TemplateManager {
 		}
 	}
 	
-	public String getPageForLang(String language, TerminologySet set, String version, int level,String baseURL,CacheManager cacheManager,LabelManager lm, BackgroundKnowledgeManager bkm, String registryBaseURL) throws ConfigurationException, ModelException {
-		return expandTermTemplate(setTemplates,language,set,version, level,baseURL,cacheManager,lm,bkm,registryBaseURL);
+	public String getPageForLang(String language, TerminologySet set, String version, int level,String baseURL,CacheManager cacheManager,LabelManager lm, BackgroundKnowledgeManager bkm, String registryBaseURL, String tag) throws ConfigurationException, ModelException, WebWriterException {
+		return expandTermTemplate(setTemplates,language,set,version, level,baseURL,cacheManager,lm,bkm,registryBaseURL,tag);
 	}
-	public String getPageForLang(String language, TerminologyIndividual ind, String version, int level,String baseURL,CacheManager cacheManager,LabelManager lm, BackgroundKnowledgeManager bkm, String registryBaseURL) throws ConfigurationException, ModelException {
-		return expandTermTemplate(indTemplates,language,ind,version,level,baseURL,cacheManager,lm,bkm,registryBaseURL); 	// TODO we don't care about levels here
+	public String getPageForLang(String language, TerminologyIndividual ind, String version, int level,String baseURL,CacheManager cacheManager,LabelManager lm, BackgroundKnowledgeManager bkm, String registryBaseURL,String tag) throws ConfigurationException, ModelException, WebWriterException {
+		return expandTermTemplate(indTemplates,language,ind,version,level,baseURL,cacheManager,lm,bkm,registryBaseURL,tag); 	// TODO we don't care about levels here
 	}
 	public String getIntroForLang(String language,String tag,TerminologyFactory tf) throws ConfigurationException, ModelException {
 		return expandFixedTemplate(preTemplates,language,tag,tf);
@@ -118,13 +120,13 @@ public class TemplateManager {
 	
 
 
-	private String expandTermTemplate(Map<String,ArrayList<TemplateElement>> templateMap, String language, TerminologyEntity entity, String version, int level,String baseURL,CacheManager cacheManager,LabelManager lm, BackgroundKnowledgeManager bkm, String registryBaseURL) throws ConfigurationException, ModelException {
+	private String expandTermTemplate(Map<String,ArrayList<TemplateElement>> templateMap, String language, TerminologyEntity entity, String version, int level,String baseURL,CacheManager cacheManager,LabelManager lm, BackgroundKnowledgeManager bkm, String registryBaseURL,String tag) throws ConfigurationException, ModelException, WebWriterException {
 		if(templateMap.get(language)==null) {
 			language=CoreConfig.DEFAULT_LANGUAGE;
 			if(templateMap.get(language)==null) throw new ConfigurationException("No suitable template defined for "+entity.getURI());
 		}
 		StringBuilder answer=new StringBuilder();
-		for(TemplateElement t:templateMap.get(language)) answer.append(((TemplateTermElement)t).render(entity, version, level,language,baseURL,cacheManager,lm,bkm,registryBaseURL));
+		for(TemplateElement t:templateMap.get(language)) answer.append(((TemplateTermElement)t).render(entity, version, level,language,baseURL,cacheManager,lm,bkm,registryBaseURL,tag));
 		return answer.toString();
 	}
 	
@@ -143,13 +145,13 @@ public class TemplateManager {
 		ArrayList<TemplateElement> bits=new ArrayList<TemplateElement>();
 		String templateString=readFileAsString(templateFile);
 		int runningIndex=0;
-		Loggers.publishLogger.trace(templateString); //TODO test
+		//Loggers.publishLogger.trace(templateString); //TODO test
 		while(runningIndex<templateString.length()) {
-			Loggers.publishLogger.trace("Running index: "+runningIndex);
+			//Loggers.publishLogger.trace("Running index: "+runningIndex);
 			int firstBit=templateString.indexOf(openTag,runningIndex);
 			int secondBit=templateString.indexOf(closeTag,runningIndex);
-			Loggers.publishLogger.trace("First bit: "+firstBit); //TODO test
-			Loggers.publishLogger.trace("Second bit: "+secondBit); //TODO test
+			//Loggers.publishLogger.trace("First bit: "+firstBit); //TODO test
+			//Loggers.publishLogger.trace("Second bit: "+secondBit); //TODO test
 			if(firstBit<0) {
 				bits.add(new StringTemplateElement(templateString.substring(runningIndex)));
 				runningIndex=templateString.length()+1;
@@ -157,7 +159,7 @@ public class TemplateManager {
 			}
 			if(firstBit>runningIndex) bits.add(new StringTemplateElement(templateString.substring(runningIndex,firstBit)));
 			//TODO here we should parse the real block
-			if(firstBit>0 && secondBit>0) bits.add(parseElement(templateString.substring(firstBit+openTag.length(),secondBit)));
+			if(firstBit>=0 && secondBit>0) bits.add(parseElement(templateString.substring(firstBit+openTag.length(),secondBit)));
 			runningIndex=secondBit+openTag.length();
 			
 		}
@@ -187,12 +189,12 @@ public class TemplateManager {
 		else if (elemString.startsWith(BreadCrumbsTemplate.bcrumbsHeader)) return new BreadCrumbsTemplate(elemString.substring(BreadCrumbsTemplate.bcrumbsHeader.length()));
 		else if (elemString.startsWith(LangMapTemplate.langMapHeader)) return new LangMapTemplate(elemString.substring(LangMapTemplate.langMapHeader.length()),this);
 		else if (elemString.startsWith(TagsTemplate.tagsHeader)) return new TagsTemplate(elemString.substring(TagsTemplate.tagsHeader.length()));
-		else if (elemString.startsWith(VersionTemplate.versionHeade)) return new VersionTemplate(elemString.substring(VersionTemplate.versionHeade.length()));
+		else if (elemString.startsWith(VersionTemplate.versionHeader)) return new VersionTemplate(elemString.substring(VersionTemplate.versionHeader.length()));
 		else if (elemString.startsWith(StatementsTemplateElement.statHeader)) return new StatementsTemplateElement(elemString.substring(StatementsTemplateElement.statHeader.length()));
 		else if (elemString.startsWith(SubRegistersTemplateElement.subRegHeader)) return new SubRegistersTemplateElement(elemString.substring(SubRegistersTemplateElement.subRegHeader.length()));
 		else if (elemString.startsWith(ContainedCodesTemplate.ccodeHeader )) return new ContainedCodesTemplate(elemString.substring(ContainedCodesTemplate.ccodeHeader.length()));
 		else if (elemString.startsWith(SetCodeValuesTemplate.setCodeValHeader )) return new SetCodeValuesTemplate(elemString.substring(SetCodeValuesTemplate.setCodeValHeader.length()));
-
+		else if (elemString.startsWith(HeaderTemplate.headerHeader )) return new HeaderTemplate(elemString.substring(HeaderTemplate.headerHeader.length()));
 		else return new StringTemplateElement(elemString);
 	}
 	

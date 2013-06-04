@@ -14,13 +14,14 @@ import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.publisher.PublisherConfig;
 import net.metarelate.terminology.utils.CodeComparator;
+import net.metarelate.terminology.utils.Loggers;
 
 public class SubRegistersTemplateElement extends TemplateParametricClass
 		implements TemplateTermElement {
 	public static final String subRegHeader="$subreg$";
 	public SubRegistersTemplateElement(String templateText) {
 		super(templateText);
-		// TODO Auto-generated constructor stub
+		Loggers.publishLogger.debug("New SubRegistersTemplateElement\n"+templateText);
 	}
 
 	public boolean isFixed() {
@@ -36,7 +37,8 @@ public class SubRegistersTemplateElement extends TemplateParametricClass
 	public String render(TerminologyEntity e, String version, int level,
 			String language, String baseURL, CacheManager cacheManager,
 			LabelManager lm, BackgroundKnowledgeManager bkm,
-			String registryBaseURL) throws ModelException {
+			String registryBaseURL,
+			String tag) throws ModelException {
 		StringBuilder result=new StringBuilder();
 		if(!e.isSet()) return "DEBUG:UNDEF";
 		Set<TerminologySet> childrenSet=((TerminologySet)e).getCollections(version);

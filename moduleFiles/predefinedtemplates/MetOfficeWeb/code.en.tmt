@@ -164,7 +164,7 @@
 <h2 id="definedInRegStr">Defined in register</h2>
 <ul>
 <!-- tmtOpen>$str+$
-<li><a href="<<tmtFatherURI>>"  class="moreb" ><<tmtFatherLabel>></a></li>
+<li><a href="<<tmtFatherURL>>"  class="moreb" ><<tmtFatherLabel>></a></li>
 <tmtClose -->
 </ul><br/>
 </section>

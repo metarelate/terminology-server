@@ -362,13 +362,13 @@ public class PublisherManager {
 	    				if(myInitializer.myFactory.terminologyIndividualExist(uri)) {
 	    					TerminologyIndividual ind=myInitializer.myFactory.getUncheckedTerminologyIndividual(uri);
 	    					if(version==null) version=ind.getLastVersion();
-	    					result=tm.getPageForLang(language, ind, version, 0, myInitializer.myCache.getValueFor(uri, PublisherConfig.uriHasUrl), myInitializer.myCache,  myInitializer.myFactory.getLabelManager(), myInitializer.myFactory.getBackgroundKnowledgeManager(), baseURL);
+	    					result=tm.getPageForLang(language, ind, version, 0, myInitializer.myCache.getValueFor(uri, PublisherConfig.uriHasUrl), myInitializer.myCache,  myInitializer.myFactory.getLabelManager(), myInitializer.myFactory.getBackgroundKnowledgeManager(), baseURL,null);
 
 	    				}
 	    				else if (myInitializer.myFactory.terminologySetExist(uri)) {
 	    					TerminologySet set=myInitializer.myFactory.getUncheckedTerminologySet(uri);
 	    					if(version==null) version=set.getLastVersion();
-	    					result=tm.getPageForLang(language, set, version, 0,  myInitializer.myCache.getValueFor(uri, PublisherConfig.uriHasUrl), myInitializer.myCache, myInitializer.myFactory.getLabelManager(), myInitializer.myFactory.getBackgroundKnowledgeManager(), baseURL);
+	    					result=tm.getPageForLang(language, set, version, 0,  myInitializer.myCache.getValueFor(uri, PublisherConfig.uriHasUrl), myInitializer.myCache, myInitializer.myFactory.getLabelManager(), myInitializer.myFactory.getBackgroundKnowledgeManager(), baseURL,null);
 
 	    				}
 	    				else {

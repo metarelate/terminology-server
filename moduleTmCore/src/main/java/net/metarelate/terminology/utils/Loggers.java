@@ -14,6 +14,7 @@ public class Loggers {
 	public static void init() {
 		BasicConfigurator.configure();
 		debugAuxOff();
+		
 		// TODO this should be replaced by a proper configuration
 	}
 	public static final Logger topLogger=Logger.getLogger("net.metarelate");
@@ -60,11 +61,11 @@ public class Loggers {
 		return debugOn;
 	}
 	private static void debugAuxOn() {
-		jenaLogger.setLevel(org.apache.log4j.Level.DEBUG);
+		jenaLogger.setLevel(org.apache.log4j.Level.WARN);
 		jettyLogger.setLevel(org.apache.log4j.Level.DEBUG);
 	}
 	private static void debugAuxOff() {
-		jenaLogger.setLevel(org.apache.log4j.Level.WARN);
+		jenaLogger.setLevel(org.apache.log4j.Level.ERROR);
 		jettyLogger.setLevel(org.apache.log4j.Level.WARN);
 	}
 	

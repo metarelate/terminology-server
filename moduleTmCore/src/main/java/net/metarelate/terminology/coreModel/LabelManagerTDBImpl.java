@@ -16,11 +16,15 @@
  You should have received a copy of the GNU Lesser General Public License
  along with terminology-server. If not, see <http://www.gnu.org/licenses/>.
 */
-	
-package net.metarelate.terminology.coreModel;
 
+// TO
+
+//
+package net.metarelate.terminology.coreModel;
+// TODO some bits of label processing is here, some in utils and some on the entity. This should be uniformed!
 import net.metarelate.terminology.config.CoreConfig;
 import net.metarelate.terminology.config.MetaLanguage;
+import net.metarelate.terminology.utils.Loggers;
 
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -30,7 +34,7 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 public class LabelManagerTDBImpl implements LabelManager {
 	private Model myLabelGraph;
-	private String defaultLanguage="en";
+	private String defaultLanguage=CoreConfig.DEFAULT_LANGUAGE;
 	public LabelManagerTDBImpl(Model labelGraph) {
 		myLabelGraph=labelGraph;
 		
@@ -84,7 +88,11 @@ public class LabelManagerTDBImpl implements LabelManager {
 		}
 	
 		// Still no label found.
-		if(method==LANG_DEF_SHORTURI) return ResourceFactory.createResource(uri).getLocalName();
+		if(method==LANG_DEF_SHORTURI) {
+			String result=ResourceFactory.createResource(uri).getLocalName();
+			//Loggers.coreLogger.trace("Got a short uri as a label for : "+uri+" -> "+result);
+			return result;
+		}
 		else if(method==URI_IF_NULL || method==LANG_DEF_URI) return uri;
 		else if(method==UNDEF_IF_NULL) return getUndefString(language);
 		else if(method==LANG_DEF_NULL) return null;

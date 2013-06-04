@@ -13,10 +13,10 @@ public class DummyTemplateElement implements TemplateTermElement,TemplateGlobalE
 	public DummyTemplateElement(String stringToRender) {
 		super();
 		this.stringToRender = stringToRender;
-		Loggers.publishLogger.info("Creation of Dummy block: "+stringToRender); //TODO test
+		Loggers.publishLogger.debug("New DummyTemplateElement\n"+stringToRender);
 	}
 	
-	public String render(TerminologyEntity e, String version, int level,String language,String baseURL, CacheManager cacheManager, LabelManager lm, BackgroundKnowledgeManager bkm,String registryBaseURL) {
+	public String render(TerminologyEntity e, String version, int level,String language,String baseURL, CacheManager cacheManager, LabelManager lm, BackgroundKnowledgeManager bkm,String registryBaseURL,String tag) {
 		return "Dummy element for entity "+e.getURI()+" , should expand accoring to "+stringToRender;
 	}
 	public boolean isFixed() {

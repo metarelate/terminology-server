@@ -6,12 +6,14 @@ import net.metarelate.terminology.coreModel.LabelManager;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.coreModel.TerminologyFactory;
 import net.metarelate.terminology.exceptions.ModelException;
+import net.metarelate.terminology.utils.Loggers;
 
 public class TagsTemplate extends TemplateParametricClass implements
 		TemplateTermElement, TemplateGlobalElement, TemplateFixedElement {
 	public static final String tagsHeader="$tags$";
 	public TagsTemplate(String templateText) {
 		super(templateText);
+		Loggers.publishLogger.debug("New TagsTemplate\n"+templateText);
 	}
 
 	public boolean isFixed() {
@@ -35,7 +37,8 @@ public class TagsTemplate extends TemplateParametricClass implements
 	public String render(TerminologyEntity e, String version, int level,
 			String language, String baseURL, CacheManager cacheManager,
 			LabelManager lm, BackgroundKnowledgeManager bkm,
-			String registryBaseURL) throws ModelException {
+			String registryBaseURL,
+			String tag) throws ModelException {
 		
 		String tagsStr="";
 		String[] tags=e.getTagsForVersion(version);

@@ -12,7 +12,7 @@ public class StringTemplateElement implements TemplateFixedElement, TemplateTerm
 	public StringTemplateElement(String stringToRender) {
 		super();
 		this.stringToRender = stringToRender;
-		Loggers.publishLogger.debug("New string block: "+stringToRender); //TODO test
+		Loggers.publishLogger.debug("New StatementsTemplateElement\n"+stringToRender);
 	}
 	
 	
@@ -28,7 +28,7 @@ public class StringTemplateElement implements TemplateFixedElement, TemplateTerm
 		return false;
 	}
 
-	public String render(TerminologyEntity e, String version, int level,String language,String baseURL, CacheManager cacheManager, LabelManager lm, BackgroundKnowledgeManager bkm,String registryBaseURL) {
+	public String render(TerminologyEntity e, String version, int level,String language,String baseURL, CacheManager cacheManager, LabelManager lm, BackgroundKnowledgeManager bkm,String registryBaseURL,String tag) {
 		return stringToRender;
 	}
 

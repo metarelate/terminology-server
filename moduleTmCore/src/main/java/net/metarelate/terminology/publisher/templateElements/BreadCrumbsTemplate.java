@@ -11,11 +11,13 @@ import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.publisher.PublisherConfig;
 import net.metarelate.terminology.publisher.PublisherManager;
+import net.metarelate.terminology.utils.Loggers;
 
 public class BreadCrumbsTemplate extends TemplateParametricClass implements TemplateTermElement {
 	public final static String bcrumbsHeader="$bcrumbs$";
 	public BreadCrumbsTemplate(String templateText) {
 		super(templateText);
+		Loggers.publishLogger.debug("New BreadCrumbsTemplate\n"+templateText);
 	}
 
 	public boolean isFixed() {
@@ -26,7 +28,7 @@ public class BreadCrumbsTemplate extends TemplateParametricClass implements Temp
 		return true;
 	}
 
-	public String render(TerminologyEntity e, String version, int level,String language, String baseURL, CacheManager cacheManager, LabelManager lm, BackgroundKnowledgeManager bkm,String registryBaseURL) throws ModelException {
+	public String render(TerminologyEntity e, String version, int level,String language, String baseURL, CacheManager cacheManager, LabelManager lm, BackgroundKnowledgeManager bkm,String registryBaseURL,String tag) throws ModelException {
 		StringBuilder result=new StringBuilder();
 		result.insert(0,"<a href=\""+e.getURI()+"\">"+getBestLabel(e, version, language)+"</a> "+spacingStringValue);
 		Collection<TerminologySet>fathers=e.getContainers(version);

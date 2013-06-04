@@ -145,8 +145,8 @@ public class WebFilesVisitor extends PublisherVisitor {
 		
 		//TODO a bit ugly, but on the other hand this is a private method to factorize a bit of procedural code
 		for(i=0;i<languages.length;i++) {
-			if(entity.isSet()) writeToFile(languageFilesPaths[i],tm.getPageForLang(languages[i],(TerminologySet)entity,version,0,collectionBaseURL,myInitializer.myCache,myInitializer.myFactory.getLabelManager(),myInitializer.myFactory.getBackgroundKnowledgeManager(),registryBaseURL)); //TODO we may need to pass more infos to the template!
-			if(entity.isIndividual()) writeToFile(languageFilesPaths[i],tm.getPageForLang(languages[i],(TerminologyIndividual)entity,version,0,collectionBaseURL,myInitializer.myCache,myInitializer.myFactory.getLabelManager(),myInitializer.myFactory.getBackgroundKnowledgeManager(),registryBaseURL));
+			if(entity.isSet()) writeToFile(languageFilesPaths[i],tm.getPageForLang(languages[i],(TerminologySet)entity,version,0,collectionBaseURL,myInitializer.myCache,myInitializer.myFactory.getLabelManager(),myInitializer.myFactory.getBackgroundKnowledgeManager(),registryBaseURL,null)); //TODO we may need to pass more infos to the template!
+			if(entity.isIndividual()) writeToFile(languageFilesPaths[i],tm.getPageForLang(languages[i],(TerminologyIndividual)entity,version,0,collectionBaseURL,myInitializer.myCache,myInitializer.myFactory.getLabelManager(),myInitializer.myFactory.getBackgroundKnowledgeManager(),registryBaseURL,null));
 		}
 		
 		Model modelToWrite=RDFrenderer.prepareModel(entity, version);

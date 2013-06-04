@@ -6,6 +6,7 @@ import java.util.TreeSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 import net.metarelate.terminology.config.CoreConfig;
@@ -17,6 +18,8 @@ import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.coreModel.TerminologyIndividual;
 import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.ModelException;
+import net.metarelate.terminology.exceptions.WebWriterException;
+import net.metarelate.terminology.utils.Loggers;
 
 public class SetCodeValuesTemplate extends TemplateParametricClass implements
 		TemplateTermElement {
@@ -24,6 +27,7 @@ public class SetCodeValuesTemplate extends TemplateParametricClass implements
 	
 	public SetCodeValuesTemplate(String templateText) {
 		super(templateText);
+		Loggers.publishLogger.debug("New SetCodeValuesTemplate\n"+templateText);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -39,14 +43,23 @@ public class SetCodeValuesTemplate extends TemplateParametricClass implements
 	public String render(TerminologyEntity e, String version, int level,
 			String language, String baseURL, CacheManager cacheManager,
 			LabelManager lm, BackgroundKnowledgeManager bkm,
-			String registryBaseURL) throws ModelException {
+			String registryBaseURL,String tag) throws ModelException, WebWriterException {
+		if(tag==null) throw new WebWriterException("Template SetCodesValues needs a tag!");
+		Loggers.publishLogger.debug("Rendering latexy table for "+e.getURI()+" v. "+version+" l="+level);
 		if(!e.isSet()) return "DEBUG:SETONLY";
 		Set<TerminologyIndividual> codes=((TerminologySet)e).getIndividuals(version);
+		Loggers.publishLogger.trace("No. individuals "+codes.size());
 		TreeSet<String> properties=new TreeSet<String>();
 		for(TerminologyIndividual code:codes) {
-			StmtIterator stats=code.getStatements(version).listStatements();
+			//Which code version ?
+			String[] codeVersions=code.getVersionsForTag(tag);
+			if(codeVersions.length>1) throw new WebWriterException("Only one version x tag is supported by SetCodesValue template!");
+			if(codeVersions.length==0) throw new ModelException("Asynch containment in set and codes for: "+code+" at tag: "+tag);
+			StmtIterator stats=code.getStatements(codeVersions[0]).listStatements();
 			while(stats.hasNext()) {
-				properties.add(stats.nextStatement().getPredicate().getURI().toString());
+				Statement stat=stats.nextStatement();
+				Loggers.publishLogger.trace("Found stat "+stat.toString());
+				properties.add(stat.getPredicate().getURI().toString());
 			}
 		}
 		String result=rawString;
@@ -68,7 +81,7 @@ public class SetCodeValuesTemplate extends TemplateParametricClass implements
 		boolean first=true;
 		for(String prop:properties) {
 			headerRow+=sepHeader;
-			String label=lm.getLabelForURI(lm.getLabelForURI(prop, LabelManager.LANG_DEF_SHORTURI), LabelManager.LANG_DEF_SHORTURI);
+			String label=lm.getLabelForURI(prop, LabelManager.LANG_DEF_SHORTURI);
 			headerRow+=headerRepBlockPre+label+headerRepBlockPost;	
 		}
 		headerRow+=endHeader;
@@ -80,9 +93,10 @@ public class SetCodeValuesTemplate extends TemplateParametricClass implements
 		StringBuilder codesString=new StringBuilder();
 		for(TerminologyIndividual code:codes) {
 			String line="";
-			String notation=code.getNotation(version);
+			String codeVersion=code.getVersionsForTag(tag)[0]; // TODO this should have been already checked
+			String notation=code.getNotation(codeVersion);
 			if(notation==null) notation=code.getResource().getLocalName();
-			Model stats=code.getStatements(version);
+			Model stats=code.getStatements(codeVersion);
 			line+=notation;
 			for(String property:properties) {
 				String value="N/A";

@@ -8,6 +8,7 @@ import net.metarelate.terminology.coreModel.TerminologyFactory;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.publisher.PublisherConfig;
 import net.metarelate.terminology.publisher.TemplateManager;
+import net.metarelate.terminology.utils.Loggers;
 
 public class LangMapTemplate extends TemplateParametricClass implements TemplateFixedElement,
 		TemplateGlobalElement, TemplateTermElement {
@@ -17,6 +18,7 @@ public class LangMapTemplate extends TemplateParametricClass implements Template
 	public LangMapTemplate(String substring, TemplateManager templateManager) {
 		super(substring);
 		this.tm=templateManager;
+		Loggers.publishLogger.debug("New LangMapTemplate\n"+substring);
 	}
 
 	public boolean isFixed() {
@@ -37,7 +39,7 @@ public class LangMapTemplate extends TemplateParametricClass implements Template
 		return null;
 	}
 	
-	public String render(TerminologyEntity e, String version, int level,String language, String baseURL, CacheManager cacheManager,LabelManager lm, BackgroundKnowledgeManager bkm,String registryBaseURL) throws ModelException {
+	public String render(TerminologyEntity e, String version, int level,String language, String baseURL, CacheManager cacheManager,LabelManager lm, BackgroundKnowledgeManager bkm,String registryBaseURL,String tag) throws ModelException {
 		StringBuilder res=new StringBuilder();
 		String stem="error";
 		if(e.isSet()) stem=PublisherConfig.setStemString; //TODO use throughout the system

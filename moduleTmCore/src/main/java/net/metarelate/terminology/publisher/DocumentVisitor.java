@@ -31,6 +31,7 @@ import net.metarelate.terminology.exceptions.ConfigurationException;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.WebWriterException;
 import net.metarelate.terminology.instanceManager.Initializer;
+import net.metarelate.terminology.utils.Loggers;
 
 public class DocumentVisitor extends PublisherVisitor {
 	Initializer myInitializer=null;
@@ -60,9 +61,12 @@ public class DocumentVisitor extends PublisherVisitor {
 	}
 
 	public void crawl(Set<TerminologySet> currentSent, String tag, String language) throws ConfigurationException, ModelException, WebWriterException, IOException {
+		Loggers.publishLogger.trace("Doc visitor crwaling at level: "+level);
 		for(TerminologySet set:currentSent) {
+			Loggers.publishLogger.trace("Set: "+set.getURI());
 			String[] versions=set.getVersionsForTag(tag);
 			if(versions!=null && versions.length>0) {	//TODO to check. If a node is not tagged, we don't go through the subtree. Seems plausible.
+				Loggers.publishLogger.trace("Tag test passed");
 				set.accept(this);
 				level+=1;
 				Set<TerminologySet> childrenToConsider=new HashSet<TerminologySet>();
@@ -83,7 +87,8 @@ public class DocumentVisitor extends PublisherVisitor {
 			IOException, ConfigurationException, ModelException {
 			String[] versions=set.getVersionsForTag(tag);
 			for(String version:versions) {
-				myDoc.append(tm.getPageForLang(language, set, version, level,"",myInitializer.myCache,myInitializer.myFactory.getLabelManager(),myInitializer.myFactory.getBackgroundKnowledgeManager(), "")); //TODO some of these argumnents (baseURL, cache) don't matter for docs. This should be implied by design.
+				Loggers.publishLogger.trace("Calling rendering for "+set.getURI()+" v. "+version);
+				myDoc.append(tm.getPageForLang(language, set, version, level,"",myInitializer.myCache,myInitializer.myFactory.getLabelManager(),myInitializer.myFactory.getBackgroundKnowledgeManager(), "",tag)); //TODO some of these argumnents (baseURL, cache) don't matter for docs. This should be implied by design.
 			}
 	}
 
@@ -92,7 +97,7 @@ public class DocumentVisitor extends PublisherVisitor {
 			IOException, ConfigurationException, ModelException {
 		String[] versions=ind.getVersionsForTag(tag);
 		for(String version:versions) {
-			myDoc.append(tm.getPageForLang(language, ind, version, level,"",myInitializer.myCache,myInitializer.myFactory.getLabelManager(),myInitializer.myFactory.getBackgroundKnowledgeManager(), "")); //TODO some of these argumnents (baseURL, cache) don't matter for docs. This should be implied by design.
+			myDoc.append(tm.getPageForLang(language, ind, version, level,"",myInitializer.myCache,myInitializer.myFactory.getLabelManager(),myInitializer.myFactory.getBackgroundKnowledgeManager(), "",tag)); //TODO some of these argumnents (baseURL, cache) don't matter for docs. This should be implied by design.
 		}
 
 	}

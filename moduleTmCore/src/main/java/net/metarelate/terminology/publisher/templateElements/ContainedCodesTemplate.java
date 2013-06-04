@@ -15,12 +15,14 @@ import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.publisher.PublisherConfig;
 import net.metarelate.terminology.utils.CodeComparator;
+import net.metarelate.terminology.utils.Loggers;
 
 public class ContainedCodesTemplate extends TemplateParametricClass implements
 		TemplateTermElement {
 	public static final String ccodeHeader="$codes$";
 	public ContainedCodesTemplate(String templateText) {
 		super(templateText);
+		Loggers.publishLogger.debug("New ContainedCodesTemplate\n"+templateText);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -37,7 +39,8 @@ public class ContainedCodesTemplate extends TemplateParametricClass implements
 	public String render(TerminologyEntity e, String version, int level,
 			String language, String baseURL, CacheManager cacheManager,
 			LabelManager lm, BackgroundKnowledgeManager bkm,
-			String registryBaseURL) throws ModelException {
+			String registryBaseURL,
+			String tag) throws ModelException {
 		StringBuilder result=new StringBuilder();
 		if(!e.isSet()) return "DEBUG:UNDEF";
 		Set<TerminologyIndividual> childrenSet=((TerminologySet)e).getIndividuals(version);

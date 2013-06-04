@@ -6,13 +6,14 @@ import net.metarelate.terminology.coreModel.LabelManager;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.publisher.PublisherConfig;
+import net.metarelate.terminology.utils.Loggers;
 
 public class VersionTemplate extends TemplateParametricClass implements
 		TemplateTermElement {
-	public static final String versionHeade="$version$";
+	public static final String versionHeader="$version$";
 	public VersionTemplate(String templateText) {
 		super(templateText);
-		// TODO Auto-generated constructor stub
+		Loggers.publishLogger.debug("New VersionTemplate\n"+versionHeader);
 	}
 
 	public boolean isFixed() {
@@ -26,7 +27,8 @@ public class VersionTemplate extends TemplateParametricClass implements
 	public String render(TerminologyEntity e, String version, int level,
 			String language, String baseURL, CacheManager cacheManager,
 			LabelManager lm, BackgroundKnowledgeManager bkm,
-			String registryBaseURL) throws ModelException {
+			String registryBaseURL,
+			String tag) throws ModelException {
 		StringBuilder result=new StringBuilder();
 		String currentVersion=e.getLastVersion();
 		while(currentVersion!=null) {

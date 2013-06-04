@@ -321,6 +321,18 @@ public abstract class TerminologyEntityTDBImpl implements TerminologyEntity {
 
 	public String[] getVersionsForTag(String tag) {
 		////
+		String[] myversions=getVersions();
+		ArrayList<String> result=new ArrayList<String>();
+		
+		for(String myversion:myversions) {
+			if(globalGraph.contains(
+					globalGraph.createResource(getVersionURI(myversion)),
+					MetaLanguage.hasTag,
+					globalGraph.createLiteral(tag)
+					)) result.add(myversion);
+		}
+		
+		/*
 		Set<String> versions=new HashSet<String>();
 		ResIterator subIter=globalGraph.listSubjectsWithProperty(MetaLanguage.hasTag,globalGraph.createLiteral(tag));
 		while(subIter.hasNext()) {
@@ -330,7 +342,8 @@ public abstract class TerminologyEntityTDBImpl implements TerminologyEntity {
 			if(obj.isLiteral()) versions.add(obj.asLiteral().getValue().toString());
 			
 		}
-		return versions.toArray(new String[0]);
+		*/
+		return result.toArray(new String[0]);
 	
 	}
 	

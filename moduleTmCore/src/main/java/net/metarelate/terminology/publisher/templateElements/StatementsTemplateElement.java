@@ -24,6 +24,7 @@ import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.publisher.WebRendererStrings;
 import net.metarelate.terminology.utils.CodeComparator;
+import net.metarelate.terminology.utils.Loggers;
 import net.metarelate.terminology.utils.StatementsOrganizer;
 
 public class StatementsTemplateElement extends TemplateParametricClass
@@ -31,6 +32,7 @@ public class StatementsTemplateElement extends TemplateParametricClass
 	public static final String statHeader="$statBlock$";
 	public StatementsTemplateElement(String templateText) {
 		super(templateText);
+		Loggers.publishLogger.debug("New StatementsTemplateElement\n"+templateText);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -45,7 +47,7 @@ public class StatementsTemplateElement extends TemplateParametricClass
 	public String render(TerminologyEntity e, String version, int level,
 			String language, String baseURL, CacheManager cacheManager,
 			LabelManager lm, BackgroundKnowledgeManager bkm,
-			String registryBaseURL) throws ModelException {
+			String registryBaseURL,String tag) throws ModelException {
 		StringBuilder result=new StringBuilder();
 		
 		Model statementsToRender=MetaLanguage.filterForWeb(e.getStatements(version));

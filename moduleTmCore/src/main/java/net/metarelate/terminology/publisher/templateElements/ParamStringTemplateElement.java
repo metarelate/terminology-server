@@ -19,6 +19,7 @@ import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.WebSystemException;
 import net.metarelate.terminology.publisher.PublisherConfig;
 import net.metarelate.terminology.publisher.WebRendererStrings;
+import net.metarelate.terminology.utils.AdvancedClassLabelExtractor;
 import net.metarelate.terminology.utils.Loggers;
 
 public class ParamStringTemplateElement extends TemplateParametricClass implements TemplateTermElement,TemplateGlobalElement{
@@ -27,6 +28,7 @@ public class ParamStringTemplateElement extends TemplateParametricClass implemen
 	
 	public ParamStringTemplateElement(String str) {
 		super(str);
+		Loggers.publishLogger.debug("New ParamStringTemplateElement\n"+str);
 		
 	}
 
@@ -38,14 +40,14 @@ public class ParamStringTemplateElement extends TemplateParametricClass implemen
 		return true;
 	}
 
-	public String render(TerminologyEntity e, String version,int level,String language,String baseURL, CacheManager cacheManager, LabelManager lm, BackgroundKnowledgeManager bkm,String registryBaseURL) throws ModelException {
+	public String render(TerminologyEntity e, String version,int level,String language,String baseURL, CacheManager cacheManager, LabelManager lm, BackgroundKnowledgeManager bkm,String registryBaseURL,String tag) throws ModelException {
 		if(e.isVersioned() && (! printIfVersioned)) return "";
 		if(!e.isVersioned() && (! printIfUnVersioned)) return "";
 		String resultString=rawString;
 		String label=e.getLabel(version, language);
 		//if(label==null) label=e.getLabel(version, CoreConfig.DEFAULT_LANGUAGE);
 		//if(label==null) label="No label for "+e.getURI();
-		resultString=resultString.replace("<<tmtLabel>>",e.getLabel(version, language));
+		resultString=resultString.replace("<<tmtLabel>>",AdvancedClassLabelExtractor.getLabelFor(e, version, language, lm));
 		resultString=resultString.replace("<<tmtVersion>>", version);
 		String description=e.getGenericVersionSpecificStringValueObjectByLanguage(MetaLanguage.commentProperty,version, language);
 		if(description==null) description=e.getGenericVersionSpecificStringValueObjectByLanguage(MetaLanguage.commentProperty,version, CoreConfig.DEFAULT_LANGUAGE);
@@ -67,6 +69,7 @@ public class ParamStringTemplateElement extends TemplateParametricClass implemen
 		String stem="";
 		if(e.isSet()) stem=PublisherConfig.setStemString;
 		if(e.isIndividual()) stem=PublisherConfig.individualStemString;
+		//TODO note below we have nulls for docs, but this is not an issue (as far as we don't use the links)
 		resultString=resultString.replace("<<tmtRDFLink>>",cacheManager.getValueFor(e.getURI(), PublisherConfig.uriHasUrl)+"/"+stem+".rdf");
 		resultString=resultString.replace("<<tmtTurtleLink>>",cacheManager.getValueFor(e.getURI(), PublisherConfig.uriHasUrl)+"/"+stem+".ttl");
 		
@@ -83,6 +86,8 @@ public class ParamStringTemplateElement extends TemplateParametricClass implemen
 		
 		resultString=resultString.replace("<<tmtLastUpdate>>", e.getLastUpdateDate());
 		resultString=resultString.replace("<<tmtGenerationDate>>", e.getGenerationDate());
+		Loggers.publishLogger.trace("Entity URI : "+e.getURI() );
+		Loggers.publishLogger.trace("Version :"+version);
 		resultString=resultString.replace("<<tmtActionDate>>", e.getActionDate(version));
 		
 		
@@ -98,6 +103,7 @@ public class ParamStringTemplateElement extends TemplateParametricClass implemen
 		Iterator<TerminologySet> containers= e.getContainers(version).iterator();
 		String containerURL="";
 		String containerLabel="";
+		//TODO Note that the cache may not be prsent for -doc exports
 		if(containers.hasNext()) { //TODO note that we expect only one container! This maybe should be made implicit by design, or this template should be changed.
 			TerminologySet container=containers.next();
 			containerURL=cacheManager.getValueFor(container.getURI(),PublisherConfig.uriHasUrl);
@@ -105,8 +111,8 @@ public class ParamStringTemplateElement extends TemplateParametricClass implemen
 			
 		}
 		
-		resultString=resultString.replace("<<tmtFatherURI>>",containerURL );
-		resultString=resultString.replace("<<tmtFatherLabel>>", containerLabel);
+		if(containerURL!=null) resultString=resultString.replace("<<tmtFatherURL>>",containerURL );
+		if(containerLabel!=null) resultString=resultString.replace("<<tmtFatherLabel>>", containerLabel);
 		
 		
 		
