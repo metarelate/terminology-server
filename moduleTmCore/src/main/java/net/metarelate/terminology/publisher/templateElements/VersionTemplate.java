@@ -34,12 +34,14 @@ public class VersionTemplate extends TemplateParametricClass implements
 		while(currentVersion!=null) {
 			String currentVersionBlock=rawString;
 			
-			currentVersionBlock=currentVersionBlock.replaceAll("<<tmtVersionLink>>", cacheManager.getValueFor(e.getURI(), PublisherConfig.uriHasUrl)+"/"+currentVersion);
-			currentVersionBlock=currentVersionBlock.replaceAll("<<tmtVersion>>", currentVersion);
-			currentVersionBlock=currentVersionBlock.replaceAll("<<tmtVersionDate>>", e.getActionDate(currentVersion));
-			currentVersionBlock=currentVersionBlock.replaceAll("<<tmtVersionAction>>", lm.getLabelForURI(e.getActionURI(currentVersion), language, lm.LANG_DEF_URI));
-			currentVersionBlock=currentVersionBlock.replaceAll("<<tmtVersionActionAuthor>>", lm.getLabelForURI(e.getActionAuthorURI(currentVersion),language, lm.LANG_DEF_URI));
-			currentVersionBlock=currentVersionBlock.replaceAll("<<tmtVersionActionDescription>>", e.getActionDescription(currentVersion));
+			String description=e.getActionDescription(currentVersion);
+			if(description==null) description=""; // TODO this should be the default design of getActionDescription()
+			currentVersionBlock=currentVersionBlock.replace("<<tmtVersionLink>>", cacheManager.getValueFor(e.getURI(), PublisherConfig.uriHasUrl)+"/"+currentVersion);
+			currentVersionBlock=currentVersionBlock.replace("<<tmtVersion>>", currentVersion);
+			currentVersionBlock=currentVersionBlock.replace("<<tmtVersionDate>>", e.getActionDate(currentVersion));
+			currentVersionBlock=currentVersionBlock.replace("<<tmtVersionAction>>", lm.getLabelForURI(e.getActionURI(currentVersion), language, lm.LANG_DEF_URI));
+			currentVersionBlock=currentVersionBlock.replace("<<tmtVersionActionAuthor>>", lm.getLabelForURI(e.getActionAuthorURI(currentVersion),language, lm.LANG_DEF_URI));
+			currentVersionBlock=currentVersionBlock.replace("<<tmtVersionActionDescription>>", description);
 			
 			result.append(currentVersionBlock);
 			currentVersion=(e.getPreviousVersion(currentVersion));

@@ -50,7 +50,7 @@ public class ContainedCodesTemplate extends TemplateParametricClass implements
 		int bogusCounter=1;
 		while(myUnsortedIndIter.hasNext()) {
 			TerminologyIndividual tempChild=myUnsortedIndIter.next();
-			String notation=tempChild.getNotation(version);
+			String notation=tempChild.getNotation(tempChild.getLastVersion());
 			if(notation!=null) 
 				indSorted.put(notation, tempChild);
 			else {
@@ -63,10 +63,10 @@ public class ContainedCodesTemplate extends TemplateParametricClass implements
 		while(myIndIter.hasNext()) {
 			String currentCodeLine=rawString;
 			TerminologyIndividual myInd=myIndIter.next();
-			String notation=myInd.getNotation(version);
+			String notation=myInd.getNotation(myInd.getLastVersion());
 			if(notation==null) notation="-";
-			String label=myInd.getLabel(version,language);
-			if(label==null) label=myInd.getLabel(version);	//TODO label behaviour should be put in a LabelCompuatationObject (LabelManager ?)
+			String label=myInd.getLabel(myInd.getLastVersion(),language);
+			if(label==null) label=myInd.getLabel(myInd.getLastVersion());	//TODO label behaviour should be put in a LabelCompuatationObject (LabelManager ?)
 			if(label==null) label="";
 			currentCodeLine=currentCodeLine.replace("<<codeURL>>",cacheManager.getValueFor(myInd.getURI(), PublisherConfig.uriHasUrl));
 			currentCodeLine=currentCodeLine.replace("<<tmtCodeNotation>>",notation);	

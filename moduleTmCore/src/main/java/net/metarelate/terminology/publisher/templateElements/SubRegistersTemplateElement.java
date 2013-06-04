@@ -48,7 +48,7 @@ public class SubRegistersTemplateElement extends TemplateParametricClass
 		int bogusCounter=1;
 		while(myUnsortedCollIter.hasNext()) {
 			TerminologySet tempChild=myUnsortedCollIter.next();
-			String notation=tempChild.getNotation(version);
+			String notation=tempChild.getNotation(tempChild.getLastVersion());
 			if(notation!=null) 
 				collSorted.put(notation, tempChild);
 			else {
@@ -61,10 +61,10 @@ public class SubRegistersTemplateElement extends TemplateParametricClass
 		while(myCollIter.hasNext()) {
 			String currentSubRegLine=rawString;
 			TerminologySet myColl=myCollIter.next();
-			String notation=myColl.getNotation(version);
+			String notation=myColl.getNotation(myColl.getLastVersion());
 			if(notation==null) notation="-";
-			String label=myColl.getLabel(version,language);
-			if(label==null) label=myColl.getLabel(version);	//TODO label behaviour should be put in a LabelCompuatationObject (LabelManager ?)
+			String label=myColl.getLabel(myColl.getLastVersion(),language);
+			if(label==null) label=myColl.getLabel(myColl.getLastVersion());	//TODO label behaviour should be put in a LabelCompuatationObject (LabelManager ?)
 			if(label==null) label="";
 			currentSubRegLine=currentSubRegLine.replace("<<subRegURL>>",cacheManager.getValueFor(myColl.getURI(), PublisherConfig.uriHasUrl));
 			currentSubRegLine=currentSubRegLine.replace("<<tmtSubRegNotation>>",notation);	
