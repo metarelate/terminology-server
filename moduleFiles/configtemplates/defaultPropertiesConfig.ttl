@@ -19,3 +19,33 @@
 <http://purl.org/dc/terms/isReplacedBy> <http://metarelate.net/config/overrides> <http://metarelate.net/code/data/superseded>;
 .
 	
+<http://www.w3.org/2000/01/rdf-schema#label> <http://www.w3.org/2000/01/rdf-schema#label> "Etichetta"@it;
+.
+
+<http://www.w3.org/2000/01/rdf-schema#label> <http://www.w3.org/2000/01/rdf-schema#label> "Label"@en;
+.
+
+<http://www.w3.org/2000/01/rdf-schema#description> <http://www.w3.org/2000/01/rdf-schema#label> "Descrizione"@it;
+.
+
+<http://www.w3.org/2000/01/rdf-schema#description> <http://www.w3.org/2000/01/rdf-schema#label> "Description"@en;
+.
+
+<http://www.w3.org/2004/02/skos/core#member> <http://www.w3.org/2000/01/rdf-schema#label> "has membro (SKOS)"@it;
+.
+
+<http://www.w3.org/2004/02/skos/core#member> <http://www.w3.org/2000/01/rdf-schema#label> "has memeber (SKOS)"@en;
+.
+
+<http://www.w3.org/2004/02/skos/core#notation> <http://www.w3.org/2000/01/rdf-schema#label> "ha notazione (SKOS)"@it;
+.
+
+<http://www.w3.org/2004/02/skos/core#notation> <http://www.w3.org/2000/01/rdf-schema#label> "has notation (SKOS)"@en;
+.
+
+<http://www.w3.org/2004/02/skos/core#prefLabel> <http://www.w3.org/2000/01/rdf-schema#label> "ha etichetta principale (SKOS)"@it;
+.
+
+<http://www.w3.org/2004/02/skos/core#prefLabel> <http://www.w3.org/2000/01/rdf-schema#label> "has preferred label (SKOS)"@en;
+.
+
