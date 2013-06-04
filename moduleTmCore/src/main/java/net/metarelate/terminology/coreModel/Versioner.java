@@ -63,8 +63,8 @@ public class Versioner {
 	 * @return
 	 */
 	public boolean hasPreviousVersion(String version) {
-		if(vEntity.getPreviousVersion(version)==null) return true;
-		else return false;
+		if(vEntity.getPreviousVersion(version)==null) return false;
+		else return true;
 	}
 	
 	/**

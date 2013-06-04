@@ -135,6 +135,11 @@
                         <preservePath>true</preservePath>
                          
                     </resource>
+                    
+                    <resource>
+    					<targetPath>tempRelease</targetPath>
+    					<file>${project.basedir}/README.txt</file>
+					</resource>
                    
                     <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
                     <!-- Create final archive and attach it as Maven artifact -->

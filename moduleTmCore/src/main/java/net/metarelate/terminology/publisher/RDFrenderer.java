@@ -50,7 +50,7 @@ public class RDFrenderer {
 		Resource collectionResource=ResourceFactory.createResource(collection.getURI());
 		modelToWrite.add(ResourceFactory.createStatement(collectionResource,MetaLanguage.hasVersionProperty,ResourceFactory.createPlainLiteral(version)));
 		if(collection.hasPreviousVersion(version)) 
-			modelToWrite.add(ResourceFactory.createStatement(collectionResource,MetaLanguage.hasPreviousVersionProperty,ResourceFactory.createPlainLiteral(version)));
+			modelToWrite.add(ResourceFactory.createStatement(collectionResource,MetaLanguage.hasPreviousVersionProperty,ResourceFactory.createResource(collection.getVersionURI(collection.getPreviousVersion(version)))));
 
 	
 		
