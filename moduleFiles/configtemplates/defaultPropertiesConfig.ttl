@@ -49,3 +49,14 @@
 <http://www.w3.org/2004/02/skos/core#prefLabel> <http://www.w3.org/2000/01/rdf-schema#label> "has preferred label (SKOS)"@en;
 .
 
+skos:narrower config:propertyFocus config:conceptRelatedProperty;
+.
+
+skos:broader config:propertyFocus config:conceptRelatedProperty;
+.
+
+skos:member config:propertyFocus config:conceptRelatedProperty;
+.
+
+
+

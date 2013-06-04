@@ -22,7 +22,7 @@ latex).
 Once you have installed the system you can run it through the command ts.jar
 (java -jar ts.jar help), that is in the command folder under the installation
 directory. A simple tsc.bat command is provided for convenience (can be run as
-"tsc.bat help", if exec permissions are set and the command is in the path).
+"tsc.sh help", if exec permissions are set and the command is in the path).
 
 In order to know where the system directory is, the system proceeds as follows:
 1) If a valid directory is provided via the -sys parameter, this is used as the
@@ -35,12 +35,12 @@ Note that (1) is currently not recognized by the web-admin functionalities
 (option 2 is suggested).
 
 The system offers a variety of command whose explanation can be obtained via the
-tsc.bat help COMMANDNAME option.
+tsc.sh help COMMANDNAME option.
 There are for main command:
-1) tsc.bat ingest : to import a terminology in the system
-2) tsc.bat tag : to tag the current state of a terminology
-3) tsc.bat web : opens a web interface for admistration
-4) tsc.bat publish : publishes the terminology. This command has three
+1) tsc.sh ingest : to import a terminology in the system
+2) tsc.sh tag : to tag the current state of a terminology
+3) tsc.sh web : opens a web interface for admistration
+4) tsc.sh publish : publishes the terminology. This command has three
 modalities:
 A) -web : publishes the terminology as a set of files, to be served by the 
 web server via content negotiation (requires some web-server configuration)

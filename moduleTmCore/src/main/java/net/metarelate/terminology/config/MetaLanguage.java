@@ -159,9 +159,9 @@ public class MetaLanguage {
 	/**
 	 * Property metadata. Whether it pertains to a concept or a code. This is held in the extraKnowledge (global) graph.
 	 */
-	public static final Property propertyHasFocus = ResourceFactory.createProperty("http://metarelate.net/core/types/propertyFocus");
-	public static final Resource propertyCodeFocus = ResourceFactory.createResource("http://metarelate.net/core/types/codeRelatedProperty");
-	public static final Resource propertyConceptFocus = ResourceFactory.createResource("http://metarelate.net/core/types/conceptRelatedProperty");
+	public static final Property propertyHasFocus = ResourceFactory.createProperty("http://metarelate.net/config/propertyFocus");
+	public static final Resource propertyCodeFocus = ResourceFactory.createResource("http://metarelate.net/config/codeRelatedProperty");
+	public static final Resource propertyConceptFocus = ResourceFactory.createResource("http://metarelate.net/config/conceptRelatedProperty");
 	
 	
 	/**
