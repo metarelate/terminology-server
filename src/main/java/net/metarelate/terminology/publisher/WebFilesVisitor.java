@@ -1,3 +1,22 @@
+/* 
+ (C) British Crown Copyright 2011 - 2013, Met Office
+
+ This file is part of terminology-server.
+
+ terminology-server is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ terminology-server is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public License
+ along with terminology-server. If not, see <http://www.gnu.org/licenses/>.
+*/
+
 package net.metarelate.terminology.publisher;
 
 import java.io.BufferedWriter;
@@ -26,7 +45,7 @@ import net.metarelate.terminology.exceptions.ConfigurationException;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.WebWriterException;
 import net.metarelate.terminology.instanceManager.Initializer;
-import net.metarelate.terminology.utils.SSLogger;
+import net.metarelate.terminology.utils.Loggers;
 
 public class WebFilesVisitor extends PublisherVisitor {
 	TemplateManager tm=null;
@@ -53,7 +72,7 @@ public class WebFilesVisitor extends PublisherVisitor {
 
 	
 	public void visit (TerminologySet set) throws WebWriterException, IOException, ConfigurationException, ModelException {
-		String type=PublisherConfig.registerStemString;
+		String type=PublisherConfig.setStemString;
 		String version=set.getLastVersion();
 		String collectionDirectoryPath=myInitializer.myCache.getValueFor(set.getURI(), PublisherConfig.uriHasDisk);
 		String collectionBaseURL=myInitializer.myCache.getValueFor(set.getURI(), PublisherConfig.uriHasUrl);
@@ -70,7 +89,7 @@ public class WebFilesVisitor extends PublisherVisitor {
 	}
 	
 	public void visit(TerminologyIndividual ind) throws WebWriterException, IOException, ConfigurationException, ModelException {
-		String type=PublisherConfig.codeStemString; //TODO better name for stems (they are sort of types...)
+		String type=PublisherConfig.individualStemString; //TODO better name for stems (they are sort of types...)
 		String version=ind.getLastVersion();
 		String individualDirectoryPath=myInitializer.myCache.getValueFor(ind.getURI(), PublisherConfig.uriHasDisk);
 		String indidvidualURL=myInitializer.myCache.getValueFor(ind.getURI(), PublisherConfig.uriHasUrl);
@@ -88,7 +107,7 @@ public class WebFilesVisitor extends PublisherVisitor {
 	
 	
 	private void makeFiles(TerminologyEntity entity, String type, String collectionDirectoryPath, String collectionBaseURL, String version) throws IOException, WebWriterException, ConfigurationException, ModelException {
-		SSLogger.log(">>Writing "+entity.getURI()+" to "+collectionDirectoryPath, SSLogger.DEBUG);
+		Loggers.publishLogger.debug(">>Writing "+entity.getURI()+" to "+collectionDirectoryPath);
 		
 		String[] languages=tm.getLanguages();
 		String[] languageFilesPaths=new String[languages.length];
@@ -111,7 +130,7 @@ public class WebFilesVisitor extends PublisherVisitor {
 		String registerQRImageFile=collectionDirectoryPath+"/"+type+".gif";	//QR image
 		String registerQRImageLink=collectionDirectoryPath+"/"+type+".gif";
 		
-		System.out.println(">> version "+version);
+		Loggers.publishLogger.trace("version "+version);
 		
 		File directory=myCheckedMkDir(collectionDirectoryPath,overwriteFiles);
 		
@@ -158,7 +177,7 @@ public class WebFilesVisitor extends PublisherVisitor {
 		else {
 			boolean success = directory.mkdir();
 			if (success) 
-			  SSLogger.log("Created directory " + directortyPath,SSLogger.DEBUG);
+				Loggers.publishLogger.debug("Created directory " + directortyPath);
 			else throw new WebWriterException("Unable to create directory "+directortyPath);
 		}
 		return directory;

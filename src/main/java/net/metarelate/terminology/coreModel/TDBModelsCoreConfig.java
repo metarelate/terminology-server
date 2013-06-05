@@ -1,5 +1,5 @@
 /* 
- (C) British Crown Copyright 2011 - 2012, Met Office
+ (C) British Crown Copyright 2011 - 2013, Met Office
 
  This file is part of terminology-server.
 
@@ -16,7 +16,11 @@
  You should have received a copy of the GNU Lesser General Public License
  along with terminology-server. If not, see <http://www.gnu.org/licenses/>.
 */
-	
+
+/**
+ * TODO this should be re-designed with a wrapper patterm for 
+ * multi-backend persistence. Same for all classes in this package!
+ */
 package net.metarelate.terminology.coreModel;
 
 import net.metarelate.terminology.config.MetaLanguage;

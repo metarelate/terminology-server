@@ -40,8 +40,8 @@ public class LangMapTemplate extends TemplateParametricClass implements Template
 	public String render(TerminologyEntity e, String version, int level,String language, String baseURL, CacheManager cacheManager,LabelManager lm, BackgroundKnowledgeManager bkm,String registryBaseURL) throws ModelException {
 		StringBuilder res=new StringBuilder();
 		String stem="error";
-		if(e.isSet()) stem=PublisherConfig.registerStemString; //TODO use throughout the system
-		else if(e.isIndividual()) stem=PublisherConfig.codeStemString;
+		if(e.isSet()) stem=PublisherConfig.setStemString; //TODO use throughout the system
+		else if(e.isIndividual()) stem=PublisherConfig.individualStemString;
 		for(String lang:tm.getLanguages()) {					
 			res.append("<a lang=\""+labelMap.get(lang)+"\" rel=\"alternate\" hreflang=\""+lang+"\" title=\""+labelMap.get(lang)+"\" href=\""+cacheManager.getValueFor(e.getURI(), PublisherConfig.uriHasUrl)+"/"+stem+"."+lang+".html"+"\">"+labelMap.get(lang)+"</a> ");
 		}

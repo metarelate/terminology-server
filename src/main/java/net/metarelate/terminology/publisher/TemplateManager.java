@@ -1,3 +1,22 @@
+/* 
+ (C) British Crown Copyright 2011 - 2013, Met Office
+
+ This file is part of terminology-server.
+
+ terminology-server is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ terminology-server is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public License
+ along with terminology-server. If not, see <http://www.gnu.org/licenses/>.
+*/
+
 package net.metarelate.terminology.publisher;
 
 import java.io.BufferedReader;
@@ -36,7 +55,7 @@ import net.metarelate.terminology.publisher.templateElements.TemplateFixedElemen
 import net.metarelate.terminology.publisher.templateElements.TemplateGlobalElement;
 import net.metarelate.terminology.publisher.templateElements.VersionTemplate;
 
-import net.metarelate.terminology.utils.SSLogger;
+import net.metarelate.terminology.utils.Loggers;
 
 public class TemplateManager {
 	private final String openTag="<!-- tmtOpen>";
@@ -53,7 +72,7 @@ public class TemplateManager {
 
 	public TemplateManager(String templateFileDir) throws ConfigurationException, IOException {
 		super();
-		SSLogger.log("Loading templates in "+templateFileDir,SSLogger.DEBUG);
+		Loggers.publishLogger.info("Loading templates in "+templateFileDir);
 		templateFile=new File(templateFileDir);
 		if(!templateFile.isDirectory()) throw new ConfigurationException("No template at "+templateFileDir);
 		File[] templateFiles=templateFile.listFiles(new FilenameFilter() {
@@ -64,7 +83,7 @@ public class TemplateManager {
 		for(File templateFile:templateFiles) {
 			//TODO we should constrain to known languge strings
 			String tfName=templateFile.getName();
-			SSLogger.log("template: "+tfName ,SSLogger.DEBUG);
+			Loggers.publishLogger.trace("template: "+tfName);
 			String[] tfNameBits=tfName.split("\\.");
 			if(tfNameBits.length!=3) throw new ConfigurationException("Invalid template file name for "+tfName);
 			if(tfNameBits[0].equalsIgnoreCase("code")) {
@@ -110,7 +129,7 @@ public class TemplateManager {
 	}
 	
 	private String expandFixedTemplate(Map<String,ArrayList<TemplateElement>> templateMap, String language, String tag, TerminologyFactory tf) throws ConfigurationException, ModelException {
-		System.out.println("Fixed template expansion for language: "+language);
+		Loggers.publishLogger.debug("Fixed template expansion for language: "+language);
 		if(templateMap.get(language)==null) {
 			language=CoreConfig.DEFAULT_LANGUAGE;
 			if(templateMap.get(language)==null) throw new ConfigurationException("No suitable template defined for pre or post block");
@@ -124,13 +143,13 @@ public class TemplateManager {
 		ArrayList<TemplateElement> bits=new ArrayList<TemplateElement>();
 		String templateString=readFileAsString(templateFile);
 		int runningIndex=0;
-		System.out.println(templateString); //TODO test
+		Loggers.publishLogger.trace(templateString); //TODO test
 		while(runningIndex<templateString.length()) {
-			System.out.println("Running index: "+runningIndex);
+			Loggers.publishLogger.trace("Running index: "+runningIndex);
 			int firstBit=templateString.indexOf(openTag,runningIndex);
 			int secondBit=templateString.indexOf(closeTag,runningIndex);
-			System.out.println("First bit: "+firstBit); //TODO test
-			System.out.println("Second bit: "+secondBit); //TODO test
+			Loggers.publishLogger.trace("First bit: "+firstBit); //TODO test
+			Loggers.publishLogger.trace("Second bit: "+secondBit); //TODO test
 			if(firstBit<0) {
 				bits.add(new StringTemplateElement(templateString.substring(runningIndex)));
 				runningIndex=templateString.length()+1;

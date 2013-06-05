@@ -1,5 +1,5 @@
 /* 
- (C) British Crown Copyright 2011 - 2012, Met Office
+ (C) British Crown Copyright 2011 - 2013, Met Office
 
  This file is part of terminology-server.
 
@@ -17,22 +17,24 @@
  along with terminology-server. If not, see <http://www.gnu.org/licenses/>.
 */
 	
+/**
+ * TODO This command should either be re-implemented as the other commands, 
+ * or obsoleted.
+ */
 package net.metarelate.terminology.commandline;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-
-import net.metarelate.terminology.auth.AuthRegistryManager;
-import net.metarelate.terminology.auth.AuthServer;
 import net.metarelate.terminology.exceptions.AuthException;
 import net.metarelate.terminology.exceptions.ImporterException;
 import net.metarelate.terminology.exceptions.InvalidProcessException;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
 import net.metarelate.terminology.management.TerminologyManager;
-import net.metarelate.terminology.utils.SSLogger;
+import net.metarelate.terminology.utils.Loggers;
 
-public class MetOp extends CommandLineTool {
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+
+public class MetOp extends OLD_CommandLineTool {
 	private static final int ACTION_UPDATE_ADD=1;
 	private static final int ACTION_UPDATE_REPLACE=2;
 	private static final int ACTION_UPDATE_REMOVE=3;
@@ -110,28 +112,28 @@ public class MetOp extends CommandLineTool {
 		
 		if(indexOfD>0) {
 			description=args[indexOfD+1];
-			SSLogger.log("Got Description: "+description,SSLogger.DEBUG);
+			Loggers.commandLogger.debug("Got Description: "+description);
 		}
 		else
 			description=null;
 		if(indexOfTag>0) {
 			tag=args[indexOfTag+1];
-			SSLogger.log("Got Tag: "+tag,SSLogger.DEBUG);
+			Loggers.commandLogger.debug("Got Tag: "+tag);
 		}
 		else tag=null;
 		
 		if(indexOfT>0) {
 			termURI=args[indexOfT+1];
-			SSLogger.log("Got term URI: "+termURI,SSLogger.DEBUG);
+			Loggers.commandLogger.debug("Got term URI: "+termURI);
 		}	
 		else {
-			System.out.println("No term specified");
+			Loggers.commandLogger.error("No term specified");
 			exitWrongUsage("");
 		}
 		
 		if(indexOfO>=0) {
 			actionAuthorURI=args[indexOfO+1];
-			SSLogger.log("Got actor: "+actionAuthorURI,SSLogger.DEBUG);
+			Loggers.commandLogger.debug("Got actor: "+actionAuthorURI);
 		}
 		else {
 			System.out.println("Anonymous operations are not permitted");
@@ -173,7 +175,6 @@ public class MetOp extends CommandLineTool {
 
 	@Override
 	protected void executeCommand() throws InvalidProcessException {
-		// TODO this is only a stub
 		TerminologyManager myManager=myInitializer.myTerminologyManager;
 		if(dataContentFile==null) {
 			System.out.println("No data specified");
@@ -233,7 +234,6 @@ public class MetOp extends CommandLineTool {
 				System.out.println(e.getLocalizedMessage());
 				e.printStackTrace();
 			} catch (ImporterException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -331,27 +331,15 @@ public class MetOp extends CommandLineTool {
 			System.out.println("Invalidating term or register: "+termURI);
 			System.out.println("Command issued from: "+actionAuthorURI);
 			System.out.println("description: "+description);
-			/*		
-			try {
-				myManager.validate(termURI, actionAuthorURI, description, false);
-			} catch (AuthException e) {
-				System.out.println("Auth error");
-				System.out.println(e.getLocalizedMessage());
-				e.printStackTrace();
-			} catch (RegistryAccessException e) {
-				System.out.println("Registry error");
-				System.out.println(e.getLocalizedMessage());
-			}
-			*/
+		
 		}
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	@Override
 	protected void printLocalHelp() {
 		System.out.println("Local help is unavailable");
-		// TODO Auto-generated method stub
 
 	}
 

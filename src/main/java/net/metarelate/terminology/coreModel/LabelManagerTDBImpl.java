@@ -1,5 +1,5 @@
 /* 
- (C) British Crown Copyright 2011 - 2012, Met Office
+ (C) British Crown Copyright 2011 - 2013, Met Office
 
  This file is part of terminology-server.
 
@@ -96,7 +96,7 @@ public class LabelManagerTDBImpl implements LabelManager {
 
 	private String getUndefString(String language) {
 		if(language.equals("en")) return "Undefined";
-		else if(language.equals("fr")) return "IndŽfini";
+		else if(language.equals("fr")) return "Indï¿½fini";
 		else if(language.equals("ru")) return "\u041D\u0435\u043E\u043F\u0440\u0435\u0434\u0435\u043B\u0435\u043D\u043D\u044B\u0435 ";
 		else if(language.equals("es")) return "indefinido";
 		else if(language.equals("zh")) return "\u672A\u5B9A\u7FA9";

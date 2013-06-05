@@ -19,7 +19,7 @@ import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.WebSystemException;
 import net.metarelate.terminology.publisher.PublisherConfig;
 import net.metarelate.terminology.publisher.WebRendererStrings;
-import net.metarelate.terminology.utils.SSLogger;
+import net.metarelate.terminology.utils.Loggers;
 
 public class ParamStringTemplateElement extends TemplateParametricClass implements TemplateTermElement,TemplateGlobalElement{
 	public static final String strPlusHeader="$str+$";
@@ -65,8 +65,8 @@ public class ParamStringTemplateElement extends TemplateParametricClass implemen
 		resultString=resultString.replace("<<tmtCode>>",code);
 
 		String stem="";
-		if(e.isSet()) stem=PublisherConfig.registerStemString;
-		if(e.isIndividual()) stem=PublisherConfig.codeStemString;
+		if(e.isSet()) stem=PublisherConfig.setStemString;
+		if(e.isIndividual()) stem=PublisherConfig.individualStemString;
 		resultString=resultString.replace("<<tmtRDFLink>>",cacheManager.getValueFor(e.getURI(), PublisherConfig.uriHasUrl)+"/"+stem+".rdf");
 		resultString=resultString.replace("<<tmtTurtleLink>>",cacheManager.getValueFor(e.getURI(), PublisherConfig.uriHasUrl)+"/"+stem+".ttl");
 		

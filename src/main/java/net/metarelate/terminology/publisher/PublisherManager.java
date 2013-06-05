@@ -1,3 +1,22 @@
+/* 
+ (C) British Crown Copyright 2011 - 2013, Met Office
+
+ This file is part of terminology-server.
+
+ terminology-server is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ terminology-server is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public License
+ along with terminology-server. If not, see <http://www.gnu.org/licenses/>.
+*/
+
 package net.metarelate.terminology.publisher;
 
 import java.io.IOException;
@@ -15,8 +34,6 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
-
 import net.metarelate.terminology.config.CoreConfig;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.coreModel.TerminologyIndividual;
@@ -26,7 +43,7 @@ import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.UnknownURIException;
 import net.metarelate.terminology.exceptions.WebWriterException;
 import net.metarelate.terminology.instanceManager.Initializer;
-import net.metarelate.terminology.utils.SSLogger;
+import net.metarelate.terminology.utils.Loggers;
 import net.metarelate.terminology.utils.SimpleQueriesProcessor;
 
 public class PublisherManager {
@@ -49,7 +66,7 @@ public class PublisherManager {
 	}
 	
 	public void publishWebFiles(String rootURI, Model extraInputGraph,boolean overwrite) throws ModelException, ConfigurationException, WebWriterException, UnknownURIException, IOException {
-		SSLogger.log("Publishing the terminology under "+rootURI+" as a set of web-files");
+		Loggers.publishLogger.info("Publishing the terminology under "+rootURI+" as a set of web-files");
 		String baseURL=null;
 		String baseDisk=null;
 		TerminologySet root=null;
@@ -58,7 +75,7 @@ public class PublisherManager {
 			if(root.isRoot()) {
 				baseURL=SimpleQueriesProcessor.getOptionalConfigurationParameterSingleValue(myInitializer.getConfigurationGraph(), PublisherConfig.baseURLProperty);
 				baseDisk=SimpleQueriesProcessor.getOptionalConfigurationParameterSingleValue(myInitializer.getConfigurationGraph(),PublisherConfig.diskPrefixProperty);
-				SSLogger.log("From configuration files:  For "+rootURI+" found URL: "+baseURL+" , Disk: "+baseDisk,SSLogger.DEBUG);
+				Loggers.publishLogger.debug("From configuration files:  For "+rootURI+" found URL: "+baseURL+" , Disk: "+baseDisk);
 			}
 			else {
 				Set<TerminologySet> uberRoots=root.getContainers(root.getLastVersion());
@@ -68,31 +85,25 @@ public class PublisherManager {
 				else uberRoot=uberRoots.iterator().next();
 				baseURL=myInitializer.myCache.getValueFor(uberRoot.getURI(), PublisherConfig.uriHasUrl);
 				baseDisk=myInitializer.myCache.getValueFor(uberRoot.getURI(), PublisherConfig.uriHasDisk);
-				SSLogger.log("From cache: For "+rootURI+" found URL: "+baseURL+" , Disk: "+baseDisk,SSLogger.DEBUG);
+				Loggers.publishLogger.debug("From cache: For "+rootURI+" found URL: "+baseURL+" , Disk: "+baseDisk);
 				if(baseURL==null || baseDisk==null) throw new WebWriterException("You attempted to publish a register never published before, roots should be published first! ("+rootURI+")");
 			}
 		}
 		else throw new WebWriterException("Only known registers can be published");
-		SSLogger.log("Cleaning cache for "+rootURI);
+		Loggers.publishLogger.info("Cleaning cache for tree starting at: "+rootURI);
 		cleanCacheTree(rootURI);
+		Loggers.publishLogger.trace("Rebuilding URI/URL cache for tree starting at: "+rootURI);
 		buildURLMapAndCache(baseURL,baseDisk,rootURI,extraInputGraph);
 		//TODO should be hidden by design.
 		myInitializer.myCache.synch();
 		TemplateManager myTm=new TemplateManager(templateLocation);
 		WebFilesVisitor vis=new WebFilesVisitor(myInitializer,myTm,baseURL);
 		vis.setOverwriteFiles(overwrite);
-		vis.crawl(root);
-		
-		
-		
-		// build Visitor
-		// cycle over passing visitor (visitor print files)
-		//TerminologyEntity entity=myInitializer.myFactory.getCheckedTerminologyEntity(rootURI);
-		
+		vis.crawl(root);	
 	}
 	
 	public void publishDoc(String tag, String language, String fileName) throws ConfigurationException, IOException, ModelException, WebWriterException {
-		SSLogger.log("Publishing the terminology as a document for tag "+tag+" in language "+language);
+		Loggers.publishLogger.info("Publishing the terminology as a document for tag "+tag+" in language "+language);
 		TemplateManager myTm=new TemplateManager(templateLocation); //TODO just in case we need a different design
 		DocumentVisitor vis=new DocumentVisitor(myInitializer,myTm);
 		vis.bind(tag, language);
@@ -102,8 +113,9 @@ public class PublisherManager {
 	}
 	
 	public void publishOnline(Model extraTriplesGraph, int port) throws Exception {
+		Loggers.publishLogger.info("Publishing starting online server for the terminology at port: "+port);
 		String baseURL=SimpleQueriesProcessor.getOptionalConfigurationParameterSingleValue(myInitializer.getConfigurationGraph(), PublisherConfig.baseURLProperty);
-		SSLogger.log("From configuration files found base URL:  "+baseURL,SSLogger.DEBUG);
+		Loggers.publishLogger.debug("From configuration files found base URL:  "+baseURL);
 		cleanCache();
 		//TODO should be hidden by design.
 		myInitializer.myCache.synch();
@@ -131,22 +143,13 @@ public class PublisherManager {
 	    server.start();
 	    server.join();
 	    
-		
-		
-			// 1) Do we know it already ? >> get/clean/compute
-		// 2) Unknown: is it a root ? >> compute (must find params or error)
-		// 3) Unknwon, not roor: error. Need to compute root first.
-		
-		// find baseURI/URL
-		// resolve URI/URLs
-		// initialize termplateManager
-		// start server
+
 	}
 	// TODO, this should be better designed, properties cleaned should be implicit.
 	private void cleanCacheTree(String rootURI) throws ModelException {
 		myInitializer.myCache.cleanValueFor(rootURI,PublisherConfig.uriHasUrl);
 		myInitializer.myCache.cleanValueFor(rootURI,PublisherConfig.uriHasDisk);
-		SSLogger.log("Cleaning uriHasUrl and uriHasDisk chache for "+rootURI,SSLogger.DEBUG);
+		Loggers.publishLogger.trace("Cleaning uriHasUrl and uriHasDisk chache for (sub)tree staring at: "+rootURI);
 		if(myInitializer.myFactory.terminologySetExist(rootURI)) {
 			Collection<TerminologySet> sets=myInitializer.myFactory.getUncheckedTerminologySet(rootURI).getCollections();
 			for (TerminologySet set:sets ) {
@@ -274,13 +277,13 @@ public class PublisherManager {
 	    		String uri="";
 	    		String version=null;
 	    		String language=CoreConfig.DEFAULT_LANGUAGE;
-	    		SSLogger.log("Request for: "+urlRequested,SSLogger.DEBUG);
+	    		Loggers.publishLogger.debug("Serving request for: "+urlRequested);
 	    		if(urlRequested.endsWith(".rdf")) {
 	    			urlRequested=urlRequested.replace(".rdf", "");
-	    			if(urlRequested.endsWith(PublisherConfig.codeStemString))
-	    				urlRequested=urlRequested.replace(PublisherConfig.codeStemString, "");
-	    			if(urlRequested.endsWith(PublisherConfig.registerStemString))
-	    				urlRequested=urlRequested.replace(PublisherConfig.registerStemString, "");
+	    			if(urlRequested.endsWith(PublisherConfig.individualStemString))
+	    				urlRequested=urlRequested.replace(PublisherConfig.individualStemString, "");
+	    			if(urlRequested.endsWith(PublisherConfig.setStemString))
+	    				urlRequested=urlRequested.replace(PublisherConfig.setStemString, "");
 	    			String[] res=getURIFromURL(urlRequested);
 	    			uri=res[0];
 	    			version=res[1];
@@ -293,10 +296,10 @@ public class PublisherManager {
 	    		}
 	    		else if(urlRequested.endsWith(".ttl")) {
 	    			urlRequested=urlRequested.replace(".ttl", "");
-	    			if(urlRequested.endsWith(PublisherConfig.codeStemString))
-	    				urlRequested=urlRequested.replace(PublisherConfig.codeStemString, "");
-	    			if(urlRequested.endsWith(PublisherConfig.registerStemString))
-	    				urlRequested=urlRequested.replace(PublisherConfig.registerStemString, "");
+	    			if(urlRequested.endsWith(PublisherConfig.individualStemString))
+	    				urlRequested=urlRequested.replace(PublisherConfig.individualStemString, "");
+	    			if(urlRequested.endsWith(PublisherConfig.setStemString))
+	    				urlRequested=urlRequested.replace(PublisherConfig.setStemString, "");
 	    			String[] res=getURIFromURL(urlRequested);
 	    			uri=res[0];
 	    			version=res[1];
@@ -314,10 +317,10 @@ public class PublisherManager {
 	    				language=urlRequested.substring(lastIndexOfDot+1);
 	    				urlRequested=urlRequested.substring(0,lastIndexOfDot);
 	    			} 
-	    			if(urlRequested.endsWith(PublisherConfig.codeStemString))
-	    				urlRequested=urlRequested.replace(PublisherConfig.codeStemString, "");
-	    			if(urlRequested.endsWith(PublisherConfig.registerStemString))
-	    				urlRequested=urlRequested.replace(PublisherConfig.registerStemString, "");
+	    			if(urlRequested.endsWith(PublisherConfig.individualStemString))
+	    				urlRequested=urlRequested.replace(PublisherConfig.individualStemString, "");
+	    			if(urlRequested.endsWith(PublisherConfig.setStemString))
+	    				urlRequested=urlRequested.replace(PublisherConfig.setStemString, "");
 	    			String[] res=getURIFromURL(urlRequested);
 	    			uri=res[0];
 	    			version=res[1];
@@ -344,16 +347,12 @@ public class PublisherManager {
 	    				if(acceptHeader.contains("text/html")) modeOut=HTMLOUT;
 	    			}
 	    		}
-	    		//	System.out.println("base was type: "+baseRequest.getContentType()+" URI: "+baseRequest.getRequestURI());
-	    		//System.out.println("request was type: "+request.getRequestURI());
-	    		//System.out.println("ServerName: "+request.getServerName());
-	    		//System.out.println("Content type:"+request.getContentType());
-	    		//System.out.println("Content type:"+baseRequest.getHeader("Accept"));
+	    	
 	    		//TODO here we need to do the proper thing!
-	    		SSLogger.log("URI: "+uri);
-	    		SSLogger.log("Version: "+version);
-	    		SSLogger.log("lnaguage: "+langOut);
-	    		SSLogger.log("mode"+modeOut);
+	    		Loggers.publishLogger.debug("Page served has URI: "+uri
+	    				+" , Version: "+version+
+	    				" , Language: "+language+
+	    				" , content-type (internal code): "+langOut);
 	    		if(modeOut==HTMLOUT) {
 	    			response.setContentType("text/html;charset=utf-8");
 	    			response.setStatus(HttpServletResponse.SC_OK);
@@ -407,10 +406,10 @@ public class PublisherManager {
 		private String[] getURIFromURL(String urlRequested) {
 			String uri=null;
 			String[] result=new String[2];
-			SSLogger.log("Looking for URI for URL: "+urlRequested);
+			Loggers.publishLogger.trace("Looking for URI for URL: "+urlRequested);
 			uri=myInitializer.myCache.getSubjectForValue(urlRequested, PublisherConfig.uriHasUrl);
 			if(uri!=null) {
-				SSLogger.log("Found URI: "+uri);
+				Loggers.publishLogger.trace("Found URI: "+uri);
 				result[0]=uri;
 				result[1]=null;
 				return result;
@@ -419,7 +418,7 @@ public class PublisherManager {
 			if(urlRequested.endsWith("/")) urlRequested=urlRequested.substring(0,urlRequested.length()-1);
 			uri=myInitializer.myCache.getSubjectForValue(urlRequested, PublisherConfig.uriHasUrl);
 			if(uri!=null) {
-				SSLogger.log("Found URI: "+uri);
+				Loggers.publishLogger.trace("Found URI: "+uri);
 				result[0]=uri;
 				result[1]=null;
 				return result;

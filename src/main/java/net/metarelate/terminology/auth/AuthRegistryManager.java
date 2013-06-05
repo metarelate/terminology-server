@@ -1,5 +1,5 @@
 /* 
- (C) British Crown Copyright 2011 - 2012, Met Office
+ (C) British Crown Copyright 2011 - 2013, Met Office
 
  This file is part of terminology-server.
 
@@ -25,9 +25,9 @@ import java.util.Set;
 import net.metarelate.terminology.coreModel.TerminologyFactory;
 import net.metarelate.terminology.coreModel.TerminologyIndividual;
 import net.metarelate.terminology.coreModel.TerminologySet;
-import net.metarelate.terminology.exceptions.AuthException;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
+import net.metarelate.terminology.utils.Loggers;
 /**
  * Manages permissions to operate on the Registry Manager.
  * 
@@ -57,7 +57,7 @@ public  class AuthRegistryManager {
 	 */
 	public boolean can(String agent,
 			String action, String entity) throws RegistryAccessException, ModelException {
-		System.out.println("Asking auth for: "+agent+" "+action+" "+entity);
+		Loggers.authLogger.debug("Asking auth for: "+agent+" "+action+" "+entity);
 		if(agent==null) agent=AuthConfig.allActors;
 		if(action==null) action=AuthConfig.allActions;
 		if(entity==null) entity=AuthConfig.allEntities;
@@ -73,7 +73,7 @@ public  class AuthRegistryManager {
 				
 				) {
 			
-			System.out.println("Granted");
+			Loggers.authLogger.debug("Granted");
 			return true;
 		
 		}
@@ -94,7 +94,7 @@ public  class AuthRegistryManager {
 			Iterator<TerminologySet> contIter=containers.iterator();
 			while(contIter.hasNext()) {
 				TerminologySet parent=contIter.next();
-				System.out.println("Asking up: "+parent.getURI());
+				Loggers.authLogger.trace("Asking up: "+parent.getURI());
 				answer=answer || can(agent,action,parent.getURI());
 			}
 			return answer;

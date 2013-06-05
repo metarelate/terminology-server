@@ -1,3 +1,24 @@
+/* 
+ (C) British Crown Copyright 2011 - 2013, Met Office
+
+ This file is part of terminology-server.
+
+ terminology-server is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ terminology-server is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public License
+ along with terminology-server. If not, see <http://www.gnu.org/licenses/>.
+*/
+/**
+ * TODO validation should be moved in its own package
+ */
 package net.metarelate.terminology.management;
 
 import java.util.ArrayList;
@@ -17,10 +38,9 @@ import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.PropertyConstraintException;
 import net.metarelate.terminology.exceptions.UnknownURIException;
 import net.metarelate.terminology.instanceManager.Initializer;
-import net.metarelate.terminology.utils.SSLogger;
+import net.metarelate.terminology.utils.Loggers;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResIterator;
@@ -49,19 +69,13 @@ public class ConstraintsManager {
 	private void parseInput() throws ConfigurationException {
 		parseInputPerSpecies(ConstraintsManagerConfig.regValidationConstraintType,defaultRegConstraints,uriRegConstraints);
 		parseInputPerSpecies(ConstraintsManagerConfig.codeValidationConstraintType,defaultCodeConstraints,uriCodeConstraints);
-		SSLogger.log("Found generic constraints for registers: ",SSLogger.DEBUG);
-		for(Resource c:defaultRegConstraints) SSLogger.log(c.getURI(),SSLogger.DEBUG);
-		SSLogger.log("Found generic constraints for codes: ",SSLogger.DEBUG);
-		for(Resource c:defaultCodeConstraints) SSLogger.log(c.getURI(),SSLogger.DEBUG);
-		SSLogger.log("Found specific constraints for registers: ",SSLogger.DEBUG);
+		for(Resource c:defaultRegConstraints) Loggers.validationLogger.info("Found generic constraint for register: "+c.getURI());
+		for(Resource c:defaultCodeConstraints) Loggers.validationLogger.info("Found generic constraint for register: "+c.getURI());
 		for(String c:uriRegConstraints.keySet()) {
-			SSLogger.log("for: "+c,SSLogger.DEBUG);
-			for(Resource c2:uriRegConstraints.get(c)) SSLogger.log("\t"+c2,SSLogger.DEBUG);
+			for(Resource c2:uriRegConstraints.get(c)) Loggers.validationLogger.info("specific constraint for reg: "+c+" : "+c2);
 		}
-		SSLogger.log("Found specific constraints for codes: ",SSLogger.DEBUG);
 		for(String c:uriCodeConstraints.keySet()) {
-			SSLogger.log("for: "+c,SSLogger.DEBUG);
-			for(Resource c2:uriCodeConstraints.get(c)) SSLogger.log("\t"+c2,SSLogger.DEBUG);
+			for(Resource c2:uriCodeConstraints.get(c)) Loggers.validationLogger.info("specific constraint for code: "+c+" : "+c2);
 		}
 	}
 	
@@ -104,7 +118,7 @@ public class ConstraintsManager {
 				defaultRegConstraints, 
 				uriRegConstraints,
 				ConstraintsManagerConfig.regValidationCommandType);
-			SSLogger.log("For edit register found #rules: "+results.size(),SSLogger.DEBUG);
+		Loggers.validationLogger.info("For edit register found #rules: "+results.size());
 		return makeSortedProperties(results);
 		
 	}
@@ -118,7 +132,7 @@ public class ConstraintsManager {
 				defaultCodeConstraints, 
 				uriCodeConstraints,
 				ConstraintsManagerConfig.codeValidationCommandType);
-		SSLogger.log("For edit code found #rules: "+results.size(),SSLogger.DEBUG);
+		Loggers.validationLogger.info("For edit code found #rules: "+results.size());
 		return makeSortedProperties(results);
 	}
 	public String[] getSortedConstraintsForNewReg(String baseRegURI) throws ConfigurationException, UnknownURIException, ModelException {
@@ -130,7 +144,7 @@ public class ConstraintsManager {
 				defaultRegConstraints, 
 				uriRegConstraints,
 				ConstraintsManagerConfig.regValidationCommandType);
-		SSLogger.log("For new regsiter found #rules: "+results.size(),SSLogger.DEBUG);
+		Loggers.validationLogger.info("For new regsiter found #rules: "+results.size());
 		return makeSortedProperties(results);
 	}
 	public String[] getSortedConstraintsForNewCode(String baseRegURI) throws ConfigurationException, UnknownURIException, ModelException {
@@ -142,7 +156,7 @@ public class ConstraintsManager {
 				defaultCodeConstraints, 
 				uriCodeConstraints,
 				ConstraintsManagerConfig.codeValidationCommandType);
-				SSLogger.log("For new code found #rules: "+results.size(),SSLogger.DEBUG);
+		Loggers.validationLogger.info("For new code found #rules: "+results.size());
 		return makeSortedProperties(results);
 	}
 	
@@ -151,7 +165,7 @@ public class ConstraintsManager {
 		TreeMap<String,String> orderedResults =new TreeMap<String,String>();
 		int i=0;
 		for(Resource res:results) {
-			System.out.println("Now: "+res.getURI());
+			//System.out.println("Now: "+res.getURI());
 			NodeIterator propIterator=inputConfig.listObjectsOfProperty(res, ResourceFactory.createProperty(ConstraintsManagerConfig.onDataProperty));
 			if(!propIterator.hasNext()) {
 				propIterator=inputConfig.listObjectsOfProperty(res, ResourceFactory.createProperty(ConstraintsManagerConfig.onObjectProperty));
@@ -182,9 +196,9 @@ public class ConstraintsManager {
 
 	private void getConstraintsForEntityRecursively(Resource entity,ArrayList<Resource>currentResult, Set<Resource> defaultConstraints, Map<String,Set<Resource>> specificConstraints,String breakCommand) throws UnknownURIException, ModelException {
 		Set<TerminologySet>roots=myInitializer.myFactory.getRootsForURI(entity.getURI());
-		System.out.println("Resolving for "+entity.getURI());
+		Loggers.validationLogger.debug("Resolving for "+entity.getURI());
 		if(specificConstraints.containsKey(entity.getURI())) {
-			System.out.println("Got specifics ");
+			//System.out.println("Got specifics ");
 			for(Resource r:specificConstraints.get(entity.getURI())) currentResult.add(r);
 			if(!isBlocking(entity,ResourceFactory.createResource(breakCommand)))
 				 {
@@ -199,7 +213,7 @@ public class ConstraintsManager {
 						}
 			}
 			else {
-				System.out.println("break!");
+				//System.out.println("break!");
 			}
 		}
 		else {
@@ -370,7 +384,7 @@ public class ConstraintsManager {
 	}
 
 	/**
-	 * Only ask if a regsiter constraint is detected, or it will rise an exception if no register constraint is present
+	 * Only ask if a register constraint is detected, or it will rise an exception if no register constraint is present
 	 * @param cons
 	 * @return
 	 * @throws PropertyConstraintException

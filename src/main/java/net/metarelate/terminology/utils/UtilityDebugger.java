@@ -26,12 +26,15 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 public class UtilityDebugger {
-	public static void printStatementsForURI(String uri, Model model) {
+	public static String printStatementsForURI(String uri, Model model) {
 		StmtIterator stats=model.listStatements(ResourceFactory.createResource(uri),null,(RDFNode)null);
+		StringBuilder sb=new StringBuilder();
 		while(stats.hasNext()) {
 			Statement stat=stats.next();
-			SSLogger.log("\t"+stat.getSubject()+"\n"+"\t"+stat.getPredicate()+"\t"+stat.getObject()+"\n",SSLogger.DEBUG);
+			sb.append("\t"+stat.getSubject()+"\n"+"\t"+stat.getPredicate()+"\t"+stat.getObject()+"\n");
 		}
+		return sb.toString();
 	}
+	
 
 }

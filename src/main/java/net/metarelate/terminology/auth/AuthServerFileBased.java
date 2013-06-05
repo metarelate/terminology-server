@@ -1,5 +1,5 @@
 /* 
- (C) British Crown Copyright 2011 - 2012, Met Office
+ (C) British Crown Copyright 2011 - 2013, Met Office
 
  This file is part of terminology-server.
 
@@ -24,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 import net.metarelate.terminology.exceptions.ConfigurationException;
+import net.metarelate.terminology.utils.Loggers;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -47,7 +48,7 @@ public class AuthServerFileBased extends AuthServer {
 		StmtIterator stats=myModel.listStatements();
 		while (stats.hasNext()) {
 			Statement stat=stats.nextStatement();
-			System.out.println(">>"+stat.toString());
+			Loggers.authLogger.trace("Read: "+stat.toString());
 		}
 	}
 

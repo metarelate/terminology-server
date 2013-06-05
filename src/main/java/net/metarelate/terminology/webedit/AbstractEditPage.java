@@ -16,7 +16,7 @@ import net.metarelate.terminology.exceptions.PropertyConstraintException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
 import net.metarelate.terminology.exceptions.UnknownURIException;
 import net.metarelate.terminology.exceptions.WebSystemException;
-import net.metarelate.terminology.utils.SSLogger;
+import net.metarelate.terminology.utils.Loggers;
 import net.metarelate.terminology.webedit.validators.DaftValidator;
 import net.metarelate.terminology.webedit.validators.InRegisterValidator;
 import net.metarelate.terminology.webedit.validators.IsNumericValidator;
@@ -104,25 +104,25 @@ public abstract class AbstractEditPage  extends SuperPage {
 		 * If this is a new action, it will be created on submit
 		 */
 	
-		SSLogger.log("Building plan for form",SSLogger.DEBUG);
+		Loggers.webAdminLogger.debug("Building plan for form");
 		/*
 		 * First we ask which constraints apply.
 		 */
 		String[] constraints=null;
 		if(isNew) {
-			SSLogger.log("New mode",SSLogger.DEBUG);
+			Loggers.webAdminLogger.debug("New mode");
 			if(isSet) constraints=CommandWebConsole.myInitializer.myConstraintsManager.getSortedConstraintsForNewReg(uriOfContainer);
 			if(isIndividual) constraints=CommandWebConsole.myInitializer.myConstraintsManager.getSortedConstraintsForNewCode(uriOfContainer);
-			SSLogger.log("Commputed",SSLogger.DEBUG);
+			Loggers.webAdminLogger.trace("Commputed");
 		}
 		else if(isEdit) {
-			SSLogger.log("Edit mode",SSLogger.DEBUG);
+			Loggers.webAdminLogger.debug("Edit mode");
 			if(isSet) constraints=CommandWebConsole.myInitializer.myConstraintsManager.getSortedConstraintsForNewReg(terminologyEntityWrapper.getObject().getURI());
 			if(isIndividual) constraints=CommandWebConsole.myInitializer.myConstraintsManager.getSortedConstraintsForNewCode(terminologyEntityWrapper.getObject().getURI());
+			Loggers.webAdminLogger.trace("Commputed");
 		}
 		else {} //TODO Something would be wrong if we end up here
-		SSLogger.log("Found:",SSLogger.DEBUG);
-		for (String cons:constraints) SSLogger.log(cons,SSLogger.DEBUG);
+		for (String cons:constraints) Loggers.webAdminLogger.debug("Found: "+cons);
 		
 		/*
 		 * We make a copy of statements already known that should be edited.
@@ -131,7 +131,7 @@ public abstract class AbstractEditPage  extends SuperPage {
 		 */
 		com.hp.hpl.jena.rdf.model.Model bagOfStatements=ModelFactory.createDefaultModel();	//Note: hopefully this is serializable or wicket will complain
 		if(isEdit) bagOfStatements.add(MetaLanguage.filterForEdit(terminologyEntityWrapper.getObject().getStatements(terminologyEntityWrapper.getObject().getLastVersion())));
-		SSLogger.log("Previous statements: "+bagOfStatements.size(), SSLogger.DEBUG);
+		Loggers.webAdminLogger.debug("N. of previous statements: "+bagOfStatements.size());
 		
 		
 		extraStatements=new LoadableDetachableModel<Model>() {
@@ -156,7 +156,7 @@ public abstract class AbstractEditPage  extends SuperPage {
 		 */
 		for(String cons:constraints) {
 			//FormComponent currentFormItem=null;
-			SSLogger.log("Starting analysis for constraint: "+cons,SSLogger.DEBUG);
+			Loggers.webAdminLogger.trace("Starting analysis for constraint: "+cons);
 			final String property=CommandWebConsole.myInitializer.myConstraintsManager.getPropertyForConstraint(cons);
 			String language=CommandWebConsole.myInitializer.myConstraintsManager.getForConstraintLanguage(cons);
 			int minCardinality=CommandWebConsole.myInitializer.myConstraintsManager.getMinCardinalityForConstr(cons);
@@ -203,10 +203,10 @@ public abstract class AbstractEditPage  extends SuperPage {
 			}
 			if(previouslyKnown>nOfElements) nOfElements=previouslyKnown; //we don't drop statements
 			if(nOfElements==0) nOfElements=1; //if it'smention, we are going to propose one field.
-			SSLogger.log("Min.: "+minCardinality,SSLogger.DEBUG);
-			SSLogger.log("Max.: "+maxCardinality,SSLogger.DEBUG);
-			SSLogger.log("Prev.: "+previouslyKnown,SSLogger.DEBUG);
-			SSLogger.log("For "+property+" we are going to have "+nOfElements+" form elements",SSLogger.DEBUG);
+			Loggers.webAdminLogger.trace("Min.: "+minCardinality);
+			Loggers.webAdminLogger.trace("Max.: "+maxCardinality);
+			Loggers.webAdminLogger.trace("Prev.: "+previouslyKnown);
+			Loggers.webAdminLogger.debug("For "+property+" we are going to have "+nOfElements+" form elements");
 			
 			/*
 			 * New we need to build these form objects
@@ -232,10 +232,10 @@ public abstract class AbstractEditPage  extends SuperPage {
 			
 			//Note: take care of language!
 			com.hp.hpl.jena.rdf.model.Model statementsForProperty=ModelFactory.createDefaultModel();
-			SSLogger.log("Inspecting known statements ",SSLogger.DEBUG);
+			Loggers.webAdminLogger.trace("Inspecting known statements ");
 			int i=0;
 			if(onObject) {
-				SSLogger.log("Looking for URIs",SSLogger.DEBUG);
+				Loggers.webAdminLogger.trace("Looking for URIs");
 				StmtIterator preMatchingStatements=bagOfStatements.listStatements(null,
 						ResourceFactory.createProperty(property),
 						(RDFNode)null);
@@ -245,14 +245,14 @@ public abstract class AbstractEditPage  extends SuperPage {
 					if(currentStat.getObject().isURIResource()) {
 						statementsForProperty.add(currentStat);
 						formsObjectsBlock[i].value=org.apache.wicket.model.Model.of(currentStat.getObject().asResource().getURI());
-						SSLogger.log("URI value set to "+formsObjectsBlock[i].value+" for element "+i,SSLogger.DEBUG);
+						Loggers.webAdminLogger.debug("URI value set to "+formsObjectsBlock[i].value+" for element "+i);
 						i++;
 					}
 				}
 					
 			}
 			else if(language!=null) {
-				SSLogger.log("Looking for language literals",SSLogger.DEBUG);
+				Loggers.webAdminLogger.trace("Looking for language literals");
 				StmtIterator preMatchingStatements=bagOfStatements.listStatements(null,
 						ResourceFactory.createProperty(property),
 						(RDFNode)null);
@@ -270,7 +270,7 @@ public abstract class AbstractEditPage  extends SuperPage {
 				}
 			}
 			else {
-				SSLogger.log("Looking for simple literals",SSLogger.DEBUG);
+				Loggers.webAdminLogger.trace("Looking for simple literals");
 				StmtIterator preMatchingStatements=bagOfStatements.listStatements(null,
 						ResourceFactory.createProperty(property),
 						(RDFNode)null);
@@ -286,7 +286,7 @@ public abstract class AbstractEditPage  extends SuperPage {
 			}
 			 
 			bagOfStatements.remove(statementsForProperty);
-			SSLogger.log("Previous statements are down to "+bagOfStatements.size(),SSLogger.DEBUG);
+			Loggers.webAdminLogger.debug("Previous statements are down to "+bagOfStatements.size());
 			
 			
 			
@@ -308,7 +308,7 @@ public abstract class AbstractEditPage  extends SuperPage {
 		/**
 		 * Creating field for remaining statements... (this should happen only for edit)
 		 */
-		SSLogger.log("Processing remaining statements ",SSLogger.DEBUG);
+		Loggers.webAdminLogger.trace("Processing remaining statements ");
 		FormObject[] extraKnownStatements=new FormObject[(int)bagOfStatements.size()];
 		int i2=0;
 		StmtIterator remStats=bagOfStatements.listStatements();
@@ -316,7 +316,7 @@ public abstract class AbstractEditPage  extends SuperPage {
 			Statement currentStat=remStats.nextStatement();
 			FormObject newObject=new FormObject();
 			newObject.property=currentStat.getPredicate().getURI();
-			SSLogger.log("Processing "+newObject.property+" - internal counter is "+i2,SSLogger.DEBUG);
+			Loggers.webAdminLogger.trace("Processing "+newObject.property+" - internal counter is "+i2);
 			if(currentStat.getObject().isURIResource()) {
 				newObject.isURI=true;
 				newObject.value=org.apache.wicket.model.Model.of(currentStat.getObject().asResource().getURI());
@@ -339,7 +339,7 @@ public abstract class AbstractEditPage  extends SuperPage {
 		 */
 		i2=0;
 		for(FormObject f:extraKnownStatements) {
-			System.out.println(i2++);
+			Loggers.webAdminLogger.trace(i2++);
 			formObjects.add(f);
 		}
 		
@@ -364,7 +364,7 @@ public abstract class AbstractEditPage  extends SuperPage {
 				 * TODO validators should have been called at this point. Can something be interecepted and added here ?
 				 */
 				//TODO note: we rely on what below!
-				SSLogger.log("Page is valid",SSLogger.DEBUG);
+				Loggers.webAdminLogger.debug("Page is valid");
 				/*
 				 * We build the new model 
 				 * TODO we could capture exceptions in case of malformed URIs and the like, and route it to the validation
@@ -372,7 +372,7 @@ public abstract class AbstractEditPage  extends SuperPage {
 				 */
 				Model newStatememts=ModelFactory.createDefaultModel();
 				for(FormObject f:formObjects) {
-					SSLogger.log("Collecting infos for statement with property: "+f.property,SSLogger.DEBUG);
+					Loggers.webAdminLogger.debug("Collecting infos for statement with property: "+f.property);
 					if(f.value.getObject()!=null) {
 						if(f.isURI) {
 							String prop=null;
@@ -456,7 +456,7 @@ public abstract class AbstractEditPage  extends SuperPage {
 				//if(labelValue==null) labelValue=""; // TODO check that things work here
 				//Statement newStatement=ResourceFactory.createStatement(ResourceFactory.createResource(getURIOfEntity()), MetaLanguage.labelProperty, ResourceFactory.createPlainLiteral(labelValue));
 				//Model newStats=ModelFactory.createDefaultModel().add(newStatement);
-				SSLogger.log("Collected model with : "+newStatememts.size()+" statements");
+				Loggers.webAdminLogger.trace("Collected model with : "+newStatememts.size()+" statements");
 				
 				/*
 				 * Here we prepare the metadata
@@ -518,9 +518,9 @@ public abstract class AbstractEditPage  extends SuperPage {
 				 */	
 				if(isSuperseding) {
 					//route to to viewPage (target=superseding)
-					System.out.println("Superseding");
-					System.out.println("e: "+getURIOfEntity());
-					System.out.println("s: "+uriToSupersed);
+					Loggers.webAdminLogger.debug("Superseding");
+					Loggers.webAdminLogger.debug("e: "+getURIOfEntity());
+					Loggers.webAdminLogger.debug("s: "+uriToSupersed);
 					PageParameters pageParameters = new PageParameters();
 					pageParameters.add("entity", uriToSupersed);
 					pageParameters.add("superseder",getURIOfEntity());

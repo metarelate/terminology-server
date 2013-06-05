@@ -1,5 +1,5 @@
 /* 
- (C) British Crown Copyright 2011 - 2012, Met Office
+ (C) British Crown Copyright 2011 - 2013, Met Office
 
  This file is part of terminology-server.
 
@@ -23,15 +23,11 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Iterator;
 
 import net.metarelate.terminology.config.CoreConfig;
 import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
-import net.metarelate.terminology.coreModel.TerminologyFactory;
-import net.metarelate.terminology.coreModel.TerminologyIndividual;
 import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.AuthException;
 import net.metarelate.terminology.exceptions.ConfigurationException;
@@ -44,7 +40,7 @@ import net.metarelate.terminology.exceptions.UnknownURIException;
 import net.metarelate.terminology.instanceManager.Initializer;
 import net.metarelate.terminology.management.TerminologyManager;
 import net.metarelate.terminology.reasoning.ReasonerProxy;
-import net.metarelate.terminology.utils.SSLogger;
+import net.metarelate.terminology.utils.Loggers;
 import net.metarelate.terminology.utils.SimpleQueriesProcessor;
 
 import com.hp.hpl.jena.rdf.model.Literal;
@@ -80,8 +76,6 @@ public class TerminologyModelBuilder {
 	protected String actionMessage=CoreConfig.DEFAULT_FROM_RDF_DESCRIPTION;
 	protected boolean updateMode=false;
 	Hashtable<String, String> entityToVersion=null; //Maps entity to be imported to their "operative" version.
-	//protected String globalOwnerURI=null;
-	
 	
 	public TerminologyModelBuilder (Initializer initializer) {
 		myInitializer=initializer;
@@ -103,12 +97,12 @@ public class TerminologyModelBuilder {
 		if(message!=null) this.actionMessage=message;
 		entityToVersion=new Hashtable<String,String>();
 		//inputGraph=myInitializer.getConfigurationGraph();
-		SSLogger.log("Starting import, update mode="+updateMode,SSLogger.DEBUG);
-		SSLogger.log("Number of known statements in input: "+inputGraph.size(),SSLogger.DEBUG);
+		Loggers.importLogger.info("Starting import, update mode="+updateMode);
+		Loggers.importLogger.debug("Number of known statements in input: "+inputGraph.size());
 		ReasonerProxy.customReason(inputGraph);
-		SSLogger.log("Number of statements after reasoning: "+inputGraph.size(),SSLogger.DEBUG);
+		Loggers.importLogger.debug("Number of statements after reasoning: "+inputGraph.size());
 		fillBackwardContainment(inputGraph);
-		SSLogger.log("Number of statements after containment completion: "+inputGraph.size(),SSLogger.DEBUG);
+		Loggers.importLogger.debug("Number of statements after containment completion: "+inputGraph.size());
 		generateIndividuals();
 		generateSets();
 		//buildContainmentStructure(); TODO verify this is obsolete now 
@@ -128,7 +122,7 @@ public class TerminologyModelBuilder {
 		Model newStats=ModelFactory.createDefaultModel();
 		StmtIterator cin=model.listStatements(null,MetaLanguage.definedInProperty,(Resource)null);
 		while(cin.hasNext()) {
-			System.out.println("contained");
+			Loggers.importLogger.trace("contained");
 			Statement stat=cin.nextStatement();
 			if(stat.getObject().isResource()) {
 				newStats.add(stat.getObject().asResource(),MetaLanguage.definesProperty,stat.getSubject());
@@ -136,7 +130,7 @@ public class TerminologyModelBuilder {
 		}
 		StmtIterator cis=model.listStatements(null,MetaLanguage.definesProperty,(Resource)null);
 		while(cis.hasNext()) {
-			System.out.println("contains");
+			Loggers.importLogger.trace("contains");
 			Statement stat=cis.nextStatement();
 			if(stat.getObject().isResource()) {
 				newStats.add(stat.getObject().asResource(),MetaLanguage.definedInProperty,stat.getSubject());
@@ -150,7 +144,7 @@ public class TerminologyModelBuilder {
 	
 
 	protected void generateSets() throws ConfigurationException, ImporterException  {
-		SSLogger.log("Generating Code Sets",SSLogger.DEBUG);
+		Loggers.importLogger.trace("Generating Code Sets");
 		ResIterator terminologySetIterator=inputGraph.listResourcesWithProperty(MetaLanguage.typeProperty,MetaLanguage.terminologySetType);		
 		while(terminologySetIterator.hasNext()) {
 			Resource currentEntitySet=terminologySetIterator.nextResource();
@@ -161,7 +155,7 @@ public class TerminologyModelBuilder {
 	}
 	
 	protected void generateIndividuals() throws ConfigurationException, ImporterException  {
-		SSLogger.log("Generating Code Individual",SSLogger.DEBUG);
+		Loggers.importLogger.trace("Generating Code Individual");
 		ResIterator entityIndividualIter=inputGraph.listResourcesWithProperty(MetaLanguage.typeProperty,MetaLanguage.terminologyIndividualType);
 		while(entityIndividualIter.hasNext()) {
 			Resource currentEntityIndividual=entityIndividualIter.nextResource();
@@ -186,8 +180,8 @@ public class TerminologyModelBuilder {
 	 */
 	
 	private  void generateEntity(Resource entityResource,boolean isSet) throws ConfigurationException, ImporterException  {
-		if(isSet) SSLogger.log("Processing set "+entityResource.getURI(),SSLogger.DEBUG);
-		else SSLogger.log("Processing individual "+entityResource.getURI(),SSLogger.DEBUG);
+		if(isSet) Loggers.importLogger.debug("Processing set "+entityResource.getURI());
+		else Loggers.importLogger.debug("Processing individual "+entityResource.getURI());
 		TerminologyEntity myEntity;
 		String version=null;
 		boolean isVersioned=true;
@@ -196,32 +190,32 @@ public class TerminologyModelBuilder {
 		}
 		int versionNumber=0;
 		if(version!=null) {
-			SSLogger.log("Found version: "+version,SSLogger.DEBUG);
+			Loggers.importLogger.trace("Found version: "+version);
 			try {
 				versionNumber=Integer.parseInt(version);
 			} catch (NumberFormatException e) {
 				throw new ConfigurationException("Unparsable version number for "+entityResource.getURI()+" ("+version+")");
 			}
 		}
-		else SSLogger.log("No version specified",SSLogger.DEBUG);
+		else Loggers.importLogger.trace("No version specified");
 		//Entity is unversioned, we just act on it idempotently.
 		if(versionNumber<0) {
 			isVersioned=false;
-			SSLogger.log("Un-versioned",SSLogger.DEBUG);
+			Loggers.importLogger.trace("Un-versioned");
 		}
-		else SSLogger.log("Versioned",SSLogger.DEBUG);
+		else Loggers.importLogger.trace("Versioned");
 		//First we check if the individual already existed, if it is new, we just create it.
 		if(!(myInitializer.myFactory.terminologyEntityExist(entityResource.getURI()))) {
-			SSLogger.log("This individual was never declared before",SSLogger.DEBUG);
+			Loggers.importLogger.debug("This individual was never declared before");
 			if(isVersioned) {
 				if(isSet) myEntity=myInitializer.myFactory.createNewVersionedTerminologySet(entityResource.getURI());
 				else myEntity=myInitializer.myFactory.createNewVersionedTerminologyIndividual(entityResource.getURI());
-				SSLogger.log("New versioned",SSLogger.DEBUG);
+				Loggers.importLogger.trace("New versioned");
 			}
 			else {
 				if(isSet) myEntity=myInitializer.myFactory.createNewUnversionedTerminologySet(entityResource.getURI()); 
 				else myEntity=myInitializer.myFactory.createNewUnversionedTerminologyIndividual(entityResource.getURI()); 
-				SSLogger.log("New un-versioned",SSLogger.DEBUG);
+				Loggers.importLogger.trace("New un-versioned");
 			}
 			entityToVersion.put(myEntity.getURI(), myEntity.getLastVersion());
 			fillEntity(myEntity,entityToVersion.get(myEntity.getURI()));
@@ -229,7 +223,7 @@ public class TerminologyModelBuilder {
 			fillDefaultStateIfNone(myEntity,entityToVersion.get(myEntity.getURI()));
 		}
 		else { //TODO check here whether it changed or not
-			SSLogger.log("An entity with this URI was declared before (we don't check for types!)",SSLogger.DEBUG);
+			Loggers.importLogger.debug("An entity with this URI was declared before (we don't check for types!)");
 			if(isSet) myEntity=myInitializer.myFactory.getUncheckedTerminologySet(entityResource.getURI());
 			else myEntity=myInitializer.myFactory.getUncheckedTerminologyIndividual(entityResource.getURI());
 			//Did it change ?
@@ -240,20 +234,20 @@ public class TerminologyModelBuilder {
 			Model newOnly=newStatement.difference(oldStatements);
 			Model oldOnly=oldStatements.difference(newStatement);
 			if(newOnly.size()==0 && oldOnly.size()==0) {
-				SSLogger.log("Nothing changed, doing nothing",SSLogger.DEBUG);
+				Loggers.importLogger.debug("Nothing changed, doing nothing");
 			}
 			else {
-				SSLogger.log("Something changed from last time: ",SSLogger.DEBUG);
+				Loggers.importLogger.debug("Something changed from last time: ");
 				StmtIterator oldOnlyIter=oldOnly.listStatements();
 				while(oldOnlyIter.hasNext()) {
-					SSLogger.log("Missing: "+oldOnlyIter.nextStatement().toString(),SSLogger.DEBUG);
+					Loggers.importLogger.trace("Missing: "+oldOnlyIter.nextStatement().toString());
 				}
 				StmtIterator newOnlyIter=newOnly.listStatements();
 				while(newOnlyIter.hasNext()) {
-					SSLogger.log("Added: "+newOnlyIter.nextStatement().toString(),SSLogger.DEBUG);
+					Loggers.importLogger.trace("Added: "+newOnlyIter.nextStatement().toString());
 				}
 				if(!isVersioned) {
-					SSLogger.log("Non versioned: overriding statements",SSLogger.DEBUG);
+					Loggers.importLogger.trace("Non versioned: overriding statements");
 					//myIndividual=myInitializer.myFactory.getUncheckedTerminologyIndividual(currentIndividual.getURI());
 					entityToVersion.put(myEntity.getURI(), myEntity.getLastVersion());
 					fillEntity(myEntity,entityToVersion.get(myEntity.getURI()));
@@ -261,7 +255,7 @@ public class TerminologyModelBuilder {
 					fillDefaultStateIfNone(myEntity,entityToVersion.get(myEntity.getURI()));
 				}
 				else if(version!=null) {
-					SSLogger.log("Versioned: overriding statements for specified version: "+version,SSLogger.DEBUG);
+					Loggers.importLogger.trace("Versioned: overriding statements for specified version: "+version);
 					//myIndividual=myInitializer.myFactory.getUncheckedTerminologyIndividual(currentIndividual.getURI());
 					myEntity.registerVersion(version);	//In case we didn't know this... shouldn't happen in correct usage
 					entityToVersion.put(myEntity.getURI(), version);
@@ -272,7 +266,7 @@ public class TerminologyModelBuilder {
 				else if(updateMode==false) {
 					//myIndividual=myInitializer.myFactory.getUncheckedTerminologyIndividual(currentIndividual.getURI());
 					entityToVersion.put(myEntity.getURI(), myEntity.getLastVersion());
-					SSLogger.log("Versioned, no version specified. Overriding statements for last version: "+entityToVersion.get(myEntity.getURI()),SSLogger.DEBUG);
+					Loggers.importLogger.trace("Versioned, no version specified. Overriding statements for last version: "+entityToVersion.get(myEntity.getURI()));
 					fillEntity(myEntity,entityToVersion.get(myEntity.getURI()));
 					fillMetadataForReimportEntity(myEntity,entityToVersion.get(myEntity.getURI()));
 					fillDefaultStateIfNone(myEntity,entityToVersion.get(myEntity.getURI()));
@@ -281,7 +275,7 @@ public class TerminologyModelBuilder {
 					try {
 						myInitializer.myTerminologyManager.amendEntityInformation(myEntity.getURI(), newStatement, myInitializer.getDefaultUserURI(), actionMessage, TerminologyManager.MODE_REPLACE);
 					} catch (AuthException e) {
-						SSLogger.log("Please check you have permission to import data. All auth on all is a safe assumption for a fresh new system",SSLogger.DEBUG);
+						Loggers.importLogger.error("Please check you have permission to import data. All auth on all is a safe assumption for a fresh new system");
 						e.printStackTrace();
 						return;
 					} catch (InvalidProcessException e) {
@@ -365,7 +359,7 @@ public class TerminologyModelBuilder {
 		StmtIterator labelStats=inputGraph.listStatements(null,MetaLanguage.labelProperty,(RDFNode)null);
 		Model labelModel=ModelFactory.createDefaultModel();
 		labelModel.add(labelStats);
-		SSLogger.log("Labels found: "+labelModel.size(),SSLogger.DEBUG);
+		Loggers.importLogger.debug("Labels found: "+labelModel.size());
 		return labelModel;
 	}
 	
@@ -373,7 +367,7 @@ public class TerminologyModelBuilder {
 		StmtIterator stIter=inputGraph.listStatements((Resource)null,MetaLanguage.propertyHasFocus,(Resource)null);
 		Model propMetaModel=ModelFactory.createDefaultModel();
 		propMetaModel.add(stIter);
-		SSLogger.log("PropertyMetadata found: "+propMetaModel.size(),SSLogger.DEBUG);
+		Loggers.importLogger.debug("PropertyMetadata found: "+propMetaModel.size());
 		return propMetaModel;
 		
 		
@@ -381,9 +375,7 @@ public class TerminologyModelBuilder {
 	
 	private void processPragma() throws UnknownURIException, ImporterException, ModelException {
 		// We check pragma for all collections
-		SSLogger.log("*************************************",SSLogger.DEBUG);
-		SSLogger.log("Checking pragmas",SSLogger.DEBUG);
-		SSLogger.log("*************************************",SSLogger.DEBUG);
+		Loggers.importLogger.info("Checking pragmas");
 		StmtIterator pragmaStatements=inputGraph.listStatements(null, MetaLanguage.pragmaProperty, (Resource)null);
 		while (pragmaStatements.hasNext()) {
 			Statement pragmaStatement=pragmaStatements.next();
@@ -393,7 +385,7 @@ public class TerminologyModelBuilder {
 			while(pragmaTypes.hasNext()) {
 				// TODO add try/catch malformed model
 				Resource pragmaType=pragmaTypes.next().getObject().asResource();
-				SSLogger.log("Found pragma of type: "+pragmaType.getURI(),SSLogger.DEBUG);
+				Loggers.importLogger.debug("Found pragma of type: "+pragmaType.getURI());
 				if(pragmaType.equals(TerminologyModelBuilderConfig.pragmaExpandDashAndSuppress)) {
 					//Here we collect this pragma parameters
 					int maxLimit=-1;
@@ -448,7 +440,7 @@ public class TerminologyModelBuilder {
 					
 				}
 				else {
-					System.out.println("Unknown type: "+pragmaType.getURI());
+					Loggers.importLogger.warn("Unknown type: "+pragmaType.getURI());
 				}
 			}
 		}

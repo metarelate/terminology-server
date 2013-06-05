@@ -5,13 +5,14 @@ import net.metarelate.terminology.coreModel.CacheManager;
 import net.metarelate.terminology.coreModel.LabelManager;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.coreModel.TerminologyFactory;
+import net.metarelate.terminology.utils.Loggers;
 
 public class StringTemplateElement implements TemplateFixedElement, TemplateTermElement, TemplateGlobalElement {
 	private String stringToRender=null;
 	public StringTemplateElement(String stringToRender) {
 		super();
 		this.stringToRender = stringToRender;
-		System.out.println("String block: "+stringToRender); //TODO test
+		Loggers.publishLogger.debug("New string block: "+stringToRender); //TODO test
 	}
 	
 	

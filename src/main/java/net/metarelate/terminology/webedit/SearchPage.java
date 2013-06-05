@@ -14,6 +14,7 @@ import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.UnknownURIException;
 import net.metarelate.terminology.exceptions.WebSystemException;
+import net.metarelate.terminology.utils.Loggers;
 import net.metarelate.terminology.utils.SimpleQueriesProcessor;
 
 import org.apache.wicket.Component;
@@ -92,13 +93,13 @@ public class SearchPage extends SuperPage {
 		                	item.add(new Label("resultDescription",CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologySet(elementURI).getLabel(lastVersion)));
 		                	BookmarkablePageLink pageLink=new BookmarkablePageLink("resultURI",ViewPage.class);
 		                	if(hasSuperseder) {
-		                		System.out.println("has: "+elementURI);
+		                		Loggers.webAdminLogger.debug("has: "+elementURI);
 		                		pageLink.getPageParameters().set("entity", urlToSupersed);
 		                		pageLink.getPageParameters().set("superseder", elementURI);
 		        				
 		                	}
 		                	else {
-		                		System.out.println("has NOT ");
+		                		Loggers.webAdminLogger.debug("has NOT ");
 		                		pageLink.getPageParameters().set("entity", elementURI);
 			    		    	
 		                	}
@@ -125,13 +126,13 @@ public class SearchPage extends SuperPage {
 		                	item.add(new Label("resultDescription",CommandWebConsole.myInitializer.myFactory.getUncheckedTerminologyIndividual(elementURI).getLabel(lastVersion)));
 		                	BookmarkablePageLink pageLink=new BookmarkablePageLink("resultURI",ViewPage.class);
 		                	if(hasSuperseder) {
-		                		System.out.println("has: "+elementURI);
+		                		Loggers.webAdminLogger.debug("has: "+elementURI);
 		                		pageLink.getPageParameters().set("entity", urlToSupersed);
 		                		pageLink.getPageParameters().set("superseder", elementURI);
 		        				
 		                	}
 		                	else {
-		                		System.out.println("has NOT ");
+		                		Loggers.webAdminLogger.debug("has NOT ");
 		                		pageLink.getPageParameters().set("entity", elementURI);
 			    		    	
 		                	}

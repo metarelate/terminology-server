@@ -1,5 +1,5 @@
 /* 
- (C) British Crown Copyright 2011 - 2012, Met Office
+ (C) British Crown Copyright 2011 - 2013, Met Office
 
  This file is part of terminology-server.
 
@@ -30,7 +30,7 @@ import net.metarelate.terminology.coreModel.TerminologyIndividual;
 import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.UnknownURIException;
-import net.metarelate.terminology.utils.SSLogger;
+import net.metarelate.terminology.utils.Loggers;
 import net.metarelate.terminology.utils.SimpleQueriesProcessor;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -56,10 +56,10 @@ public class ComputeTreePragmaProcessor extends PragmaProcessor {
 	@Override
 	public void run() throws UnknownURIException, ModelException {
 		if(rootSet==null) return;
-		SSLogger.log("*** PRAGMA Computation ***",SSLogger.DEBUG);
-		SSLogger.log("Root collection : "+rootSet.getURI(),SSLogger.DEBUG);
-		if(schemeResource!=null) SSLogger.log("Scheme resource : "+schemeResource.getURI(),SSLogger.DEBUG);
-		SSLogger.log("Extracting tree elements : "+rootSet.getURI(),SSLogger.DEBUG);
+		Loggers.pragmaLogger.info("Starting Pragma Computation: Tree detection");
+		Loggers.pragmaLogger.debug("Root collection : "+rootSet.getURI());
+		if(schemeResource!=null) Loggers.pragmaLogger.debug("Scheme resource : "+schemeResource.getURI());
+		Loggers.pragmaLogger.trace("Extracting tree elements : "+rootSet.getURI());
 		Set<TerminologyIndividual> nodesSet=rootSet.getAllKnownContainedInviduals(); // TODO note: we structure in a tree all contained individuals
 		Iterator<TerminologyIndividual> nodeIter=nodesSet.iterator();
 		Set<ExpandedURI> uriNodes=new HashSet<ExpandedURI>();
@@ -68,7 +68,7 @@ public class ComputeTreePragmaProcessor extends PragmaProcessor {
 			String nodeURI=tempNode.getURI();
 			int lastIndexOfTo=nodeURI.lastIndexOf("to");
 			if(lastIndexOfTo>0) {
-				SSLogger.log("Found possible action for : "+nodeURI,SSLogger.DEBUG);
+				Loggers.pragmaLogger.trace("Found possible action for : "+nodeURI);
 				String left=nodeURI.substring(0,lastIndexOfTo);
 				String right=nodeURI.substring(lastIndexOfTo+2);
 				int lastIndexOfSlah=left.lastIndexOf('/');
@@ -92,7 +92,7 @@ public class ComputeTreePragmaProcessor extends PragmaProcessor {
 				}
 				//System.out.println("begin left : "+beginLeft);
 				if(beginLeft<0) {
-					SSLogger.log("Cannot find left index",SSLogger.DEBUG);
+					Loggers.pragmaLogger.warn("Cannot find left index for dash expansion in "+left);
 					return;
 				}
 				left=left.substring(beginLeft+1);	
@@ -103,62 +103,60 @@ public class ComputeTreePragmaProcessor extends PragmaProcessor {
 					maxIndex=Integer.parseInt(right);
 				}
 				catch(Exception e) {
-					SSLogger.log("!!!! Error in parsing "+left+" or "+right,SSLogger.DEBUG);
+					Loggers.pragmaLogger.warn("!!!! Error in parsing "+left+" or "+right);
 					continue;
 					//return;
 				}
 				uriNodes.add(new ExpandedURI(nodeURI,nodeURI.substring(0,beginLeft)+lastSeparator,minIndex,maxIndex));
-				SSLogger.log("Found : "+nodeURI+"("+minIndex+","+maxIndex+")",SSLogger.DEBUG);
+				Loggers.pragmaLogger.debug("Found : "+nodeURI+"("+minIndex+","+maxIndex+")");
 					
 			}//if
 				
 		}//while
-		SSLogger.log("Building Tree",SSLogger.DEBUG);
-		SSLogger.log("1) Expanding containement relationships",SSLogger.DEBUG);
-		SSLogger.log("Starting point",SSLogger.DEBUG);
-		SSLogger.log("Total nodes"+myRenderer(uriNodes)+" size :"+uriNodes.size(),SSLogger.DEBUG);
+		Loggers.pragmaLogger.trace("Building Tree");
+		Loggers.pragmaLogger.trace("1) Expanding containment relationships for nodes: "+myRenderer(uriNodes)+" size :"+uriNodes.size());
 		Set<ExpandedURI> topURIs=getTopLayerAndReduce(uriNodes);
 		Set<ExpandedURI> treeRoots=new HashSet<ExpandedURI>(topURIs);
-		SSLogger.log("tree roots "+myRenderer(treeRoots)+" size :"+topURIs.size(),SSLogger.DEBUG);
+		Loggers.pragmaLogger.trace("tree roots "+myRenderer(treeRoots)+" size :"+topURIs.size());
 		//percolateSet(treeRoots,uriNodes);
 		
 		int iterCounter=1;
 		while(uriNodes.size()>0) {
-			SSLogger.log("Iteration "+iterCounter+SSLogger.DEBUG);
+			Loggers.pragmaLogger.trace("Iteration "+iterCounter);
 			iterCounter++;
 			topURIs=getTopLayerAndReduce(uriNodes);
-			SSLogger.log("Top set "+myRenderer(topURIs)+" size: "+topURIs.size(),SSLogger.DEBUG);
-			SSLogger.log("Rest "+myRenderer(uriNodes)+" size: "+uriNodes.size(),SSLogger.DEBUG);
+			Loggers.pragmaLogger.trace("Top set "+myRenderer(topURIs)+" size: "+topURIs.size());
+			Loggers.pragmaLogger.trace("Rest "+myRenderer(uriNodes)+" size: "+uriNodes.size());
 			percolateSet(treeRoots,topURIs);
 			
 			//TODO here percolate assignment
 		}
 			
 			
-		SSLogger.log("Registering scheme terminology entities",SSLogger.DEBUG);
+		Loggers.pragmaLogger.trace("Registering scheme terminology entities");
 		Iterator<ExpandedURI> expIter=treeRoots.iterator();
 		while(expIter.hasNext()) {
 			ExpandedURI tempRoot=expIter.next();
 			int result=paintTreeSchemeTerms(tempRoot);
-			SSLogger.log("For +"+tempRoot.uri+" -> "+result,SSLogger.DEBUG);
+			Loggers.pragmaLogger.trace("For +"+tempRoot.uri+" -> "+result);
 		}
 			
 		// 1) get Top concept
-		SSLogger.log("Looking for top concept",SSLogger.DEBUG);
+		Loggers.pragmaLogger.trace("Looking for top concept");
 		Resource topConcept=SimpleQueriesProcessor.getOptionalResourceObject(schemeResource, MetaLanguage.skosTopConceptProperty, globalConfigurationModel);
 		if(topConcept==null) {
-			SSLogger.log("Unable to find top concept, end of pragma",SSLogger.DEBUG);
+			Loggers.pragmaLogger.trace("Unable to find top concept, end of pragma");
 			return;
 		}
-		SSLogger.log("Found top concept: "+topConcept.getURI(),SSLogger.DEBUG);
+		Loggers.pragmaLogger.trace("Found top concept: "+topConcept.getURI());
 		TerminologyEntity topConceptEntity=myFactory.getCheckedTerminologyIndividual(topConcept.getURI());
 		if(topConceptEntity==null) {
-			SSLogger.log("Unknown top concept, end of pragma",SSLogger.DEBUG);
+			Loggers.pragmaLogger.trace("Unknown top concept, end of pragma");
 			return;
 		}
 			
 		// 2) get list of entities "narrower" top concept
-		SSLogger.log("Looking at all narrower concepts",SSLogger.DEBUG);
+		Loggers.pragmaLogger.trace("Looking at all narrower concepts");
 		NodeIterator narrIter=globalConfigurationModel.listObjectsOfProperty(topConceptEntity.getResource(), MetaLanguage.skosNarrowerProperty);
 		Set<TerminologyIndividual> leafsSet=new HashSet<TerminologyIndividual>();
 		int totalCounter=0;
@@ -171,20 +169,20 @@ public class ComputeTreePragmaProcessor extends PragmaProcessor {
 			totalCounter++;
 			
 		}
-		SSLogger.log("Found "+totalCounter+" solutions, out which I know "+leafsSet.size()+" unique individuals",SSLogger.DEBUG);
+		Loggers.pragmaLogger.trace("Found "+totalCounter+" solutions, out which I know "+leafsSet.size()+" unique individuals");
 		
 		// 4) remove all narrower from Top concept
-		SSLogger.log("Removing all narrower from top concept",SSLogger.DEBUG);
+		Loggers.pragmaLogger.trace("Removing all narrower from top concept");
 		//Model tempModel=ModelFactory.createDefaultModel();
 		Model topConceptModel=topConceptEntity.getStatements(topConceptEntity.getLastVersion());
-		SSLogger.log("Top concept had : "+topConceptModel.size()+" statements",SSLogger.DEBUG);
+		Loggers.pragmaLogger.trace("Top concept had : "+topConceptModel.size()+" statements");
 		StmtIterator resIter=topConceptModel.listStatements(topConceptEntity.getResource(),MetaLanguage.skosNarrowerProperty,(Resource)null);
 		topConceptModel.remove(resIter);
-		SSLogger.log("Now it has : "+topConceptModel.size()+" statements",SSLogger.DEBUG);
+		Loggers.pragmaLogger.trace("Now it has : "+topConceptModel.size()+" statements");
 			
 			
 		// 5) for all entities, remove broader from statements
-		SSLogger.log("Going to remove broader from entities",SSLogger.DEBUG);
+		Loggers.pragmaLogger.trace("Going to remove broader from entities");
 		Iterator<TerminologyIndividual> termsIterator=leafsSet.iterator();
 		int affectCount=0;
 		while(termsIterator.hasNext()) {
@@ -195,17 +193,17 @@ public class ComputeTreePragmaProcessor extends PragmaProcessor {
 			termModel.remove(toRemove);
 			if(termModel.size()<pre) affectCount++;
 		}
-		SSLogger.log("Affected : "+affectCount+" entities",SSLogger.DEBUG);
+		Loggers.pragmaLogger.trace("Broader concept removeed from : "+affectCount+" entities");
 		
 		
 		// 3) remove tree elements from list of entities
-		SSLogger.log("Removing tree elements from the list",SSLogger.DEBUG);
+		Loggers.pragmaLogger.trace("Removing tree elements from the list");
 		Iterator<ExpandedURI> treeRootsIter=treeRoots.iterator();
 		while(treeRootsIter.hasNext()) {
 			//ExpandedURI tempURI=treeRootsIter.next();
 			removeFromTree(treeRootsIter.next(),leafsSet);
 		}
-		SSLogger.log("Of which I can consider leafs: "+leafsSet.size(),SSLogger.DEBUG);
+		Loggers.pragmaLogger.trace("Of which I can consider leafs: "+leafsSet.size());
 			
 			
 			
@@ -224,7 +222,7 @@ public class ComputeTreePragmaProcessor extends PragmaProcessor {
 		Iterator<TerminologyIndividual> leafsIter=leafsSet.iterator();
 		while(leafsIter.hasNext()) {
 			TerminologyIndividual leaf=leafsIter.next();
-			SSLogger.log("Trying "+leaf.getURI()+" value: "+getNumber(leaf.getURI()));
+			Loggers.pragmaLogger.trace("Trying "+leaf.getURI()+" value: "+getNumber(leaf.getURI()));
 			treeRootsIter=treeRoots.iterator();
 			while(treeRootsIter.hasNext()) {
 				percolateAndConnectLeaf(treeRootsIter.next(),leaf);
@@ -268,10 +266,10 @@ public class ComputeTreePragmaProcessor extends PragmaProcessor {
 			for(int tk=0;tk<tokensArray.length;tk++) {
 				for(int to=0;to<topArray.length;to++) {
 					//Does the token fit the hole ?
-					//SSLogger.log("trying "+tokensArray[tk].getBracketName()+" in "+topArray[to].getBracketName(),SSLogger.DEBUG);
+					//SSLogger.log("trying "+tokensArray[tk].getBracketName()+" in "+topArray[to].getBracketName());
 					if(tokensArray[tk].min>=topArray[to].min && tokensArray[tk].max<=topArray[to].max) {
 						//can it fit a child?
-						//SSLogger.log("fit",SSLogger.DEBUG);
+						//SSLogger.log("fit");
 						Set<ExpandedURI> childrenOfTo=topArray[to].childrenSet;
 						boolean wentTochildren=false;
 						//We need a copy, not a reference here:
@@ -286,13 +284,13 @@ public class ComputeTreePragmaProcessor extends PragmaProcessor {
 								newTokens.add(tokensArray[tk]);
 								percolateSet(newTop,newTokens);
 								wentTochildren=true;
-								//SSLogger.log("went to "+child.uri,SSLogger.DEBUG);
+								//SSLogger.log("went to "+child.uri);
 							}
 						
 						}
 						if(!wentTochildren) {
 							topArray[to].childrenSet.add(tokensArray[tk]);
-							SSLogger.log("Registered "+tokensArray[tk].getBracketName()+" under "+topArray[to].getBracketName(),SSLogger.DEBUG);
+							Loggers.pragmaLogger.trace("Registered "+tokensArray[tk].getBracketName()+" under "+topArray[to].getBracketName());
 						}
 						
 						
@@ -346,7 +344,7 @@ public class ComputeTreePragmaProcessor extends PragmaProcessor {
 		int result=0;
 		if(myFactory.terminologyIndividualExist(tempRoot.uri)) {
 			tempRoot.myIndividual=myFactory.getUncheckedTerminologyIndividual(tempRoot.uri);
-			SSLogger.log("Found ind for :"+tempRoot.uri);
+			Loggers.pragmaLogger.trace("Found ind for :"+tempRoot.uri);
 			result+=1;
 		}
 			
@@ -394,16 +392,16 @@ public class ComputeTreePragmaProcessor extends PragmaProcessor {
 	 
 	private boolean percolateAndConnectLeaf(ExpandedURI node,TerminologyIndividual leaf) {
 		int leafN=getNumber(leaf.getURI());
-		SSLogger.log("trying "+node.getBracketName(),SSLogger.DEBUG);
+		Loggers.pragmaLogger.trace("trying "+node.getBracketName());
 		if(leafN<node.min || leafN>node.max) {
-			SSLogger.log("No fit",SSLogger.DEBUG);
+			Loggers.pragmaLogger.trace("No fit");
 			return false;
 		}
 		else {
 			if(node.childrenSet.size()==0) {
 				//it's me!
 				assertPair(leaf,node.myIndividual);
-				SSLogger.log("Attached (c) to "+node.getBracketName(),SSLogger.DEBUG);
+				Loggers.pragmaLogger.trace("Attached (c) to "+node.getBracketName());
 				return true;
 			}
 			else {
@@ -416,7 +414,7 @@ public class ComputeTreePragmaProcessor extends PragmaProcessor {
 					
 				if(!found) {
 					assertPair(leaf,node.myIndividual);
-					SSLogger.log("Attached (i) to "+node.getBracketName(),SSLogger.DEBUG);
+					Loggers.pragmaLogger.trace("Attached (i) to "+node.getBracketName());
 					return true;
 				} 
 				else return true;

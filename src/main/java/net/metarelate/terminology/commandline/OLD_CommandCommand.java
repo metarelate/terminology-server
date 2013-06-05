@@ -18,15 +18,16 @@
 */
 
 /**
- * TODO this command is unimplemented
+ * TODO should eventually re-implement what is now in @net.metarelate.terminology.commandline.MetOp
+ * This is currently only a stub class.
  */
 package net.metarelate.terminology.commandline;
 
 import net.metarelate.terminology.instanceManager.Initializer;
 
-public class CommandCheck extends TsCommand {
+public class OLD_CommandCommand extends TsCommand {
 
-	public CommandCheck(Initializer myInitializer, String[] args, boolean debug) {
+	public OLD_CommandCommand(Initializer myInitializer, String[] args, boolean debug) {
 		super(myInitializer, args,debug);
 		for(String arg:args) if(arg.equals("help")) {
 			System.out.println(getStaticLocalHelpMessage());
@@ -39,12 +40,12 @@ public class CommandCheck extends TsCommand {
 		// TODO Nothing to do here yet
 
 	}
+	
 	@Override
 	public String getLocalHelpMessage() {
 		return getStaticLocalHelpMessage();
 	}
 	
-
 	public static String getStaticLocalHelpMessage() {
 		return "This method is not implemented yet. Please come back later!";
 		
@@ -54,5 +55,7 @@ public class CommandCheck extends TsCommand {
 	public boolean validate() {
 		return true;
 	}
+	
+	
 
 }

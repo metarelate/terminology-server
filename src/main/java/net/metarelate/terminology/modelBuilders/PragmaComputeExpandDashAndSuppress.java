@@ -1,5 +1,5 @@
 /* 
- (C) British Crown Copyright 2011 - 2012, Met Office
+ (C) British Crown Copyright 2011 - 2013, Met Office
 
  This file is part of terminology-server.
 
@@ -29,7 +29,7 @@ import net.metarelate.terminology.coreModel.TerminologyIndividual;
 import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.ImporterException;
 import net.metarelate.terminology.exceptions.ModelException;
-import net.metarelate.terminology.utils.SSLogger;
+import net.metarelate.terminology.utils.Loggers;
 
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -67,25 +67,25 @@ public class PragmaComputeExpandDashAndSuppress extends PragmaProcessor {
 
 	@Override
 	public void run() throws ImporterException, ModelException {
-		SSLogger.log("*** PRAGMA Computation ***",SSLogger.DEBUG);
-		SSLogger.log("On collection : "+terminologySet.getURI(),SSLogger.DEBUG);
-		SSLogger.log("To suppress : "+toSuppress,SSLogger.DEBUG);
+		Loggers.pragmaLogger.info("Begin Pragma Computation: Dash expander");
+		Loggers.pragmaLogger.debug("On collection : "+terminologySet.getURI());
+		Loggers.pragmaLogger.debug("To suppress : "+toSuppress);
 		Iterator<Property> propIter=overrideProps.iterator();
 		while(propIter.hasNext()) {
 			Property prop=propIter.next();
-			SSLogger.log("Override : "+prop,SSLogger.DEBUG);
+			Loggers.pragmaLogger.debug("Override : "+prop);
 		}
 			
-		SSLogger.log("Action : expanding individuals with x-y range",SSLogger.DEBUG);
+		Loggers.pragmaLogger.trace("Action : expanding individuals with x-y range");
 		if(maxLimit>0) {
-			SSLogger.log("Max expansion: "+maxLimit,SSLogger.DEBUG);
-			if(hardLimitCut) SSLogger.log("Dropping all if exceeding "+maxLimit,SSLogger.DEBUG);
-			else SSLogger.log("Expanding only max number if exceeding "+maxLimit,SSLogger.DEBUG);
+			Loggers.pragmaLogger.trace("Max expansion: "+maxLimit);
+			if(hardLimitCut) Loggers.pragmaLogger.trace("Dropping all if exceeding "+maxLimit);
+			else Loggers.pragmaLogger.trace("Expanding only max number if exceeding "+maxLimit);
 		}
 			
 		Set<TerminologyIndividual> terms=terminologySet.getIndividuals();
-		SSLogger.log("Version (default) :"+terminologySet.getLastVersion(),SSLogger.DEBUG);
-		SSLogger.log("Individuals count :"+terms.size(),SSLogger.DEBUG);
+		Loggers.pragmaLogger.trace("Version (default) :"+terminologySet.getLastVersion());
+		Loggers.pragmaLogger.trace("Individuals count :"+terms.size());
 		Set<TerminologyIndividual> termsToRemove=new HashSet<TerminologyIndividual>();
 		Set<TerminologyIndividual> termsToAdd=new HashSet<TerminologyIndividual>();
 		Iterator<TerminologyIndividual> termIterator=terms.iterator();
@@ -94,7 +94,7 @@ public class PragmaComputeExpandDashAndSuppress extends PragmaProcessor {
 			String currentTermURI=term.getURI();
 			int lastIndexOfDash=currentTermURI.lastIndexOf("-");
 			if(lastIndexOfDash>0) {
-				SSLogger.log("Found possible action for : "+currentTermURI,SSLogger.DEBUG);
+				Loggers.pragmaLogger.trace("Found possible action for : "+currentTermURI);
 				String left=currentTermURI.substring(0, lastIndexOfDash);
 				String right=currentTermURI.substring(lastIndexOfDash+1);
 				int lastIndexOfSlah=left.lastIndexOf('/');
@@ -118,7 +118,7 @@ public class PragmaComputeExpandDashAndSuppress extends PragmaProcessor {
 				}
 				//System.out.println("begin left : "+beginLeft);
 				if(beginLeft<0) {
-					SSLogger.log("Cannot find left index",SSLogger.DEBUG);
+					Loggers.pragmaLogger.trace("Cannot find left index");
 					return;
 				}
 				left=left.substring(beginLeft+1);	
@@ -129,7 +129,7 @@ public class PragmaComputeExpandDashAndSuppress extends PragmaProcessor {
 					maxIndex=Integer.parseInt(right);
 				}
 				catch(Exception e) {
-					SSLogger.log("!!!! Error in parsing "+left+" or "+right,SSLogger.DEBUG);
+					Loggers.pragmaLogger.debug("!!!! Error in parsing "+left+" or "+right);
 					continue;
 					//return;
 				}
@@ -138,12 +138,12 @@ public class PragmaComputeExpandDashAndSuppress extends PragmaProcessor {
 				if(maxLimit>0) {
 					if(maxIndex-minIndex>maxLimit) {
 						if(hardLimitCut) {
-							SSLogger.log("Too long, skipping expansion",SSLogger.DEBUG);
+							Loggers.pragmaLogger.trace("Too long, skipping expansion");
 							continue;
 						}
 						else {
 							maxIndex=minIndex+maxLimit;
-							SSLogger.log("Expanding only from "+minIndex+" to "+maxIndex,SSLogger.DEBUG);
+							Loggers.pragmaLogger.trace("Expanding only from "+minIndex+" to "+maxIndex);
 						}
 					}
 				}
@@ -159,7 +159,7 @@ public class PragmaComputeExpandDashAndSuppress extends PragmaProcessor {
 							
 					}
 					String newURI=root+lastSeparator+numberS;
-					SSLogger.log("Pragma: geration of "+newURI,SSLogger.DEBUG);
+					Loggers.pragmaLogger.trace("Pragma: geration of "+newURI);
 					TerminologyIndividual newTerm=myFactory.createNewVersionedTerminologyIndividual(newURI);
 					newTerm.registerVersion(term.getLastVersion());
 					term.cloneTo(newTerm);
@@ -176,9 +176,9 @@ public class PragmaComputeExpandDashAndSuppress extends PragmaProcessor {
 							Model tempModel=ModelFactory.createDefaultModel(); // TODO this could just be a list of statements
 							StmtIterator matchingIter=newTermModel.listStatements(null,ovProp,(Literal)null);
 							tempModel.add(matchingIter);
-							SSLogger.log("Pragma: stats before override ("+ovProp+")"+newTermModel.size());
+							Loggers.pragmaLogger.debug("Pragma: stats before override ("+ovProp+")"+newTermModel.size());
 							newTermModel.remove(tempModel);
-							SSLogger.log("Pragma: after pruning "+newTermModel.size());
+							Loggers.pragmaLogger.debug("Pragma: after pruning "+newTermModel.size());
 							StmtIterator toBeGeneratedIter=tempModel.listStatements();
 							while(toBeGeneratedIter.hasNext()) {
 								Statement toBeGenStat=toBeGeneratedIter.next();
@@ -193,9 +193,9 @@ public class PragmaComputeExpandDashAndSuppress extends PragmaProcessor {
 									int lastIndexOfDotInNewCode=oldValueString.lastIndexOf(".");
 									if(lastIndexOfDotInNewCode>=0) {
 										prefixForComplexCode =oldValueString.substring(0,oldValueString.lastIndexOf("."));
-										System.out.println(">>"+prefixForComplexCode);
-										System.out.println(">>"+candidateNewValue);
-										System.out.println(">>"+oldValueString);
+										Loggers.pragmaLogger.trace(">>"+prefixForComplexCode);
+										Loggers.pragmaLogger.trace(">>"+candidateNewValue);
+										Loggers.pragmaLogger.trace(">>"+oldValueString);
 									}
 									// Still need padding ?
 									int toPad=oldValueString.length()-oldValueString.lastIndexOf("-")-1;
@@ -207,53 +207,13 @@ public class PragmaComputeExpandDashAndSuppress extends PragmaProcessor {
 										candidateNewValue=prefixForComplexCode+"."+candidateNewValue;
 										
 										
-										/*
-										if(prefixForComplexCode.length()+candidateNewValue.length()+1<oldValueString.length()) {
-											String oldValueRest=oldValueString.substring(oldValueString.lastIndexOf(".")+1);
-											System.out.println(">>NewValue: "+candidateNewValue);
-											System.out.println(">>OldValueRest: "+oldValueRest);
-											//String filler=oldValueRest.substring(0,1);
-											String filler="0";
-											while(candidateNewValue.length()+prefixForComplexCode.length()+1<oldValueRest.length()) {
-												candidateNewValue=filler+candidateNewValue;
-											}
-											candidateNewValue=prefixForComplexCode+lastSeparator+candidateNewValue;
-										}
-									}
-									else {
-										System.out.println(">>NewValue: "+candidateNewValue);
-										System.out.println(">>OldValueRest: "+oldValueRest);
-										//String filler=oldValueRest.substring(0,1);
-										String filler="0";
-										while(candidateNewValue.length()<oldValueRest.length()) {
-											candidateNewValue=filler+candidateNewValue;
-										}
 										
-									}
-									*/
-									/*
-									if(oldValueString.startsWith("0")) {
-									System.out.println("is 0");
-									int paddingTo=oldValueString.indexOf('-');
-									if(paddingTo>0) {
-										if(candidateNewValue.length()<paddingTo) {
-											int nOfLoops=paddingTo-candidateNewValue.length();
-											System.out.println("To add "+nOfLoops);
-											for(int i=0;i<nOfLoops;i++) {
-												candidateNewValue="0"+candidateNewValue;
-												System.out.println("DEBUG ("+i+")>> old newNS "+candidateNewValue);
-											}
-												
-										}
-										
-									}
-									*/
 								}
 								//System.out.println("DEBUG >> newNS "+candidateNewValue);
 								//System.out.println("Prop >> newNS "+toBeGenStat.getPredicate());
 								newTermModel.add(ResourceFactory.createStatement(toBeGenStat.getSubject(), toBeGenStat.getPredicate(), ResourceFactory.createPlainLiteral(candidateNewValue)));
 							}
-							SSLogger.log("Pragma: after generation "+newTermModel.size());
+							Loggers.pragmaLogger.debug("Pragma: after generation "+newTermModel.size());
 						}
 						
 						
@@ -278,7 +238,7 @@ public class PragmaComputeExpandDashAndSuppress extends PragmaProcessor {
 			TerminologyIndividual toAdd=toAddIter.next();
 			terminologySet.registerContainedIndividual(toAdd);
 		}
-		SSLogger.log("Individuals count (after adding) :"+terminologySet.getIndividuals().size(),SSLogger.DEBUG);
+		Loggers.pragmaLogger.debug("Individuals count (after adding) :"+terminologySet.getIndividuals().size());
 			
 		Iterator<TerminologyIndividual> toRemoveIter=termsToRemove.iterator();
 		while(toRemoveIter.hasNext()) {
@@ -286,7 +246,7 @@ public class PragmaComputeExpandDashAndSuppress extends PragmaProcessor {
 			terminologySet.unregisterContainedEntity(toRemove);
 			// TODO Remove the triples! Not only the reference...
 		}
-		SSLogger.log("Individuals count (after pruning) :"+terminologySet.getIndividuals().size(),SSLogger.DEBUG);
+		Loggers.pragmaLogger.debug("Individuals count (after pruning) :"+terminologySet.getIndividuals().size());
 			
 	}
 
