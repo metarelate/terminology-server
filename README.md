@@ -1,4 +1,5 @@
 terminology-server
 ==================
 
-Registry Publishing Software 
+Registry Publishing Software.
+ 

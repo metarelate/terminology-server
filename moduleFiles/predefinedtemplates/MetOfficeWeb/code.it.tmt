@@ -1,0 +1,234 @@
+<!DOCTYPE html><html lang="en">
+<!-- begin block 1 -->
+<head>
+	<title>
+	<!-- tmtOpen>$str+$
+		<<tmtLabel>> v. <<tmtVersion>>
+	<tmtClose -->
+	</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width; initial-scale=1.0" />
+	<meta name="robots" content="nofollow" />
+	<link rel="shortcut icon" href="http://www.metoffice.gov.uk/favicon.ico" />
+	<link rel="stylesheet" type="text/css" href="http://reference.metoffice.gov.uk/data/wmo/web/css/normalize.css" />
+	<link rel="stylesheet" type="text/css" href="http://reference.metoffice.gov.uk/data/wmo/web/css/default.css" />
+	<!--[if lt IE 9]>
+		<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<!-- Replace favicon.ico & apple-touch-icon.png in the root of your domain and delete these references -->
+	<style type="text/css"></style>
+</head>
+<body>
+	<div id="sizer">
+	<!-- begin head -->
+	<header> 
+		<a id="skip" accesskey="S" href="#moContent">Skip Navigation</a>
+		<div class="moNavTabs">
+			<ul class="fc">
+				<li id="primary0" class="active"><a href="http://reference.metoffice.gov.uk/data/wmo/tdcf/">WMO codes</a></li>
+				<li id="primary1"><a href="http://reference.metoffice.gov.uk/data/wmo/docs/">Documentation</a></li>
+				<li id="primary2"><a href="http://reference.metoffice.gov.uk:8080/wmo/">Trac</a></li>
+			</ul>
+		</div>
+		<div class="logoBar fc"> 
+			<a id="topLogo" href="http://www.metoffice.gov.uk/" title="Go to Met Office home page"><img src="http://reference.metoffice.gov.uk/data/wmo/web/img/head-mo-logo.png" alt="Met Office" /></a>
+			<h1>Search</h1>
+			<form action="http://search.metoffice.gov.uk/kb5/metoffice/metoffice/results.page" method="get" id="fsrch">
+				<label for="searchInput">Search</label>
+				<input type="text" name="qt" id="searchInput" value="" maxlength="1000" accesskey="4">
+				<button type="submit" name="button" id="button" class="button" value="Search">Search</button>
+			</form>
+		</div>
+	</header>
+	<!-- end head -->
+<!-- end block 1 -->
+
+
+
+
+<!-- begin block 2 -->			
+<nav id=\"breadcrumb\"><p>
+<!-- tmtOpen>$bcrumbs$spacing:: &gt ||<tmtClose -->	
+</p></nav>				
+<!-- end block 2 -->
+
+
+				
+<div id="content">
+<article>
+
+<!-- begin block 4 -->
+<hgroup>
+<!-- tmtOpen>$str+$
+<h1><<tmtCode>></h1>
+<h2 id="labelAndType"><<tmtLabel>> : un <<tmtTypes>></h2>
+<tmtClose -->
+</hgroup>
+<!-- end block 4 -->
+
+<section id="main">
+
+<!-- begin block 6 -->
+<!-- tmtOpen>$str+$
+<p><<tmtDescription>></p>
+<dl>
+<dt>URI:</dt>
+<dd><a href="<<tmtURI>>"><<tmtURI>></a></dd>
+<dt>Also available as: </dt>
+<dd><a href="<<tmtRDFLink>>">RDF/XML</a></dd>
+<dd><a href="<<tmtTurtleLink>>">Turtle</a></dd>
+</dl>			
+<tmtClose -->
+
+<!-- end block 6 -->
+
+
+
+<!-- begin block 7 -->
+<!-- tmtOpen>$str+$
+<table><caption id="metaInformationValue">Metadata registrazione codice</caption>
+<tr><th scope="row" id="metaStatusCol">Status</th><td id="metaStatusValue"><<tmtStatus>></td></tr>
+<tr><th scope="row" id="metaOwnerCol">Owner</th><td><<tmtOwner>></td></tr>
+<tmtClose -->		
+<tr><th scope="row">in tags</th><td>
+<!-- tmtOpen>$tags$spacing::&nbsp;||
+<tmtClose -->
+</td></tr>
+<!-- tmtOpen>$str+$
+<tr><th scope="row" id="metaGenerationDateCol">Date of generation</th><td id="metaGenerationDateValue"><time datetime="<<tmtGenerationDate>>"><<tmtGenerationDate>></time></td></tr>					
+<tmtClose -->
+<!-- tmtOpen>$str+$versionScope::version||
+<tr><th scope="row" id="metaLastUpdateCol">version date</th><td id="metaLastUpdateValue"><time datetime="<<tmtActionDate>>"><<tmtActionDate>></time></td></tr>
+<tmtClose -->
+<!-- tmtOpen>$str+$versionScope::nonversion||
+<tr><th scope="row" id="metaLastUpdateCol">last update</th><td id="metaLastUpdateValue"><time datetime="<<tmtLastUpdate>>"><<tmtLastUpdate>></time></td></tr>
+<tmtClose -->
+<!-- tmtOpen>$str+$versionScope::version||			
+<tr><th scope="row" id="metaVersionCol">version</th><td><span id="metaVersionValue"><<tmtVersion>></span></td></tr>
+<tr><th scope="row" id="metaVersionCol">version state</th><td><span id="metaVersionValue"><<tmtNewerVersion>></span></td></tr>
+<tmtClose -->
+</table>
+<!-- end block 7 -->
+
+
+
+<!-- begin block 71 -->
+<table>
+<caption>Properties</caption>
+<tr><th scope="col"></th><th scope="col" id="propAttributeCol">Property</th><th scope="col" id="propValueCol">Value</th></tr>
+<!-- tmtOpen>$statBlock$mode::html||codeLabel::code attributes||conceptLabl::concept attributes::otherLabel:: ||
+
+<tmtClose -->
+</table>
+<!-- end block 71 -->
+
+
+
+<!-- begin block 75 -->
+<!-- tmtOpen>$str+$versionScope::version||
+<table>
+	<caption>
+		<span id="strVersionHistory">Version history</span></caption>
+			<tr>
+				<th scope="col"><span id="versionColTitle">Version</span></th>
+				<th scope="col"><span id="dateColTitle">Date</span></th>
+				<th scope="col"><span id="actionColTitle">Action</span></th>
+				<th scope="col"><span id="actorColTitle">By</span></th>
+				<th scope="col"><span id="descColTitle">Description</span></th>
+			</tr>
+<tmtClose -->
+<!-- tmtOpen>$version$
+	<tr>
+	<td><a href="<<tmtVersionLink>>"><<tmtVersion>></a></td>
+	<td><time datetime="<<tmtVersionDate>>"><<tmtVersionDate>></time></td>
+	<td><<tmtVersionAction>></td>
+	<td><<tmtVersionActionAuthor>></td>
+	<td><<tmtVersionActionDescription>></td>
+	</tr>
+<tmtClose -->
+<!-- tmtOpen>$str+$versionScope::version||
+</table>
+<tmtClose -->
+
+
+<!-- end block 75 -->
+
+
+		
+
+</section>
+
+
+<!-- begin block 9 -->
+<section id="second">
+<h2 id="definedInRegStr">Defined in register</h2>
+<ul>
+<!-- tmtOpen>$str+$
+<li><a href=""  class="moreb" ><<tmtFatherLabel>></a></li>
+<tmtClose -->
+</ul><br/>
+</section>
+		
+<!-- end block 9 -->
+
+
+
+
+<!-- begin block 11 -->		
+</article>
+<div id="pageLang">
+<div id="langSelector"> Also available in:
+	<div id="langContainer">
+	<!-- tmtOpen>$LangMap$spacing:: ||label::en-english||label::it-italian||label::fr-french||
+	<tmtClose -->
+	</div></div></div></div>
+	<!-- begin base -->
+	<footer>
+	<div id="footerlogoBar"><img id="footerLogo" src="http://reference.metoffice.gov.uk/data/wmo/web/img/head-mo-logo.png" alt="Met Office" /> </div>
+	<div id="footerContents">
+	<ul id="footerLeft">
+	<li class="first"><a href="http://www.metoffice.gov.uk/about-us/legal" accesskey="8">Legal</a></li>
+	<li><a href="http://www.metoffice.gov.uk/about-us/legal/privacy-and-cookie">Privacy and cookies</a></li>
+	</ul>
+	<ul id="footerRight">
+	<li class="first"><a href="http://www.metoffice.gov.uk/about-us/legal#licences">� Crown copyright</a></li>
+	<li><a href="http://www.metoffice.gov.uk/">www.metoffice.gov.uk</a></li>
+	</ul>
+	</div>
+	</footer>
+	<!-- end base -->
+	</div>
+	<script src="http://reference.metoffice.gov.uk/data/wmo/web/js/common_bottom.min.js" type="text/javascript"></script>
+	<!-- START OF SmartSource Data Collector TAG -->
+	<!-- Copyright (c) 1996-2011 Webtrends Inc.  All rights reserved. -->
+	<!-- Version: 9.4.0 -->
+	<!-- Tag Builder Version: 3.2  -->
+	<!-- Created: 8/1/2011 3:15:41 PM -->
+	<script src="http://reference.metoffice.gov.uk/data/wmo/web/js/webtrends.min.js" type="text/javascript"></script>
+	<!-- Warning: The two script blocks below must remain inline. Moving them to an external -->
+	<!-- JavaScript include file can cause serious problems with cross-domain tracking.      -->
+	<script type="text/javascript">
+				//<![CDATA[
+				var _tag=new WebTrends();
+				_tag.dcsGetId();
+				//]]>
+				</script>
+				<script type=\"text/javascript\">
+				//<![CDATA[
+				_tag.dcsCustom=function(){
+				// Add custom parameters here.
+				//_tag.DCSext.param_name=param_value;
+				}
+				_tag.dcsCollect();
+				//]]>
+	</script>
+	<noscript>
+	<div><img alt="" id="DCSIMG" width="1" height="1" src="http://statse.webtrendslive.com/dcshckprv00000spazrt5ckdq_6d2t/njs.gif?dcsuri=/nojavascript&amp;WT.js=No&amp;WT.tv=9.4.0&amp;dcssip=www.metoffice.gov.uk" /></div>
+	</noscript>
+	<!-- END OF SmartSource Data Collector TAG -->
+	</body>
+	</html>
+	
+<!-- end block 11 -->
+		
+				
