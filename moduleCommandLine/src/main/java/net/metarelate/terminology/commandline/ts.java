@@ -39,6 +39,7 @@ public class ts {
 	private static final int COMMAND_CLEAN=10;
 	private static final int COMMAND_CHECK=11;
 	private static final int COMMAND_COMMAND=12;
+	private static final int COMMAND_OBSOLETE=13;
 	
 	
 	public static Initializer myInitializer=null;
@@ -95,6 +96,9 @@ public class ts {
 			else if (arg.equalsIgnoreCase("web")) {
 				if(command==COMMAND_UNDEF) command=COMMAND_WEB;
 			}
+			else if (arg.equalsIgnoreCase("obsolete")) {
+				if(command==COMMAND_UNDEF) command=COMMAND_OBSOLETE;
+			}
 			
 			
 			argCounter++;
@@ -142,6 +146,9 @@ public class ts {
 		}
 		else if(command==COMMAND_COMMAND) { // TODO unimplemented
 			commandExec =new OLD_CommandCommand(sysDir,args); 
+		}
+		else if(command==COMMAND_OBSOLETE) { // TODO unimplemented
+			commandExec =new CommandObsolete(sysDir,args); 
 		}
 		
 		else {
