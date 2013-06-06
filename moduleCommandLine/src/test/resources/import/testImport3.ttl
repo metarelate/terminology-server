@@ -1,0 +1,64 @@
+#Test dataset 2
+
+#Versioned reg.
+@prefix test:	<http://metarelate.net/tests/import/> .
+@prefix meta:	<http://metarelate.net/core/types/> .
+@prefix rdf: 			<http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: 			<http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: 			<http://www.w3.org/2004/02/skos/core#> .
+
+#Reg 1 (not versioned) now changes because of an additional property
+#No version is declared but the entity was unversioned.
+<http://test.meraleate.net/test/reg1> a skos:collection;
+	skos:member <http://test.meraleate.net/test/ind2>;
+	rdfs:label "test register 1"@en;
+.	
+
+
+#One item is removed.
+<http://test.meraleate.net/test/reg2> a skos:collection;
+	meta:hasNamespace "REG2";
+	skos:member <http://test.meraleate.net/test/ind4>;
+	skos:member <http://test.meraleate.net/test/reg4>;
+.	
+
+
+#REgister change because of a statement
+#Does not declare namespace
+<http://test.meraleate.net/test/reg3> a skos:collection;
+	rdfs:label "test register 3"@en;
+.
+
+#New sub-register introduced
+<http://test.meraleate.net/test/reg4> a skos:collection;
+	rdfs:label "test register 4"@en;
+.
+
+#This is how we declare an unversioned individual
+<http://test.meraleate.net/test/ind1> a skos:concept;
+	meta:hasVersion	"-1";
+.	
+
+
+# Individual gets an additonal label, with version specified
+<http://test.meraleate.net/test/ind2> a skos:concept;
+	meta:hasNamespace "IND2";
+	rdfs:label "test individual 2"@en;
+.	
+
+
+#Item removed is not provided anymore now
+#Does not declare namespace
+#<http://test.meraleate.net/test/ind3> a skos:concept;
+#	rdfs:label "test individual 3"@en;
+#.
+
+#Individual with no version info provided
+#Does not declare namespace
+<http://test.meraleate.net/test/ind4> a skos:concept;
+.
+
+#This is how we declare an unversioned individual
+<http://test.meraleate.net/test/ind5> a skos:concept;
+	rdfs:label "dangling concept"@en;
+.	
