@@ -202,6 +202,9 @@ public class ts {
 		else if(helpFocus.equalsIgnoreCase("web")) {
 			System.out.println(WebCommand.getStaticLocalHelpMessage());
 		}
+		else if(helpFocus.equalsIgnoreCase("obsolete")) {
+			System.out.println(CommandObsolete.getStaticLocalHelpMessage());
+		}
 		else System.out.println(getGenericHelpMessage());
 		
 		
@@ -219,6 +222,7 @@ public class ts {
 				//"       ts [-d|-t] [-sys|-system dirName] [help] command  [parameters]    (single term actions)\n"+
 				"       ts [-d|-t] [-sys|-system dirName] [help] tag      [parameters]    (tag the current terminology state)\n" +
 				"       ts [-d|-t] [-sys|-system dirName] [help] web      [parameters]    (starts the administration web interface)\n" +
+				"       ts [-d|-t] [-sys|-system dirName] [help] obsolete [parameters]  	(batch-obsolete a list of terms/regsiters)\n" +
 				"       [-d|-t] : debug level option. Default is info only.\n" +
 				"       [-sys|-system] : allow to specify the installation dir. Default $TSHOME or, if undefined $HOME/.tserver\n" +
 				"       [help] provides help on the specific command (without initializing the system)\n" ;

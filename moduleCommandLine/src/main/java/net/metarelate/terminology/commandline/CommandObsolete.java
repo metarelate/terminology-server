@@ -10,6 +10,7 @@ import java.util.Set;
 import net.metarelate.terminology.coreModel.TerminologyIndividual;
 import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.ConfigurationException;
+import net.metarelate.terminology.exceptions.ImpossibleOperationException;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.UnknownURIException;
 import net.metarelate.terminology.exceptions.WebWriterException;
@@ -44,15 +45,22 @@ public class CommandObsolete extends TsCommand {
 			if(myInitializer.myFactory.terminologyIndividualExist(line)) {
 				TerminologyIndividual termToDelete=myInitializer.myFactory.getUncheckedTerminologyIndividual(line);
 				Set<TerminologySet> parents=termToDelete.getContainers();
-				if(parents.size()!=1) throw new ModelException(line+" has not one parent, it has : "+parents.size());
+				if(parents.size()>1) throw new ModelException(line+" is in more than one register, it is in : "+parents.size());
+				if(parents.size()==0) throw new ImpossibleOperationException("I cannot obsolete "+line+" as it's not in any register");
+
 				TerminologySet register=parents.iterator().next();
 				myInitializer.myTerminologyManager.delTermFromRegister(termToDelete.getURI(), register.getURI(), myInitializer.getDefaultUserURI(), message);
+				Loggers.commandLogger.trace("Command succesfully executed");
 			}
 			else if(myInitializer.myFactory.terminologySetExist(line)) {
 				TerminologySet setToDelete=myInitializer.myFactory.getUncheckedTerminologySet(line);
 				myInitializer.myTerminologyManager.delTerm(setToDelete.getURI(), myInitializer.getDefaultUserURI(), message);
+				Loggers.commandLogger.trace("Command succesfully executed");
 			}
-			else throw new UnknownURIException(line); 
+			else {
+				Loggers.commandLogger.trace("Nothing happened");
+				throw new UnknownURIException(line); 
+			}
 			line=myReader.readLine();
 		}
 	}
@@ -66,12 +74,19 @@ public class CommandObsolete extends TsCommand {
 
 	@Override
 	public String getLocalHelpMessage() {
-		return "Nothing yet"; // TODO to fill!
+		return getStaticLocalHelpMessage();
 	}
 
 	@Override
 	public String getName() {
 		return "Obsolete";
+	}
+
+	public static String getStaticLocalHelpMessage() {
+		return "ts -list listOfObsoleteURL\n" +
+				"listOfObsolete is a file containing one URI to be obsolete per line.\n" +
+				"The action is considered performed from the default user.\n" +
+				"The configured authorization and process consraints are applied."; // TODO to fill!
 	}
 
 }
