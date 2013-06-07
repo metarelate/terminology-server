@@ -39,6 +39,7 @@ public class ts {
 	private static final int COMMAND_CLEAN=10;
 	private static final int COMMAND_CHECK=11;
 	private static final int COMMAND_COMMAND=12;
+	private static final int COMMAND_OBSOLETE=13;
 	
 	
 	public static Initializer myInitializer=null;
@@ -95,6 +96,9 @@ public class ts {
 			else if (arg.equalsIgnoreCase("web")) {
 				if(command==COMMAND_UNDEF) command=COMMAND_WEB;
 			}
+			else if (arg.equalsIgnoreCase("obsolete")) {
+				if(command==COMMAND_UNDEF) command=COMMAND_OBSOLETE;
+			}
 			
 			
 			argCounter++;
@@ -142,6 +146,9 @@ public class ts {
 		}
 		else if(command==COMMAND_COMMAND) { // TODO unimplemented
 			commandExec =new OLD_CommandCommand(sysDir,args); 
+		}
+		else if(command==COMMAND_OBSOLETE) { // TODO unimplemented
+			commandExec =new CommandObsolete(sysDir,args); 
 		}
 		
 		else {
@@ -195,6 +202,9 @@ public class ts {
 		else if(helpFocus.equalsIgnoreCase("web")) {
 			System.out.println(WebCommand.getStaticLocalHelpMessage());
 		}
+		else if(helpFocus.equalsIgnoreCase("obsolete")) {
+			System.out.println(CommandObsolete.getStaticLocalHelpMessage());
+		}
 		else System.out.println(getGenericHelpMessage());
 		
 		
@@ -212,6 +222,7 @@ public class ts {
 				//"       ts [-d|-t] [-sys|-system dirName] [help] command  [parameters]    (single term actions)\n"+
 				"       ts [-d|-t] [-sys|-system dirName] [help] tag      [parameters]    (tag the current terminology state)\n" +
 				"       ts [-d|-t] [-sys|-system dirName] [help] web      [parameters]    (starts the administration web interface)\n" +
+				"       ts [-d|-t] [-sys|-system dirName] [help] obsolete [parameters]  	(batch-obsolete a list of terms/regsiters)\n" +
 				"       [-d|-t] : debug level option. Default is info only.\n" +
 				"       [-sys|-system] : allow to specify the installation dir. Default $TSHOME or, if undefined $HOME/.tserver\n" +
 				"       [help] provides help on the specific command (without initializing the system)\n" ;

@@ -329,7 +329,10 @@ public class TerminologyManager {
 	
 	public void delTerm(String urlToDelete, String actionAuthorURI,
 			String description) throws ModelException, RegistryAccessException, ImpossibleOperationException {
+		Loggers.processLogger.debug("Going to obsolete "+urlToDelete+" by "+actionAuthorURI+" because : "+description);		
+
 		if(myInitializer.myFactory.terminologySetExist(urlToDelete)) {
+			Loggers.processLogger.trace("This is a set, checking if it's empty first");
 			//This is a set, we can obsolete it only if in its last version it has not valid individuals
 			TerminologySet setToDelete=myInitializer.myFactory.getUncheckedTerminologySet(urlToDelete);
 			String lastVersion=setToDelete.getLastVersion();
@@ -341,6 +344,7 @@ public class TerminologyManager {
 			propagateDeleteOverContainers(setToDelete,actionAuthorURI,description);
 		}
 		else if(myInitializer.myFactory.terminologyIndividualExist(urlToDelete)) {
+			Loggers.processLogger.trace("This is a code, proceeding from deletion");
 			TerminologyIndividual individualToDelete=myInitializer.myFactory.getUncheckedTerminologyIndividual(urlToDelete);
 			propagateDeleteOverContainers(individualToDelete,actionAuthorURI,description);
 		}
@@ -362,18 +366,21 @@ public class TerminologyManager {
 					actionAuthorURI, description);
 		}
 	}
+	
 	//TODO generalize to set
 	//TODO overall TerminologyManager is due a big overhaul!!!
 	public void delTermFromRegister(String termURI, String regURI,
 			String actionAuthorURI, String description) throws AuthException, RegistryAccessException, InvalidProcessException, ModelException {
-			
+	Loggers.processLogger.debug("Going to remove "+termURI+" from "+regURI+" by "+actionAuthorURI+" because : "+description);		
 		if(!myInitializer.myAuthManager.can(actionAuthorURI,RegistryPolicyManager.actionObsoleteURI,regURI))
 			throw new AuthException(actionAuthorURI,RegistryPolicyManager.actionObsoleteURI,regURI);
+
 	TerminologySet myRegister=null;
 	if(!myInitializer.myFactory.terminologySetExist(regURI)) throw new RegistryAccessException("Unable to modify "+regURI+" (register does not exist)");
 	myRegister=myInitializer.myFactory.getUncheckedTerminologySet(regURI);
 	TerminologyEntity myTerm=null;
 	if(myInitializer.myFactory.terminologyIndividualExist(termURI)) {
+		Loggers.processLogger.trace("Going to remove a code");
 		myTerm=myInitializer.myFactory.getUncheckedTerminologyIndividual(termURI);
 		if(myTerm==null) throw new RegistryAccessException("Code "+termURI+" does not exists.");
 		if(!myRegister.containsEntity(myTerm)) {
@@ -383,6 +390,7 @@ public class TerminologyManager {
 			
 	}
 	if(myInitializer.myFactory.terminologySetExist(termURI)) {
+		Loggers.processLogger.trace("Going to remove a register");
 		myTerm=myInitializer.myFactory.getUncheckedTerminologySet(termURI);
 		if(myTerm==null) throw new RegistryAccessException("Code "+termURI+" does not exists.");
 		if(!myRegister.getCollections(myRegister.getLastVersion()).contains(myTerm))
@@ -447,7 +455,7 @@ public class TerminologyManager {
 	
 	myTerm.synch();
 	myRegister.synch();
-	
+	Loggers.commandLogger.trace("Action completed");
 		//////
 		
 	}

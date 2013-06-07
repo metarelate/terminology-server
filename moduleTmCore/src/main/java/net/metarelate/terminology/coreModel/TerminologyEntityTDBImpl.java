@@ -151,10 +151,12 @@ public abstract class TerminologyEntityTDBImpl implements TerminologyEntity {
 	}
 	
 	public Set<TerminologySet> getContainers(String version) throws ModelException  {
+		Loggers.coreLogger.trace("Getting containers for "+getURI()+" for version "+version);
 		Set<TerminologySet>answer=new HashSet<TerminologySet>();
 		NodeIterator superRegIter=getStatements(version).listObjectsOfProperty(myRes,TDBModelsCoreConfig.definedInRegister);
 		while(superRegIter.hasNext()) {
 			RDFNode currSupReg=superRegIter.nextNode();
+			Loggers.coreLogger.trace("Found "+currSupReg.toString());
 			if(currSupReg.isResource())
 				try {
 					answer.add(((TerminologyFactoryTDBImpl)myFactory).getCheckedTerminologySet(currSupReg.asResource().getURI()));

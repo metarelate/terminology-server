@@ -40,7 +40,7 @@ import net.metarelate.terminology.utils.Loggers;
 
 public abstract class TsCommand {
 	protected Initializer myInitializer=null;
-	protected String nextIsMessage="";
+	protected String nextIsMessage="";		// TODO to move here from other commands, and check it is properly implemented
 	protected String sysDir=null;
 	
 	public TsCommand(String sysDir,String[] args) {
