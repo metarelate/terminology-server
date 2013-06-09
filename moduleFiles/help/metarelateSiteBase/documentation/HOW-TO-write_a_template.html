@@ -1,0 +1,372 @@
+
+<h1>How to build a template</h1>
+<br>
+The terminology server provides a templating mechanism that can be used
+to configure the way its content is rendered on the web or in latex.<br>
+Templates are html or latex code that include some extra code that is
+expanded at run-time.<br>
+<br>
+Here is a simple example:<br>
+<br>
+&lt;html&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;head&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;/head&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;body&gt;<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; Here is the definition of the
+entity this pages relates to: <br>
+<span style="color: rgb(0, 153, 0); font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &lt;!-- tmtOpen&gt;$str+$</span><br style="color: rgb(0, 153, 0); font-weight: bold;">
+<span style="color: rgb(0, 153, 0); font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &lt;&lt;tmtDescription&gt;&gt;</span><br style="color: rgb(0, 153, 0); font-weight: bold;">
+<span style="color: rgb(0, 153, 0); font-weight: bold;">&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &lt;tmtClose --&gt;</span><br>
+&nbsp;&nbsp;&nbsp; &lt;/body&gt;<br>
+&lt;/html&gt;<br>
+<br>
+The system identifies anything between the strings <span style="color: rgb(0, 153, 0); font-weight: bold;">&lt;!-- tmtOpen&gt; </span><span style="color: rgb(0, 153, 0);"><span style="color: black;">and</span></span><span style="color: rgb(0, 153, 0); font-weight: bold;"> </span><span style="color: rgb(0, 153, 0); font-weight: bold;">&lt;tmtClose --&gt; </span><span style="color: rgb(0, 153, 0);"><span style="color: black;">as a
+directive for the rendering mechanism. The beginning of this directive
+specifies its type, in this case: <span style="color: rgb(0, 153, 0); font-weight: bold;">$str+$</span>.<br>
+The template directive in question outputs the string between </span></span><span style="color: rgb(0, 153, 0); font-weight: bold;">&lt;!-- tmtOpen&gt; </span><span style="color: rgb(0, 153, 0);"><span style="color: black;">and</span></span><span style="color: rgb(0, 153, 0); font-weight: bold;"> </span><span style="color: rgb(0, 153, 0); font-weight: bold;">&lt;tmtClose --&gt;</span><span style="color: rgb(0, 153, 0);"><span style="color: black;">, but
+replaces a set of place-holders with entity-dependents values (in this
+case </span></span><span style="color: rgb(0, 153, 0); font-weight: bold;">&lt;&lt;tmtDescription&gt;&gt;
+</span><span style="color: rgb(0, 153, 0);"><span style="color: black;">is
+replaced by the by the description of the entity for which this page
+(or piece of latex test) is rendered.<br>
+<br>
+It is possible to specify parameters for templates directives, which
+must follow the directive on a single line without spaces. The syntax
+for parameters is:<br>
+<span style="font-weight: bold;">$directiveID$</span>[<span style="font-weight: bold;">paramName::paraValue||</span>]+<br>
+Some examples are illustrated below.<br>
+<br>
+There are two bits to the templating mechanisms: a set of directives,
+and how different templates for different languages or part of
+documents can be specified and brought together. In particular,
+templates can be specified differently for page-based representation
+(e.g.: web publishing) or for the construction of documents (e.g.: pdf
+representation of code tables).<br>
+<br>
+</span></span><span style="color: rgb(0, 153, 0);"><span style="color: black;"></span></span>
+<h2>Available template-directives</h2>
+<h3>None</h3>
+This is not really a template per se, but everything between the tags <span style="color: rgb(0, 153, 0); font-weight: bold;"><span style="color: black;">&lt;!-- tmtOpen&gt;</span> </span><span style="color: rgb(0, 153, 0);"><span style="color: black;">and</span></span><span style="color: rgb(0, 153, 0); font-weight: bold;"> </span><span style="color: black; font-weight: bold;">&lt;tmtClose --&gt; </span><span style="color: black;">is reported unchanged. As any text not included
+in tags is reported unchanged, this is not a useful feature, but rather
+a safe fallback option.<br>
+</span><span style="color: black;"></span>
+<h3>$str+$ : Strings with placeholders</h3>
+Output the string included between <span style="color: rgb(0, 153, 0); font-weight: bold;"><span style="color: black;">&lt;!-- tmtOpen&gt;</span> </span><span style="color: rgb(0, 153, 0);"><span style="color: black;">and</span></span><span style="color: rgb(0, 153, 0); font-weight: bold;"> </span><span style="color: black; font-weight: bold;">&lt;tmtClose --&gt; </span><span style="color: black;">after having replaced a few placeholder with
+actual values.</span><br>
+<h4><span style="color: black;">Parameters</span></h4>
+<span style="font-weight: bold;">versionScope</span> : specifies
+whether the template directive should be executed or not, depending on
+the entity being versioned or not. <span style="font-weight: bold;">versionScope::version
+</span>implies that the directive is processed only if the entity is
+versioned. <span style="font-weight: bold;">versionScope::versionVersion</span>
+presents the opposite behaviour. If not specified, the system defaults
+to versionScope::version.<br>
+<h4>Placeholders<br>
+</h4>
+<span style="color: black;"></span><span style="font-weight: bold;">&lt;&lt;tmtURI&gt;&gt;</span>
+: the entity URI<br>
+<span style="font-weight: bold;">&lt;&lt;tmtRDFLink&gt;&gt;</span> : a
+link to the RDF representation of files. This is useful for the file
+based web representation only. However it's use will be correctly
+handled by the online representation.<br>
+<span style="font-weight: bold;">&lt;&lt;tmtTurtleLink&gt;&gt;</span> :
+a link to the Turtle representation of files. This is useful for the
+file
+based web representation only. However it's use will be correctly
+handled by the online representation.<br>
+<span style="font-weight: bold;">&lt;&lt;tmtLabel&gt;&gt; </span>:
+replaced by the label of the entity. The system will attempt to fine a
+label that is specific to the version of the entity being rendered and
+in the requested language. Failng this, the system will adopt some heuristics (not guaranteed) and look into later versions and the
+default language. Failing this,&nbsp; it will use the last part of the
+URI as a label.<span style="font-weight: bold;"><br>
+&lt;&lt;tmtVersion&gt;&gt;</span> : the version of the object being
+rendered (undefined for un-versioned objects).<br>
+<span style="font-weight: bold;">&lt;&lt;tmtTypes&gt;&gt;</span> : a
+list of types for this entity, rendered as labels (if found) or as the
+last part of the URIs.<br>
+<span style="font-weight: bold;">&lt;tmtCode&gt;&gt;</span> : a
+"notation" for the entity. This is the object of the skos:notation
+property, if found, or the last part of the URI.<br>
+<span style="font-weight: bold;">&lt;&lt;tmtDescription&gt;&gt;</span>
+: a description. This is the value of the rdfs:comment property, or
+nothing.<br style="font-weight: bold;">
+<span style="font-weight: bold;">&lt;&lt;tmtStatus&gt;&gt;</span> : the
+current state of the entity (looks for a label, or renders a URI is not
+found)<br>
+<span style="font-weight: bold;">&lt;&lt;tmtOwner&gt;&gt;</span> : the
+"owner" of the entity (the responsible for its content, who is also the
+entity checked for authorization). The label (if available) or the URI
+is rendered.<br>
+<span style="font-weight: bold;">&lt;&lt;tmtGenerationDate&gt;&gt;</span>
+: the date the entity was introduced first in the system.<br>
+<span style="font-weight: bold;">&lt;&lt;tmtActionDate&gt;&gt;</span> :
+the date of the action that generated this version.<br>
+<span style="font-weight: bold;">&lt;&lt;tmtLastUpdate&gt;&gt;</span> :
+the date of the last update for this code.<br>
+<span style="font-weight: bold;">&lt;&lt;tmtNewerVersion&gt;&gt;</span>
+: Returns a string indicating whether this is the last version, or if a
+new version is available. The String is hard-code in the class
+WebRendererStrings in the Publisher package, and it can be specified
+for several languages. If a newer version is available, the version
+number is rendered with an html link to the proper URL.<br>
+<span style="font-weight: bold;">&lt;&lt;tmtFatherURL&gt;&gt;</span> :
+the URL of the container for this entity<br>
+<span style="font-weight: bold;">&lt;&lt;tmtFatherLabel&gt;&gt;</span>
+: the label of the container of this entity<br>
+<span style="font-weight: bold;">&lt;&lt;tmtTag&gt;&gt;</span> : the
+tag for which an export was issued (typically the case when a full
+terminology is exported as a document)<br>
+<span style="font-weight: bold;">&lt;&lt;tmtRoots&gt;&gt;</span> : a
+list of root registers for the terminology: typically useful when a
+full terminology is exported<br>
+<span style="font-weight: bold;">&lt;&lt;tmtOwner&gt;&gt;</span> : the
+"owner" of the terminology (currently unimplemented) <br>
+<h3>$brcrumbs$ : breadcrumbs generation</h3>
+generates breadcrumbs for the current page, reflecting the nesting of
+registers. It allows to specify which separator to use in breadcrumbs.
+Breadcrumbs will be generated as http links (no class currently
+associated).<br>
+<h4>Parameters</h4>
+<span style="font-weight: bold;">spacing</span> : (e.g.:
+$bcrumbs$spacing:: &amp;gt)<br>
+<br>
+<h3>$tags$ : generates a list of tags for the rendered entity</h3>
+tags are only rendered as strings (no links)<br>
+<h4>Parameters</h4>
+<span style="font-weight: bold;">spacing</span> : (e.g.:
+$tags$spacing::&amp;nbsp;||) specifies the separator to be used between
+tags.<br>
+<br>
+<br>
+<h3>$statBlock$ : generates a block of statements</h3>
+Generates a a table with a list of statements for a given entity. A
+table of statements is a list of either attributes/values, or
+relations/objects (the distinction being that relations/objects are
+link between codes or set, not numeric or string values). Objects are
+rendered via a label (if provided), or as their URI.<br>
+If the proper metadata is provided, the system will attempt to organize
+statements in statements about the conceptual nature of the code, its
+coding nature or other properties. <br>
+<h4>Parameters</h4>
+<span style="font-weight: bold;">mode</span> : the rendering mode.
+Currently only html is supported.<br>
+<span style="font-weight: bold;">codeLabel</span> : the label to be
+used to annotate statements relative to the "coding nature" of the code.<br>
+<span style="font-weight: bold;">concept Label</span>: the label to be
+used to annotate statements relative to the "conceptual nature" of the
+code.<br>
+<span style="font-weight: bold;">otherLabel</span>: a label for al
+other statements.<br>
+<h4>Example</h4>
+&lt;!-- tmtOpen&gt;<br>
+mode::html||codeLabel::code attributes||conceptLabl::concept
+attributes::otherLabel:: ||<br>
+&lt;tmtClose --&gt;<br>
+<br>
+<h3>$version$ : generates a version block</h3>
+Repeat the string contained for each version of the entity, each time
+expanding placeholders for the current version.<br>
+<br>
+<h4>Placeholders</h4>
+&lt;&lt;tmtVersion&gt;&gt; : the "current" version.<br>
+&lt;&lt;tmtVersionLink&gt;&gt; : a link to the URL from which the
+current version can be accessed.<br>
+&lt;&lt;tmtVersionDate&gt;&gt; : the date the current version was
+generated.<br>
+&lt;&lt;tmtVersionAction&gt;&gt; : the action that lead to the current
+version.<br>
+&lt;&lt;tmtVersionActionAuthor&gt;&gt; : the agent that performed the
+above action (Label or URI).<br>
+&lt;&lt;tmtVersionActionDescription&gt;&gt; : a description for the
+above action (Label or URI).<br>
+<h4>Example</h4>
+&lt;!-- tmtOpen&gt;$version$<br>
+&nbsp;&nbsp;&nbsp; &lt;tr&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;td&gt;&lt;a
+href="&lt;&lt;tmtVersionLink&gt;&gt;"&gt;&lt;&lt;tmtVersion&gt;&gt;&lt;/a&gt;&lt;/td&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;td&gt;&lt;time
+datetime="&lt;&lt;tmtVersionDate&gt;&gt;"&gt;&lt;&lt;tmtVersionDate&gt;&gt;&lt;/time&gt;&lt;/td&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;td&gt;&lt;&lt;tmtVersionAction&gt;&gt;&lt;/td&gt;<br>
+&nbsp;&nbsp;&nbsp;
+&lt;td&gt;&lt;&lt;tmtVersionActionAuthor&gt;&gt;&lt;/td&gt;<br>
+&nbsp;&nbsp;&nbsp;
+&lt;td&gt;&lt;&lt;tmtVersionActionDescription&gt;&gt;&lt;/td&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;/tr&gt;<br>
+&lt;tmtClose --&gt;<br>
+<br>
+<h3>$LangMap$ : languages links.</h3>
+Generates a set of (html) links to the representation of the current
+entity in different languages.<br>
+<h4>Parameters</h4>
+<span style="font-weight: bold;">spacing</span> : the space to be used
+between different links (anything between "::" and "||")<br>
+<span style="font-weight: bold;">label</span> : a label for each
+language, specified as (example) en-english. In this case "en" is the
+language definition (essentially as used in RDF), while "english" is
+the label displayed.<br>
+<h4>Example</h4>
+&lt;!-- tmtOpen&gt;<br>
+$LangMap$spacing:: ||::en-english||label::it-italian||label::fr-french||<br>
+&lt;tmtClose --&gt;<br>
+<br>
+<h3>$codes$ : a list of codes&nbsp;</h3>
+Renders a list of codes for a register (an error message may be
+reported if this directive is used for a code. For each code, the
+directive repeats the enclosed string, expanding some pre-defined
+placeholders.<br>
+<h4>Placeholders</h4>
+<span style="font-weight: bold;">&lt;&lt;codeURL&gt;&gt;</span> : The
+URL for the code (that may be distinct from the URI).<br>
+<span style="font-weight: bold;">&lt;&lt;tmtCodeNotation&gt;&gt; :</span>
+The object of the skos:notation property for the displayed version (or
+"-" if nothing is found).<br>
+<span style="font-weight: bold;">&lt;&lt;tmtCodeLabel&gt;&gt; </span>:
+The label for the code. An attempt is made to find a label for the
+current langauge and version, if nothing is found, the language for
+default language and the latest version is returned. If nothing was
+found an empty string is returned.<br>
+<h4>Example</h4>
+&lt;ul&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;!-- tmtOpen&gt;$codes$<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &lt;li&gt;&lt;a
+href="&lt;&lt;codeURL&gt;&gt;"
+class="moreb"&gt;[&lt;&lt;tmtCodeNotation&gt;&gt;]
+&lt;&lt;tmtCodeLabel&gt;&gt;&lt;/a&gt;&lt;/li&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;tmtClose --&gt;<br>
+&lt;/ul&gt;<br>
+<br>
+<h3>$subreg$ : list of subregisters</h3>
+Expands to a list of subregisters for a set (if the directive applies to
+a code, an error may be returned). The usage and the configuration are
+essentially as in the $codes$ directive.<br>
+<h4>Placeholders </h4>
+<span style="font-weight: bold;">&lt;&lt;subRegURL&gt;&gt;</span><br style="font-weight: bold;">
+<span style="font-weight: bold;">&lt;&lt;tmtSubRegNotation&gt;&gt;</span><br style="font-weight: bold;">
+<span style="font-weight: bold;">&lt;&lt;tmtSubRegLabel&gt;&gt;</span>
+<h4>Example</h4>
+&lt;ul&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;!-- tmtOpen&gt;$subreg$<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &lt;li&gt;&lt;a
+href="&lt;&lt;subRegURL&gt;&gt;"
+class="moreb"&gt;[&lt;&lt;tmtSubRegNotation&gt;&gt;]
+&lt;&lt;tmtSubRegLabel&gt;&gt;&lt;/a&gt;&lt;/li&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;tmtClose --&gt;<br>
+&lt;/ul&gt;<br>
+<br>
+<h3>$onLevel$ : nesting dependent strings</h3>
+When a terminology is visited by a document visitor (see below), each
+item rendered has a level of nesting. For instance the root register
+may havea level of nesting of 1, a sub register of 2 and so on... This
+directive outputs a string that is dependent on this nesting level. A
+typical use case if to specify if some text should be rendered as a
+chapter, section or sub-section in latex.<br>
+<h4>Parameters</h4>
+a list of the form number::string (e.g.:
+$onLevel$0::chapter||1::section||2::subsection||)<br>
+<br>
+<h4>Placeholders</h4>
+<span style="font-weight: bold;">
+&lt;&lt;tmtOnLevel&gt;&gt;</span> : replaced by the string specified in
+the
+parameters for n=the nexting level of the entity to be rendered.<br>
+<br>
+<h4>Example</h4>
+&lt;!--
+tmtOpen&gt;$onLevel$0::chapter||1::section||2::subsection||\&lt;&lt;tmtOnLevel&gt;&gt;&lt;tmtClose
+--&gt;Chapter, section, or subsection text.<br>
+<h3>$setCodesProp : supports the rendering of tables of codes</h3>
+This macro is typically used for the document visitor in Latex. It
+supports the rendering of all codes of a register as a single table. In
+particular it collects all possible properties used for the code of a
+given register (in all versions) and renders elements of a table where
+one line corresponds to a code, and one column to a property. If cell
+values are URIs, the system attempts to render a label if found. This
+directive only applies to sets and may return an error message if used
+for a code.<br>
+<h4>Parameters</h4>
+<span style="font-weight: bold;">sepTableDesc</span> : the separator
+for the table descriptor. Note that _UP_ is replaces with | <br>
+<span style="font-weight: bold;">colTableDesc</span> : the column
+description (type and attributes, not label)<br>
+<span style="font-weight: bold;">headerRepBlockPre</span> : text before
+each column description<br>
+<span style="font-weight: bold;">headerRepBlockPost</span> : text after
+each column description<br>
+<span style="font-weight: bold;">sepHeader</span> : separator of the
+header line<br>
+<span style="font-weight: bold;">endHeader</span> : ends the header line<br>
+<span style="font-weight: bold;">sepLine</span> : the table line
+separator<br>
+<span style="font-weight: bold;">endLine</span> : the table line
+delimiter
+&nbsp; <br>
+<br>
+<br>
+&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+\\||sepTableDesc::_UP_||||headerRepBlockPre::\textsc{||headerRepBlockPost::}||sepHeader::&nbsp;
+<h4>Placeholder</h4>
+<span style="font-weight: bold;">&lt;&lt;colBlockLatexStyle&gt;&gt;</span>
+: a repetition of the block sepTableDesc colTableDesc sepTableDesc,
+bounded by two sepTableDesc (e.g.: |c|c|c| for a table of three columns)<br>
+<span style="font-weight: bold;">&lt;&lt;tmtColNumber&gt;&gt;</span> :
+the number of columns (attributes or relations)<br>
+<span style="font-weight: bold;">&lt;&lt;tmtDescription&gt;&gt;</span>
+:&nbsp; descripttion for the register (object of the property
+rdfs:comment). If nothing is found for the selected language and
+version, the default language and then the most current version are
+tried. If nothing is found returns "description not found".<br>
+<span style="font-weight: bold;">&lt;&lt;headerRow&gt;&gt; </span>:
+expanded as, for each attribute : [sepHeader, headerRepBlockTest, the
+label or URI of the column attribute, headerRepBlockPost] terminated by
+a endHeader.<br>
+<span style="font-weight: bold;"> &lt;&lt;valuesRow&gt;&gt;</span> : A
+repetition of: [attribute value, URI or label, seLine] for each property,
+followed by endLine. In rendering values '&amp;' and '_' are escaped,
+to allow for inclusion in latex tables.
+<h4>Example</h4>
+\begin{center}<br>
+&nbsp;&nbsp;&nbsp; \begin{landscape}<br>
+&nbsp;&nbsp;&nbsp; &lt;!-- tmtOpen&gt;$setCodesProps$sepLine:: &amp;
+||endLine::
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+\\||sepTableDesc::_UP_||colTableDesc::p{1cm}||headerRepBlockPre::\textsc{||headerRepBlockPost::}||sepHeader::
+&amp; ||endHeader:: \\||<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+\begin{longtable}{&lt;&lt;colBlockLatexStyle&gt;&gt;}<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+\multicolumn{&lt;&lt;tmtColNumber&gt;&gt;}{@{*}c@{*}}%<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+{&lt;&lt;tmtDescription&gt;&gt;}\\<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&lt;&lt;headerRow&gt;&gt;<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; \hline<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; \endhead<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&lt;&lt;valuesRow&gt;&gt;<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &lt;tmtClose
+--&gt;<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; \end{longtable}<br>
+&nbsp;&nbsp;&nbsp; \end{landscape}<br>
+\end{center}<br>
+<br>
+(the basicLatex template provides a working example for directive, that
+can be run to see its result.<br>
+<br>
+<br>
+<br>
+<h2>How to specifies templates for a terminology system</h2>
+<big><big><small><small>The templates are used by the system to provide
+a (html/rdf) file based representation of the terminology, to publish
+it via an embedded server or to publish it as a pdf document. There are
+two three ways in which templates can be accessed, which corresponds to
+two templates structures.<br>
+
+<h3>Templates for html pages</h3>html&nbsp; templates are used both by the online server and when a file based representation of terminology is generated. When a page is requested, the server looks for a template corresponding to the entity type (register or code) and the language in the request, and uses it to generate a page that is served over http.<br>The file based representation uses the same mechanism, but visits all the terminology and prints it as files, including some extra files that are needed to setup conent negotation in apache and rdf/turtle files. In particular the visitor visits every register and codes for all their versions and for all languages available.<br>An html template is specified with two files for each language available:<br><span style="font-weight: bold;">code.langauge.tmt </span>: (e.g. code.en.tmt) the template for a code. The language string is the one used to denote the language in RDF labels.<br><span style="font-weight: bold;">set.language.tmt</span>: (e.g. code.set.tmt) the template for a set (register).<br>
+<h3>Templates for documents</h3>
+Documents are generated by a visitor that crawl the all terminology tree extracting information for versions which are relative to a specific tag. The implemented visitor assumes that one tag can only be associated to a version (not vice versa). This is the natural case if tags are used for releases (rather than to denote feature such as "stable", "experimental", as usage that is not currently supported by the template mechamism).<br>In visiting the tree, the system proceeds breadth first, and each template is called with information on the level of the register hiearchy being rendered.<br>A template for documents is specified via four files for each language:<br>pre.language.tmt : a template included at the beginning of the document<br>post.language.tmt :</small></small></big></big><big><big><small><small> a template included at the end of the document</small></small></big></big><br><big><big><small><small>set.language.tmt : a template for a set or register<br>code.language.tmt : a template for a code<br><br>
+</small></small></big></big>
+<br>
