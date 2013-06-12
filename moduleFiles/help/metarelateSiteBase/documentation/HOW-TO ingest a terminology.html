@@ -1,0 +1,304 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>HOW-TO ingest a terminology</title>
+
+  
+</head><body>
+<h1>How to import (ingest) a terminology</h1>
+
+<br>
+
+A terminology represented in RDF can be imported in the system through
+the ts ingest command, for an explanation of which we refer to the
+command line help.<br>
+
+Here we detail which conditions the RDF needs to meet to be
+successfully imported, and how this can be achieved.<br>
+
+<br>
+
+<h2>Import process</h2>
+
+The terminology server, while importing a terminology will proceed as
+follows:<br>
+
+<br>
+
+<h3>Input processing<br>
+</h3>
+
+All input files are unified in single graph.<br>
+
+<br>
+
+"Inference" is applied to this graph (what is to be inferred is
+specified in the input graph as well).<br>
+
+<h3>Individuals extraction</h3>
+
+The system will look for all individuals, defined as resources that are
+explicitly typed as TerminologyIndividual. E.g. it will look in the
+overall RDF in input for triples of the form:<br>
+
+<pre>resource a &lt;http://metarelate.net/core/meta/TerminologyIndividual&gt;</pre>
+
+<br>
+
+<h3>Sets (registers) extraction</h3>
+
+The system will look for sets defined as resources that are explicitly
+types
+as TerminologySet. E.g. it will look in the overall RDF for triples of
+the form:<br>
+
+<pre>resource a &lt;http://metarelate.net/core/meta/TerminologyIndividual&gt;</pre>
+
+<h3>Processing of statements and versions</h3>
+
+<pre>For both individuals and sets, it will look at the hasVersion property (http://metarelate.net/config/hasVersion) , to determine whether:</pre>
+
+A) the entity is subject to versioning (default) <br>
+
+B) the entity is subject to versioning and a specific version is
+provided. E.g.:<br>
+
+<pre>resourceURI&nbsp; <span style="font-family: monospace;"></span>http://metarelate.net/config/hasVersion<br>"3"</pre>
+
+C) the entity is not subject to versioning (this is specified via a
+negative version number). E.g.: <br>
+
+<pre>E.g. resourceURI&nbsp; <span style="font-family: monospace;"></span>http://metarelate.net/core/meta/hasVersion<br>"-1"</pre>
+
+<br>
+
+Actions taken depends on the ingest modality (-update set or not) and
+whether the entity was already present and its versioning policy. In
+particular, if an entity is imported that is already in the system, the
+following combinations are possible:<br>
+
+<br>
+
+<table style="text-align: left; width: 100%;" border="1" cellpadding="2" cellspacing="2">
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">Update off<br>
+      </td>
+      <td style="vertical-align: top;">Update on<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">non-versioned (-1)<br>
+      </td>
+      <td style="vertical-align: top;">Statements replaced, metadata
+updated.<br>
+      </td>
+      <td style="vertical-align: top;">Statements replaced, metadata
+updated.</td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">version (no version spec.)<br>
+      </td>
+      <td style="vertical-align: top;">New version generated with the
+new statements.<br>
+      </td>
+      <td style="vertical-align: top;">New version generated with the
+new statements only if version changed.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">version (version spec.)<br>
+      </td>
+      <td style="vertical-align: top;">Statements for this versions
+replaced (no new version!)<br>
+      </td>
+      <td style="vertical-align: top;">Statements for this version
+replaced (no new version!)<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+Note that whether an entity is versioned or not is decided at the first
+import. A version can be specified or not at any point.<br>
+
+<br>
+
+<h3>Note on containment relations</h3>
+
+The system considers two special relations are defining containment
+(definition) relations betweeen codes and registers and between
+register and sub-registers.<br>
+
+These are:<br>
+
+<pre>http://metarelate.net/core/data/definedIn</pre>
+
+<pre>http://metarelate.net/core/data/defines</pre>
+
+These properties are treated as any other statements pertaining to
+codes and registers (they are eventually versioned).<br>
+
+<br>
+
+<br>
+
+<h3>Properties metadata extraction</h3>
+
+<br>
+
+The system will look for metadata about properties, that it will
+extract and remember. This is typically the property:<br>
+
+<br>
+
+<pre>http://metarelate.net/config/propertyFocus</pre>
+
+<br>
+
+whose objects can be <br>
+
+<br>
+
+<pre>http://metarelate.net/config/conceptRelatedProperty </pre>
+
+(the property is relative to the conceptual nature of a code. E.g.
+skos:narrower)<br>
+
+<br>
+
+or <br>
+
+<br>
+
+<pre>http://metarelate.net/config/codeRelatedProperty</pre>
+
+(the property is relative to the "code" nature of a code. E.g.:
+bytes_length)<br>
+
+<br>
+
+Some metadata is provided in the default configuration file
+<span style="font-style: italic;">defaultPropertiesConfig.ttl</span>,
+but is not read at startup time as
+explained in <a href="Guide%20to%20the%20defautl%20configuration%20files.html">Guide
+to the default configuration files</a>. An extract of this file is
+reported here as an example:<br>
+
+<br>
+
+<pre>skos:narrower config:propertyFocus config:conceptRelatedProperty;</pre>
+
+<pre>.</pre>
+
+<pre><br>skos:broader config:propertyFocus config:conceptRelatedProperty;</pre>
+
+<pre>.</pre>
+
+<pre><br>skos:member config:propertyFocus config:conceptRelatedProperty;</pre>
+
+<pre>.</pre>
+
+<br>
+
+<h3>Labels extraction</h3>
+
+The system will extract and remember all labels. Note that when the
+ingest command is called with the option -labelsOnly, this is the only
+step taking place (in addition to gathering all input files in a single
+graph and performing reasoning).<br>
+
+<br>
+
+<br>
+
+<br>
+
+<h2>Inference and reasoning directives</h2>
+
+<br>
+
+The inferencing step can be useful to generate relations when these are
+not in the original terminology set. For instance one reasoning
+directive could add a&nbsp; <span style="font-style: italic;">metarelate:TerminologyIndividual</span>
+statement
+when <span style="font-style: italic;">skos:concept</span> is asserted
+in the dataset.<br>
+
+The reasoning directives available are:<br>
+
+<br>
+
+
+
+<h3>http://metarelate.net/config/generatesProperty</h3>
+
+<br>
+
+For each statements <span style="font-style: italic;">?s ?p ?o</span>, if ?p matches the property subject of the
+directive, it adds a new statement <span style="font-style: italic;">?s ?p2 ?o</span>, with <span style="font-style: italic;">?p2</span> the property
+indicated as the object of the directive.
+<br>
+
+Example:<br>
+
+<pre>skos:prefLabel config:generatesProperty rdfs:label;<br><br>.<br><br></pre>
+
+
+
+<h3>http://metarelate.net/config/generatesType</h3>
+
+<br>
+
+For each statements <span style="font-style: italic;">?s</span> <span style="font-style: italic;">a</span> <span style="font-style: italic;">?t</span>, the system adds a new statement <span style="font-style: italic;">?s a ?t2</span>, where <span style="font-style: italic;">?t config:generates ?t2</span>
+<br>
+
+<br>
+
+Example:
+<pre>skos:Concept config:generatesType meta:TerminologyIndividual;<br>.<br></pre>
+
+<br>
+
+
+
+<h3>http://metarelate.net/config/symmetric</h3>
+
+<br>
+
+If <span style="font-style: italic;">?p config:symmetric ?p2</span>, for any statement matching <span style="font-style: italic;">?s ?p ?o</span> the system generates a new statement <span style="font-style: italic;">?p ?p2 ?s
+</span>.<br>
+
+
+Note that the inference of the symmetry between <span style="font-style: italic;">definedIn</span> and <span style="font-style: italic;">defines</span> properties is computed by the system in any case and before following inference steps.
+
+<h2>Terminology understood by the system:</h2>
+
+The terminology systems hard-codes specific actions for the following
+properties that can be found in a representation of a terminology in
+RDF.
+<br>
+<br>
+<span style="font-style: italic;">http://metarelate.net/core/data/TerminologySet</span><span style="font-weight: bold;"> </span>: used to identify what is a register.<br>
+<span style="font-style: italic;">http://metarelate.net/core/data/TerminologyIndividual</span> : used to identify what is a code.<br>
+<span style="font-style: italic;">http://metarelate.net/core/data/defines</span> : used to identify containment between register and codes or registers and sub-registers<br>
+<span style="font-style: italic;">http://metarelate.net/core/data/definedIn</span> : used to identify containment between codes and registers or sub-registers and registers<br>
+<span style="font-style: italic;">http://metarelate.net/core/meta/hasVersion</span> : used to identify the version (or absence of) some entity description refer to<br>
+<span style="font-style: italic;">
+rdfs:label</span> : used in rendering for displaying purposes<br>
+<span style="font-style: italic;">
+rdfs:comment</span> : used in rendering as a description<br>
+<span style="font-style: italic;">
+skos:notation</span> : used in rendering for a concise (often numeric) code<br>
+
+<br>
+
+<pre><br></pre>
+
+</body></html>
