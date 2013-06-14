@@ -27,7 +27,12 @@ import net.glxn.qrgen.QRCode;
 import net.glxn.qrgen.image.ImageType;
 
 public class IDrenderer {
-
+	/**
+	 * Generates a QR representation for a URI
+	 * @param registerQRImageFile
+	 * @param uri
+	 * @throws IOException
+	 */
 	public static void writeToFile(String registerQRImageFile, String uri) throws IOException {
 		File registerQRImageFileFW= new File(registerQRImageFile);
 		FileOutputStream registerQRImageFileBW = new FileOutputStream(registerQRImageFileFW);

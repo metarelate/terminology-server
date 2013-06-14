@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.Reader;
 import java.util.UUID;
 
 public class Installer {
@@ -122,6 +121,7 @@ public class Installer {
 		System.out.println();
 		
 		//pdfLatex
+		/*
 		pdfLatexFile=readLine("If want authomatic creation of pdf files, please provide the abosulte path of the pdflatex command\n" +
 				"The system generates latex and will simply call this command for the final conversion, it is your responsability to be sure you have a functioning Tex system in place. \n");
 		if(pdfLatexFile!=null) {
@@ -129,7 +129,8 @@ public class Installer {
 				System.out.println("Invalid file, skipping it! You will be able to add the correct command by editing the config files (see documentation)");
 			}
 		} 
-		
+		*/
+		pdfLatexFile="NOT_IMPLEMENTED";
 		System.out.println();
 		System.out.println("Beginning installation");
 		

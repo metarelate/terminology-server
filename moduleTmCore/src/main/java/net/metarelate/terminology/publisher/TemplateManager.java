@@ -21,7 +21,6 @@ package net.metarelate.terminology.publisher;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -42,7 +41,6 @@ import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.WebWriterException;
 import net.metarelate.terminology.publisher.templateElements.BreadCrumbsTemplate;
 import net.metarelate.terminology.publisher.templateElements.ContainedCodesTemplate;
-import net.metarelate.terminology.publisher.templateElements.DummyTemplateElement;
 import net.metarelate.terminology.publisher.templateElements.HeaderTemplate;
 import net.metarelate.terminology.publisher.templateElements.LangMapTemplate;
 import net.metarelate.terminology.publisher.templateElements.ParamStringTemplateElement;
@@ -52,13 +50,16 @@ import net.metarelate.terminology.publisher.templateElements.StringTemplateEleme
 import net.metarelate.terminology.publisher.templateElements.SubRegistersTemplateElement;
 import net.metarelate.terminology.publisher.templateElements.TagsTemplate;
 import net.metarelate.terminology.publisher.templateElements.TemplateElement;
-import net.metarelate.terminology.publisher.templateElements.TemplateTermElement;
-import net.metarelate.terminology.publisher.templateElements.TemplateFixedElement;
 import net.metarelate.terminology.publisher.templateElements.TemplateGlobalElement;
+import net.metarelate.terminology.publisher.templateElements.TemplateTermElement;
 import net.metarelate.terminology.publisher.templateElements.VersionTemplate;
-
 import net.metarelate.terminology.utils.Loggers;
 
+/**
+ * Manages templates
+ * @author andreasplendiani
+ *
+ */
 public class TemplateManager {
 	private final String openTag="<!-- tmtOpen>";
 	private final String closeTag="<tmtClose -->";
@@ -72,6 +73,13 @@ public class TemplateManager {
 	Map<String,ArrayList<TemplateElement>> preTemplates=new Hashtable<String,ArrayList<TemplateElement>>();
 	Map<String,ArrayList<TemplateElement>> postTemplates=new Hashtable<String,ArrayList<TemplateElement>>();
 
+	/**
+	 * Initializes the template manager with a specific template dir.
+	 * A template manager is relative to only one template.
+	 * @param templateFileDir
+	 * @throws ConfigurationException
+	 * @throws IOException
+	 */
 	public TemplateManager(String templateFileDir) throws ConfigurationException, IOException {
 		super();
 		Loggers.publishLogger.info("Loading templates in "+templateFileDir);
@@ -104,15 +112,70 @@ public class TemplateManager {
 		}
 	}
 	
+	/**
+	 * Returns a rendered page for a set
+	 * @param language the desired language
+	 * @param set a terminology set
+	 * @param version 
+	 * @param level
+	 * @param baseURL the URL for the entity (only or web publishing)
+	 * @param cacheManager
+	 * @param lm
+	 * @param bkm
+	 * @param registryBaseURL the URL for the root of the terminology resiter (above root registers)
+	 * @param tag (only for docs)
+	 * @return
+	 * @throws ConfigurationException
+	 * @throws ModelException
+	 * @throws WebWriterException
+	 */
 	public String getPageForLang(String language, TerminologySet set, String version, int level,String baseURL,CacheManager cacheManager,LabelManager lm, BackgroundKnowledgeManager bkm, String registryBaseURL, String tag) throws ConfigurationException, ModelException, WebWriterException {
 		return expandTermTemplate(setTemplates,language,set,version, level,baseURL,cacheManager,lm,bkm,registryBaseURL,tag);
 	}
+	
+	/**
+	 * Returns a rendered page for an individual
+	 * @param language the desired language
+	 * @param set a terminology set
+	 * @param version 
+	 * @param level
+	 * @param baseURL the URL for the entity (only or web publishing)
+	 * @param cacheManager
+	 * @param lm
+	 * @param bkm
+	 * @param registryBaseURL the URL for the root of the terminology resiter (above root registers)
+	 * @param tag (only for docs)
+	 * @return
+	 * @throws ConfigurationException
+	 * @throws ModelException
+	 * @throws WebWriterException
+	 */
 	public String getPageForLang(String language, TerminologyIndividual ind, String version, int level,String baseURL,CacheManager cacheManager,LabelManager lm, BackgroundKnowledgeManager bkm, String registryBaseURL,String tag) throws ConfigurationException, ModelException, WebWriterException {
 		return expandTermTemplate(indTemplates,language,ind,version,level,baseURL,cacheManager,lm,bkm,registryBaseURL,tag); 	// TODO we don't care about levels here
 	}
+	
+	/**
+	 * Gets the into template
+	 * @param language
+	 * @param tag
+	 * @param tf
+	 * @return
+	 * @throws ConfigurationException
+	 * @throws ModelException
+	 */
 	public String getIntroForLang(String language,String tag,TerminologyFactory tf) throws ConfigurationException, ModelException {
 		return expandFixedTemplate(preTemplates,language,tag,tf);
 	}
+	
+	/**
+	 * gets the post template
+	 * @param language
+	 * @param tag
+	 * @param tf
+	 * @return
+	 * @throws ConfigurationException
+	 * @throws ModelException
+	 */
 	public String getClosingForLang(String language,String tag,TerminologyFactory tf) throws ConfigurationException, ModelException {
 		return expandFixedTemplate(postTemplates,language,tag,tf);
 	}
@@ -180,6 +243,10 @@ public class TemplateManager {
 	    return stringBuilder.toString();
 	}
 
+	/**
+	 * returns the list of supported languages for the template that this template manager is initialized with
+	 * @return
+	 */
 	public String[] getLanguages() {
 		return indTemplates.keySet().toArray(new String [0]);
 	}

@@ -113,7 +113,12 @@ public interface TerminologySet extends TerminologyEntity{
 	 * @throws ModelException 
 	 */
 	public Set<TerminologyIndividual> getAllKnownContainedInviduals() throws ModelException ;
-
+	
+	/**
+	 * returns true if the entity is a register defining some code or sub-register.
+	 * returns false if the entity is a code or an empty register.
+	 * @param myTerm
+	 */
 	public abstract boolean containsEntity(TerminologyEntity myTerm);
 
 

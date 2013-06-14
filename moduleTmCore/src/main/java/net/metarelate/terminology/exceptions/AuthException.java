@@ -26,7 +26,7 @@ package net.metarelate.terminology.exceptions;
  * This is not en exception related to the lack of privileges to perform an operation.
  * 
  * 
- * @author andreasplendiani
+ * @author andrea_splendiani
  *
  */
 public class AuthException extends ImpossibleOperationException {

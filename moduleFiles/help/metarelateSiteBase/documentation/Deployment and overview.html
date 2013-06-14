@@ -1,0 +1,257 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>Deployment and overview</title></head><body>
+<h1>An overview of the Metarelate Terminology Server<br>
+</h1>
+<h2>Introduction</h2>
+The Meterelate Terminology server is a system that allows the curation
+and publishing of code lists as Linked-Data, Pdf (Latex) or Linked
+Data. It allows to maintain the evolution of a base of codes keeping
+track of modifications via versioning, and recording which action was
+taken when. <br>
+<h2>Terminology and conventions adopted</h2>
+Throughout this documentation (and largely in the code), we refer to codes as <span style="font-weight: bold;">codes</span> or <span style="font-weight: bold;">individuals</span>, and we refer to sets as <span style="font-weight: bold;">sets</span> or <span style="font-weight: bold;">registers</span>. Codes and sets are both subclasses of a more generic <span style="font-weight: bold;">entity</span>.<br>
+We indicate URIs as <span style="font-style: italic;">&lt;http://example.com/test&gt;</span> , <span style="font-style: italic;">http://example.com/test</span> and <span style="font-style: italic;">ex:test</span> (assuming the definition of a prefix ex.<br>
+<span style="font-weight: bold;"><br>
+</span>
+<h2><span style="font-weight: bold;"></span>Concepts and codes</h2>
+If we think about the common idea of a code, we would have something like:<br>
+<pre>001 : Temperature.</pre>
+This code makes sense given a specific context, so for instance we could have the code:<br>
+<pre>Measurement Standard 1, 001 : Temperature.</pre>
+<br>
+With some more detail, we could have something like:<br>
+<br>
+<pre>Measurement Standard 1</pre>
+<pre>Code : 001</pre>
+<pre>Definition : Temperature</pre>
+<pre>Unit : K</pre>
+<pre>Status : Operational</pre>
+<pre>Encoding : 26bit</pre>
+<br>
+In expressing attributes of this code, we are referring to different conceptual entities. We can easily distinguish a <span style="font-weight: bold;">concept</span> (an idea of temperature) and <span style="font-weight: bold;">information artifact</span>
+(the code 001, a representation for temperature that was considered
+"operational" within some process). We could articulate the concept in
+a more complex description, noting that we have a physical entity
+(Temperature), a unit of measure (K) and a representation property.<br>
+The terminology server supports a representation of codes that can
+distinguish these different aspects, and presents them as a set of
+interlinked web resources.<br>
+In particular the terminology server is built on the idea that codes
+are "defined" in registers, that can at their time be organized in
+hierarchies of sub-registers. The definition in a register is dependent
+upon a <span style="font-weight: bold;">process</span> and a set of <span style="font-weight: bold;">responsible agents</span>,
+it isn't dependent on the meaning of the definition. For instance the
+DVLA can be seen as a register of vehicles (physical entities), while a
+skos:collection can be seen as a register of concepts (for instance a
+list of colors).<br>
+The terminology server is neutral respect to the nature of what is
+registered (physical entity, concept), or what the register is (an
+institute, or simply a list definition), but enforce the authority of
+the definition. For colors, the register would say that <span style="font-style: italic;">Blue</span> in <span style="font-style: italic;">ColorRegister X</span>
+implies that the responsible person for this register has taken
+responsibility (according to a process) for its presence in the
+register.<br>
+<br>
+<h2>URI, URL and versioning</h2>
+One basic ideas behind the design of the terminology server is that
+entities (codes or registers) are identified by URIs. In this system,
+URIs are built with a "hackable" convention in which their structure
+maps to the register hierarchy and cutting URIs resolve to sensible
+results.<br>
+For example a URI for a temperature may be defined as:<br>
+<pre>http://instituteOfExamples.com/metarelateExamples/Standard1/001</pre>
+Chopping the URI would progressively result in:<br>
+<pre>http://instituteOfExamples.com/metarelateExamples/Standard1</pre>
+(the register where 001 is defined)<br>
+<pre>http://instituteOfExamples.com/metarelateExamples</pre>
+(the register in which the register Standard1 is defined)<br>
+<pre>http://instituteOfExamples.com</pre>
+(the institution that is de-fact responsible for publishing this information)<br>
+<br>
+URIs are immutably associated to the semantics of the identifier and
+never change, as far as they denote the same thing. The properties that
+pertain to given URI may change in time. The system allows to record
+these properties, and access them via URIs which have a version number.<br>
+<br>
+For instance:<br>
+A register may denote the car pool of a company X, which at a give time (corresponding to version 0) has two car, A and B.<br>
+<br>
+the URI for the car pool could be.<br>
+<pre>http://carRegister.com/companyX</pre>
+<br>
+the register would provide, for this URI, the following information (in pseudo rdf):<br>
+<pre>http://carRegister.com/companyX hasCar http://carRegister.com/cars/1 </pre>
+<br>
+at the same time resolving the URI for the code car would result in:<br>
+<pre>http://carRegister.com/cars/1 inPool http://carRegister.com/companyX</pre>
+<br>
+We could ask the system for the same information respect ton version 0, and we would have:<br>
+<pre>http://carRegister.com/companyX/0</pre>
+yields<br>
+<pre>http://carRegister.com/companyX hasCar http://carRegister.com/cars/1 </pre>
+and <br>
+<br>
+<pre>http://carRegister.com/cars/1/0</pre>
+yields<br>
+<pre>http://carRegister.com/companyX hasCar http://carRegister.com/cars/1 </pre>
+<br>
+Now, let's assume that later in time, the car gets demolished and a new
+car (2) is bought. For both the car pool and the car, we denote this
+time has version 1 (note that in principle this number could be
+different from the two entities).<br>
+<br>
+We would have:<br>
+<pre>http://carRegister.com/companyX/1</pre>
+<br>
+yields<br>
+<br>
+<pre>http://carRegister.com/companyX hasCar http://carRegister.com/cars/1 </pre>
+<br>
+(note that the uri for the car pool didn't change. Its meaning didn't
+change, it is intended to be the same car pool. The state of the car
+pool is changed, and this can be retrieved via the version "URL").<br>
+<br>
+for the car, we could imagine that:<br>
+<pre>http://carRegister.com/cars/1/1</pre>
+yields:<br>
+<pre>http://carRegister.com/cars/1 destructionDate DD-MM-YYYY</pre>
+<br>
+Note that even here the URI for the car doesn't change, even if the car
+doesn't exist anymore, as its meaning doesn't change. To make a
+parallel, we can imagine that the id for the Titanic didn't change from
+when the ship was a project, to when it was built to now that it's only
+a memory.<br>
+<br>
+The terminology manager provide full metadata on why each version
+originates, how version links, and provide sensible defaults is an
+unspecified state of a code is asked (latest version).<br>
+<br>
+URIs are identifiers. URLs are like URIs with the additional property
+that they resolve on the web (in principle a URI may not resolve). The
+terminology server distinguish the two aspects. As we have seen, URLs
+can be used to access the information relative to a URI (different
+from&nbsp; the URL, as it doesn't contain the version) for a given
+point in time. The terminology server also allows to dis-align the two
+entity, and publish information about some URIs at a different location
+(this feature at the current stage should be rarely used).<br>
+<br>
+<h2>How to use it (basics)</h2>
+The system is released as a zip archive containing an installer
+program. A README file details steps required for the installation and,
+once installed, a single utility (command line) is made available to
+control all operations of the system. Help options are provided within
+this utility to guide through the different functionality. The system
+is inherently platform-independent, but minor aspects may be
+specifically tuned to unix systems.<br>
+<br>
+<h2>Ingestion, Administration and publishing</h2>
+The system allows the batch import of a terminology, which would
+normally be the first action (after installation) in a new system. When
+a terminology (represented in RDF) is imported (ingested), the system
+creates a terminology structure that is persisted on a triplestore
+(under the db directory. See <a href="Guide%20to%20the%20defautl%20configuration%20files.html">Guide to the default configuration</a>).<br>
+Once a terminology has been imported, it possible to start a web interface that allows to update the terminology.<br>
+It is also possible to issue the publishing of the terminology, in different forms. It is possible to:<br>
+<ul>
+  <li>publish the terminology as latex file</li>
+  <li>publish the terminology as a set of files designed to provide a
+linked-data representation based on files served by apache via content
+negotiation. Note that this requires the apache configuration to be
+tweaked to allow .var based content negotiation.</li>
+  <li>publish the terminology via an embedded server</li>
+  <li>open a sparql server (fuseki) on the content of the triplestore (third party software).</li>
+</ul>
+Note that in the current implementation only one instance of the
+triplestore where files are persisted can be accessed at any time.
+Therefore it is not possible to edit and publish the terminology via
+the embedded server (or to use fuseki) at the same time.<br>
+<br>
+The following operational scenarios are possible:<br>
+<ul>
+  <li>The system only runs the import command, the administrative web
+interface or the online publisher at any one time. In practice when
+data are edited, access to data is removed.</li>
+  <li>The system publishes the terminology as files. The terminology is
+still accessible while edit takes place. Changes take place when a new
+publish operation is invoked.</li>
+  <li>The content of the /db directory is copied between different
+instances. In this case a user could edit the terminology, all the
+resulting files in /db could then be copied to a second directory and
+this can be used to open an online server publishing the terminology
+(or a sparql endpoint). This approach minimize down-time when the
+terminology is updated.</li>
+</ul>
+The publication of a terminology as a set of files or via an embedded
+server provide distinct pros and cons. The optimal solution depends on
+specific requirements.<br>
+<table style="text-align: left; width: 100%;" border="1" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+      <td style="vertical-align: top;">Pros<br>
+      </td>
+      <td style="vertical-align: top;">Cons<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">File based publishing<br>
+      </td>
+      <td style="vertical-align: top;">Virtually no systems resources needed at run time.<br>
+Only apache required.<br>
+Easy to transport on media (e.g.: cd!)<br>
+No downtime.<br>
+      </td>
+      <td style="vertical-align: top;">It can easily generate a large amount of files (may require tuning of the file system to expand the iNode table).<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">Embedded server<br>
+      </td>
+      <td style="vertical-align: top;">Doesn't require space for files.<br>
+Doesn't need to publish the whole terminology (publishing on demand)<br>
+      </td>
+      <td style="vertical-align: top;">Cannot be used together with the online publishing, unless triplestore files are duplicated.<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+Note: the system provides a template mechanisms for publishing.
+Currently, css, scripts and external information have to be managed
+separately and cannot be served by the embedded server. Templates could
+include access to such elements from a different server (in the case
+the online publisher is used) or the same server (file based
+representation only).<br>
+<br>
+<h2>Process, validation and authority</h2>
+The terminology server supports generic processes, custom validation rules and a basic authority model.<br>
+The authority model, whose only implementation is file based, is based
+on an "authority server" which is able to answer if a triple of the
+following form is allowed or not:<br>
+<span style="font-style: italic;">agentURI actionTypeURI targetURI </span>(potentially any of&nbsp; these may be replaced by an "any" symbol.<br>
+The system automatically travel the sub-register containment upstream
+until a positive answer is found, or otherwise doesn't allow the action.<br>
+A simple configuration example can be found in the default
+configuration files under the /auth directory (allowing the default
+user to perform any action on any register).<br>
+<br>
+Generic validation rules can be provided that are applied when the user edits core or registers via the web interface (more in <a href="HOW-TO%20specify%20validation%20constraints.html">HOW-TO specify validation constraints</a>).<br>
+<br>
+A generic process (validation, validated, obsoletion, ...) as well as allowed transitions can also be configured (more in <a href="HOW-TO%20configure%20a%20process.html">HOW-TO configure a process</a>).<br>
+<br>
+<h2>Other references</h2>
+The Metarelate terminology server originates from a prototype developed
+to publish WMO code tables as Linked-Data. Some of the features (e.g.:
+import from descriptions in relational tables) are still in part
+present in the current systems. Other implementation aspects have been
+modified, but the logical model of what at terminology is is unchanged.
+Documentation relative to this prototype can be found <a href="oldDocs/webHelp/index.html">here</a>.<br>
+<br>
+<br>
+<br>
+<br>
+
+
+</body></html>

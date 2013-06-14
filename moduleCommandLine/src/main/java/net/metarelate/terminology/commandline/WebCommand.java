@@ -21,14 +21,18 @@ package net.metarelate.terminology.commandline;
 
 import net.metarelate.terminology.config.CoreConfig;
 import net.metarelate.terminology.exceptions.ConfigurationException;
-import net.metarelate.terminology.instanceManager.Initializer;
 import net.metarelate.terminology.utils.Loggers;
 
 import org.apache.wicket.util.time.Duration;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.bio.SocketConnector;
 import org.eclipse.jetty.webapp.WebAppContext;
-
+/**
+ * Command to start the admin web interface
+ * @see TSCommand for help
+ * @author andreasplendiani
+ *
+ */
 public class WebCommand extends TsCommand {
 	int port=CoreConfig.DEFAULT_ADMIN_PORT;
 	public WebCommand(String sysDir, String[] args) {

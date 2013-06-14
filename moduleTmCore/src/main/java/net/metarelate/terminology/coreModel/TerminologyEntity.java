@@ -28,6 +28,11 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 
+/**
+ * Common traits of sets and registers
+ * @author andrea_splendiani
+ *
+ */
 public interface TerminologyEntity extends Visitee {
 	//final int INDIVIDUAL_TYPE = 1;	// Note: these are not meant to be set! they are only constants to be used...
 	//final int SET_TYPE=2;			// TODO  the design should be changed to avoid confusion
@@ -98,6 +103,10 @@ public interface TerminologyEntity extends Visitee {
 	 */
 	public String getLocalNamespace();
 	
+	/**
+	 * Convenience method that return the last part (local name) of entity URI
+	 * @return
+	 */
 	String getLastURIBit() ;
 	
 	/**
@@ -396,14 +405,24 @@ public interface TerminologyEntity extends Visitee {
 	String getGenericVersionSpecificURIObject(Property property, String version);
 	String getGenericEndurantStringValueObject(Property property);
 	String getGenericEndurantURIObject(Property property);
+	Set<Resource> getGenericVersionSpecificURIObjects(Property typeProperty, String version);
 
+	/**
+	 * Issues a synch to the persistence layer (implementation specific)
+	 */
 	public abstract void synch();
 
-	
+	/**
+	 * returns true if this entity is a set or register
+	 */
 	public boolean isSet();
 	
+	/**
+	 * rerurns true if this entity is a code or individual
+	 * @return
+	 */
 	public boolean isIndividual();
 
-	public Set<Resource> getGenericVersionSpecificURIObjects(Property typeProperty, String version);
+	
 	
 }

@@ -43,7 +43,11 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.tdb.TDB;
 import com.hp.hpl.jena.tdb.TDBFactory;
-
+/**
+ * A jena TDB based implementation of @see TerminologyFactory . Refer to the interface for help.
+ * @author andrea_splendiani
+ *
+ */
 public class TerminologyFactoryTDBImpl implements TerminologyFactory {
 	private Dataset myDataset=null;
 	private Model globalGraph=null;

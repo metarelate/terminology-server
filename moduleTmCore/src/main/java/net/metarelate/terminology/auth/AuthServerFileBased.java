@@ -31,11 +31,29 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
-
+/**
+ * A file based authorization server.
+ * Expects authorization ruls of the form:
+ * agent action target 
+ * in files.
+ * For instance:
+ * <http://example/user/1> <http://example/action/update> <http://metarelate.net/config/allEntities>
+ * Specifies that user/1 can update all entities in the terminology server.
+ * The consumer of this class will ask permissions to containing registers if no permission is found.
+ * E.g.: given the super register X and sub-registers X/A and X/B, this class should only implement
+ * rules for X in order for this to be considered by the system for X/A and X/B.
+ * @author andreasplendiani
+ *
+ */
 public class AuthServerFileBased extends AuthServer {
 	private Model myModel=null;
 
-
+	/**
+	 * Constructor
+	 * @param authFiles a list fof file names (absolute paths) in turtle syntax
+	 * specifying all aspects of the authorization system, including permission rules.
+	 * @throws ConfigurationException
+	 */
 	public AuthServerFileBased(File[] authFiles) throws ConfigurationException {
 		myModel=ModelFactory.createDefaultModel();
 		for(int i=0;i<authFiles.length;i++) {

@@ -17,6 +17,7 @@
  along with terminology-server. If not, see <http://www.gnu.org/licenses/>.
 */
 
+// TODO this class should be obsoleted and is left for some references only
 package net.metarelate.terminology.publisher;
 
 public final class WebRendererStrings {

@@ -1,16 +1,39 @@
+/* 
+ (C) British Crown Copyright 2011 - 2013, Met Office
+
+ This file is part of terminology-server.
+
+ terminology-server is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ terminology-server is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public License
+ along with terminology-server. If not, see <http://www.gnu.org/licenses/>.
+*/
+
 package net.metarelate.terminology.utils;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
+/**
+ * Controls loggers (log4j)
+ * @author andrea_splendiani
+ *
+ */
 public class Loggers {
-	
 
+	private static boolean debugOn=false;
 	
-
-	static boolean debugOn=false;
-	
+	/**
+	 * Initializes loggers
+	 */
 	public static void init() {
 		BasicConfigurator.configure();
 		debugAuxOff();
@@ -32,34 +55,53 @@ public class Loggers {
 	public static final Logger jettyLogger=Logger.getLogger("org.eclipse.jetty");
 	public static final Logger jenaLogger=Logger.getLogger("com.hp.hpl.jena");
 	
-	public static void setLevel(Level level) {
+	private static void setLevel(Level level) {
 		topLogger.setLevel(level);
 	}
+	
+	/**
+	 * Sets the debug level to warning (can be lower for libraries)
+	 */
 	public static void warningOn() {
 		setLevel(org.apache.log4j.Level.WARN);
 		debugAuxOff();
 		debugOn=false;
 	}
 	
+	/**
+	 * Sets the debug level to info (can be lower for libraries)
+	 */
 	public static void infoOn() {
 		setLevel(org.apache.log4j.Level.INFO);
 		debugAuxOff();
 		debugOn=false;
 	}
+	
+	/**
+	 * Sets the debug level to debug (can be lower for libraries)
+	 */
 	public static void debugOn() {
 		setLevel(org.apache.log4j.Level.DEBUG);
 		debugAuxOff();
 		debugOn=true;
 	}
+	
+	/**
+	 * Sets the debug level to trace (can be lower for libraries)
+	 */
 	public static void traceOn() {
 		setLevel(org.apache.log4j.Level.TRACE);
 		debugAuxOn();
 		debugOn=true;
 		
 	}
+	/**
+	 * @return true if the terminology server is running in debug mode
+	 */
 	public static boolean isDebugOn() {
 		return debugOn;
 	}
+	
 	private static void debugAuxOn() {
 		jenaLogger.setLevel(org.apache.log4j.Level.WARN);
 		jettyLogger.setLevel(org.apache.log4j.Level.DEBUG);

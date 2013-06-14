@@ -24,21 +24,40 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 /**
  * A collection of static configuration fields
- * @author andreasplendiani
+ * @author andrea_splendiani
  *
  */
 public class AuthConfig {
+	/**
+	 * A resource that identifies the File-based authentication modality
+	 */
 	public static final String isConfigFileString = "http://metarelate.net/config/authIsInFile";
+	
 	/**
 	 * Represents "all" entries. 
 	 * This is used to specify general authorizations: e.g.: agent-action-all.
 	 * 
 	 */
-	public static String allEntities="http://metarelate.net/config/allEntities";
-	public static String allActions="http://metarelate.net/config/allActions";
-	public static String allActors="http://metarelate.net/config/allActors";
+	public static final String allEntities="http://metarelate.net/config/allEntities";
 	
+	/**
+	 * Represents "all" actions
+	 */
+	public static final String allActions="http://metarelate.net/config/allActions";
+	
+	/**
+	 * Represents "all" agents
+	 */
+	public static final String allActors="http://metarelate.net/config/allActors";
+	
+	/**
+	 * A property specifying which Auth mode is used
+	 */
 	public static final String authConfigURI="http://metarelate.net/config/hasAuthConfigType";
+	
+	/**
+	 * Same as @see authConfigURI, but as Property class.
+	 */
 	public static final Property authConfigProperty=ResourceFactory.createProperty(authConfigURI);
 
 }

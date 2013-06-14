@@ -1,0 +1,150 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta content="text/html; charset=ISO-8859-1"
+      http-equiv="Content-Type">
+    <title>HOW To Install</title>
+  </head>
+  <body>
+    <h1>How to install the WMO Terminology Manager</h1>
+    <h2>Index</h2>
+    <ul>
+      <li><a href="#Types">Types of Installation</a></li>
+      <li><a href="#Requirements">Requirements</a></li>
+      <li><a href="#Files">How to install web accessible representations
+          of WMO codes</a></li>
+      <li><a href="#Server">How to install the Terminology Manager</a></li>
+      <li><a href="#Mapper">How to install the mapping engine</a></li>
+    </ul>
+    <a name="Types">
+      <h2>Types of Installation</h2>
+    </a> Several installations of the WMO TDCF Web accessible registers
+    (TDCF-Register) are possible, depending on functionalities provided.<br>
+    To make a <b>web-representation of codes</b> available, there is no
+    need to install any particular software other than a web server and
+    only a minimum of configuration is required. The terminology server
+    in fact renders all codes simply as files with a proper directory
+    structure. A copy of these files that is performed maintaining the
+    directory structure (e.g.: recursively or via a tar archieve), can
+    be just deployed in a web server directory for "web publication".
+    Clearly, the root of the web server must be compatible with the URLs
+    used for the codes (note that URIs and URLs may differ for testing
+    or other purposes. cfr. <a
+      href="Technical/Terminology%20Manager%20Platform%20Design.html">Terminology
+
+
+
+
+      Manager platform design</a>).<br>
+    To allow for modification of codes (currently via command line), the
+    full <b>Terminology Server</b> must be installed. The Terminology
+    Server requires that an RDF representation from which to build a
+    terminology model is already available.<br>
+    Such representation is provided essentially by the D2RQ system,
+    following conventions outlined in the <a
+      href="Technical/Terminology%20Manager%20Platform%20Design.html">Terminology
+
+
+
+
+      Manager Platform Design</a> document. The D2RQ system complements
+    some functionalities in the Terminology Server to provide the <b>Terminology
+
+
+
+
+      Mapper</b>.<br>
+    <br>
+    <a name="Requirements">
+      <h2>Requirements</h2>
+    </a>
+    <h3><a name="Requirements">
+        <p>Web-representation of codes<br>
+        </p>
+      </a></h3>
+    <ul>
+      <li>A web server supporting content negotation via .var files
+        (e.g.: Apache). The system is tested under: Apache 2.2.22 (Unix)<br>
+      </li>
+    </ul>
+    <h3>Terminology Manager</h3>
+    <p>All of the above, plus:<br>
+    </p>
+    <ul>
+      <li>A Java runtime system (&gt;1.6). The system is tested under
+        OpenJDK 1.10.6 (amazon built) and Java(TM) SE Runtime
+        Environment (1.6.0, Mac OSX)</li>
+    </ul>
+    <h3>Terminology Mapper</h3>
+    <p>All of the above, plus:<br>
+    </p>
+    <ul>
+      <li>A D2RQ installation (ref. Terminology Manager platform
+        design). The system is tested under version 0.7<br>
+      </li>
+      <li>A database supported by D2RQ. The system is tested under:
+        mysql 5.1.44</li>
+      <li>(Optional) the utility <a
+          href="http://librdf.org/raptor/rapper.html">rapper</a> for
+        synatx conversion. The syste, is tested under version 2.0.8.<br>
+      </li>
+    </ul>
+    In addition to the above, access to a server with permissions to
+    operate on the file system and on web accessible directories is
+    required.<br>
+    <h3><a name="Requirements"></a></h3>
+    <a name="Requirements"> </a> <a name="Files"> </a>
+    <h2>How to install web accessible representations of WMO codes</h2>
+    <p>Make sure the <a
+        href="http://httpd.apache.org/docs/2.2/mod/mod_negotiation.html"
+        name="Files">mod_negotation module</a> is installed in Apache.<br>
+      Edit the httpd configuration file (usually found at
+      /etc/httpd/conf/httpd.con on unix systems) to specify the
+      directory index option as folllows:<br>
+    </p>
+    <pre>DirectoryIndex index.html index.html.var code.var register.var</pre>
+    <p> (it should include code.var and register.var).<br>
+    </p>
+    <p>Is is then sufficient to copy and expand a tarball with
+      terminology files in a web accessible directory. An example of
+      such file is available <a href="../resources/allCodesTar.tgz">here</a>
+      (this referes to reference.metoffice.gov.uk/data/wmo URIs and
+      URLs, and links would appear as broken if installed elsewhere).<br>
+    </p>
+    <a name="Server">
+      <h2>How to install the Terminology Manager</h2>
+    </a>
+    <p>The current version of the terminology manager can be downloaded
+      <a href="../resources/WMOTermReg.jar">here</a> a boundle of the
+      rquired libs is available <a
+        href="http://reference.metoffice.gov.uk/data/wmo/resources/libs.tgz">here</a>
+      (all the included jars must be made visibile prior or at command
+      execution). This piece of software is self contained, requiring
+      only a Java Run Time environment for execution. The software will
+      need to operate on a triplestore whose file location is specified
+      via command line (cfr. <a
+        href="HOWTO/HOW-TO%20make%20a%20mapping.html">HOW-TO make a
+        mapping</a> and <a
+        href="HOW-TO%20publish%20a%20terminology%20model.html">HOW-TO
+        publish a terminology model</a>). The Terminology Manager will
+      need access to the file system both to access (r/w) triplestore
+      files and to write/delete files in a directory served by the web
+      server.<br>
+      If the Terminology Manager is used to generate a mapping, a
+      triplestore, if not present, will be initialized in the specified
+      location.<br>
+    </p>
+    <a name="Mapper">
+      <h2>How to install the mapping engine</h2>
+    </a> The mapping engine is in part contained in the Terminology
+    Manager, and in part relies on the presence of <a
+      href="http://d2rq.org">D2RQ</a> on the system. D2RQ, at its time,
+    requires access to a relational engine with proper read-only
+    permissions on a datatabase containg a representation of tables to
+    be mapped. For installation of D2RQ please refer to the D2RQ
+    documentation. Security settings are specific to the chosen
+    relational engine.<br>
+    <br>
+    <br>
+  </body>
+</html>

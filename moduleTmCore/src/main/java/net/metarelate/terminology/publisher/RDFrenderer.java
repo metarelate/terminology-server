@@ -19,20 +19,26 @@
 
 package net.metarelate.terminology.publisher;
 
-import java.util.Iterator;
-import java.util.Set;
-
 import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
-import net.metarelate.terminology.coreModel.TerminologyIndividual;
-import net.metarelate.terminology.coreModel.TerminologySet;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
-
+/**
+ * Provides an RDF representation of a code or register information.
+ * This basically combines information from the global and local graph.
+ * @author andreasplendiani
+ *
+ */
 public class RDFrenderer {
+	/**
+	 * returns a set of statements for the specific version of the entity, which is enriched with information from the global graph
+	 * @param entity
+	 * @param version
+	 * @return
+	 */
 	public static Model prepareModel(TerminologyEntity entity, String version) {
 		Model modelToWrite=ModelFactory.createDefaultModel();
 		modelToWrite.add(MetaLanguage.filterForData(entity.getStatements(version)));

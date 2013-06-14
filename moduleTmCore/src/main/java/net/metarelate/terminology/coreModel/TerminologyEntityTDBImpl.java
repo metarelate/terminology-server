@@ -42,6 +42,12 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.tdb.TDB;
 
+/**
+ * a Jena-TDB based implementation of @see TerminologyEntity
+ * Please refer to the interface for documentation
+ * @author andrea_splendiani
+ *
+ */
 public abstract class TerminologyEntityTDBImpl implements TerminologyEntity {
 	protected TerminologyFactory myFactory=null;	//The factory responsible for the construction of this entity
 	private String uri=null; 							//This is the uri of the entity. 
@@ -99,7 +105,7 @@ public abstract class TerminologyEntityTDBImpl implements TerminologyEntity {
 	
 	/**
 	 * Note: the information held is held in memory.
-	 * @see {@link TerminologyEntityTDBImpl#getLocalNamespace}
+	 * @see TerminologyEntityTDBImpl#getLocalNamespace
 	 * TODO it would be better if the namespace was persisted as an endurant information. 
 	 */
 	public void setLocalNamespace(String lns) {
@@ -270,13 +276,6 @@ public abstract class TerminologyEntityTDBImpl implements TerminologyEntity {
 		return descRes;
 	}
 
-	//public void setDefaultVersion(String version) {
-	//	this.defaultVersion=version;
-	//}
-	
-	//public String getDefaultVersion() {
-	//	return this.defaultVersion;
-	//}
 
 	public void setIsVersioned(boolean isVersioned) {
 		StmtIterator toRemove=globalGraph.listStatements(myRes,TDBModelsCoreConfig.isVersionedProperty,(Resource)null);

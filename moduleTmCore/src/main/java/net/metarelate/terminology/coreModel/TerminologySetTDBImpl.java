@@ -36,7 +36,11 @@ import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
-
+/**
+ * A jena-TDB based implementation of @see TerminologySet . Refer to the extended abstract classes and implemented interfaces for help
+ * @author andrea_splendiani
+ *
+ */
 public class TerminologySetTDBImpl extends
 		TerminologyEntityTDBImpl implements TerminologySet {
 

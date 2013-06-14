@@ -52,8 +52,13 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 
+/**
+ * Performs operations on registers
+ * @author andrea_splendiani
+ *
+ */
 public class TerminologyManager {
-	public static final int MODE_REPLACE = 1;
+	public static final int MODE_REPLACE = 1;	//TODO thes should be all private and the only method calling them wrapped
 	private static final int MODE_ADD = 2;
 	private static final int MODE_REMOVE = 3;
 	private static final int MODE_SOBSTITUTE = 4;
@@ -61,36 +66,129 @@ public class TerminologyManager {
 	private final int INDIVIDUAL_TYPE = 10;	// Note: these are not meant to be set! they are only constants to be used...
 	private final int SET_TYPE=11;			// TODO  the design should be changed to avoid confusion
 
-	Initializer myInitializer=null;
+	private Initializer myInitializer=null;
 	//TerminologyFactory myFactory;
 	//AuthRegistryManager myAuthManager;
-	DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+	private DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+	
 	public TerminologyManager(Initializer initializer) {
 		myInitializer=initializer;
 	}
 	
+	/**
+	 * For the statements in the model, if a statement with the same subject and property is present in statsToReplace,
+	 * the old statement is removed before all statsToReplace are added.
+	 * @param entityURI
+	 * @param statsToReplace
+	 * @param actionAuthor
+	 * @param description
+	 * @throws AuthException
+	 * @throws RegistryAccessException
+	 * @throws InvalidProcessException
+	 * @throws ModelException
+	 */
 	public void replaceEntityInformation(String entityURI, Model statsToReplace, String actionAuthor, String description) throws AuthException, RegistryAccessException, InvalidProcessException, ModelException {
 		amendEntityInformation(entityURI, statsToReplace, actionAuthor, description, MODE_REPLACE);
 	}
+	
+	/**
+	 * Remove all current statements and replaces them with the ones provided
+	 * @param entityURI
+	 * @param statsToReplace
+	 * @param actionAuthor
+	 * @param description
+	 * @throws AuthException
+	 * @throws RegistryAccessException
+	 * @throws InvalidProcessException
+	 * @throws ModelException
+	 */
 	public void sobstituteEntityInformation(String entityURI, Model statsToReplace, String actionAuthor, String description) throws AuthException, RegistryAccessException, InvalidProcessException, ModelException {
 		amendEntityInformation(entityURI, statsToReplace, actionAuthor, description, MODE_SOBSTITUTE);
 	}
-	public void addToEntityInformation(String entityURI, Model statsToReplace, String actionAuthor, String description) throws AuthException, RegistryAccessException, InvalidProcessException, ModelException {
-		amendEntityInformation(entityURI, statsToReplace, actionAuthor, description, MODE_ADD);
+	
+	/**
+	 * Adds a set of statement to an entity
+	 * @param entityURI
+	 * @param statsToAdd the set of statements to be added
+	 * @param actionAuthor
+	 * @param description
+	 * @throws AuthException
+	 * @throws RegistryAccessException
+	 * @throws InvalidProcessException
+	 * @throws ModelException
+	 */
+	public void addToEntityInformation(String entityURI, Model statsToAdd, String actionAuthor, String description) throws AuthException, RegistryAccessException, InvalidProcessException, ModelException {
+		amendEntityInformation(entityURI, statsToAdd, actionAuthor, description, MODE_ADD);
 
 	}
-	public void removeFromEntityInformation(String entityURI, Model statsToReplace, String actionAuthor, String description) throws AuthException, RegistryAccessException, InvalidProcessException, ModelException {
-		amendEntityInformation(entityURI, statsToReplace, actionAuthor, description, MODE_REMOVE);		
+	
+	/**
+	 * Removes a set of statements from an entity
+	 * @param entityURI
+	 * @param statsToRemove the statements to be removed
+	 * @param actionAuthor
+	 * @param description
+	 * @throws AuthException
+	 * @throws RegistryAccessException
+	 * @throws InvalidProcessException
+	 * @throws ModelException
+	 */
+	public void removeFromEntityInformation(String entityURI, Model statsToRemove, String actionAuthor, String description) throws AuthException, RegistryAccessException, InvalidProcessException, ModelException {
+		amendEntityInformation(entityURI, statsToRemove, actionAuthor, description, MODE_REMOVE);		
 	}
 	
+	/**
+	 * Adds a new term to a register
+	 * @param codeURI
+	 * @param registerURI
+	 * @param defaultEntityModel the statements for the new code
+	 * @param actionAuthor
+	 * @param description
+	 * @param isVersioned
+	 * @throws AuthException
+	 * @throws RegistryAccessException
+	 * @throws InvalidProcessException
+	 * @throws ModelException
+	 * @throws ImporterException
+	 */
 	public void addTermToRegister(String codeURI, String registerURI, Model defaultEntityModel,String actionAuthor, String description, boolean isVersioned ) throws AuthException, RegistryAccessException, InvalidProcessException, ModelException, ImporterException {
 		addEntityToRegister( codeURI,  registerURI,  defaultEntityModel, actionAuthor,  description,  isVersioned, INDIVIDUAL_TYPE);
 	}
+	
+	/**
+	 * Adds a new sub register to a register
+	 * @param codeURI
+	 * @param registerURI
+	 * @param defaultEntityModel the statements for the new register
+	 * @param actionAuthor
+	 * @param description
+	 * @param isVersioned
+	 * @throws AuthException
+	 * @throws RegistryAccessException
+	 * @throws InvalidProcessException
+	 * @throws ModelException
+	 * @throws ImporterException
+	 */
 	public void addSubRegister(String codeURI, String registerURI, Model defaultEntityModel,String actionAuthor, String description, boolean isVersioned ) throws AuthException, RegistryAccessException, InvalidProcessException, ModelException, ImporterException {
 		addEntityToRegister( codeURI,  registerURI,  defaultEntityModel, actionAuthor,  description,  isVersioned, SET_TYPE);
 
 	}
-			//TODO we start refactoring from this!
+	
+	/**
+	 * Add a new entity to a register
+	 * @param codeURI the uri of the new entity
+	 * @param registerURI the register
+	 * @param defaultEntityModel the statements for the new entity
+	 * @param actionAuthor the agent
+	 * @param description a description of the action
+	 * @param isVersioned true is versioning should be active
+	 * @param entityType set o code (flag)
+	 * @throws AuthException
+	 * @throws RegistryAccessException
+	 * @throws InvalidProcessException
+	 * @throws ModelException
+	 * @throws ImporterException
+	 */
 	private void addEntityToRegister(String codeURI, String registerURI, Model defaultEntityModel,String actionAuthor, String description, boolean isVersioned, int entityType ) throws AuthException, RegistryAccessException, InvalidProcessException, ModelException, ImporterException {
 			if(!myInitializer.myAuthManager.can(actionAuthor,RegistryPolicyManager.actionAddURI,registerURI))
 					throw new AuthException(actionAuthor,RegistryPolicyManager.actionAddURI,registerURI);
@@ -99,7 +197,7 @@ public class TerminologyManager {
 			if(!myInitializer.myFactory.terminologySetExist(registerURI)) throw new RegistryAccessException("Unable to modify "+registerURI+" (register does not exist)");
 			myRegister=myInitializer.myFactory.getUncheckedTerminologySet(registerURI);
 			if(myInitializer.myFactory.terminologyIndividualExist(codeURI)) {
-				// Note this is only for addding! Not for changing obsolete/valid status. In other words, a delete operation
+				// Note this is only for adding! Not for changing obsolete/valid status. In other words, a delete operation
 				throw new RegistryAccessException("Code "+codeURI+" exists. Use \"move\" to change register");
 			}
 			String lastRegisterVersion=myRegister.getLastVersion();
@@ -182,8 +280,19 @@ public class TerminologyManager {
 				
 		}
 	
-	
-	
+
+	/**
+	 * Update action
+	 * @param entityURI the entity to be updated
+	 * @param statsToReplace the new statements
+	 * @param actionAuthor the agent
+	 * @param description a description for this action
+	 * @param mode the update modality (@see #MODE_ADD @see #MODE_REMOVE @see #MODE_SOBSTITUTE @see #MODE_REPLACE)
+	 * @throws AuthException
+	 * @throws RegistryAccessException
+	 * @throws InvalidProcessException
+	 * @throws ModelException
+	 */
 	public void amendEntityInformation(String entityURI, Model statsToReplace, String actionAuthor, String description, int mode) throws AuthException, RegistryAccessException, InvalidProcessException, ModelException {
 		if(!myInitializer.myAuthManager.can(actionAuthor,RegistryPolicyManager.actionUpdateURI,entityURI))
 			throw new AuthException(actionAuthor,RegistryPolicyManager.actionUpdateURI,entityURI);
@@ -239,6 +348,17 @@ public class TerminologyManager {
 		myEntity.synch();
 	}
 	
+	/**
+	 * Performs a generic action (only results in change of states)
+	 * @param actionURI
+	 * @param entityURI
+	 * @param actionAuthor
+	 * @param description
+	 * @throws AuthException
+	 * @throws RegistryAccessException
+	 * @throws InvalidProcessException
+	 * @throws ModelException
+	 */
 	public void performGenericAction(String actionURI, String entityURI, String actionAuthor, String description) throws AuthException, RegistryAccessException, InvalidProcessException, ModelException {
 		if(!myInitializer.myAuthManager.can(actionAuthor,actionURI,entityURI)) {
 				throw new AuthException(actionAuthor,actionURI,entityURI);
@@ -280,15 +400,16 @@ public class TerminologyManager {
 	
 
 	
-
 	
 
-		
-		
-	
-	
-
-	
+	/**
+	 * Tag a release
+	 * @param authorURI the agent
+	 * @param tag the tag value
+	 * @param description
+	 * @throws AuthException
+	 * @throws ModelException
+	 */
 	public void tagRelease(String authorURI, String tag, String description) throws AuthException, ModelException {
 		try {
 			if(!myInitializer.myAuthManager.can(authorURI,RegistryPolicyManager.tagAction,null))
@@ -327,6 +448,15 @@ public class TerminologyManager {
 		
 	}
 	
+	/**
+	 * Obsolete a term
+	 * @param urlToDelete the term to be obsoleted
+	 * @param actionAuthorURI the agent
+	 * @param description a description associated to this action
+	 * @throws ModelException
+	 * @throws RegistryAccessException
+	 * @throws ImpossibleOperationException
+	 */
 	public void delTerm(String urlToDelete, String actionAuthorURI,
 			String description) throws ModelException, RegistryAccessException, ImpossibleOperationException {
 		Loggers.processLogger.debug("Going to obsolete "+urlToDelete+" by "+actionAuthorURI+" because : "+description);		
@@ -369,6 +499,19 @@ public class TerminologyManager {
 	
 	//TODO generalize to set
 	//TODO overall TerminologyManager is due a big overhaul!!!
+	
+	//TODO should be made private, other classes can call through the wrapping method
+	/**
+	 * Obsolete a term
+	 * @param termURI the term to be obsoleted
+	 * @param regURI the register where the term is contained
+	 * @param actionAuthorURI the uri of the agent
+	 * @param description a description associated to this action
+	 * @throws AuthException
+	 * @throws RegistryAccessException
+	 * @throws InvalidProcessException
+	 * @throws ModelException
+	 */
 	public void delTermFromRegister(String termURI, String regURI,
 			String actionAuthorURI, String description) throws AuthException, RegistryAccessException, InvalidProcessException, ModelException {
 	Loggers.processLogger.debug("Going to remove "+termURI+" from "+regURI+" by "+actionAuthorURI+" because : "+description);		
@@ -460,7 +603,16 @@ public class TerminologyManager {
 		
 	}
 	
-	//////////////
+	/**
+	 * Superseds a term
+	 * @param urlToAction the uri of the superseded term
+	 * @param urlSuperseder the uri of the superseded
+	 * @param actionAuthorURI the uri of the author
+	 * @param description a description associated to this action
+	 * @throws ImpossibleOperationException
+	 * @throws RegistryAccessException
+	 * @throws ModelException
+	 */
 	public void superseedTerm(String urlToAction, String urlSuperseder,
 			String actionAuthorURI, String description) throws ImpossibleOperationException, RegistryAccessException, ModelException {
 		if(!myInitializer.myFactory.terminologySetExist(urlToAction)) {
@@ -493,8 +645,8 @@ public class TerminologyManager {
 	}
 
 	
-	
-	public void superseedTermInRegister(String termURI,
+
+	private void superseedTermInRegister(String termURI,
 			String superseedingTermURI, String regURI, 
 			String actionAuthorURI, String description) throws AuthException, RegistryAccessException, InvalidProcessException, ModelException {
 		// TODO Auto-generated method stub
@@ -581,7 +733,7 @@ public class TerminologyManager {
 	superseedingTerm.linkVersions(lastSuperseedingsTermVersion,newSuperseedingVersion);
 	
 	
-	
+	//TODO to check versions are ok
 	myRegister.unregisterContainedEntity(myTerm, newRegisterVersion, newTermVersion);
 	
 		//////	

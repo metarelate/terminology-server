@@ -46,6 +46,11 @@ import net.metarelate.terminology.instanceManager.Initializer;
 import net.metarelate.terminology.utils.Loggers;
 import net.metarelate.terminology.utils.SimpleQueriesProcessor;
 
+/**
+ * Manages publishing of terminologies
+ * @author andreasplendiani
+ *
+ */
 public class PublisherManager {
 	Initializer myInitializer=null;
 	public static final int WEB_FILES = 0;
@@ -65,6 +70,17 @@ public class PublisherManager {
 		
 	}
 	
+	/**
+	 * Publish the terminology as a set of web files. 
+	 * @param rootURI the root URI from which publishing should start (normally a root register)
+	 * @param extraInputGraph configuration statements
+	 * @param overwrite true if files can be overwritten
+	 * @throws ModelException
+	 * @throws ConfigurationException
+	 * @throws WebWriterException
+	 * @throws UnknownURIException
+	 * @throws IOException
+	 */
 	public void publishWebFiles(String rootURI, Model extraInputGraph,boolean overwrite) throws ModelException, ConfigurationException, WebWriterException, UnknownURIException, IOException {
 		Loggers.publishLogger.info("Publishing the terminology under "+rootURI+" as a set of web-files");
 		String baseURL=null;
@@ -102,6 +118,16 @@ public class PublisherManager {
 		vis.crawl(root);	
 	}
 	
+	/**
+	 * Publish the terminology as a document
+	 * @param tag the tag identifying the release to be published
+	 * @param language the desired language
+	 * @param fileName the output file (absolute path with extension)
+	 * @throws ConfigurationException
+	 * @throws IOException
+	 * @throws ModelException
+	 * @throws WebWriterException
+	 */
 	public void publishDoc(String tag, String language, String fileName) throws ConfigurationException, IOException, ModelException, WebWriterException {
 		Loggers.publishLogger.info("Publishing the terminology as a document for tag "+tag+" in language "+language);
 		TemplateManager myTm=new TemplateManager(templateLocation); //TODO just in case we need a different design
@@ -112,6 +138,12 @@ public class PublisherManager {
 		
 	}
 	
+	/**
+	 * Starts and embedded server to publish the terminology
+	 * @param extraTriplesGraph
+	 * @param port
+	 * @throws Exception
+	 */
 	public void publishOnline(Model extraTriplesGraph, int port) throws Exception {
 		Loggers.publishLogger.info("Publishing starting online server for the terminology at port: "+port);
 		String baseURL=SimpleQueriesProcessor.getOptionalConfigurationParameterSingleValue(myInitializer.getConfigurationGraph(), PublisherConfig.baseURLProperty);

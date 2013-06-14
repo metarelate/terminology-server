@@ -18,6 +18,8 @@
 */
 
 package net.metarelate.terminology.exceptions;
+// TODO to clarify with AuthException
+
 /**
  * Registry Manager Exception
  *

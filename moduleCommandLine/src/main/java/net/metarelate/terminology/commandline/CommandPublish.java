@@ -30,13 +30,16 @@ import java.util.ArrayList;
 import net.metarelate.terminology.config.CoreConfig;
 import net.metarelate.terminology.coreModel.TerminologySet;
 import net.metarelate.terminology.exceptions.ConfigurationException;
-import net.metarelate.terminology.instanceManager.Initializer;
-import net.metarelate.terminology.publisher.PublisherConfig;
 import net.metarelate.terminology.publisher.PublisherManager;
 import net.metarelate.terminology.utils.Loggers;
 
 import com.hp.hpl.jena.rdf.model.Model;
-
+/**
+ * Command to publish a terminology
+ * @see TSCommand for help
+ * @author andreasplendiani
+ *
+ */
 public class CommandPublish extends TsCommand {
 	boolean overwrite=false;				//default
 	boolean cleanCache=false;				//default

@@ -39,7 +39,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 
-public class ComputeTreePragmaProcessor extends PragmaProcessor {
+class ComputeTreePragmaProcessor extends PragmaProcessor {
 	TerminologySet rootSet;
 	Resource schemeResource;
 	Model globalConfigurationModel;

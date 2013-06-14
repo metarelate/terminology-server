@@ -18,7 +18,11 @@
 */
 
 package net.metarelate.terminology.exceptions;
-
+/**
+ * Exception representing a configuration error.
+ * @author andrea_splendiani
+ *
+ */
 public class ConfigurationException extends Exception {
 
 	

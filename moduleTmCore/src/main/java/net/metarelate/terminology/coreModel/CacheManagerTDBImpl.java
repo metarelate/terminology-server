@@ -48,8 +48,9 @@ public class CacheManagerTDBImpl implements CacheManager {
 		auxDataset = TDBFactory.createDataset(cacheLocation);
 		cacheGraph=auxDataset.getNamedModel(CoreConfig.cacheGraph);
 	}
-	/* (non-Javadoc)
-	 * @see net.metarelate.terminology.instanceManager.CacheManager#getValueFor(java.lang.String, java.lang.String)
+	
+	/**
+	 * @see CacheManager#getValueFor(String, String)
 	 */
 	public String getValueFor(String resource, String property) {
 		Resource subjectRes=ResourceFactory.createResource(resource);
@@ -62,8 +63,9 @@ public class CacheManagerTDBImpl implements CacheManager {
 		}
 		return null;
 	}
-	/* (non-Javadoc)
-	 * @see net.metarelate.terminology.instanceManager.CacheManager#cleanValueFor(java.lang.String, java.lang.String)
+	
+	/** 
+	 * @see nCacheManager#cleanValueFor(String, String)
 	 */
 	public boolean cleanValueFor(String resource, String property) {
 		Resource subjectRes=ResourceFactory.createResource(resource);
@@ -77,8 +79,9 @@ public class CacheManagerTDBImpl implements CacheManager {
 		return true;	
 		
 	}
-	/* (non-Javadoc)
-	 * @see net.metarelate.terminology.instanceManager.CacheManager#recordValue(java.lang.String, java.lang.String, java.lang.String)
+	
+	/** 
+	 * @see CacheManager#recordValue(String, String, String)
 	 */
 	public void recordValue(String resource, String property, String value) {
 		cacheGraph.add(cacheGraph.createStatement(
@@ -86,13 +89,18 @@ public class CacheManagerTDBImpl implements CacheManager {
 				ResourceFactory.createProperty(property), 
 				ResourceFactory.createPlainLiteral(value))	);
 	}
-	/* (non-Javadoc)
-	 * @see net.metarelate.terminology.instanceManager.CacheManager#changeValue(java.lang.String, java.lang.String, java.lang.String)
+	
+	/** 
+	 * @see CacheManager#changeValue(String, String, String)
 	 */
 	public void changeValue(String resource, String property, String value) {
 		cleanValueFor(resource,property);
 		recordValue(resource,property,value);
 	}
+	
+	/**
+	 * @see CacheManager#forceCleanProp(String)
+	 */
 	public void forceCleanProp(String propertyURI) {
 		Model toRemove=ModelFactory.createDefaultModel();
 		StmtIterator toRemItemIter=cacheGraph.listStatements(null,ResourceFactory.createProperty(propertyURI),(RDFNode)null);
@@ -102,12 +110,20 @@ public class CacheManagerTDBImpl implements CacheManager {
 		cacheGraph.remove(toRemove);
 		TDB.sync(cacheGraph);
 	}
+	
+	/**
+	 * @see CacheManager#synch()
+	 */
 	public void synch() {
 		TDB.sync(cacheGraph);
 		
 	}
-	//TODO note that we assume there's only one URI for a url...
+	
+	/**
+	 * @see CacheManager#getSubjectForValue(String, String)
+	 */
 	public String getSubjectForValue(String urlRequested, String property) {
+		//TODO note that we assume there's only one URI for a url...
 		Literal objectRes=ResourceFactory.createPlainLiteral(urlRequested);
 		Property proRes=ResourceFactory.createProperty(property);
 		ResIterator currentValues=cacheGraph.listSubjectsWithProperty(proRes,objectRes);

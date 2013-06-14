@@ -36,6 +36,14 @@ import net.metarelate.terminology.exceptions.InvalidProcessException;
 import net.metarelate.terminology.utils.Loggers;
 import net.metarelate.terminology.utils.SimpleQueriesProcessor;
 
+//TODO visibility of most methods could be package-restricted
+/**
+ * Given a process configuration, checks if some actions is valid for the current state
+ * and compute result states.
+ * 
+ * @author andrea_splendiani
+ *
+ */
 public class RegistryPolicyManager {
 	final static int PRE_THIS=0;
 	final static int PRE_UP=1;
@@ -89,7 +97,10 @@ public class RegistryPolicyManager {
 	private Map<String,ArrayList<String[]>> codeTransitions=new Hashtable<String,ArrayList<String[]>>();
 
 	
-	
+	/**
+	 * Constructor
+	 * @param allConfig the global configuration file
+	 */
 	public RegistryPolicyManager(Model allConfig) {
 		Loggers.policyLogger.debug("Looking for built in actions and transitions");
 		Set<Resource> actions=new HashSet<Resource>();
@@ -249,10 +260,28 @@ public class RegistryPolicyManager {
 	
 	}
 	
+	/**
+	 * Returns true is the specified action is viable for the state map, if the target is a code.
+	 * @param actionURI the identifier of the action
+	 * @param thisState the current state of the target of the action
+	 * @param upState the current state of the container of the action
+	 * @param downState the current state of the contained of the action
+	 * @param auxState the current state of a third entity involved in the action
+	 * @return
+	 */
 	public boolean isViableOperationOnReg(String actionURI, String thisState, String upState, String downState, String auxState) {
 		return isViableOperation(registerTransitions, actionURI,  thisState,  upState,  downState,  auxState);
 	}
-	
+
+	/**
+	 * Returns true is the specified action is viable for the state map, if the target is a register.
+	 * @param actionURI the identifier of the action
+	 * @param thisState the current state of the target of the action
+	 * @param upState the current state of the container of the action
+	 * @param downState the current state of the contained of the action
+	 * @param auxState the current state of a third entity involved in the action
+	 * @return
+	 */
 	public boolean isViableOperationOnCode(String actionURI, String thisState, String upState, String downState, String auxState) {
 		return isViableOperation(codeTransitions, actionURI,  thisState,  upState,  downState,  auxState);
 
@@ -308,11 +337,31 @@ public class RegistryPolicyManager {
 	}
 	
 	
-	
+	/**
+	 * Computes the next state for the given action on a register
+	 * @param actionURI the identifier of the action
+	 * @param thisState the current state of the target of the action
+	 * @param upState the current state of the container of the action
+	 * @param downState the current state of the contained of the action
+	 * @param auxState the current state of a third entity involved in the action
+	 * @return an array containing the states for (in the specified order): target entity, container, contained, third party object
+	 * @throws InvalidProcessException
+	 */
 	public String[] nextRegState(String actionURI, String thisState, String upState, String downState, String auxState) throws InvalidProcessException {
 		Loggers.policyLogger.trace("nextRegCall");
 		return nextAnyState(registerTransitions, actionURI,  thisState,  upState,  downState,  auxState);
 	}
+	
+	/**
+	 * Computes the next state for the given action on a code
+	 * @param actionURI the identifier of the action
+	 * @param thisState the current state of the target of the action
+	 * @param upState the current state of the container of the action
+	 * @param downState the current state of the contained of the action
+	 * @param auxState the current state of a third entity involved in the action
+	 * @return an array containing the states for (in the specified order): target entity, container, contained, third party object
+	 * @throws InvalidProcessException
+	 */
 	public String[] nextCodeState(String actionURI, String thisState, String upState, String downState, String auxState) throws InvalidProcessException {
 		Loggers.policyLogger.trace("nextCodeCall");
 		return nextAnyState(codeTransitions, actionURI,  thisState,  upState,  downState,  auxState);

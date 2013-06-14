@@ -41,6 +41,11 @@ public class DocumentVisitor extends PublisherVisitor {
 	String tag=null;
 	private int level=0;
 	
+	/**
+	 * Constructor
+	 * @param myInitializer
+	 * @param myTemplate
+	 */
 	public DocumentVisitor(Initializer myInitializer, TemplateManager myTemplate) {
 		super();
 		this.myInitializer = myInitializer;
@@ -48,6 +53,15 @@ public class DocumentVisitor extends PublisherVisitor {
 		myDoc=new StringBuilder();
 	}
 
+	/**
+	 * pack visits the terminology and pack results of the visit together, adding pre and post templates
+	 * @param tag the tag that identifies the release to be exported
+	 * @param language the desired language for the export
+	 * @throws ConfigurationException
+	 * @throws ModelException
+	 * @throws WebWriterException
+	 * @throws IOException
+	 */
 	public void bind(String tag, String language) throws ConfigurationException, ModelException, WebWriterException, IOException {
 		this.language=language;
 		this.tag=tag;
@@ -60,7 +74,8 @@ public class DocumentVisitor extends PublisherVisitor {
 		
 	}
 
-	public void crawl(Set<TerminologySet> currentSent, String tag, String language) throws ConfigurationException, ModelException, WebWriterException, IOException {
+	
+	void crawl(Set<TerminologySet> currentSent, String tag, String language) throws ConfigurationException, ModelException, WebWriterException, IOException {
 		Loggers.publishLogger.trace("Doc visitor crwaling at level: "+level);
 		for(TerminologySet set:currentSent) {
 			Loggers.publishLogger.trace("Set: "+set.getURI());
@@ -102,6 +117,11 @@ public class DocumentVisitor extends PublisherVisitor {
 
 	}
 
+	/**
+	 * Outputs the overall representation of the terminology as a file
+	 * @param fileName the absolute path of the file where to write to (including extensions)
+	 * @throws IOException
+	 */
 	public void writeToFile(String fileName) throws IOException {
 		FileWriter fWriter = new FileWriter(fileName);
 		BufferedWriter fBWriter = new BufferedWriter(fWriter);

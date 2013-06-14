@@ -1,5 +1,5 @@
 /* 
- (C) British Crown Copyright 2011 - 2012, Met Office
+ (C) British Crown Copyright 2011 - 2013, Met Office
 
  This file is part of terminology-server.
 
@@ -26,6 +26,12 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 public class UtilityDebugger {
+	/**
+	 * Returns a String representation of the statements in a model
+	 * @param uri
+	 * @param model
+	 * @return
+	 */
 	public static String printStatementsForURI(String uri, Model model) {
 		StmtIterator stats=model.listStatements(ResourceFactory.createResource(uri),null,(RDFNode)null);
 		StringBuilder sb=new StringBuilder();

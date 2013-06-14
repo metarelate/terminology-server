@@ -1,0 +1,187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>Guide to the defautl configuration files</title>
+
+  
+</head><body>
+<h1>Guide to the default configuration files (HOW-TO change the default
+configuration)</h1>
+
+When installed, the terminology server generates default configuration
+files, that can be altered to tune the setup of the system. All
+configuration files are present in the /conf directory, and in two
+additional files (prefixFile and instanceSeed). All files under /conf
+are part of a unique configuration space: they are read by the system
+after being merged in a single graph. For this reason, <span style="font-weight: bold;">it is important to verify that no spurious
+files appear in this directory (e.g.: some editor automatically
+generates backup files, that lead to inconsistent configurations and
+unpredictable effects).</span><br>
+
+<br>
+
+Two configuration files are out of the /conf directory and they are:<br>
+
+<br>
+
+<h2>prefixFile.ttl</h2>
+
+Is an RDF files only used to extract the prefix map, which is used when
+publishing information in RDF. This prefix is read each time the server
+is started. The name of the file and its syntax are hard-coded. <span style="font-weight: bold;">Additional prefixes should be added to this
+file to be considered by the system</span>.<br>
+
+<h2>seedFile.ttl</h2>
+
+Contains a single statement with the unique identifier of the specific
+instance of the terminology manager. This file is generated at
+installation time and it shouldn't be altered.<br>
+
+<br>
+
+<h2>Default files under the /conf directory</h2>
+
+Note that these files can be renamed/and or merged. What is important
+is only their content. Files should be provided in Turtle syntax.<br>
+
+<br>
+
+<h3>defaultServerConfig.ttl</h3>
+
+Provides details on the system component. Every change on this file
+will take effect at the next startup file.<br>
+
+The parameters that can be configured in this file are:<br>
+
+<br>
+
+<span style="font-weight: bold;">http://metarelate.net/config/hasDBDir</span>
+:&nbsp; The directory where the triplestore (or other engine) files
+are. (e.g. "/metarelate/test/db")<br>
+
+<br>
+
+<span style="font-weight: bold;">http://metarelate.net/config/hasAuthConfigType</span>
+:&nbsp; The authorization mechanism supported, currently the only
+implemented system is an auth-basd authentication
+(http://metarelate.net/config/authIsInFile)<br>
+
+<br>
+
+<span style="font-weight: bold;">http://metarelate.net/config/baseURL</span>
+: The base URL for the publication of the terminology as linked data.<br>
+
+<br>
+
+<span style="font-weight: bold;">http://metarelate.net/config/diskPrefix</span>
+: The directory where a terminology can be published as a set of files
+(web-based representation).<br>
+
+<br>
+
+<span style="font-weight: bold;">http://metarelate.net/config/hasPdfLatexCommand</span>
+: the absolute path of the pdflatex command (currently not used).<br>
+
+<br>
+
+<span style="font-weight: bold;">http://metarelate.net/config/hasAuthDir</span>
+: the directory where authorization files can be found (used by the
+file based auth implementation).<br>
+
+<br>
+
+<span style="font-weight: bold;">http://metarelate.net/config/hasCacheDir</span>
+: the directory for cache files (currently the indexes of an
+independent triplestore).<br>
+
+<br style="font-weight: bold;">
+
+<span style="font-weight: bold;">http://metarelate.net/config/hasTemplatesDir</span>
+: the directory where web or latex templates can be found (files of
+each template are in a sub-directory named after the template).<br>
+
+<br>
+
+<span style="font-weight: bold;">http://metarelate.net/config/hasWebPackageDir</span>
+: the directory where the web-application for the administrative
+interface of the terminology editor can be found (war file).<br>
+
+<br>
+
+<span style="font-weight: bold;">http://metarelate.net/config/hasGitDir</span>
+: A directory where files used to support a githib based implementation
+of the terminology server can be found (currently not implemented)<br>
+
+&nbsp;&nbsp; <br>
+
+<span style="font-weight: bold;">http://metarelate.net/config/hasPrefixFile</span>
+: absolute path of prefixFile.ttl<br>
+
+<br style="font-weight: bold;">
+
+<span style="font-weight: bold;">http://metarelate.net/config/hasSeedFile</span>
+: absolute path of seedFile.ttl&nbsp; <br>
+
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; <br>
+
+<span style="font-weight: bold;">http://metarelate.net/config/hasDefaultUserID</span>
+: the dafult user URI.<br>
+
+&nbsp; <br>
+
+<h3>defaultPropertiesConfig.ttl</h3>
+
+This file provides metadata annotation for properties. Of this
+metadata, some is read when the system is started, but some is never
+read unless the file is specifically included as a configuration while a
+terminology is imported. Therefore the role of this file is
+two-fold.&nbsp; It provides some "core-configuration" directives which
+are relevant for properties. At the same time, it provides some
+annotations that are useful for other terminology-server related
+actions. The two "aspects" are both represented in the same file as to
+have a "file about properties".<br>
+
+Here we present only parameters pertaining to the "core-configuration",
+which is configuration that takes place when the system start. Other
+attributes used while ingesting a terminology are described in <a href="HOW-TO%20ingest%20a%20terminology.html">HOW-TO import a
+terminology</a>.<br>
+
+<br>
+
+The only property in this file that is interpreted at startup-time is <span style="font-weight: bold;">http://metarelate.net/config/overrides</span>,
+that allows to redefine properties internal to the system. For instance
+the system has an abstract notion of <span style="font-style: italic;">label</span>,
+identified by <span style="font-style: italic;">http://metarelate.net/core/data/label</span>.<br>
+
+The statement:<br>
+
+<pre>&lt;http://www.w3.org/2000/01/rdf-schema#label&gt;<br>&lt;http://metarelate.net/config/overrides&gt;<br>&lt;http://metarelate.net/core/data/label&gt;;<br><br>.<br></pre>
+
+tells the system that rdfs:label should be used insteaf of the system
+notion of label.<br>
+
+<br>
+
+Some of the properties that can be overridden are the following
+(together with the properties that override them in the default
+configuration). More internal properties can be overridden in different
+parts of the system&nbsp; (e.g.: state transitions) are presented in
+the relative HOW-TOs.<br>
+
+<br>
+
+<pre>&lt;http://www.w3.org/2000/01/rdf-schema#comment&gt;<br>&lt;http://metarelate.net/config/overrides&gt;<br>&lt;http://metarelate.net/core/data/comment&gt;;<br><br>.<br><br>&lt;http://www.w3.org/2004/02/skos/core#notation&gt;<br>&lt;http://metarelate.net/config/overrides&gt;<br>&lt;http://metarelate.net/core/data/notation&gt;;<br><br>.<br><br>&lt;http://purl.org/dc/terms/replaces&gt;<br>&lt;http://metarelate.net/config/overrides&gt;<br>&lt;http://metarelate.net/code/structure/hasPreviousVersion&gt;;<br><br>.<br><br>&lt;http://purl.org/dc/terms/replaces&gt;<br>&lt;http://metarelate.net/config/overrides&gt;<br>&lt;http://metarelate.net/code/data/superseds&gt;;<br><br>.<br><br>&lt;http://purl.org/dc/terms/isReplacedBy&gt;<br>&lt;http://metarelate.net/config/overrides&gt;<br>&lt;http://metarelate.net/code/data/superseded&gt;;<br><br>.<br></pre>
+
+<br>
+
+<h3>defaultProcessConfig.ttl</h3>
+A default process configuration. Please refer to HOW-TO configure the process.<br>
+
+<h3>demoConstraints.ttl</h3>
+
+A default set of validation rules. Please refer to HOW-TO specify validation constraints.<br>
+
+<br>
+
+</body></html>

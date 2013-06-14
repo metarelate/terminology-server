@@ -166,7 +166,10 @@ public class TerminologyModelBuilder {
 	
 	//protected abstract void buildContainmentStructure();
 
-	
+	/**
+	 * Sets the description for the import action
+	 * @param message
+	 */
 	public void setActionMessage(String message) {
 		this.actionMessage=message;
 		
@@ -355,6 +358,10 @@ public class TerminologyModelBuilder {
 		e.setActionDate(dateFormat.format(date),version);
 	}
 	
+	/**
+	 * Returns all labels in the input to the import process
+	 * @return
+	 */
 	public Model getLabels() {
 		StmtIterator labelStats=inputGraph.listStatements(null,MetaLanguage.labelProperty,(RDFNode)null);
 		Model labelModel=ModelFactory.createDefaultModel();
@@ -363,6 +370,10 @@ public class TerminologyModelBuilder {
 		return labelModel;
 	}
 	
+	/**
+	 * Returns property metadata (focus) found in the input to the import process
+	 * @return
+	 */
 	public Model getPropertyMetadata() {
 		StmtIterator stIter=inputGraph.listStatements((Resource)null,MetaLanguage.propertyHasFocus,(Resource)null);
 		Model propMetaModel=ModelFactory.createDefaultModel();
@@ -447,6 +458,10 @@ public class TerminologyModelBuilder {
 		
 	}
 
+	/**
+	 * sets the input to the import process
+	 * @param globalInput
+	 */
 	public void registerInput(Model globalInput) {
 		this.inputGraph=globalInput;
 		

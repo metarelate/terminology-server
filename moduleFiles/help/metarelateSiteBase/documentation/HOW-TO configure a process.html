@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>HOW-TO configure a process</title></head><body>
+<h1>HOW-TO configure a process</h1>A process can be configured as a set
+of states and transitions (change of states resulting from actions).
+The system hard-code special behavior only for a few states and and
+actions.<br>
+<h2>States</h2>
+The states that have a special treatment in the system are :<br>
+<span style="font-style: italic;">http://metarelate.net/states/osboleted</span> : the obsolete state<br>
+<span style="font-style: italic;">http://metarelate.net/states/superseded</span> : the superseded state (obsoleted and "replaced" by another term)<br>
+<span style="font-style: italic;">http://metarelate.net/states/default</span> : a default state<br>
+<br>
+These state can be overridden with different states for specific
+processes, and new states can be declared by typing the corresponding
+resource as <span style="font-style: italic;">http://metarelate.net/config/State</span> .<br>
+The following example, taken by the default configuration, overrides the system states and introduce a new <span style="font-style: italic;">valid</span> state,<br>
+<pre>states:obsoleted a config:State;<br>rdfs:label	"Obsoleted"@en;<br>config:overrides states:obsoleted;<br>.<br>states:superseded a config:State;<br>rdfs:label	"Superseded"@en;<br>config:overrides states:superseded;<br>.<br>states:default a config:State;<br>rdfs:label	"Default"@en;<br>config:overrides states:default;<br>.<br>states:valid a config:State;<br>rdfs:label	"Valid"@en;<br>.</pre>
+
+<br>
+<h2>Actions</h2>
+As for states, the system assign a special meaning to a few actions.
+These can be overridden, and new actions can be defined with a simple
+declaration (see the default configuration for examples).<br>
+The "systems actions" are:<br>
+<br>
+<span style="font-style: italic;">http://metarelate.net/actions/updates</span><br style="font-style: italic;">
+
+<span style="font-style: italic;">http://metarelate.net/actions/obsolete</span><br style="font-style: italic;">
+<span style="font-style: italic;">http://metarelate.net/actions/supersed</span><br style="font-style: italic;">
+<span style="font-style: italic;">http://metarelate.net/actions/add</span><br>
+<br>
+In the default configuration, an extra <span style="font-style: italic;">validate</span> action is introduced.<br>
+<br>
+<h2>Transitions</h2>
+Transitions describe under which conditions an action can take place,
+and the resulting state of involved entity (no transition is
+hard-coded, even if related to system states or actions).<br>
+Transitions are specified as follows:<br>
+<br>
+To each action, one ore more resources of type <span style="font-style: italic;">http://metarelate.net/config/role </span>can be associated<span style="font-style: italic;">.</span>
+Each role describes a set of pre/post conditions that apply to the
+action. Roles can be associated to actions via two different
+properties: <span style="font-style: italic;">http://metarelate.net/config/hasEffectOnCode </span>and <span style="font-style: italic;">http://metarelate.net/config/hasEffectOnRegister</span>. If the actions has a register as a target, the state transitions linked via <span style="font-style: italic;">http://metarelate.net/config/hasEffectOnRegister </span>apply to the register, while if the target of the operation is a code, the transitions linked via <span style="font-style: italic;">http://metarelate.net/config/hasEffectOnCode </span>are used.<br>
+<br>
+Each role presents a four preconditions and four post-conditions:<br>
+<span style="font-style: italic;">http://metarelate.net/confi/preThis</span> : the precondition for the state of the entity target of the operation<br>
+<span style="font-style: italic;">http://metarelate.net/confi/preUp </span>: the precondition for the register defining the entity target of the operation<br>
+<span style="font-style: italic;">http://metarelate.net/confi/preDown </span>: the precondition for entities defined in the entity target of the operation<br>
+<span style="font-style: italic;">http://metarelate.net/confi/preAux</span> : the precondition for the state of an external entity involved in the operation (e.g. a superseding term).<br>
+
+<br>
+The system looks at the state of the target of the action and related
+entities, then when it finds a matching pre-condition it updates states
+as specified in by the corresponding four post-condition properties.<br>
+<span style="font-style: italic;">http://metarelate.net/confi/postThis </span><br>
+<span style="font-style: italic;">
+http://metarelate.net/confi/postUp</span> <br>
+<span style="font-style: italic;">
+http://metarelate.net/confi/postDown </span><br>
+<span style="font-style: italic;">
+http://metarelate.net/confi/postAux </span><span style="font-weight: bold;"><br>
+<br>
+</span>When no property is specified, matching is considered "any" in the pre-conditions, and unchanged in the post-conditions.<br>
+Note that the implementation of preUp and preDown is not currently
+complete (only partial checks are done, and it is yet to be defined
+whether the pre-condition check should transitively propagate the
+definition structure or not).<br>
+<br>
+<h2>Default configuration</h2>
+<pre>@prefix config:		&lt;http://metarelate.net/config/&gt;	.<br>@prefix states: 	&lt;http://metarelate.net/states/&gt; .<br>@prefix actions:	&lt;http://metarelate.net/actions/&gt; .<br>@prefix default:	&lt;http://metarelate.net/default/config/&gt; .<br>@prefix rdfs:		&lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br><br>actions:update a config:Action;<br>rdfs:label	"Update"@en;<br>config:overrides actions:update;<br>config:hasEffectOnCode default:actionUpdate1;<br>config:hasEffectOnCode default:actionUpdate2;<br>config:hasEffectOnReg default:actionUpdate1;<br>config:hasEffectOnReg default:actionUpdate2;<br>.<br>default:actionUpdate1 a config:Role;<br>config:preThis states:default;<br>config:postThis states:default;<br>.<br>default:actionUpdate2 a config:Role;<br>config:preThis states:valid;<br>config:postThis	states:valid;<br>.<br>actions:obsolete a config:Role;<br>rdfs:label	"Obsolete"@en;<br>config:overrides actions:obsolete;<br>config:hasEffectOnCode default:actionObsolete1;<br>config:hasEffectOnCode default:actionObsolete2;<br>config:hasEffectOnReg default:actionObsolete1;<br>config:hasEffectOnReg default:actionObsolete2;<br>.<br>default:actionObsolete1 a config:Role;<br>config:preThis states:default;<br>config:postThis states:obsoleted;<br>.<br>default:actionObsolete2 a config:Role;<br>config:preThis states:valid;<br>config:postThis states:obsoleted;<br>.<br>actions:supersed a config:Action;<br>rdfs:label	"Supersed"@en;<br>config:overrides actions:supersed;<br>config:hasEffectOnCode default:actionSupersed1 ;<br>.<br>default:actionSupersed1 a config:Role;<br>	config:preThis	states:valid;<br>config:preAux	states:valid;<br>config:postThis	states:superseded;<br>config:postAux	states:valid;<br>.<br>actions:add	a config:Action;<br>rdfs:label	"Add"@en;<br>config:overrides actions:add;<br>config:hasEffectOnReg default:addAction1 ;<br>config:hasEffectOnReg default:addAction2 ;<br>.<br>default:addAction1 a config:Role;<br>config:preThis	states:valid;<br>config:postThis	states:default;	<br>.<br>default:addAction2 a config:Role;<br>config:preThis	states:default;<br>config:postThis	states:default;	<br>.<br>actions:validate	a config:Action;<br>rdfs:label	"Validate"@en;	<br>config:hasEffectOnReg default:validateAction1 ;<br>config:hasEffectOnCode default:validateAction1 ;<br>.<br>default:validateAction1  a config:Role; <br>config:preThis states:default;<br>config:postThis states:valid;<br>.<br>states:obsoleted a config:State;<br>rdfs:label	"Obsoleted"@en;<br>config:overrides states:obsoleted;<br>.<br>states:superseded a config:State;<br>rdfs:label	"Superseded"@en;<br>config:overrides states:superseded;<br>.<br>states:default a config:State;<br>rdfs:label	"Default"@en;<br>config:overrides states:default;<br>.<br>states:valid a config:State;<br>rdfs:label	"Valid"@en;<br>.<br></pre>
+The default state transition can be visualized pictorially as follows<br>
+<br>
+<img style="width: 565px; height: 750px;" alt="Default transitions" src="images/DefaultStatesAndTransitions.png"><br>
+
+
+  
+
+</body></html>

@@ -18,11 +18,15 @@
 */
 
 package net.metarelate.terminology.management;
-
+/**
+ * Constants
+ * @author andrea_splendiani
+ *
+ */
 public class ConstraintsManagerConfig {
 	//TODO maybe we should move all prefixes to a more general config
 	//public static final String coreTypesPrefix="http://metarelate.net/core/types/";
-	public static final String configPrefix="http://metarelate.net/config/";
+	static final String configPrefix="http://metarelate.net/config/";
 	
 	public static final String regValidationConstraintType=configPrefix+"RegisterValidationConstraint";
 	public static final String regValidationCommandType= configPrefix+"RegisterValidationCommand";

@@ -100,24 +100,30 @@ public class MetaLanguage {
 	 * defaults to a metarelate property but can be re-defined
 	 */
 	public static Property definedInProperty=ResourceFactory.createProperty("http://metarelate.net/core/data/definedIn");
+	
 	/**
-	 * @see definedInProperty (symmetric)
+	 * @see MetaLanguage#definedInProperty (symmetric)
 	 */
 	public static Property definesProperty=ResourceFactory.createProperty("http://metarelate.net/core/data/defines");
+	
 	/**
 	 * Used as a typing property throughout the system
 	 */
 	public static Property typeProperty=rdfsTypeProperty;
+	
 	/**
 	 * The property to be considered as a comment for visualization purposes
 	 */
 	public static Property commentProperty=ResourceFactory.createProperty("http://metarelate.net/core/data/comment");
+	
 	/**
 	 * the property generally used to denote IDs
 	 */
 	public static Property notationProperty=ResourceFactory.createProperty("http://metarelate.net/core/data/notation");
 	
-	
+	/**
+	 * the property defining the state of an entity
+	 */
 	public static Property hasStatusProperty=ResourceFactory.createProperty("http://metarelate.net/core/data/state");
 	
 	private static void initDataFilters() {
@@ -144,7 +150,8 @@ public class MetaLanguage {
 	 * Entry to pragma specifications. For specific pargama configuration options, @see TerminologyModelBuilderConfig
 	 */
 	public static final Property pragmaProperty=ResourceFactory.createProperty("http://metarelate.net/config/hasPragma");
-	public static void initConfigFilters() {
+	
+	private static void initConfigFilters() {
 		nonDataProperties.add(nameSpaceProperty);
 		nonDataProperties.add(pragmaProperty);
 	}
@@ -153,14 +160,33 @@ public class MetaLanguage {
 	/************************************************************************
 	 * Meta-properties (typically in the global graph only)
 	 ************************************************************************/
+	/**
+	 * Defines a Terminology Set (Register)
+	 */
 	public static final Resource terminologySetType=ResourceFactory.createResource("http://metarelate.net/core/meta/TerminologySet");
-	public static final Resource terminologyIndividualType=ResourceFactory.createResource("http://metarelate.net/core/meta/TerminologyIndividual");
 	
 	/**
+	 * Defiens a Terminology Individual (Code)
+	 */
+	public static final Resource terminologyIndividualType=ResourceFactory.createResource("http://metarelate.net/core/meta/TerminologyIndividual");
+	
+	/*
 	 * Property metadata. Whether it pertains to a concept or a code. This is held in the extraKnowledge (global) graph.
 	 */
+	
+	/**
+	 * property that identifies the focus of a property (metadata)
+	 */
 	public static final Property propertyHasFocus = ResourceFactory.createProperty("http://metarelate.net/config/propertyFocus");
+	
+	/**
+	 * indicates that the property is related to the "coding" nature of a code.
+	 */
 	public static final Resource propertyCodeFocus = ResourceFactory.createResource("http://metarelate.net/config/codeRelatedProperty");
+	
+	/**
+	 * indicates that the property is related to the "concept" nature of a code
+	 */
 	public static final Resource propertyConceptFocus = ResourceFactory.createResource("http://metarelate.net/config/conceptRelatedProperty");
 	
 	
@@ -170,20 +196,28 @@ public class MetaLanguage {
 	 */
 	public static Property hasVersionProperty=ResourceFactory.createProperty("http://metarelate.net/core/meta/hasVersion");
 	
+	/**
+	 * Identifies the responsible for an entity. Operation authority relates to the manager.
+	 */
 	public static Property hasManagerProperty =ResourceFactory.createProperty("http://metarelate.net/code/meta/hasOwner");
 
+	/**
+	 * link to the previous version of an entity (global graph)
+	 */
 	public static Property hasPreviousVersionProperty=ResourceFactory.createProperty("http://metarelate.net/code/structure/hasPreviousVersion");
 
-	//public static final Property hasNonVersionModel = ResourceFactory.createProperty("http://metarelate.net/code/types/hasNonVersionModel");
-	
-	//public static final Property hasVersionModel =  ResourceFactory.createProperty("http://metarelate.net/code/types/hasVersionModel");
-
+	/**
+	 * link between a superseding term and the superseded
+	 */
 	public static Property superseeds=ResourceFactory.createProperty("http://metarelate.net/code/data/superseds");
 	
+	/**
+	 * link between a superseded term and the superseding
+	 */
 	public static Property superseededBy=ResourceFactory.createProperty("http://metarelate.net/code/data/superseded");
 
 	
-	public static void initMetaFilters() {
+	private static void initMetaFilters() {
 		nonDataResources.add(terminologySetType);
 		nonDataResources.add(terminologyIndividualType);
 		nonDataProperties.add(hasVersionProperty);
@@ -199,26 +233,54 @@ public class MetaLanguage {
 	/************************************************************************
 	 * Version-properties 
 	 ************************************************************************/
+	
+	/**
+	 * The date an action resulting in a new version was taken
+	 */
 	public static Property versionActionDateProperty=ResourceFactory.createProperty("http://metarelate.net/core/meta/hasActionDate");
+	
+	/**
+	 * The URI of the action resulting in a new version was taken
+	 */
 	public static Property versionActionProperty=ResourceFactory.createProperty("http://metarelate.net/core/meta/hasAction");
+	
+	/**
+	 * The agent of the action resulting in a new version was taken
+	 */
 	public static Property versionActorProperty=ResourceFactory.createProperty("http://metarelate.net/core/meta/hasActor");
+	
+	/**
+	 * A description for an action resulting in a new version was taken
+	 */
 	public static Property versionActionDescription=ResourceFactory.createProperty("http://metarelate.net/core/meta/hasActionDescription");
+	
+	/**
+	 * links a version to a tag (global graph)
+	 */
 	public static final Property hasTag=ResourceFactory.createProperty("http://metarelate.net/core/structure/hasTag");
 
 	
 	
-	public static void initVersionFilters() {
+	private static void initVersionFilters() {
 	
 	}
 	
 	
-	/**
+	/*
 	 * MetaLanguage config properties
 	 */
+	
+	// TODO the following should be in MetaLanguage
 	public static String overridesPropertyString="http://metarelate.net/config/overrides";
 	public static Property overridesProperty=ResourceFactory.createProperty(overridesPropertyString);
 	
-	
+	/**
+	 * Filters the model removing statements that should not appear in a web (html) export of the data.
+	 * For instance definedIn/defines properties are rendered as navigation links, and they should not appear
+	 * in the list of properties as this would be duplicated information from the interface point of view.
+	 * @param ModelIn
+	 * @return a model with only the statements that should be displayed on the web
+	 */
 	public static Model filterForWeb(Model ModelIn) {
 		Model modelOut=ModelFactory.createDefaultModel();
 		if(filteredPForWebDisplay==null) buildFilters();
@@ -233,6 +295,11 @@ public class MetaLanguage {
 		
 	}
 	
+	/**
+	 * Remove statements that shouldn't appear in a data export
+	 * @param ModelIn
+	 * @return a model containing only statements that should appear in a data export
+	 */
 	public static Model filterForData(Model ModelIn) {
 		Model modelOut=ModelFactory.createDefaultModel();
 		if(filteredPForDataDisplay==null) buildFilters();
@@ -247,6 +314,13 @@ public class MetaLanguage {
 		
 	}
 	
+	/**
+	 * Remove statements that are not pertaining to them model "per se". One example is the namespace property, that is used to construct
+	 * the URL of the entity but it is not part of the "code information" from the register. 
+	 * Note that most of these properties should now be in the global graph. ( TODO eventually they all should be!)
+	 * @param ModelIn
+	 * @return a model containing only statements proper of the model
+	 */
 	public static Model filterForModel(Model ModelIn) {
 		Model modelOut=ModelFactory.createDefaultModel();
 		if(nonDataProperties==null) buildFilters();
@@ -261,6 +335,12 @@ public class MetaLanguage {
 		
 	}
 	
+	/**
+	 * Removes properties that are proper of the code/regsiter, but shouldn't be directly editable by the user.
+	 * Example: defines/definedIn property, that should be altered only via the proper process/checks.
+	 * @param ModelIn
+	 * @return a model whose properties can be directly edited by the user in the admin interface
+	 */
 	public static Model filterForEdit(Model ModelIn) {
 		Model modelOut=ModelFactory.createDefaultModel();
 		if(filteredPForFormEdit==null) buildFilters();
@@ -273,6 +353,12 @@ public class MetaLanguage {
 		}
 		return modelOut;
 	}
+	
+	/**
+	 * Return the complement of @see MetaLangauge#filterForEdit(Model ModelIn)
+	 * @param modelIn
+	 * @return the filtered model
+	 */
 	public static Model filterForEditComplement(Model modelIn) {
 		Model answer=ModelFactory.createDefaultModel();
 		answer.add(modelIn);

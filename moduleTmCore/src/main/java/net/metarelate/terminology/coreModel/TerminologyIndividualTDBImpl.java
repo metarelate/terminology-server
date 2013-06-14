@@ -32,7 +32,11 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
-
+/**
+ * A jena-TDB based implementation of @see TerminologyIndividual . Refer to the extended abstract classes and implemented interfaces for help
+ * @author andrea_splendiani
+ *
+ */
 public class TerminologyIndividualTDBImpl extends TerminologyEntityTDBImpl implements TerminologyIndividual{
 
 	TerminologyIndividualTDBImpl(String uri,

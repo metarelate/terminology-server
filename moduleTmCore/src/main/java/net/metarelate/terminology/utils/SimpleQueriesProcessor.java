@@ -1,5 +1,5 @@
 /* 
- (C) British Crown Copyright 2011 - 2012, Met Office
+ (C) British Crown Copyright 2011 - 2013, Met Office
 
  This file is part of terminology-server.
 
@@ -49,14 +49,23 @@ public class SimpleQueriesProcessor {
 		return result;
 	}
 	
+	/**
+	 * Returns a label for a URI, or the Undefined label (@see CoreConfig#UNDEFINED_LABEL) is nothing is found
+	 */
 	public static String getLabelorUndefinedForURI(String URI,Model myModel) {
 		String result="";
 		result=getGenericValue(URI,MetaLanguage.labelProperty, myModel);
-		if(result.equals("")) return CoreConfig.UNDEFINED_LABEL;
+		if(result.equals("")) return CoreConfig.UNDEFINED_LABEL; //TODO should be uniformed with the LabelManager
 		return result;
 	}
 	
-	
+	/**
+	 * Gets a literal for the provides resource and property. If more matching statements are present, a random result is returned.
+	 * @param uri the subject of the statement
+	 * @param property
+	 * @param myModel
+	 * @return
+	 */
 	private static String getGenericValue(String uri,Property property, Model myModel) {
 		String result="";
 		NodeIterator myResults= myModel.listObjectsOfProperty(ResourceFactory.createResource(uri), property);
@@ -67,7 +76,12 @@ public class SimpleQueriesProcessor {
 		return result;
 	}
 	
-	
+	/**
+	 * @param resource
+	 * @param property
+	 * @param model
+	 * @return true if a statements with the provided subject and predicate exists in the specified model
+	 */
 	public static boolean hasOptionalLiteral(Resource resource, Property property, Model model)  {
 		NodeIterator literalIter=model.listObjectsOfProperty(resource,property);
 		if(literalIter.hasNext()) return true;
@@ -95,6 +109,14 @@ public class SimpleQueriesProcessor {
 		return value;
 	}
 	
+	/**
+	 * Returns a literal matching resource/property if found, null otherwise. If more than one matching statements are found,
+	 * a random result is returned
+	 * @param resource
+	 * @param property
+	 * @param model
+	 * @return
+	 */
 	public static Literal getOptionalLiteral(Resource resource,
 			Property property, Model model) {
 		Literal value=null;
@@ -107,7 +129,15 @@ public class SimpleQueriesProcessor {
 		return value;
 	}
 
-
+	/**
+	 * Returns a literal value for the specified resource and property.
+	 * If zero or more than one matching values are found, throws an exception.
+	 * @param resource
+	 * @param property
+	 * @param model
+	 * @return
+	 * @throws NonConformantRDFException
+	 */
 	public static Literal getSingleMandatoryLiteral(Resource resource, Property property, Model model) throws NonConformantRDFException {
 		NodeIterator literalIter=model.listObjectsOfProperty(resource,property);
 		Literal result=null;
@@ -139,7 +169,13 @@ public class SimpleQueriesProcessor {
 		return null;
 	}
 
-
+	/**
+	 * Returns an array containing all URIs of resources which are objects in statements with the specified subject/property
+	 * @param resource the subject
+	 * @param property
+	 * @param myGraph
+	 * @return
+	 */
 	public static String[] getArrayObjectsResourcesAsURIs(
 			Resource resource, Property property,
 			Model myGraph) {
@@ -155,6 +191,16 @@ public class SimpleQueriesProcessor {
 		return urisResult.toArray(new String[0]);
 	}
 
+	/**
+	 * Returns the resource object in a statement with the specified subject/property.
+	 * If no matching statement is found throws an exception.
+	 * If more than one maching statement is found returns a random result.
+	 * @param resource the subject
+	 * @param property
+	 * @param model
+	 * @return
+	 * @throws NonConformantRDFException
+	 */
 	public static Resource getRequiredResourceObject(Resource resource,
 			Property property, Model model) throws NonConformantRDFException {
 		NodeIterator nodeIter=model.listObjectsOfProperty(resource, property);
@@ -182,6 +228,14 @@ public class SimpleQueriesProcessor {
 		return null;
 	}
 	
+	/**
+	 * Returns a literal in a statement having the specified property.
+	 * If no literal can be found returns null
+	 * If more literals can be found returns a random result
+	 * @param configuration the graph
+	 * @param parameter the property
+	 * @return
+	 */
 	public static String getOptionalConfigurationParameterSingleValue(Model configuration, String parameter) {
 		NodeIterator nodeIter=configuration.listObjectsOfProperty(configuration.createProperty(parameter));
 		while (nodeIter.hasNext()) {

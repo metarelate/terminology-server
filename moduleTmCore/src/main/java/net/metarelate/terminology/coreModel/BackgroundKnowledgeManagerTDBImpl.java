@@ -21,12 +21,17 @@ package net.metarelate.terminology.coreModel;
 
 import com.hp.hpl.jena.rdf.model.Model;
 
-public class BackgroundKnowledgeManagerTDBImpl extends BackgroundKnowledgeManager {
+public class BackgroundKnowledgeManagerTDBImpl implements BackgroundKnowledgeManager {
 	private Model myBackgroundKnowledgeModel=null;
-	public BackgroundKnowledgeManagerTDBImpl(Model extraGraph) {
+	
+	
+	BackgroundKnowledgeManagerTDBImpl(Model extraGraph) {
 		myBackgroundKnowledgeModel=extraGraph;
 	}
-
+	
+	/**
+	 * @see BackgroundKnowledgeManager#getModel()
+	 */
 	public Model getModel() {
 		return myBackgroundKnowledgeModel;
 	}

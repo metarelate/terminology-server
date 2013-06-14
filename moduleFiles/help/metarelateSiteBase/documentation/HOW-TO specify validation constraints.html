@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>HOW-TO specify validation constraints</title></head><body>
+<h1>How to specify validation constraints</h1>Constraints can be applied to properties, and are processed by the web-based administrative user interface.<br>
+A constraint can be declared by typing a resource as <span style="font-style: italic;">http://metarelate.net/config/RegisterValidationConstraint</span> (applies to registers) or <span style="font-style: italic;">http://metarelate.net/config/RegisterValidationConstraint</span> (applies to codes).<br>
+<br>
+The property that is the object of the constraint can be specified via <span style="font-style: italic;">config:onObjectProperty</span> or <span style="font-style: italic;">config:onDataProperty</span> (we use config as a prefix for http:metarelate.net/config).<br>
+In particualar:<br>
+<span style="font-style: italic;">config:onObjectProperty </span>: implies that this property must have a URI as an object<br>
+<span style="font-style: italic;">config:onDataProperty</span> : implies that this property will be considered a literal<br>
+<br>
+Constraints can be specified via the following properties (we remind to the default configuration for a comprehensive example):<br>
+<br style="font-style: italic;">
+<span style="font-style: italic;">config:minCardinality</span> : the
+minimal amount of times this properties needs to be asserted for a
+resource (note that labels in different languages count as distinct
+properties. E.g.: <span style="font-style: italic;">x rdfs:label "eau"@fr</span> and <span style="font-style: italic;">x rdfs:label "water"@en</span> are two properties with cardinality one.<br>
+<span style="font-style: italic;">config:maxCardinaliy</span> : the maximum times a property can be asserted on a resource. Same considerations as for minCardinality apply.<br>
+<span style="font-style: italic;">config:language</span> : the object must be a literal with the specified language tag<br>
+<span style="font-style: italic;">config:oneOf</span> : the object must be one of the values listed in a series of oneOf assertions (object properties only)<br>
+<span style="font-style: italic;">config:type</span> : the object of the property must be of the specified type. Currently supported: <span style="font-style: italic;">config:String</span> and <span style="font-style: italic;">config:Numeric</span> (data properties only) <br>
+<span style="font-style: italic;">config:pattern</span> : the object of
+the property must match a regular expression (Java syntax and escaping,
+e.g.: "\\D\\D"). Applies only to data properties.<br>
+<span style="font-style: italic;">config:inRegister</span> : the object of the property must be present in the terminology server in the specified register (<span style="font-style: italic;">config:allRegisters</span> for all registers).<br>
+<br>
+the additional property <span style="font-style: italic;">config:pseudoOrder</span> can be used to provide a tentative sorting of properties, when these are presented to the user in a form.<br>
+<br>
+<h2>Constraint resolution</h2>
+A constraint that is defined as:<br>
+<pre>default:typesXRegisters a config:RegisterValidationConstraint;<br>	config:onObjectProperty	rdf:type; <br>	config:pseudoOrder 	"A";<br>	config:minCardinality	"1";<br>	config:oneOf	skos:Collection;<br>	config:oneOf	skos:Scheme;<br>	config:oneOf	default:GenericCollection;<br>	.</pre>
+
+Is a global constraint. Constraints can be applied also to specific registers:<br>
+<pre>default:typesXRegistersC6 a config:RegisterValidationConstraint;<br>	config:appliesTo	&lt;http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-6&gt; ;<br>	config:onObjectProperty	rdf:type; <br>	config:pseudoOrder 	"A";<br>	config:minCardinality	"1";<br>	config:oneOf	skos:Collection;<br>	config:oneOf	skos:Scheme;<br>	config:oneOf	default:GenericCollection;<br>	.</pre>
+
+The resolution mechanism proceeds as follows:<br>
+<ol>
+  <li>When declared constraints are asked for a given code, the
+register containing the code is resolved, and the
+CodeValidationConstraints for that register are scanned. If the request
+was for a register, the RegisterValidationConstraints are considered.</li>
+  <li>All validation constraints found are collected. The request is propagated to super-registers, if these exists</li>
+  <li>Where no more super registers exist, global constraints are added</li>
+</ol>
+This system allow to declare generic constraints (e.g. all entities
+must have at least one label) and narrow down the requirements as
+registers become more specific. <br>
+The resolution mechanism can be configured as well. If we wish that a
+register doesn't inherit constraints of super registers, we can
+associated a command to a register:<br>
+<pre>default:clearRule	a config:RegisterValidationCommand;<br>	config:appliesTo	&lt;http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-6&gt; ;<br>	config:validationCommand	config:clear;<br>	.</pre>
+Currently config:clear is the only validation command implemented. In
+the example, after constraints for&nbsp; met:tdcf/common/c-6 are
+retrieved, no other constraints are sought in super-registers (global
+constraints can be considered as belonging to a virtual super-register
+containing all root registers in the terminology server).<br>
+<br>
+<h2>Default configuration (includes extra "demo" statements)</h2>
+<pre>@prefix config:		&lt;http://metarelate.net/config/&gt; .<br>@prefix default:	&lt;http://metarelate.net/default/config/&gt; .<br>@prefix rdfs:		&lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>@prefix rdf:		&lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; .<br>@prefix skos:		&lt;http://www.w3.org/2004/02/skos/core#&gt; .<br><br>#We want one and only one skos notation for all registers and codes. <br>#We want one and only one type (out of a selected range)<br>#We want one and only one description in Englih<br>#We want one or less description in Italian<br><br><br>default:typesXRegisters a config:RegisterValidationConstraint;<br>	config:onObjectProperty	rdf:type; <br>	config:pseudoOrder 	"A";<br>	config:minCardinality	"1";<br>	config:oneOf	skos:Collection;<br>	config:oneOf	skos:Scheme;<br>	config:oneOf	default:GenericCollection;<br>	.<br>		<br>default:labelXRegisters a config:RegisterValidationConstraint;<br>	config:onDataProperty	rdfs:label; <br>	config:pseudoOrder 	"B";<br>	config:minCardinality	"1";<br>	config:maxCardinality	"1";<br>	config:language			"en";<br>	.<br>	<br>default:notationXRegisters a config:RegisterValidationConstraint;<br>	config:onDataProperty	skos:notation; <br>	config:pseudoOrder 	"C";<br>	config:minCardinality	"1";<br>	config:maxCardinality	"1";<br>	config:type			config:String;<br>	.	<br>	<br>default:descriptionXRegistersEN a config:RegisterValidationConstraint;<br>	config:onDataProperty	rdfs:description; <br>	config:pseudoOrder 	"D";<br>	config:minCardinality	"1";<br>	config:maxCardinality	"1";<br>	config:language			"en";<br>	.	<br>	<br>default:descriptionXRegistersIT a config:RegisterValidationConstraint;<br>	config:onDataProperty	rdfs:description; <br>	config:pseudoOrder 	"E";<br>	config:minCardinality	"0";<br>	config:maxCardinality	"1";<br>	config:language			"it";<br>	.		<br><br>default:typesXCodes a config:CodeValidationConstraint;<br>	config:onObjectProperty	rdf:type; <br>	config:pseudoOrder 	"A";<br>	config:minCardinality	"1";<br>	config:oneOf	skos:Concept;<br>	config:oneOf	default:GenericConcept;<br>	.		<br><br>default:labelXCodes a config:CodeValidationConstraint;<br>	config:onDataProperty	rdfs:label; <br>	config:pseudoOrder 	"B";<br>	config:minCardinality	"1";<br>	config:maxCardinality	"1";<br>	config:language			"en";<br>	.<br>	<br>default:notationXCodes a config:CodeValidationConstraint;<br>	config:onDataProperty	skos:notation; <br>	config:pseudoOrder 	"C";<br>	config:minCardinality	"1";<br>	config:maxCardinality	"1";<br>	config:type			config:String;<br>	.	<br>	<br>default:descriptionXCodesEN a config:CodeValidationConstraint;<br>	config:onDataProperty	rdfs:description; <br>	config:pseudoOrder 	"D";<br>	config:minCardinality	"1";<br>	config:maxCardinality	"1";<br>	config:language			"en";<br>	.	<br>	<br>default:descriptionXCodesIT a config:CodeValidationConstraint;<br>	config:onDataProperty	rdfs:description; <br>	config:pseudoOrder 	"E";<br>	config:minCardinality	"0";<br>	config:maxCardinality	"1";<br>	config:language			"it";<br>	.	<br><br><br>#<br># Here we override results for Table C-6, and we place fr instead of it as an optional description<br>#<br><br>default:clearRule	a config:RegisterValidationCommand;<br>	config:appliesTo	&lt;http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-6&gt; ;<br>	config:validationCommand	config:clear;<br>	.<br><br>default:typesXRegistersC6 a config:RegisterValidationConstraint;<br>	config:appliesTo	&lt;http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-6&gt; ;<br>	config:onObjectProperty	rdf:type; <br>	config:pseudoOrder 	"A";<br>	config:minCardinality	"1";<br>	config:oneOf	skos:Collection;<br>	config:oneOf	skos:Scheme;<br>	config:oneOf	default:GenericCollection;<br>	.<br>		<br>default:labelXRegistersC6 a config:RegisterValidationConstraint;<br>	config:appliesTo	&lt;http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-6&gt; ;<br>	config:onDataProperty	rdfs:label; <br>	config:pseudoOrder 	"B";<br>	config:minCardinality	"1";<br>	config:maxCardinality	"1";<br>	config:language			"en";<br>	.<br>	<br>default:notationXRegistersC6 a config:RegisterValidationConstraint;<br>	config:appliesTo	&lt;http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-6&gt; ;<br>	config:onDataProperty	skos:notation; <br>	config:pseudoOrder 	"C";<br>	config:minCardinality	"1";<br>	config:maxCardinality	"1";<br>	config:type			config:String;<br>	.	<br>	<br>default:descriptionXRegistersENC6 a config:RegisterValidationConstraint;<br>	config:appliesTo	&lt;http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-6&gt; ;<br>	config:onDataProperty	rdfs:description; <br>	config:pseudoOrder 	"D";<br>	config:minCardinality	"1";<br>	config:maxCardinality	"1";<br>	config:language			"en";<br>	.	<br>	<br>default:descriptionXRegistersFRC6 a config:RegisterValidationConstraint;<br>	config:appliesTo	&lt;http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-6&gt; ;<br>	config:onDataProperty	rdfs:description; <br>	config:pseudoOrder 	"E";<br>	config:minCardinality	"0";<br>	config:maxCardinality	"1";<br>	config:language			"fr";<br>	.	<br><br><br><br>#<br># Here we extend the validaton rules for the codes of Table C-6<br>#<br><br><br>default:refersToXCode a config:CodeValidationConstraint;<br>	config:appliesTo	&lt;http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-6&gt; ;<br>	config:onObjectProperty	default:refersToC6; <br>	config:pseudoOrder 	"F";<br>	config:minCardinality	"0";<br>	config:inRegister	&lt;http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-6&gt;;<br>	config:hasSymmetric	&lt;default:refersTo&gt;; #We have unbounded propagation for the time being.<br>	.<br><br>default:refersToXCode2 a config:CodeValidationConstraint;<br>	config:appliesTo	&lt;http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-6&gt; ;<br>	config:onObjectProperty	default:refersToAnyValid; <br>	config:pseudoOrder 	"G";<br>	config:minCardinality	"0";<br>	config:inRegister	config:allRegisters;<br>	.	<br><br><br>default:refersToXCode3 a config:CodeValidationConstraint;<br>	config:appliesTo	&lt;http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-6&gt; ;<br>	config:onDataProperty	default:hasNumber; <br>	config:pseudoOrder 	"H";<br>	config:minCardinality	"0";<br>	config:hasType		config:Numeric;<br>	.<br>default:refersToXCode4 a config:CodeValidationConstraint;<br>	config:appliesTo	&lt;http://reference.metoffice.gov.uk/data/wmo/tdcf/common/c-6&gt; ;<br>	config:onDataProperty	default:hasPattern; <br>	config:pseudoOrder 	"I";<br>	config:minCardinality	"0";<br>	config:pattern		"\\D\\D";<br>	.	<br><br><br><br></pre>
+
+
+  
+
+</body></html>

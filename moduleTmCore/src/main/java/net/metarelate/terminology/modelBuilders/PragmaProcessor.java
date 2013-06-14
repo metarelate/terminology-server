@@ -27,7 +27,7 @@ import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.UnknownURIException;
 import net.metarelate.terminology.utils.Loggers;
 
-public abstract class PragmaProcessor {
+abstract class PragmaProcessor {
 	TerminologyFactory myFactory=null;
 	//Model globalConfigurationModel=null;
 	
