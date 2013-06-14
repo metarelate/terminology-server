@@ -23,15 +23,19 @@
 package net.metarelate.terminology.commandline;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-
-import com.hp.hpl.jena.rdf.model.Model;
 
 import net.metarelate.terminology.exceptions.ModelException;
-import net.metarelate.terminology.instanceManager.Initializer;
 import net.metarelate.terminology.modelBuilders.TerminologyModelBuilder;
 import net.metarelate.terminology.utils.Loggers;
 
+import com.hp.hpl.jena.rdf.model.Model;
+
+/**
+ * Command to import a terminology
+ * @see TSCommand for help
+ * @author andrea_splendiani
+ *
+ */
 public class CommandIngest extends TsCommand {
 	private boolean labelsOnly=false;
 	boolean updateMode=false;

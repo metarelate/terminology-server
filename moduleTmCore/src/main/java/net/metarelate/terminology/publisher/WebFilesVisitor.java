@@ -21,23 +21,11 @@ package net.metarelate.terminology.publisher;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
-import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.NodeIterator;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-
-import net.glxn.qrgen.QRCode;
-import net.glxn.qrgen.image.ImageType;
-import net.metarelate.terminology.config.MetaLanguage;
 import net.metarelate.terminology.coreModel.TerminologyEntity;
 import net.metarelate.terminology.coreModel.TerminologyIndividual;
 import net.metarelate.terminology.coreModel.TerminologySet;
@@ -47,6 +35,13 @@ import net.metarelate.terminology.exceptions.WebWriterException;
 import net.metarelate.terminology.instanceManager.Initializer;
 import net.metarelate.terminology.utils.Loggers;
 
+import com.hp.hpl.jena.rdf.model.Model;
+/**
+ * Visits a terminology to provide a file based representation of terms and registers.
+ * (visits also versions)
+ * @author andreasplendiani
+ *
+ */
 public class WebFilesVisitor extends PublisherVisitor {
 	TemplateManager tm=null;
 	Initializer myInitializer=null;
@@ -61,7 +56,14 @@ public class WebFilesVisitor extends PublisherVisitor {
 		overwriteFiles=ow;
 	}
 	
-
+	/**
+	 * crqwl the tree (recursive)
+	 * @param root
+	 * @throws WebWriterException
+	 * @throws ModelException
+	 * @throws IOException
+	 * @throws ConfigurationException
+	 */
 	public void crawl(TerminologySet root) throws WebWriterException, ModelException, IOException, ConfigurationException {
 		root.accept(this);
 		Set<TerminologyIndividual> inds=root.getAllKnownContainedInviduals();

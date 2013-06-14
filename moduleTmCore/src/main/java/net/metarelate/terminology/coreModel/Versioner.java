@@ -50,7 +50,7 @@ public class Versioner {
 	 * @param version
 	 * @return
 	 */
-	public boolean isLastVersion(String version) {
+	boolean isLastVersion(String version) {
 		if(vEntity.getNextVersion(version)==null) return true;
 		else return false;
 		
@@ -62,7 +62,7 @@ public class Versioner {
 	 * @param version
 	 * @return
 	 */
-	public boolean hasPreviousVersion(String version) {
+	boolean hasPreviousVersion(String version) {
 		if(vEntity.getPreviousVersion(version)==null) return false;
 		else return true;
 	}
@@ -73,7 +73,7 @@ public class Versioner {
 	 * In other words, this method is not compatible with multi-version threads
 	 * @return
 	 */
-	public String getNewestVersion() {
+	String getNewestVersion() {
 		String[] versions=vEntity.getVersions();
 		String newest=versions[0];
 		for(int i=1;i<versions.length;i++) {
@@ -88,7 +88,7 @@ public class Versioner {
 	 * In other words, this method is not compatible with multi-version threads
 	 * @return
 	 */
-	public String getFirstVersion() {
+	String getFirstVersion() {
 		String[] versions=vEntity.getVersions();
 		String first=versions[0];
 		for(int i=1;i<versions.length;i++) {
@@ -103,7 +103,7 @@ public class Versioner {
 	 * TODO note as date ordering could be made more robust by using date objects, instead of strings.
 	 * @return
 	 */
-	public String getGenerationDate() {
+	String getGenerationDate() {
 		String[] versions=vEntity.getVersions();
 		Set<String> dates=new HashSet<String>();
 		for(int i=0;i<versions.length;i++) {
@@ -128,7 +128,7 @@ public class Versioner {
 	 * TODO obsolete ?
 	 * @return
 	 */
-	public String getLastUpdateDate() {
+	String getLastUpdateDate() {
 		String[] versions=vEntity.getVersions();
 		Set<String> dates=new HashSet<String>();
 		for(int i=0;i<versions.length;i++) {

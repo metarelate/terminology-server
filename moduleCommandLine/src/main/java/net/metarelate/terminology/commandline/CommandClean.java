@@ -22,7 +22,12 @@
 package net.metarelate.terminology.commandline;
 
 import net.metarelate.terminology.instanceManager.Initializer;
-
+/**
+ * Unimplemented (does nothing)
+ * @see TSCommand for help
+ * @author andrea_splendiani
+ *
+ */
 public class CommandClean extends TsCommand {
 
 	public CommandClean(String sysDir,String[] args) {

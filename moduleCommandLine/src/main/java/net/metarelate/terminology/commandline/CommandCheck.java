@@ -24,6 +24,12 @@ package net.metarelate.terminology.commandline;
 
 import net.metarelate.terminology.instanceManager.Initializer;
 
+/**
+ * Unimplemented (does nothing)
+ * @see TSCommand for help
+ * @author andrea_splendiani
+ *
+ */
 public class CommandCheck extends TsCommand {
 
 	public CommandCheck(String sysDir,String[] args) {

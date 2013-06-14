@@ -21,9 +21,9 @@ package net.metarelate.terminology.auth;
 
 /**
  * Controls permissions to operate the register.
+ * This interface must be implemented by any Authorization System plugged into the system.
  * 
- * 
- * @author andreasplendiani
+ * @author andrea_splendiani
  *
  */
  public abstract class AuthServer {

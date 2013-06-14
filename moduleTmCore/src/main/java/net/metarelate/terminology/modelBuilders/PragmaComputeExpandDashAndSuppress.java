@@ -40,7 +40,7 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 
-public class PragmaComputeExpandDashAndSuppress extends PragmaProcessor {
+class PragmaComputeExpandDashAndSuppress extends PragmaProcessor {
 	TerminologySet terminologySet=null;
 	boolean toSuppress;
 	ArrayList<Property> overrideProps;

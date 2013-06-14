@@ -42,7 +42,7 @@ public class ts {
 	private static final int COMMAND_OBSOLETE=13;
 	
 	
-	public static Initializer myInitializer=null;
+	private static Initializer myInitializer=null;
 	
 	public static void main(String[] args) {
 		Loggers.init();

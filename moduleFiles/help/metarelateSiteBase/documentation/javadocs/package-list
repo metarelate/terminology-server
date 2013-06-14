@@ -1,0 +1,15 @@
+net.metarelate.terminology.auth
+net.metarelate.terminology.commandline
+net.metarelate.terminology.config
+net.metarelate.terminology.coreModel
+net.metarelate.terminology.exceptions
+net.metarelate.terminology.installer
+net.metarelate.terminology.instanceManager
+net.metarelate.terminology.management
+net.metarelate.terminology.modelBuilders
+net.metarelate.terminology.publisher
+net.metarelate.terminology.publisher.templateElements
+net.metarelate.terminology.reasoning
+net.metarelate.terminology.utils
+net.metarelate.terminology.webedit
+net.metarelate.terminology.webedit.validators

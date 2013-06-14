@@ -40,10 +40,16 @@ public class LabelManagerTDBImpl implements LabelManager {
 		
 	}
 
+	/**
+	 * @see LabelManager#getLabelForURI(String, int)
+	 */
 	public String getLabelForURI(String uri, int method) {
 		return getLabelForURI(uri,defaultLanguage,method);
 	}
 
+	/**
+	 * @see LabelManager#getLabelForURI(String,String,int)
+	 */
 	public String getLabelForURI(String uri, String language, int method) {
 		// TODO we could definitively optimize this.
 		//Does a language exists in the specified language ?
@@ -102,6 +108,7 @@ public class LabelManagerTDBImpl implements LabelManager {
 		
 	}
 
+	// TODO remove duplicate in Config
 	private String getUndefString(String language) {
 		if(language.equals("en")) return "Undefined";
 		else if(language.equals("fr")) return "Ind�fini";
@@ -112,11 +119,17 @@ public class LabelManagerTDBImpl implements LabelManager {
 		else return "Undefined";
 	}
 
+	/**
+	 * @see LabelManager#getLanguagesForURI(String)
+	 */
 	public String[] getLanguagesForURI(String uri) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/**
+	 * @see LabelManager#registerLabels(Model)
+	 */
 	public void registerLabels(Model labelsModel) {
 		myLabelGraph.add(labelsModel);
 		

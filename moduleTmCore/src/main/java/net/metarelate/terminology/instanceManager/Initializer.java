@@ -63,7 +63,7 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 //TODO Note the use of thisInstance.org as a bougs URL of namespace. Perhaps this could be linked to the instance seed (URL), although not necessary.
 
 /**
- * Initializer is responsible for initalizing an instance of the terminology server (e.g. directory structure).
+ * Initializer is responsible for initializing an instance of the terminology server (e.g. directory structure).
  * It can be called with or without arguments. Arguments override initialization default settings.
  * If directories of necessary configuration files are missing, default versions are created.
  * @author andreasplendiani
@@ -92,22 +92,54 @@ public class Initializer {
 	
 	
 	private  	AuthServer myAuthServer=null;
-	public  		AuthRegistryManager myAuthManager=null;
-	public  		TerminologyManager myTerminologyManager=null;
-	public  		TerminologyFactory myFactory=null;
+	
+	/**
+	 * The Auth manager of this instance of the terminology server
+	 */
+	public  	AuthRegistryManager myAuthManager=null;
+	
+	/**
+	 * The Terminology Manager (actions) of this instance of the terminology server
+	 */
+	public  	TerminologyManager myTerminologyManager=null;
+	
+	/**
+	 * The Terminology Factory of this instance of the terminology server
+	 */
+	public  	TerminologyFactory myFactory=null;
+	
+	/**
+	 * The Constraints manager (validation) of this instance of the terminology server
+	 */
 	public 		ConstraintsManager myConstraintsManager=null;
+	
+	/**
+	 * The Registry Policy manager (transitions) of this instance of the terminology server
+	 */
 	public 		RegistryPolicyManager myRegistryPolicyManager=null;
+	
+	/**
+	 * The Cache manager of this instance of the terminology server
+	 */
 	public 		CacheManager myCache=null;
+	
+	/**
+	 * The Publisher manager of this instance of the terminology server
+	 */
 	public 		PublisherManager myPublisherManager=null;
 	
 	//protected String rootDirString=CoreConfig.rootDirString;
 	
 	
-	
-	public Initializer(String confDir) throws ConfigurationException {
-		if((new File(confDir)).isDirectory()) {
-			rootDirectoryString=confDir;
-			Loggers.coreLogger.debug("Root directory provided via command line: "+confDir);
+	/**
+	 * Constructor
+	 * @param sysDir the system directory
+	 * @throws ConfigurationException
+	 */
+	public Initializer(String sysDir) throws ConfigurationException {
+		if((new File(sysDir)).isDirectory()) {
+			rootDirectoryString=sysDir;
+			Loggers.coreLogger.debug("Root directory provided via command line: "+sysDir);
 		}
 		else resolveConfDir();
 		construct();
@@ -264,7 +296,9 @@ public class Initializer {
 	}
 
 
-	
+	/**
+	 * Returns the name of the server
+	 */
 	public String getServerName() {
 		return serverName;
 	}
@@ -290,18 +324,26 @@ public class Initializer {
 			
 	}
 	
+	/**
+	 * 
+	 * @return the absolute path of the directory containing the WAR of the web admin interface
+	 */
 	public String getWebDirectory() {
 		return webDirAbsoluteString;
 	}
+	
+	/**
+	 * 
+	 * @return the absolute path of the directory where templates for rendering are defined
+	 */
 	public String getTemplatesDirectory() {
 		return templatesDirAbsoluteString;
 	}
 	
-	/*
-	public String getRootDirectory() {
-		return rootDirectoryString;
-	}
-	*/
+	/**
+	 * 
+	 * @return the URI of the default user of this instance of the terminology server
+	 */
 	public String getDefaultUserURI() {
 		return defaultUserURI;
 	}
@@ -327,30 +369,54 @@ public class Initializer {
 		return configuration;
 	}
 	
-	
+	/**
+	 * A list of files in the auth directory (TODO maybe this shouldn't be here)
+	 * @return
+	 */
 	public static File[] getAuthFiles() {
 		File authConfDir=new File(authDirAbsoluteString);
 		return authConfDir.listFiles();
 	}
 	
+	/**
+	 * Unimplemented
+	 * @return whether this terminology server is tracking another terminology server
+	 */
 	public boolean isRemote() {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Unimplemented
+	 * @return whether this terminology server is tracked by another terminology server
+	 */
 	public boolean hasRemote() {
 		// TODO Auto-generated method stub
 		return false;
 	}
 	
+	/**
+	 * 
+	 * @return the user working directory
+	 */
 	public String getWorkingDirectory() {
 		return System.getProperty("user.dir");
 	}
 	
+	/**
+	 * Returns the prefix maps specied in the prefix file
+	 * @return a prefix to prefix expansion map
+	 */
 	public Map<String,String> getPrefixMap() {
 		return nsPrefixMap;
 	}
 
+	/**
+	 * Returns the absolute path to the WAR file for the web admin interface
+	 * @return the 
+	 * @throws ConfigurationException
+	 */
 	public String getWARFile() throws ConfigurationException {
 		File warDir=new File(getWebDirectory());
 		//Note that we should have already checked this is an ok dir;
@@ -358,6 +424,7 @@ public class Initializer {
 		if(warFiles.length==0) throw new ConfigurationException("Invalid WAR file");
 		return warFiles[0].getAbsolutePath();
 	}
+	//TODO maybe to move
 	
 	
 	

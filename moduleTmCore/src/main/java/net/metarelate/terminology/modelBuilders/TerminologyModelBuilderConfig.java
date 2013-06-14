@@ -23,7 +23,7 @@ import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
-public class TerminologyModelBuilderConfig {
+class TerminologyModelBuilderConfig {
 	public static final Resource pragmaExpandDashAndSuppress=ResourceFactory.createResource("http://metarelate.net/config/ExpandDashAndSuppress");
 	public static final Resource pragmaExpandTree =ResourceFactory.createResource("http://metarelate.net/config/ExpandTreeProcedure");
 	public static final Resource pragmaSuppress =ResourceFactory.createResource("http://metarelate.net/config/pragmaSuppressSource");

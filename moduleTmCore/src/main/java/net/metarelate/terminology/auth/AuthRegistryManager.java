@@ -31,12 +31,18 @@ import net.metarelate.terminology.utils.Loggers;
 /**
  * Manages permissions to operate on the Registry Manager.
  * 
- * @author andreasplendiani
+ * @author andrea_splendiani
  *
  */
 public  class AuthRegistryManager {
-	AuthServer myAuthServer=null;
-	TerminologyFactory myFactory=null;
+	private AuthServer myAuthServer=null;
+	private TerminologyFactory myFactory=null;
+	
+	/**
+	 * Constructor
+	 * @param myAuthServer an authentication server
+	 * @param myFactory the terminology factory
+	 */
 	public AuthRegistryManager(AuthServer myAuthServer,TerminologyFactory myFactory) {
 		this.myAuthServer = myAuthServer;
 		this.myFactory=myFactory;
@@ -50,10 +56,8 @@ public  class AuthRegistryManager {
 	 * @param agent the URI of the agent performing the action. Through the code the agent is also referred to as "actor" or "actorURI". A null values stands for all agents.
 	 * @param action the URI of the action. A null value stands for all actions.
 	 * @param entity the URI of the target entity. A null value stands for all targets.
-	 * @param server the authority server (that follows an Open World assumption)
-	 * @param factory (the terminology factory). This knows about the containment of registers.
-	 * @return true if the operation is authorized, false otherwise.
 	 * @throws ModelException 
+	 * @throws RegistryAccessException
 	 */
 	public boolean can(String agent,
 			String action, String entity) throws RegistryAccessException, ModelException {

@@ -20,7 +20,12 @@
 package net.metarelate.terminology.coreModel;
 
 import com.hp.hpl.jena.rdf.model.Model;
-
+/**
+ * The label manager handles label that are part of a global label pool that can be accessed by the system
+ * to render URIs with their label. Labels that defined within registers are not seen by the LabelManager.
+ * @author andrea_splendiani
+ *
+ */
 public interface  LabelManager {
 	/**
 	 * Specifies to return the URI of a resource if no label is found
@@ -51,7 +56,6 @@ public interface  LabelManager {
 	 * Returns a label for a URI, following the method specified. Note that a random label matching the requirements is returned.
 	 * @param uri
 	 * @param method what to do if no label matching the criteria is found
-	 * @return
 	 */
 	public abstract String getLabelForURI(String uri, int method);
 	
@@ -60,7 +64,6 @@ public interface  LabelManager {
 	 * @param uri
 	 * @param language specified as in the RDF representation
 	 * @param method what to do if no label matching the criteria is found
-	 * @return
 	 */
 	public abstract String getLabelForURI(String uri, String language,int method);
 	

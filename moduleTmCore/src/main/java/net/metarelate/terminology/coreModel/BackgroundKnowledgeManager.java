@@ -33,10 +33,14 @@ import com.hp.hpl.jena.rdf.model.Model;
  * More specialized methods (add/set/inspect) would be possible, but they bring scarce utility in the current implementation.
  * TODO In the current version of the prototype, this class in not in use (though it should be once the publishing layer is re-factored)
  * 
- * @author andreasplendiani
+ * @author andrea_splendiani
  *
  */
-public abstract class BackgroundKnowledgeManager {
-	// TODO we may want to abstract more the level here
+public interface BackgroundKnowledgeManager {
+	// TODO we may want to abstract more here
+	
+	/**
+	 * Returns the graph holding background knowledge.
+	 */
 	public abstract Model getModel();
 }

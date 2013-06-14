@@ -37,12 +37,21 @@ import net.metarelate.terminology.exceptions.UnknownURIException;
 import net.metarelate.terminology.exceptions.WebWriterException;
 import net.metarelate.terminology.instanceManager.Initializer;
 import net.metarelate.terminology.utils.Loggers;
-
+/**
+ * A super-class for command line commands
+ * @author andrea_splendiani
+ *
+ */
 public abstract class TsCommand {
 	protected Initializer myInitializer=null;
 	protected String nextIsMessage="";		// TODO to move here from other commands, and check it is properly implemented
 	protected String sysDir=null;
 	
+	/**
+	 * Constructor
+	 * @param sysDir the system directory
+	 * @param args arguments to the command line
+	 */
 	public TsCommand(String sysDir,String[] args) {
 		super();
 		this.sysDir=sysDir;
@@ -63,7 +72,10 @@ public abstract class TsCommand {
 	}
 
 	
-	
+	/**
+	 * Execute the command (checks if the right parameters are provided, then initalizes the system and run the command "content")
+	 * @throws Exception
+	 */
 	public void execute() throws Exception {
 		if(!validate()) {
 			Loggers.commandLogger.debug("Validation failed at second step. Should have failed first!");
@@ -95,11 +107,31 @@ public abstract class TsCommand {
 		
 	}
 
-
-
+	/**
+	 * Executes the "actual" content of the command. This method needs to be implemented by command with their own execution code.
+	 * @throws ModelException
+	 * @throws UnknownURIException
+	 * @throws ConfigurationException
+	 * @throws WebWriterException
+	 * @throws IOException
+	 * @throws Exception
+	 */
 	public abstract void localExecute() throws ModelException, UnknownURIException, ConfigurationException, WebWriterException, IOException, Exception;
+	
+	/**
+	 * @return true if parameters are correct and systems initalization can start
+	 */
 	public abstract boolean validate();
+	
+	/**
+	 * @return the command specific help message
+	 */
 	public abstract String getLocalHelpMessage();
+	
+	/**
+	 * 
+	 * @return a name for this command (for displaying purposes only)
+	 */
 	public abstract String getName();
 	
 	protected Model readIntoModel(ArrayList<String> files) {

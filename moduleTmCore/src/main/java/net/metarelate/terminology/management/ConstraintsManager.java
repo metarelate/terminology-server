@@ -46,15 +46,20 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 
+/**
+ * Manages validation rules
+ * @author andrea_splendiani
+ *
+ */
 public class ConstraintsManager {
-	Initializer myInitializer=null;
-	Model inputConfig=null;
+	private Initializer myInitializer=null;
+	private Model inputConfig=null;
 	private Map<String,Set<Resource>> uriRegConstraints=null;
 	private Map<String,Set<Resource>> uriCodeConstraints=null;
 	private Set<Resource> defaultRegConstraints=null;
 	private Set<Resource> defaultCodeConstraints=null;
+	
 	public ConstraintsManager(Initializer initializer) throws ConfigurationException {
 		myInitializer=initializer;
 		inputConfig=initializer.getConfigurationGraph();
@@ -107,7 +112,14 @@ public class ConstraintsManager {
 		}
 	}
 	
-	
+	/**
+	 * Returns a sorted array of constraints (identified by their URI) for the register with the specified URI
+	 * @param uri
+	 * @return
+	 * @throws ConfigurationException
+	 * @throws UnknownURIException
+	 * @throws ModelException
+	 */
 	public String[] getSortedConstraintsForReg(String uri) throws ConfigurationException, UnknownURIException, ModelException {
 		ArrayList<Resource> results=new ArrayList<Resource>();
 		TerminologyEntity entity=myInitializer.myFactory.getCheckedTerminologyEntity(uri);
@@ -122,6 +134,15 @@ public class ConstraintsManager {
 		return makeSortedProperties(results);
 		
 	}
+	
+	/**
+	 * returns a sorted array of constraints (identified by their URI) for the codes in the register with the specified URI
+	 * @param uri
+	 * @return
+	 * @throws ConfigurationException
+	 * @throws UnknownURIException
+	 * @throws ModelException
+	 */
 	public String[] getSortedConstraintsForCode(String uri) throws ConfigurationException, UnknownURIException, ModelException {
 		ArrayList<Resource> results=new ArrayList<Resource>();
 		TerminologyEntity entity=myInitializer.myFactory.getCheckedTerminologyEntity(uri);
@@ -135,6 +156,15 @@ public class ConstraintsManager {
 		Loggers.validationLogger.info("For edit code found #rules: "+results.size());
 		return makeSortedProperties(results);
 	}
+	
+	/**
+	 * Returns a list of sorted constraints for a new register (not yet created)
+	 * @param baseRegURI the register in which this (sub)register will be defined
+	 * @return
+	 * @throws ConfigurationException
+	 * @throws UnknownURIException
+	 * @throws ModelException
+	 */
 	public String[] getSortedConstraintsForNewReg(String baseRegURI) throws ConfigurationException, UnknownURIException, ModelException {
 		ArrayList<Resource> results=new ArrayList<Resource>();
 		TerminologyEntity entity=myInitializer.myFactory.getCheckedTerminologyEntity(baseRegURI);
@@ -147,6 +177,15 @@ public class ConstraintsManager {
 		Loggers.validationLogger.info("For new regsiter found #rules: "+results.size());
 		return makeSortedProperties(results);
 	}
+	
+	/**
+	 * Returns a list of sorted constraints for a new code (not yet created)
+	 * @param baseRegURI the register in which this code will be defined
+	 * @return
+	 * @throws ConfigurationException
+	 * @throws UnknownURIException
+	 * @throws ModelException
+	 */
 	public String[] getSortedConstraintsForNewCode(String baseRegURI) throws ConfigurationException, UnknownURIException, ModelException {
 		ArrayList<Resource> results=new ArrayList<Resource>();
 		TerminologyEntity entity=myInitializer.myFactory.getCheckedTerminologyEntity(baseRegURI);
@@ -160,11 +199,16 @@ public class ConstraintsManager {
 		return makeSortedProperties(results);
 	}
 	
-	
-	private String[] makeSortedProperties(ArrayList<Resource> results) throws ConfigurationException {
+	/**
+	 * Given a list of propertis, returns an array where these are sorted following the pseudoOrder property of the corresponding constraint
+	 * @param props a list of properties
+	 * @return
+	 * @throws ConfigurationException
+	 */
+	private String[] makeSortedProperties(ArrayList<Resource> props) throws ConfigurationException {
 		TreeMap<String,String> orderedResults =new TreeMap<String,String>();
 		int i=0;
-		for(Resource res:results) {
+		for(Resource res:props) {
 			//System.out.println("Now: "+res.getURI());
 			NodeIterator propIterator=inputConfig.listObjectsOfProperty(res, ResourceFactory.createProperty(ConstraintsManagerConfig.onDataProperty));
 			if(!propIterator.hasNext()) {
@@ -253,6 +297,11 @@ public class ConstraintsManager {
 		
 	}
 
+	/**
+	 * returns true if the constraint applies to a data property
+	 * @param cons
+	 * @return
+	 */
 	public boolean isOnDataProperty(String cons) {
 		if(inputConfig.contains(
 				ResourceFactory.createResource(cons),
@@ -260,6 +309,12 @@ public class ConstraintsManager {
 				)) return true;
 		else return false;
 	}
+	
+	/**
+	 * Returns true if the constraint applies to an object property
+	 * @param cons
+	 * @return
+	 */
 	public boolean isOnObjectProperty(String cons) {
 		if(inputConfig.contains(
 				ResourceFactory.createResource(cons),
@@ -268,6 +323,11 @@ public class ConstraintsManager {
 		else return false;
 	}
 	
+	/**
+	 * Returns true if the constraint is of type isNumeric
+	 * @param cons
+	 * @return
+	 */
 	public boolean isNumeric(String cons) {
 		if(inputConfig.contains(
 				ResourceFactory.createResource(cons),
@@ -277,6 +337,11 @@ public class ConstraintsManager {
 		else return false;
 	}
 	
+	/**
+	 * Returns the language for a language constraint. Null if this value canot be found
+	 * @param cons
+	 * @return
+	 */
 	public String getForConstraintLanguage(String cons) {
 		String result=null;
 		NodeIterator possibleResultsIter=inputConfig.listObjectsOfProperty(ResourceFactory.createResource(cons), ResourceFactory.createProperty(ConstraintsManagerConfig.language));
@@ -287,6 +352,13 @@ public class ConstraintsManager {
 		return result;
 	}
 	
+	/**
+	 * Returns the property which is the focus of the given constraint
+	 * @param cons the constraint URI
+	 * @return
+	 * @throws PropertyConstraintException
+	 * @throws ConfigurationException
+	 */
 	public String getPropertyForConstraint(String cons) throws PropertyConstraintException, ConfigurationException {
 		String result=null;
 		NodeIterator possibleResultsIter=null;
@@ -302,9 +374,14 @@ public class ConstraintsManager {
 		throw new ConfigurationException("Unable to find property for constraint: "+cons);
 	}
 	
+	/**
+	 * Returns the min cardinality value for the given constraint. Returns -1 if this value cannot be found.
+	 * @param cons
+	 * @return
+	 */
 	public int getMinCardinalityForConstr(String cons) {
 		int result=-1;
-				NodeIterator possibleResultsIter=inputConfig.listObjectsOfProperty(ResourceFactory.createResource(cons), ResourceFactory.createProperty(ConstraintsManagerConfig.minCardinality));
+		NodeIterator possibleResultsIter=inputConfig.listObjectsOfProperty(ResourceFactory.createResource(cons), ResourceFactory.createProperty(ConstraintsManagerConfig.minCardinality));
 		while(possibleResultsIter.hasNext()) {
 			RDFNode tentativeResult=possibleResultsIter.nextNode();
 			if(tentativeResult.isLiteral()) result= tentativeResult.asLiteral().getInt();
@@ -313,6 +390,11 @@ public class ConstraintsManager {
 		return result;
 	}
 
+	/**
+	 * Returns the max cardinality value for the given constraint. Returns -1 if this value cannot be found.
+	 * @param cons
+	 * @return
+	 */
 	public int getMaxCardinalityForConstr(String cons) {
 		int result=-1;
 				NodeIterator possibleResultsIter=inputConfig.listObjectsOfProperty(ResourceFactory.createResource(cons), ResourceFactory.createProperty(ConstraintsManagerConfig.maxCardinality));
@@ -324,7 +406,11 @@ public class ConstraintsManager {
 		return result;
 	}
 
-
+	/**
+	 * Returns true if the constraint applies to a data property
+	 * @param cons
+	 * @return
+	 */
 	private boolean isDataConstraint(String cons) {
 		if(inputConfig.
 				contains(
@@ -335,6 +421,11 @@ public class ConstraintsManager {
 		else return false;
 	}
 
+	/**
+	 * Returns true if the constraint applies to an object property
+	 * @param cons
+	 * @return
+	 */
 	private boolean isObjectConstraint(String cons) {
 		if(inputConfig.
 				contains(
@@ -345,6 +436,11 @@ public class ConstraintsManager {
 		else return false;
 	}
 
+	/**
+	 * Returns true if the constraint is of type isInRegister
+	 * @param cons
+	 * @return
+	 */
 	public boolean isInRegisterForConstr(String cons) {
 		if(inputConfig.
 				contains(
@@ -355,23 +451,31 @@ public class ConstraintsManager {
 		else return false;
 	}
 	
+	/* Unimplemented
 	public boolean isStringRegProperty(String property) {
 		return false;
 	}
-
+	*/
+	/* Unimplemented
 	public boolean isPlainRegProperty(String property) {
 		return false;
 	}
-
+	*/
+	/* Unimplemented
 	public String[] getRegPropertyRange(String property) {
 		return null;
 	}
-	
+	*/
+	/* Unimplemented
 	public String getSymmetricRegProperty(String property) {
 		return null;
 	}
-
-
+	*/
+	/**
+	 * Returns an array of option for the oneOf constraint. Null if such constraint values cannot be found.
+	 * @param cons
+	 * @return
+	 */
 	public String[] getOptionsForConstraints(String cons) {
 		ArrayList<String>values=new ArrayList<String>();
 		NodeIterator possibleResultsIter=inputConfig.listObjectsOfProperty(ResourceFactory.createResource(cons), ResourceFactory.createProperty(ConstraintsManagerConfig.oneOf));
@@ -432,30 +536,11 @@ public class ConstraintsManager {
 			}
 		}
 			
-		
-		
-		
-		
-		// TODO Auto-generated method stub
 		return result;
 	}
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-	
 
 	
 }

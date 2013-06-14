@@ -21,9 +21,13 @@ package net.metarelate.terminology.commandline;
 
 import net.metarelate.terminology.exceptions.AuthException;
 import net.metarelate.terminology.exceptions.ModelException;
-import net.metarelate.terminology.instanceManager.Initializer;
 import net.metarelate.terminology.utils.Loggers;
-
+/**
+ * Command to tag a release
+ * @see TSCommand for help
+ * @author andreasplendiani
+ *
+ */
 public class TagCommand extends TsCommand {
 	String tag=null;
 	String message="";

@@ -1,20 +1,35 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html><head><meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>Technical notes</title></head><body>Improvements:<br>
+<html><head>
+<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>Technical notes</title></head><body>
+<h1>Technical notes</h1>
+A few notes on the state of the code and possible improvements.<br>
 <br>
-Template design is dirty: interfaces don't make much sense and some
-code seems the same but it's called through different functions
-depending on the visitor.<br>
-<br>
-Kernel archiecture.<br>
-<br>
-Management Object refatctoring).<br>
-<br>
-String vs Resources (typing levels) in methods.<br>
-<br>
-Exceptions hierarchy.<br>
-<br>
-<br>
-<br>
+<ul>
+  <li>The template design is to be reworked. It currently provides
+interfaces for code-varying templates, static templates and
+terminology-related templates. However only a few methods with a long
+list of parameters are calling. This is equivalent to not using
+interfaces!</li>
+  <li>The core classess could be reworked as to have core classes
+implementing the minimal logic needed to interface with the persistence
+layer, and wrappers to implement current functionalities. This would
+simplify porting to different backends.</li>
+  <li>Trhoughout the system, there is not a clear commitment to strong
+or weak typing. Sometimes Terminology Entities are passed, sometimes
+URIs (strings), sometimes Resources. There should be a coherent approach throughout the system.</li>
+  <li>The exception hierachry should be rationalized.</li>
+  <li>Sorting of statements and code comparators could be used more extensively and made more robust.</li>
+  <li>Label management is fragmented through the system. It should be
+moved to labelManager, that should also be responsible for applying
+heuristics.</li>
+  <li>References between components of the system could be
+rationalized: we could only pass Initializer or use it as a static
+class that other elements can access (at the moment components are
+passed throughut the system a bit arbitrarily)<br>
+  </li>
+</ul>
+
+<br><br>
 
 
 </body></html>

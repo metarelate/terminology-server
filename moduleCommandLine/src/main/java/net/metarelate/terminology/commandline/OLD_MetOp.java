@@ -25,6 +25,7 @@ package net.metarelate.terminology.commandline;
 
 import net.metarelate.terminology.exceptions.AuthException;
 import net.metarelate.terminology.exceptions.ImporterException;
+import net.metarelate.terminology.exceptions.ImpossibleOperationException;
 import net.metarelate.terminology.exceptions.InvalidProcessException;
 import net.metarelate.terminology.exceptions.ModelException;
 import net.metarelate.terminology.exceptions.RegistryAccessException;
@@ -34,7 +35,7 @@ import net.metarelate.terminology.utils.Loggers;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
-public class MetOp extends OLD_CommandLineTool {
+public class OLD_MetOp extends OLD_CommandLineTool {
 	private static final int ACTION_UPDATE_ADD=1;
 	private static final int ACTION_UPDATE_REPLACE=2;
 	private static final int ACTION_UPDATE_REMOVE=3;
@@ -56,7 +57,7 @@ public class MetOp extends OLD_CommandLineTool {
 	private String superseedingTermURI="";
 	
 	public static void main(String[] args) {
-		MetOp myMetOp=new MetOp();
+		OLD_MetOp myMetOp=new OLD_MetOp();
 		myMetOp.startCommand(args);
 	}
 	
@@ -293,7 +294,9 @@ public class MetOp extends OLD_CommandLineTool {
 			
 		
 			try {
-				myManager.superseedTermInRegister(termURI, superseedingTermURI,regURI, actionAuthorURI, description);
+				//TODO 
+				//myManager.superseedTermInRegister(termURI, superseedingTermURI,, actionAuthorURI, description);
+				myManager.superseedTerm(termURI, superseedingTermURI, actionAuthorURI, description);
 			} catch (AuthException e) {
 				System.out.println("Auth error");
 				System.out.println(e.getLocalizedMessage());
@@ -304,6 +307,9 @@ public class MetOp extends OLD_CommandLineTool {
 			} catch (ModelException e) {
 				System.out.println("Model error");
 				System.out.println(e.getLocalizedMessage());
+				e.printStackTrace();
+			} catch (ImpossibleOperationException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

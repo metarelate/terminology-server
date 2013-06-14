@@ -1,12 +1,38 @@
+/* 
+ (C) British Crown Copyright 2011 - 2013, Met Office
+
+ This file is part of terminology-server.
+
+ terminology-server is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ terminology-server is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public License
+ along with terminology-server. If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
 package net.metarelate.terminology.publisher.templateElements;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
+
+import net.metarelate.terminology.config.MetaLanguage;
+import net.metarelate.terminology.coreModel.BackgroundKnowledgeManager;
+import net.metarelate.terminology.coreModel.CacheManager;
+import net.metarelate.terminology.coreModel.LabelManager;
+import net.metarelate.terminology.coreModel.TerminologyEntity;
+import net.metarelate.terminology.exceptions.ModelException;
+import net.metarelate.terminology.utils.Loggers;
+import net.metarelate.terminology.utils.StatementsOrganizer;
 
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -16,17 +42,11 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 
-import net.metarelate.terminology.config.MetaLanguage;
-import net.metarelate.terminology.coreModel.BackgroundKnowledgeManager;
-import net.metarelate.terminology.coreModel.CacheManager;
-import net.metarelate.terminology.coreModel.LabelManager;
-import net.metarelate.terminology.coreModel.TerminologyEntity;
-import net.metarelate.terminology.exceptions.ModelException;
-import net.metarelate.terminology.publisher.WebRendererStrings;
-import net.metarelate.terminology.utils.CodeComparator;
-import net.metarelate.terminology.utils.Loggers;
-import net.metarelate.terminology.utils.StatementsOrganizer;
-
+/**
+ * Generates a html representation of a list of statements
+ * @author andreasplendiani
+ *
+ */
 public class StatementsTemplateElement extends TemplateParametricClass
 		implements TemplateTermElement {
 	public static final String statHeader="$statBlock$";

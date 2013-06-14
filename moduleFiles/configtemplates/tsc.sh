@@ -1,3 +1,3 @@
 #!/bin/bash
 
-exec java -jar <<commandFile>>  "$@" 
+exec java -Dwicket.configuration=deployment -jar <<commandFile>>  "$@" 
